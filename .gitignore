@@ -1,0 +1,84 @@
+# -----------------------------
+# Python
+# -----------------------------
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pyc
+venv/
+env/
+*.sqlite3
+
+# -----------------------------
+# Django
+# -----------------------------
+*.log
+*.pot
+*.mo
+db.sqlite3
+/staticfiles/
+media/
+
+# -----------------------------
+# Environment / secrets
+# -----------------------------
+.env
+.env.dev
+.env.staging
+.env.production
+# Keep example files in git
+!.env.dev.example
+!.env.staging.example
+!.env.production.example
+
+# -----------------------------
+# Docker
+# -----------------------------
+*.dockerfile              # Optional: ignore local Dockerfile variants if you want
+docker-compose.override.yml
+docker-compose.override.*.yml
+docker-compose.override.yml.bak
+docker-compose.override.*.yml.bak
+*.pid
+**/volumes/
+**/tmp/
+
+# -----------------------------
+# Node / npm (if used)
+# -----------------------------
+node_modules/
+package-lock.json
+npm-debug.log
+
+# -----------------------------
+# VSCode / IDEs
+# -----------------------------
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+*.iml
+
+# -----------------------------
+# Mac / Linux / Windows
+# -----------------------------
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*.bak
+*.tmp
+
+# -----------------------------
+# Coverage / testing
+# -----------------------------
+htmlcov/
+.coverage
+.tox/
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.cache
+pytest_cache/

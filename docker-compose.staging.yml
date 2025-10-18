@@ -1,0 +1,80 @@
+version: "3.9"
+
+services:
+  # --------------------
+  # Staging Postgres
+  # --------------------
+  db_staging:
+    image: postgres:15.13
+    container_name: db_staging
+    environment:
+      POSTGRES_DB: staging_db
+      POSTGRES_USER: staging_user
+      POSTGRES_PASSWORD: staging_pass
+    ports:
+      - "5434:5432"
+    volumes:
+      - db_staging_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U staging_user -d staging_db"]
+      interval: 10s
+      retries: 5
+      start_period: 30s
+      timeout: 10s
+
+  # --------------------
+  # Redis Service
+  # --------------------
+  redis_staging:
+    image: redis:7.0
+    container_name: redis_staging
+    ports:
+      - "6380:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # --------------------
+  # Maildev Service
+  # --------------------
+  maildev_staging:
+    image: maildev/maildev
+    container_name: maildev
+    ports:
+      - "1081:1080"
+      - "1026:1025"
+    healthcheck:
+      test: ["CMD-SHELL", "nc -z localhost 1025"]
+      interval: 10s
+      retries: 5
+      start_period: 5s
+      timeout: 5s
+
+  # --------------------
+  # Django Web
+  # --------------------
+  web_staging:
+    build:
+      context: .
+      dockerfile: Dockerfile.staging
+    container_name: pointless_impressions_web_staging
+    env_file:
+      - .env.staging
+    ports:
+      - "8001:8000"
+    volumes:
+      - .:/app
+    depends_on:
+      db_staging:
+        condition: service_healthy
+      redis_staging:
+        condition: service_healthy
+      maildev_staging:
+        condition: service_healthy
+    restart: no
+    command: /app/pointless_impressions_src/staging-entrypoint.sh
+
+volumes:
+  db_staging_data:

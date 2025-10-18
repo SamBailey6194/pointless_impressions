@@ -1,0 +1,80 @@
+version: "3.9"
+
+services:
+  # --------------------
+  # Development Postgres
+  # --------------------
+  db_dev:
+    image: postgres:15.13
+    container_name: db_dev
+    environment:
+      POSTGRES_DB: dev_db
+      POSTGRES_USER: dev_user
+      POSTGRES_PASSWORD: dev_pass
+    ports:
+      - "5433:5432"
+    volumes:
+      - db_dev_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U dev_user -d dev_db"]
+      interval: 10s
+      retries: 5
+      start_period: 30s
+      timeout: 10s
+
+  # --------------------
+  # Redis Service
+  # --------------------
+  redis_dev:
+    image: redis:7.0
+    container_name: redis_dev
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # --------------------
+  # Maildev Service
+  # --------------------
+  maildev_dev:
+    image: maildev/maildev
+    container_name: maildev
+    ports:
+      - "1080:1080"
+      - "1025:1025"
+    healthcheck:
+      test: ["CMD-SHELL", "nc -z localhost 1025"]
+      interval: 10s
+      retries: 5
+      start_period: 5s
+      timeout: 5s
+
+  # --------------------
+  # Django Web
+  # --------------------
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: pointless_impressions_web_dev
+    env_file:
+      - .env.dev
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/app
+    depends_on:
+      db_dev:
+        condition: service_healthy
+      redis_dev:
+        condition: service_healthy
+      maildev_dev:
+        condition: service_healthy
+    restart: no
+    command: /app/pointless_impressions_src/dev-entrypoint.sh
+
+volumes:
+  db_dev_data:
