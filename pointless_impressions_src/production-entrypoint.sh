@@ -33,8 +33,9 @@ python manage.py migrate --noinput
 
 # Build Tailwind + JS
 echo "Building Tailwind + JS..."
+python manage.py tailwind build
 cd $NODE_DIR
-npm run build > ../../../../build.log 2>&1
+npm run build:js
 cd - > /dev/null
 
 # Collect static files

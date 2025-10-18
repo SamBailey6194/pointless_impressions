@@ -34,11 +34,9 @@ python manage.py migrate
 echo "Installing Tailwind..."
 python manage.py tailwind install
 
-# Start all watchers concurrently (Tailwind + JS)
-echo "Starting Tailwind + JS watchers..."
-cd $NODE_DIR
-npm run dev > watchers.log 2>&1 &
-cd - > /dev/null
+# Start Tailwind in watch mode
+echo "Starting Tailwind"
+python manage.py tailwind start &
 
 # Start Django dev server
 echo "Starting Django development server..."

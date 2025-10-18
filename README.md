@@ -15,7 +15,6 @@
   - [Lessons Learnt](#lessons-learnt)
   - [Testing](#testing)
     - [Fixed Bugs](#fixed-bugs)
-      - [First submission](#first-submission)
     - [Unfixed Bugs](#unfixed-bugs)
     - [Validator Testing](#validator-testing)
       - [Page Speed Insights](#page-speed-insights)
@@ -100,9 +99,9 @@ Please note for the Jest and Cypress testing there was a need to create html fix
 
 ### Fixed Bugs
 
-#### First submission
-
-- 
+ **Tailwind build failure**: The `npm run dev` and `npm run build` commands were failing because the PostCSS scripts pointed to a non-existent `./src/style.css` file. Updated paths to the correct `src/css/styles.css` file.
+- **Clean script issue**: The `rimraf` command in `package.json` was originally wiping folders instead of just their contents. Adjusted it to remove only files inside `static/css` and `static/js`, preserving the directories.
+- **Development watcher errors**: Running `python manage.py tailwind start` previously threw `Input Error: You must pass a valid list of files to parse` because PostCSS couldn’t locate the source CSS file. This is now fixed with the correct path.
 
 ### Unfixed Bugs
 
