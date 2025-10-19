@@ -25,8 +25,8 @@ COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
 
 # Install dependencies
 COPY requirements.txt .
-RUN uv pip install --upgrade pip --system
-RUN uv pip install -r requirements.txt --system
+RUN uv pip install --upgrade pip --system && \
+    uv pip install -r requirements.txt --system -- --root-user-action=ignore
 
 # Copy project files
 COPY pointless_impressions_src/ ./pointless_impressions_src/

@@ -19,7 +19,7 @@ REQ_HASH_FILE="/tmp/requirements.hash"
 if [ -f requirements.txt ]; then
     REQ_HASH=$(md5sum requirements.txt | awk '{print $1}')
     echo "$REQ_HASH" > "$REQ_HASH_FILE"
-    pip install -r requirements.txt
+    uv pip install -r requirements.txt
 fi
 
 # --- Node dependencies watcher ---
@@ -44,7 +44,7 @@ while true; do
         OLD_REQ_HASH=$(cat "$REQ_HASH_FILE")
         if [ "$NEW_REQ_HASH" != "$OLD_REQ_HASH" ]; then
             echo "requirements.txt changed. Installing Python dependencies..."
-            pip install -r requirements.txt
+            uv pip install -r requirements.txt
             echo "$NEW_REQ_HASH" > "$REQ_HASH_FILE"
         fi
     fi

@@ -1,41 +1,54 @@
-# Dockerfile.production for production environment
-# Python slim image with Bookworm
-FROM python:3.13-slim-bookworm
-
-# Set environment variables
-ENV PYTHONDONTWRITEBYTECODE=1
-ENV PYTHONUNBUFFERED=1
-
-# Set working directory
+# ---------- Stage 1: Build JS ----------
+FROM node:24-bookworm-slim AS node_builder
 WORKDIR /app
 
-# System dependencies
+# Copy Node package files and install dependencies
+COPY pointless_impressions_src/theme/static_src/package*.json ./
+RUN npm ci --omit=dev
+
+# Copy JS source and build
+COPY pointless_impressions_src/theme/static_src/src/js ./src/js
+RUN npm run build:js  # Output: ./../../static/js
+
+# ---------- Stage 2: Python + Django ----------
+FROM python:3.13-slim-bookworm
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1
+
+WORKDIR /app
+
+# Install system dependencies
 RUN apt-get update && apt-get install -y \
-    curl \
-    netcat-openbsd \
-    gcc \
-    libpq-dev \
-    && curl -fsSL https://deb.nodesource.com/setup_24.x | bash - \
-    && apt-get install -y nodejs \
-    && npm install -g npm@11.6.2 \
+    curl netcat-openbsd gcc libpq-dev \
     && rm -rf /var/lib/apt/lists/*
 
-# UV binary
+# UV for faster pip
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
 
 # Install Python dependencies
 COPY requirements.txt .
-RUN uv pip install --upgrade pip --system
-RUN uv pip install -r requirements.txt --system
+RUN uv pip install --upgrade pip --system && \
+    uv pip install -r requirements.txt --system -- --root-user-action=ignore
 
-# Copy project files
+# Copy Django project
 COPY pointless_impressions_src/ ./pointless_impressions_src/
+
+# Copy JS built assets from Node stage
+COPY --from=node_builder /app/src/js ./pointless_impressions_src/static/js
+
+# Add non-root user
+RUN useradd -m appuser
+USER appuser
+
+# Build Tailwind CSS via Python
+RUN python manage.py tailwind install
+RUN python manage.py tailwind build  # Output: ./static/css
 
 # Make entrypoint executable
 RUN chmod +x ./pointless_impressions_src/production-entrypoint.sh
 
-# Expose port
 EXPOSE 8000
+HEALTHCHECK CMD curl -f http://localhost:8000/health/ || exit 1
 
-# Default command for production
 CMD ["/app/pointless_impressions_src/production-entrypoint.sh"]
