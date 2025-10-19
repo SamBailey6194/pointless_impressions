@@ -28,27 +28,15 @@ services:
     container_name: redis_staging
     ports:
       - "6380:6379"
+    volumes:
+      - ./redis.conf:/usr/local/etc/redis/redis.conf
+      - redis_staging_data:/data
+    command: ["redis-server", "/usr/local/etc/redis/redis.conf"]
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 5s
       timeout: 5s
       retries: 5
-
-  # --------------------
-  # Maildev Service
-  # --------------------
-  maildev_staging:
-    image: maildev/maildev
-    container_name: maildev
-    ports:
-      - "1081:1080"
-      - "1026:1025"
-    healthcheck:
-      test: ["CMD-SHELL", "nc -z localhost 1025"]
-      interval: 10s
-      retries: 5
-      start_period: 5s
-      timeout: 5s
 
   # --------------------
   # Django Web
@@ -69,10 +57,9 @@ services:
         condition: service_healthy
       redis_staging:
         condition: service_healthy
-      maildev_staging:
-        condition: service_healthy
     restart: no
     command: /app/pointless_impressions_src/staging-entrypoint.sh
 
 volumes:
   db_staging_data:
+  redis_staging_data:

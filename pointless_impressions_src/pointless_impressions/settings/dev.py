@@ -5,6 +5,14 @@ SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", "dev-secret-key")
 DEBUG = os.getenv("DJANGO_DEBUG", "True") == "True"
 ALLOWED_HOSTS = ["localhost", "127.0.0.1"]
 
+INSTALLED_APPS += [
+    "django_browser_reload",
+]
+
+MIDDLEWARE += [
+    "django_browser_reload.middleware.BrowserReloadMiddleware",
+]
+
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",

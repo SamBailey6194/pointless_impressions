@@ -28,12 +28,14 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
 
+    # Redis cache
+    "django_redis",
+
     # Tailwind CSS integration
     "tailwind",
-    "django_browser_reload",
     "theme",
 
-    # Third-party apps
+    # Storage backends
     "cloudinary_storage",
     "cloudinary",
     "storages",
@@ -51,6 +53,14 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
+
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": os.getenv("REDIS_URL"),
+        "OPTIONS": {"CLIENT_CLASS": "django_redis.client.DefaultClient"},
+    }
+}
 
 ROOT_URLCONF = "pointless_impressions.urls"
 

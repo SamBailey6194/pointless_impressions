@@ -19,6 +19,7 @@ dj-database-url==3.0.1
 Django==5.2.7
 django-browser-reload==1.21.0
 django-cloudinary-storage==0.3.0
+django-redis==6.0.0
 django-storages==1.14.6
 django-tailwind==4.2.0
 dotenv==0.9.9
@@ -40,6 +41,7 @@ python-dateutil==2.9.0.post0
 python-dotenv==1.1.1
 python-slugify==8.0.4
 PyYAML==6.0.3
+redis==6.4.0
 requests==2.32.5
 rich==14.2.0
 s3transfer==0.14.0

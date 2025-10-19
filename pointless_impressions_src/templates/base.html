@@ -1,0 +1,32 @@
+{% load static tailwind_tags %}
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+
+    <title>{% block title %}Django Tailwind{% endblock %}</title>
+
+    {% tailwind_preload_css %}
+    {% tailwind_css %}
+
+    {% block extra_head %}{% endblock %}
+  </head>
+
+  <body class="bg-black text-white font-serif leading-normal tracking-normal">
+    
+    <!-- Toast / Alerts -->
+    <div class="toast toast-top toast-end">
+      {% block toast %}{% endblock %}
+    </div>
+
+    <!-- Main Content -->
+    <div class="container mx-auto">
+      {% block content %}
+      {% endblock %}
+    </div>
+
+    {% block extra_scripts %}{% endblock %}
+  </body>
+</html>

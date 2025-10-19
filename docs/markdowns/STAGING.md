@@ -87,11 +87,11 @@ cp .env.staging.example .env.staging
     STAGING_DB_USER=staging_user
     STAGING_DB_PASS=staging_pass
     CACHE_URL=redis://redis_staging:6379/0
-    EMAIL_BACKEND=django.core.mail.backends.smtp.EmailBackend
-    EMAIL_HOST=maildev_staging
-    EMAIL_PORT=1025
+    EMAIL_BACKEND=
+    EMAIL_HOST=
+    EMAIL_PORT=
     EMAIL_USE_TLS=False
-    DEFAULT_FROM_EMAIL=staging@example.com
+    DEFAULT_FROM_EMAIL=
 
     On Heroku for staging you will need to put these in as config vars, along with AWS S3, Cloudinary and .env.staging variables.
 

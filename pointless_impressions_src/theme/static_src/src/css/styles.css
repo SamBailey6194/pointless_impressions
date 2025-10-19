@@ -11,3 +11,5 @@
   * the scope of this path.
   */
 @source "../../../**/*.{html,py,js}";
+
+@custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));

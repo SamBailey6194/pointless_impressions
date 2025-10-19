@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% load tailwind_tags %}
+
+{% block content %}
+<div class="container mx-auto p-6">
+  <!-- Hello World Card -->
+  <div class="card bg-black shadow-lg rounded-lg p-6 max-w-md mx-auto">
+    <h1 class="text-3xl font-bold mb-4 text-center text-white">Hello, World! 🌎</h1>
+    <p class="text-white mb-4 text-center">
+      This is a Django template styled with Tailwind CSS and DaisyUI components.
+    </p>
+    <div class="flex justify-center">
+      <button class="btn btn-primary">Click Me</button>
+    </div>
+  </div>
+
+  <!-- Info Toast Example -->
+  <div class="toast toast-bottom toast-center mt-6">
+    <div class="alert alert-success">
+      <span>Hello from DaisyUI Toast! 🎉</span>
+    </div>
+  </div>
+</div>
+{% endblock %}

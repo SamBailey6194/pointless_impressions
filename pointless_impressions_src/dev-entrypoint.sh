@@ -1,83 +1,68 @@
-#!/bin/sh
+#!/bin/bash
 set -e
-
 echo "Starting development container..."
 
 # Load environment variables
-if [ -f ".env.dev" ]; then
+if [ -f .env.dev ]; then
     export $(grep -v '^#' .env.dev | xargs)
 fi
 
-# Wait for Postgres
-echo "Waiting for database at $DEV_DB_HOST:$DEV_DB_PORT..."
+# Wait for database to be ready
+echo "Waiting for database at ${DEV_DB_HOST}:${DEV_DB_PORT}..."
 while ! nc -z $DEV_DB_HOST $DEV_DB_PORT; do
   sleep 1
 done
 
-# --- Python dependencies watcher ---
-REQ_HASH_FILE="/tmp/requirements.hash"
+# Initialize hash files
+REQ_HASH_FILE=/tmp/requirements.hash
+PKG_HASH_FILE=/tmp/package.hash
+
+touch $REQ_HASH_FILE $PKG_HASH_FILE
+
 if [ -f requirements.txt ]; then
-    REQ_HASH=$(md5sum requirements.txt | awk '{print $1}')
-    echo "$REQ_HASH" > "$REQ_HASH_FILE"
-    uv pip install -r requirements.txt
+    md5sum requirements.txt | awk '{print $1}' > $REQ_HASH_FILE
 fi
 
-# --- Node dependencies watcher ---
-NODE_DIR="./pointless_impressions_src/theme/static_src"
-PKG_HASH_FILE="/tmp/package.hash"
+NODE_DIR=./pointless_impressions_src/theme/static_src
 if [ -f "$NODE_DIR/package.json" ]; then
-    PKG_HASH=$(md5sum "$NODE_DIR/package.json" | awk '{print $1}')
-    echo "$PKG_HASH" > "$PKG_HASH_FILE"
-    [ ! -d "$NODE_DIR/node_modules" ]; then
-    echo "Installing Node dependencies..."
-    cd $NODE_DIR
-    npm install
-    cd - > /dev/null
+    md5sum "$NODE_DIR/package.json" | awk '{print $1}' > $PKG_HASH_FILE
 fi
 
-# --- Start background watcher for dev ---
-(
-while true; do
-    # Watch Python requirements
-    if [ -f requirements.txt ]; then
-        NEW_REQ_HASH=$(md5sum requirements.txt | awk '{print $1}')
-        OLD_REQ_HASH=$(cat "$REQ_HASH_FILE")
-        if [ "$NEW_REQ_HASH" != "$OLD_REQ_HASH" ]; then
-            echo "requirements.txt changed. Installing Python dependencies..."
-            uv pip install -r requirements.txt
-            echo "$NEW_REQ_HASH" > "$REQ_HASH_FILE"
-        fi
-    fi
-
-    # Watch Node package.json
-    if [ -f "$NODE_DIR/package.json" ]; then
-        NEW_PKG_HASH=$(md5sum "$NODE_DIR/package.json" | awk '{print $1}')
-        OLD_PKG_HASH=$(cat "$PKG_HASH_FILE")
-        if [ "$NEW_PKG_HASH" != "$OLD_PKG_HASH" ]; then
-            echo "package.json changed. Installing Node dependencies..."
-            cd $NODE_DIR
-            npm install
-            cd - > /dev/null
-            echo "$NEW_PKG_HASH" > "$PKG_HASH_FILE"
-        fi
-    fi
-
-    sleep 5
-done
-) &
-
-# Apply database migrations
+# Apply Django migrations
 echo "Applying database migrations..."
-python manage.py migrate
+python manage.py migrate || true
 
-# Install Tailwind
-echo "Installing Tailwind..."
-python manage.py tailwind install
+# Install Tailwind dependencies and build
+echo "Installing Tailwind and Node..."
+cd $NODE_DIR
+npm install
+cd -
 
-# Start Tailwind in watch mode
-echo "Starting Tailwind"
+# Start Tailwind watcher in background
+echo "Starting Tailwind in watch mode..."
 python manage.py tailwind start &
 
-# Start Django dev server
+# Start Django dev server in background
 echo "Starting Django development server..."
-python manage.py runserver 0.0.0.0:8000
+python manage.py runserver 0.0.0.0:8000 &
+
+# Watch requirements.txt and package.json for changes
+echo "Watching requirements.txt and package.json for changes..."
+while inotifywait -e close_write requirements.txt ./pointless_impressions_src/theme/static_src/package.json; do
+    echo "Change detected!"
+
+    # Update Python dependencies if requirements.txt changed
+    if [ -f requirements.txt ]; then
+        echo "Installing Python dependencies..."
+        pip install -r requirements.txt
+    fi
+
+    # Update Node dependencies if package.json changed
+    NODE_DIR=./pointless_impressions_src/theme/static_src
+    if [ -f "$NODE_DIR/package.json" ]; then
+        echo "Installing Node dependencies..."
+        cd $NODE_DIR
+        npm install
+        cd -
+    fi
+done
