@@ -11,9 +11,9 @@
     "build:tailwind": "cross-env NODE_ENV=production postcss ./src/css/styles.css -o ../../static/css/styles.css",
     "build:js": "node src/build.js/hash-js.js",
     "test": "jest",
-    "test:home": "jest ../../js/app_name/__tests__/",
+    "test:home": "jest ./src/tests.js/jest/home/__tests__/",
     "cypress:run": "cypress run",
-    "cypress:home": "cypress run --spec 'cypress/e2e/app_name/**/*'"
+    "cypress:home": "cypress run --spec './src/tests.js/cypress/e2e/home/**/*'"
   },
   "keywords": [],
   "author": "",

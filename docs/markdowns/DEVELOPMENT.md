@@ -22,6 +22,11 @@ Venv is only for managing the `requirements.txt` and the `package.json` so other
   - [Git Workflow](#git-workflow)
     - [Testing Guides](#testing-guides)
       - [Writing Tests](#writing-tests)
+        - [Django Tests (Backend)](#django-tests-backend)
+        - [Behave (BDD) Tests](#behave-bdd-tests)
+      - [Frontend Tests (Jest \& Cypress)](#frontend-tests-jest--cypress)
+        - [Jest (Unit Tests)](#jest-unit-tests)
+        - [Cypress (End-to-End Tests)](#cypress-end-to-end-tests)
       - [Run Tests](#run-tests)
         - [For Django TestCase](#for-django-testcase)
         - [For Django Behave](#for-django-behave)
@@ -332,9 +337,89 @@ Please ensure you update the **Testing Markdowns** with your **automatic tests**
 
 #### Writing Tests
 
-Ensure the Django TestCase and Behave are written in the correct apps.
+When writing tests for **Pointless Impressions**, it’s important to keep test frameworks organized by type and location to maintain clarity and consistency.
 
-Ensure Jest and Cypress are written in `pointless_impressions_src/theme/static_src/src/tests.js/*`
+##### Django Tests (Backend)
+
+**Location:** Each app should have its own a `tests/tests.py` folder.  
+Example: pointless_impressions_src/home/tests/tests.py
+
+**Structure:**  
+- Use `django.test.TestCase` for model, view, and form tests.  
+- Keep tests small and focused (one assertion per behavior).  
+- Name test methods descriptively:  
+  
+  ```python
+  class HomeModelTest(TestCase):
+      def test_home_str_method_returns_title(self):
+          home = Home.objects.create(title="Sunset")
+          self.assertEqual(str(home), "Sunset")
+  ```
+
+**Best Practices:**  
+- Use `setUpTestData()` for creating objects once per class if multiple tests share them.  
+- Mock external calls where needed (e.g., APIs, email sending).
+
+##### Behave (BDD) Tests
+
+**Location:** Each app should have its own `features/` folder.  
+Example: pointless_impressions_src/home/features/
+
+- **Structure:**  
+- `.feature` files describe behavior in **Given/When/Then** format.  
+- Step definitions go in `steps/` within the same `features/` folder.
+
+- **Naming:** Feature file names should be descriptive, e.g., `browse_home.feature`.
+
+**Example:**
+```gherkin
+Feature: Browse available Home
+  As a customer
+  I want to see the homepage display current artwork for sale
+  So that I can decide what to purchase
+
+  Scenario: Viewing artwork list
+    Given the following artwork exists:
+      | title       | price |
+      | Sunset      | 100   |
+      | Mountains   | 200   |
+    When I visit the homepage I want to see a section for latest artwork
+    Then I should see "Sunset" and "Mountains"
+```
+
+#### Frontend Tests (Jest & Cypress)
+
+**Location** all frontend tests live in `pointless_impressions_src/theme/static_src/src/tests.js/`
+
+##### Jest (Unit Tests)
+
+- Test JavaScript functions, components, or utilities
+- **File Naming:** Use `NAME.test.js` suffix, e.g., `artwork.test.js`
+
+**Example**
+
+```javascript
+import { formatPrice } from '../utils/format';
+
+test('formats price correctly', () => {
+  expect(formatPrice(100)).toBe('£100.00');
+});
+```
+
+##### Cypress (End-to-End Tests)
+
+- Test full user flows in the browser
+- **File Naming:** Use `NAME.cy.js` suffix, e.g., `browse_artwork.cy.js`
+- **HTML Fixture:**
+  - Store mock HTML pages or snippets in `pointless_impressions_src/theme/static_src/src/tests.js/fixtures/app_name/*.html`
+  - Load fixtures in Cypress tests
+    
+    ```javascript
+    cy.fixture('artwork_list.html').then((html) => {
+        document.body.innerHTML = html;
+        cy.get('.artwork-title').should('contain', 'Sunset');
+    });
+    ```
 
 #### Run Tests
 
@@ -413,7 +498,7 @@ To run the tests please use:
     1. Ensure you add the line below to package.json:
 
         ```bash
-        "test:app_name": "jest ../../js/app_name/__tests__/",
+        "test:app_name": "jest ./src/tests.js/jest/app_name/__tests__/",
         ```
 
     2. Then you can run the below command for app specific tests:
@@ -443,7 +528,7 @@ To run the tests please use:
     1. Ensure you add the line below to package.json:
 
         ```bash
-        "cypress:app_name": "cypress run --spec 'cypress/e2e/app_name/**/*'",
+        "cypress:app_name": "cypress run --spec './src/tests.js/cypress/e2e/app_name/**/*'",
         ```
 
     2. Then you can run the below command for app specific tests:
