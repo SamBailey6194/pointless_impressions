@@ -14,17 +14,57 @@ while ! nc -z $DEV_DB_HOST $DEV_DB_PORT; do
   sleep 1
 done
 
-# Install Node dependencies (for Tailwind Plugins, Jest, Cypress)
-NODE_DIR="./pointless_impressions_src/theme/static_src"
-if [ ! -d "$NODE_DIR/node_modules" ]; then
-  echo "Installing Node dependencies..."
-  cd $NODE_DIR
-  RUN npm install -g npm@11.6.2
-  npm install
-  cd - > /dev/null
-else
-  echo "Node dependencies already installed."
+# --- Python dependencies watcher ---
+REQ_HASH_FILE="/tmp/requirements.hash"
+if [ -f requirements.txt ]; then
+    REQ_HASH=$(md5sum requirements.txt | awk '{print $1}')
+    echo "$REQ_HASH" > "$REQ_HASH_FILE"
+    pip install -r requirements.txt
 fi
+
+# --- Node dependencies watcher ---
+NODE_DIR="./pointless_impressions_src/theme/static_src"
+PKG_HASH_FILE="/tmp/package.hash"
+if [ -f "$NODE_DIR/package.json" ]; then
+    PKG_HASH=$(md5sum "$NODE_DIR/package.json" | awk '{print $1}')
+    echo "$PKG_HASH" > "$PKG_HASH_FILE"
+    [ ! -d "$NODE_DIR/node_modules" ]; then
+    echo "Installing Node dependencies..."
+    cd $NODE_DIR
+    npm install
+    cd - > /dev/null
+fi
+
+# --- Start background watcher for dev ---
+(
+while true; do
+    # Watch Python requirements
+    if [ -f requirements.txt ]; then
+        NEW_REQ_HASH=$(md5sum requirements.txt | awk '{print $1}')
+        OLD_REQ_HASH=$(cat "$REQ_HASH_FILE")
+        if [ "$NEW_REQ_HASH" != "$OLD_REQ_HASH" ]; then
+            echo "requirements.txt changed. Installing Python dependencies..."
+            pip install -r requirements.txt
+            echo "$NEW_REQ_HASH" > "$REQ_HASH_FILE"
+        fi
+    fi
+
+    # Watch Node package.json
+    if [ -f "$NODE_DIR/package.json" ]; then
+        NEW_PKG_HASH=$(md5sum "$NODE_DIR/package.json" | awk '{print $1}')
+        OLD_PKG_HASH=$(cat "$PKG_HASH_FILE")
+        if [ "$NEW_PKG_HASH" != "$OLD_PKG_HASH" ]; then
+            echo "package.json changed. Installing Node dependencies..."
+            cd $NODE_DIR
+            npm install
+            cd - > /dev/null
+            echo "$NEW_PKG_HASH" > "$PKG_HASH_FILE"
+        fi
+    fi
+
+    sleep 5
+done
+) &
 
 # Apply database migrations
 echo "Applying database migrations..."

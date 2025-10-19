@@ -21,13 +21,20 @@ Venv is only for managing the `requirements.txt` and the `package.json` so other
   - [Running the Development Environment](#running-the-development-environment)
   - [Git Workflow](#git-workflow)
     - [Testing Guides](#testing-guides)
-      - [For Django TestCase](#for-django-testcase)
-      - [For Django Behave](#for-django-behave)
-      - [For JavaScript Jest](#for-javascript-jest)
-      - [For JavaScript Cypress](#for-javascript-cypress)
-    - [Commit Message Guide](#commit-message-guide)
+      - [Run Tests](#run-tests)
+        - [For Django TestCase](#for-django-testcase)
+        - [For Django Behave](#for-django-behave)
+        - [For JavaScript Jest](#for-javascript-jest)
+        - [For JavaScript Cypress](#for-javascript-cypress)
+    - [Installing Packages and Dependencies](#installing-packages-and-dependencies)
+      - [Django Packages and Dependencies](#django-packages-and-dependencies)
+      - [Django-Tailwind Plugins](#django-tailwind-plugins)
+      - [Node Packages and Dependencies for JavaScript](#node-packages-and-dependencies-for-javascript)
+    - [Commit Guide](#commit-guide)
+      - [Local Commands to Run](#local-commands-to-run)
       - [Git Commit Template](#git-commit-template)
         - [Definitions](#definitions)
+      - [Git Commit Commands](#git-commit-commands)
     - [Pull Request Flow](#pull-request-flow)
       - [PR Template](#pr-template)
 
@@ -108,8 +115,9 @@ Make sure you have the following installed:
 - [Docker](https://www.docker.com/get-started)
 - [Docker Compose](https://docs.docker.com/compose/install/)
 - Git
-- Python 3.13 (optional, if you want to run Django outside Docker)
-- Node.js and npm (optional, if you want to run Tailwind outside Docker)
+- Python 3.13
+- Node.js 24.10
+- nvm 11.6
 
 ---
 
@@ -135,13 +143,31 @@ Ensure you pick the correct guide for your OS.
 
 ## Environment Setup
 
-1. Copy the environment template
+1. Ensure you create a local venv to be able to manage the requirements.txt and install the requirements.txt into your venv.
+
+    ```bash
+    python -m venv .venv
+    source .venv/bin/activate  # Linux/Mac
+    .venv\Scripts\activate     # Windows
+    pip install -r requirements.txt
+    ```
+
+    If python or pip don't work ensure you can run this as:
+
+    ```bash
+    python3 -m venv .venv
+    source .venv/bin/activate  # Linux/Mac
+    .venv\Scripts\activate     # Windows
+    pip3 install -r requirements.txt
+    ```
+
+2. Copy the environment template
 
     ```bash
     cp .env.example .env.dev
     ```
 
-2. Update the .env.dev with the credentials, secret key and database settings
+3. Update the .env.dev with the credentials, secret key and database settings
 
     ### Example
     DJANGO_SECRET_KEY="your_generated_secret_key"
@@ -157,7 +183,26 @@ Ensure you pick the correct guide for your OS.
     EMAIL_USE_TLS=False
     DEFAULT_FROM_EMAIL=dev@example.com
 
-3. We will create a superuser later.
+4. Now let us create a secret key for local .env.dev:
+
+    ```bash
+    python -c "from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())"
+    ```
+
+    If python doesn't work ensure you can run this as:
+
+    ```bash
+    python3 -c "from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())"
+    ```
+
+    You should get a long string in your terminal. You can then copy it and paste it into the .env.dev and this is your local secret key for **Pointless Impressions**
+
+5. Ensure you have a terminal pointing to pointless_impressions/pointless_impressions_src/theme/static_src and install npm into the venv
+
+    ```bash
+    cd pointless_impressions_src/theme/static_src
+    npm install
+    ```
 
 ### Environment Variables
 
@@ -192,31 +237,7 @@ Only with permission can you adjust those files.
 
 **Important**: Never change or upgrade dependencies or packages, leave this to the lead dev. If there are any warnings at install please contact the lead dev. 
 
-1. Ensure you create a local venv to be able to manage the requirements.txt and install the requirements.txt into your venv.
-
-    ```bash
-    python -m venv venv
-    source venv/bin/activate  # Linux/Mac
-    venv\Scripts\activate     # Windows
-    pip install -r requirements.txt
-    ```
-
-2. Now let us create a secret key for local .env.dev:
-
-    ```bash
-    python -c "from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())"
-    ```
-
-    You should get a long string in your terminal. You can then copy it and paste it into the .env.dev and this is your local secret key for **Pointless Impressions**
-
-3. Ensure you have a terminal pointing to pointless_impressions/pointless_impressions_src/theme/static_src and install npm into the venv
-
-    ```bash
-    cd pointless_impressions_src/theme/static_src
-    npm install
-    ```
-
-4. Now we have things set up locally you can build and start all Docker containers
+1. Now we have things set up locally you can build and start all Docker containers
 
     ```bash
     docker compose -f docker-compose.dev.yml up --build
@@ -241,14 +262,20 @@ Only with permission can you adjust those files.
     1. Ensure you are in your venv
 
         ```bash
-        source venv/bin/activate  # Linux/Mac
-        venv\Scripts\activate     # Windows
+        source .venv/bin/activate  # Linux/Mac
+        .venv\Scripts\activate     # Windows
         ```
 
     2. Typing:
 
         ```bash
-        python -c "from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())"
+        python manage.py createsuperuser
+        ```
+
+        If python doesn't work ensure you can run this as:
+
+        ```bash
+        python3 manage.py createsuperuser
         ```
 
     3. Enter the username
@@ -302,14 +329,22 @@ Please ensure you update the **Testing Markdowns** with your **automatic tests**
 
 [Manual Tests](docs/markdowns/MANUALTESTING.md)
 
+#### Run Tests
+
 To run the tests please use:
 
-#### For Django TestCase
+##### For Django TestCase
 
 1. For all tests run in your venv:
     
     ```bash
     python manage.py test
+    ```
+
+    If python doesn't work then run the below
+
+    ```bash
+    python3 manage.py test
     ```
 
 2. For app specific tests run in your venv:
@@ -318,20 +353,39 @@ To run the tests please use:
     python manage.py test app_name
     ```
 
-#### For Django Behave
+    If python doesn't work then run the below
+
+    ```bash
+    python3 manage.py test app_name
+    ```
+
+##### For Django Behave
 
 1. For tests run in your venv:
 
     ```bash
     python manage.py behave
     ```
+
+    If python doesn't work then run the below
+
+    ```bash
+    python3 manage.py behave
+    ```
+
 2. For specific feature file tests run in your venv:
 
     ```bash
     python manage.py behave pointless_impressions_src/app_name/features/my_feature.feature
+    ```
+
+    If python doesn't work then run the below
+
+    ```bash
+    python3 manage.py behave pointless_impressions_src/app_name/features/my_feature.feature
     ```    
 
-#### For JavaScript Jest
+##### For JavaScript Jest
 
 1. You will need to make dummy HTML files for the Jest tests
 
@@ -361,7 +415,7 @@ To run the tests please use:
         npm run test:app_name
         ```
 
-#### For JavaScript Cypress
+##### For JavaScript Cypress
 
 1. You will need to have dummy HTML files for the Cypress tests
 
@@ -391,7 +445,39 @@ To run the tests please use:
         npm run cypress:app_name
         ```
 
-### Commit Message Guide
+### Installing Packages and Dependencies
+
+This app is using Django which requires a `requirements.txt`, Django-Tailwind and JavaScript testing frameworks that both require a `package.json`.
+To get certain aspects working you may need to install dependencies and packages yourself. Ensure you do this locally in your venv following the steps below.
+
+#### Django Packages and Dependencies
+
+1. Ensure you are in project root `YOUR-REPO-STORAGE-PATH/pointless_impressions` and you can then type `pip install package-name` or `pip3 install package-name`
+2. This should then install the package and you can then run `pip freeze > requirements.txt` or `pip3 freeze > requirements.txt` and the Docker Dev Container should be able to read the updated `requirements.txt` due to the settings in the `dev.entrypoint.sh`
+
+#### Django-Tailwind Plugins
+
+1. Ensure you are in project root `YOUR-REPO-STORAGE-PATH/pointless_impressions` and you can then type `python manage.py tailwind plugin_install TAILWIND-PLUGIN` or `python3 manage.py tailwind plugin_install TAILWIND-PLUGIN`
+2. This should automatically update your `package.json` in `pointless_impressions_src/theme/static_src` and the Docker Dev Container should be able to read the updated `package.json` due to the settings in the `dev.entrypoint.sh`
+
+#### Node Packages and Dependencies for JavaScript
+
+1. Ensure you are in the theme app `pointless_impressions_src/theme/static_src`, if not you can run `cd pointless_impressions_src/theme/static_src`
+and you can then type `npm install PACKAGE-NAME`
+2. This should automatically update your `package.json` in `pointless_impressions_src/theme/static_src` and the Docker Dev Container should be able to read the updated `package.json` due to the settings in the `dev.entrypoint.sh`
+
+If you follow the above you should then be able to access and see changes at [Local Development](http://localhost:8000/). If they aren't taking place you may need to run exit the container and rebuild it by following the below
+
+1. In the terminal with the container open press `Ctrl + C` or `Cmd + C`, this will exit the container
+2. Then run `docker compose -f docker-compose.dev.yml up --build` this will build the container and start it up. Alternatively you can run the build and up separately.
+   1. Build first, run `docker compose -f docker-compose.dev.yml build`
+   2. Start up, run `docker compose -f docker-compose.dev.yml up`
+
+### Commit Guide
+
+#### Local Commands to Run
+
+Before you commit always run `pip freeze > requirements.txt` or `pip3 freeze > requirements.txt`
 
 #### Git Commit Template 
 
@@ -426,6 +512,67 @@ Still to do:
 - **Scope** A small scope indicating the part of the codebase affected
 - **Description** Summarise what you did for this commit
 - **Body** Explain what you did for this commit
+
+#### Git Commit Commands
+
+1. In your terminal run
+
+```bash
+git add .
+```
+
+2. Then you can write out the commit message by using
+
+```bash
+ git commit -m "feat(dev-container): update dev entrypoint and Dockerfile - ensure Node 24 and NPM 11.6.2 are installed globally for dev workflow" \
+-m "Body - Modified dev.entrypoint.sh to install Node dependencies if missing and start Tailwind in watch mode. Updated Dockerfile.dev to install Node 24.10 and NPM 11.6.2 globally, avoiding version mismatch warnings." \
+-m "Files Changed:
+- dev.entrypoint.sh
+- Dockerfile.dev" \
+-m "Still to do:
+- Add optional watcher for requirements.txt and package.json updates
+- Test Tailwind hot reload inside dev container"
+```
+
+The \ and -m allows you to type out the full commit. Alternatively you can enter after running `git add .` an editor using:
+
+
+1. Running the below
+
+```bash
+git commit
+```
+
+2. Then in the editor write out the git commit message using the template above
+
+    Then depending on your editor depends how you confirm the message two examples are below.
+
+       1. Vim:
+          1. Press `Esc`
+          2. Type: `:wq` (write+quite)
+          3. Press `Enter`
+
+           If you just want to abort type `:q!` then press `enter`
+
+       2. Nano:
+          1. Press `Ctrl + O` or `Cmd + O` (write out)
+          2. Press `Enter` (confirm filename)
+          3. Press `Ctrl + X` or `Cmd + x` (exit)
+
+           If you just want to abort you can press `Ctrl + X` or `Cmd + x` and then `N` when prompted
+
+       3. VS Code:
+          1. Press `Ctrl + S` or `Cmd + S` to save the message
+          2. Close the VS Code tab/window and Git will detect the file is saved and then create the commit message
+
+       4. If you are unsure which editor Git is using type `git var GIT_EDITOR` and it will return which one you are using
+          1. `editor` or `vim` is most likely Vim
+          2. `nano` is nano
+          3. `code` is VS Code
+          4. If you want to set the Git editor to your preference enter `git config --global core.editor "name-editor"`:
+             1. `"vim"` = Vim
+             2. `"nano"` = nano
+             3. `"code --wait"` = VS Code and instructs Git to wait until you close it.
   
 ### Pull Request Flow
 

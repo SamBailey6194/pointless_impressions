@@ -1,5 +1,5 @@
 # -----------------------------
-# Python
+# Python / Django
 # -----------------------------
 __pycache__/
 *.py[cod]
@@ -8,18 +8,16 @@ __pycache__/
 *.pyc
 venv/
 .venv
+.git
 env/
 *.sqlite3
-
-# -----------------------------
-# Django
-# -----------------------------
 *.log
 *.pot
 *.mo
-db.sqlite3
 /staticfiles/
 media/
+docs/
+READEME.md
 
 # -----------------------------
 # Environment / secrets
@@ -28,29 +26,31 @@ media/
 .env.dev
 .env.staging
 .env.production
-# Keep example files in git
-!.env.dev.example
-!.env.staging.example
-!.env.production.example
+# Ignore example files too in builds (optional)
+.env.dev.example
+.env.staging.example
+.env.production.example
 
 # -----------------------------
-# Docker
+# Docker / build artifacts
 # -----------------------------
-*.dockerfile              # Optional: ignore local Dockerfile variants if you want
+*.dockerfile
 docker-compose.override.yml
 docker-compose.override.*.yml
 docker-compose.override.yml.bak
 docker-compose.override.*.yml.bak
-*.pid
 **/volumes/
 **/tmp/
+*.pid
 
 # -----------------------------
-# Node / npm (if used)
+# Node / npm
 # -----------------------------
 node_modules/
 package-lock.json
 npm-debug.log
+dist/
+build/
 
 # -----------------------------
 # VSCode / IDEs
@@ -72,7 +72,7 @@ Thumbs.db
 *.tmp
 
 # -----------------------------
-# Coverage / testing
+# Testing / coverage
 # -----------------------------
 htmlcov/
 .coverage

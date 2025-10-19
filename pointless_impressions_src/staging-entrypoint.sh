@@ -17,15 +17,11 @@ echo "Database ready."
 
 # Install Node dependencies (staging only)
 NODE_DIR="./pointless_impressions_src/theme/static_src"
-if [ ! -d "$NODE_DIR/node_modules" ]; then
-  echo "Installing Node dependencies..."
-  cd $NODE_DIR
-  npm install -g npm@11.6.2
-  npm ci --omit=dev
-  cd - > /dev/null
-else
-  echo "Node dependencies already installed."
-fi
+echo "Installing Node dependencies..."
+cd $NODE_DIR
+npm install -g npm@11.6.2
+npm ci --omit=dev
+cd - > /dev/null
 
 # Run database migrations
 echo "Running Django migrations..."

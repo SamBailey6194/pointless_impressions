@@ -8,6 +8,13 @@
   - [Table of Contents](#table-of-contents)
   - [Development Guide](#development-guide)
   - [Pointless Impressions](#pointless-impressions-1)
+    - [Planning Process](#planning-process)
+      - [Business Plan and User Stories](#business-plan-and-user-stories)
+      - [Database Plan](#database-plan)
+      - [Wireframes](#wireframes)
+      - [Font and Colours](#font-and-colours)
+        - [Colours](#colours)
+      - [Fonts](#fonts)
   - [Features](#features)
     - [Existing Features](#existing-features)
       - [Navbar](#navbar)
@@ -37,21 +44,134 @@ Please read [Development Markdown](docs/markdowns/DEVELOPMENT.md) before develop
 
 ## Pointless Impressions
 
-The decision to make this website is due to the user stories found [here]().
+### Planning Process
 
-You can also see how the user stories were made into sprints [here]().
+#### Business Plan and User Stories
+
+The decision to make this website is due to the [B2C Business Plan](docs/markdowns/BUSINESSPLAN.md). Please note this has teh keywords for SEO in it as well.
+
+This led to this [User Stories Backlog](docs/markdowns/USERSTORYBACKLOG.md) being made and agreed with the client.
+
+You can also see how the user stories were made into [Sprints](docs/markdowns/SPRINTS.md).
 
 As we progressed in the project some of the sprints were skipped due to time. You can see more in [Features](#features) section, especially [Features Left to Implement](#features-left-to-implement).
 
-The design and layout is due to the wireframes shown below:
+#### Database Plan
 
-![Wireframe]()
+Following on from the Sprints the [Database Tables](docs/markdowns/DATABASEPLAN.md) were made, which then had the ERDs visually made.
 
-Alongside the user stories, sprints and wireframes ERDs were made and a logic flow chart.
+![Visual ERDs](docs/images/pointless_impressions_visual_erds.png)
 
-![ERDs]()
+Then the flows of different users were generated.
 
-![User Flow Chart]()
+**General Flow**
+
+![General Flow](docs/images/pointless_impressions_general_flow.drawio.png)
+
+**Signup Flow**
+
+![Signup Flow](docs/images/pointless_impressions_signup_flow.drawio.png)
+
+**Registered Customer Flow**
+
+![Registered Customer Flow](docs/images/pointless_impressions_registered_customer_flow.drawio.png)
+
+**Admin Flow**
+
+![Admin Flow](docs/images/pointless_impressions_admin_flow.png)
+
+#### Wireframes
+
+Next the below wireframes were generated:
+
+**Homepage**
+
+![Homepage](docs/images/homepage.png)
+
+**About**
+
+![About](docs/images/about.png)
+
+**Shop**
+
+![Shop](docs/images/product_listing.png)
+
+**Product Details**
+
+![Product Details](docs/images/product_detail.png)
+
+**Checkout**
+
+![Checkout](docs/images/checkout.png)
+
+**Account Profile**
+
+![Account Profile](docs/images/account_profile.png)
+
+**Blog Index**
+
+![Blog Index](docs/images/blog_index.png)
+
+**Blog Page**
+
+![Blog Page](docs/images/blog_page.png)
+
+There are other pages planned to do, but time was running out in the planning phase.
+
+Other pages not done include:
+
+1. Signup Form
+2. Login Form
+3. Logout Success
+4. Order Change Request Form
+5. Address Add Form
+6. Admin Dashboard
+7. Admin Add Art Form
+8. Admin Update Art Form
+9. Delete Art Success
+
+Some of these will be models rather than full pages.
+
+#### Font and Colours
+
+##### Colours
+
+- Logo Colours:
+  - Bakground = #fbfcfc (Off-White)
+  - Yellow = #fba419
+  - Blue = #055187
+  - Red = #ec381c
+  - Black = #000301
+- Header and Footer BG = #055187 (Blue)
+- Header and Footer Text = #fbfcfc (Off-White)
+- Background = #fbfcfc (Off-White)
+- Headings = #000301 (Black)
+- Body = #055187 (Blue) or #000301 (Black)
+- Form Input BG = #fbfcfc (Off-White)
+- Form Input Outline = #055187 (Blue)
+- Form Input Placeholder = #05518780 (Blue 50% Opacity)
+- Form Input Text = #000301 (Black)
+- Buttons = #fba419 (Yellow)
+- Buttons on Hover = #ec381c (Red)
+- Button Outlines = #055187 (Blue)   
+- Button Outlines Hover = #fba419 (Yellow)
+- Modals BG = #000301 (Black)
+- Modals Outline = #055187 (Blue)
+- Modals Header = #fba419 (Yellow)
+- Modals Body = #fbfcfc (Off-White)
+- Modals Input BG = #fbfcfc (Off-White) 
+- Modals input Outline = #055187 (Blue) 
+- Modals Input Text = #000301 (Black)
+- Modals Buttons = #fba419 (Yellow)
+- Modals Buttons on Hover = #ec381c (Red)
+- Modals Button Outlines = #055187 (Blue)
+- Modals Button Outlines Hover = #fba419 (Yellow)
+
+#### Fonts
+
+- Header and Footer = Poppins
+- Headings = Montserrat
+- Body = Inter
 
 As you venture to look at the [Features](#features) you will notice some design choices, flow and relationships between the database tables were changed while the project was being made.
 

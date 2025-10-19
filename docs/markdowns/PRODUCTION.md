@@ -54,7 +54,25 @@ Production uses the same project structure as development and staging. Relevant 
 
 ## Environment Setup
 
-1. Copy the production environment template:
+1. Ensure you create a local venv to be able to manage the requirements.txt and install the requirements.txt into your venv.
+
+    ```bash
+    python -m venv .venv
+    source .venv/bin/activate  # Linux/Mac
+    .venv\Scripts\activate     # Windows
+    pip install -r requirements.txt
+    ```
+
+    If python or pip don't work ensure you can run this as:
+
+    ```bash
+    python3 -m venv .venv
+    source .venv/bin/activate  # Linux/Mac
+    .venv\Scripts\activate     # Windows
+    pip3 install -r requirements.txt
+    ```
+
+2. Copy the production environment template:
 
 ```bash
 cp .env.production.example .env.production
@@ -88,8 +106,8 @@ cp .env.production.example .env.production
     In the venv in VS Code you can enter:
 
     ```bash
-    source venv/bin/activate  # Linux/Mac
-    venv\Scripts\activate     # Windows
+    source .venv/bin/activate  # Linux/Mac
+    .venv\Scripts\activate     # Windows
     python -c "from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())"
     ```
 
@@ -129,21 +147,51 @@ Ensure AWS S3, Cloudinary, PostgreSQL, and Stripe are reachable from the product
 
 1. Ensure env.production is set up and has the relevant variables
 
+2. In the venv ensure you run `pip freeze > requirements.txt` or `pip3 freeze > requirements.txt` this will ensure the requirements.txt is up to date.
+
+
 3. Ensure your Dockerfile.production and production-entrypoint.sh are correctly configured.
 
-2. Build and start staging the containers
+4. Build and start staging the containers
 
     ```bash
     docker compose -f docker-compose.production.yml up --build -d
     ```
 
-3. Verify they are running
+5. Verify they are running
 
     ```bash
     docker ps
     ```
 
-4. Ensure you have Heroku CLI installed, you can check by typing.
+6. Create a superuser for the Django Admin by:
+
+    1. Ensure you are in your venv
+
+        ```bash
+        source .venv/bin/activate  # Linux/Mac
+        .venv\Scripts\activate     # Windows
+        ```
+
+    2. Typing:
+
+        ```bash
+        python manage.py createsuperuser
+        ```
+
+        If python doesn't work ensure you can run this as:
+
+        ```bash
+        python3 manage.py createsuperuser
+        ```
+
+    3. Enter the username
+
+    4. Enter an email
+
+    5. Enter a password
+
+7. Ensure you have Heroku CLI installed, you can check by typing.
 
     ```bash
     heroku --version
@@ -153,26 +201,26 @@ Ensure AWS S3, Cloudinary, PostgreSQL, and Stripe are reachable from the product
 
     If you do not have a version appear then install Heroku CLI from [here](https://devcenter.heroku.com/articles/heroku-cli)
 
-5. Log into Heroku and Heroku Container Registry
+8. Log into Heroku and Heroku Container Registry
 
     ```bash
     heroku login
     heroku container:login
     ```
 
-6. Create your app in Heroku
+9. Create your app in Heroku
 
     ```bash
     heroku create pointless-impressions
     ```
 
-7. Push the docker image to Heroku
+10. Push the docker image to Heroku
 
     ```bash
     heroku container:push web --app pointless-impressions --context-dir .
     ```
 
-8. Create the config vars in Heroku CLI
+11.  Create the config vars in Heroku CLI
 
     ```bash
     heroku config:set \
@@ -206,13 +254,13 @@ Ensure AWS S3, Cloudinary, PostgreSQL, and Stripe are reachable from the product
     --app pointless-impressions-staging
     ```
 
-9. Release the container
+12. Release the container
 
     ```bash
     heroku container:release web --app pointless-impressions
     ```
 
-10. Access the app
+13. Access the app
 
     ```bash
     heroku open --app pointless-impressions
