@@ -21,6 +21,7 @@ Venv is only for managing the `requirements.txt` and the `package.json` so other
   - [Running the Development Environment](#running-the-development-environment)
   - [Git Workflow](#git-workflow)
     - [Testing Guides](#testing-guides)
+      - [Writing Tests](#writing-tests)
       - [Run Tests](#run-tests)
         - [For Django TestCase](#for-django-testcase)
         - [For Django Behave](#for-django-behave)
@@ -329,6 +330,12 @@ Please ensure you update the **Testing Markdowns** with your **automatic tests**
 
 [Manual Tests](docs/markdowns/MANUALTESTING.md)
 
+#### Writing Tests
+
+Ensure the Django TestCase and Behave are written in the correct apps.
+
+Ensure Jest and Cypress are written in `pointless_impressions_src/theme/static_src/src/tests.js/*`
+
 #### Run Tests
 
 To run the tests please use:
@@ -524,7 +531,7 @@ git add .
 2. Then you can write out the commit message by using
 
 ```bash
- git commit -m "feat(dev-container): update dev entrypoint and Dockerfile - ensure Node 24 and NPM 11.6.2 are installed globally for dev workflow" \
+git commit -m "feat(dev-container): update dev entrypoint and Dockerfile - ensure Node 24 and NPM 11.6.2 are installed globally for dev workflow" \
 -m "Body - Modified dev.entrypoint.sh to install Node dependencies if missing and start Tailwind in watch mode. Updated Dockerfile.dev to install Node 24.10 and NPM 11.6.2 globally, avoiding version mismatch warnings." \
 -m "Files Changed:
 - dev.entrypoint.sh
