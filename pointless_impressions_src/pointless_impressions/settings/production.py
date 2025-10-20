@@ -1,6 +1,8 @@
 from .base import *
 import os
 import dj_database_url
+import subprocess
+
 
 SECRET_KEY = os.getenv("DJANGO_SECRET_KEY")
 DEBUG = False
@@ -67,6 +69,14 @@ STORAGES = {
 
 # Override static URL in production
 STATIC_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/static/'
+
+# Use Git commit hash as STATIC_VERSION for cache busting
+try:
+    STATIC_VERSION = subprocess.check_output(
+        ['git', 'rev-parse', '--short', 'HEAD']
+    ).decode().strip()
+except Exception:
+    STATIC_VERSION = 'prod'
 
 # Caching
 CACHE_URL = os.getenv("CACHE_URL", "redis://redis:6379/0")

@@ -1,113 +1,120 @@
 {% load static tailwind_tags %}
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="en">
 
-<head>
+  <head>
 
-  {% block meta %}
-    {% comment %} Define encoding and viewport meta tags {% endcomment %}
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    {% block meta %}
+      {% comment %} Define encoding and viewport meta tags {% endcomment %}
+      <meta charset="UTF-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    {% comment %} SEO Meta Tags {% endcomment %}
+      {% comment %} SEO Meta Tags {% endcomment %}
 
-    {% comment %} Dynamic Meta Description based on page type {% endcomment %}
-    {% block meta_description %}
+      {% comment %} Dynamic Meta Description based on page type {% endcomment %}
       <meta name="description" content="{% if product %}{{ product.description|striptags|truncatechars:155 }}{% elif post %}{{ post.meta_description|striptags|truncatechars:155 }}{% elif category %}{{ category.description|striptags|truncatechars:155 }}{% elif page_slug == 'about' %}Learn about Pointless Impressions, our mission, values, and the artists we support.{% else %}Discover and buy unique Pointillism art online at Pointless Impressions. Explore curated pieces, artist stories, and art education.{% endif %}" />
-    {% endblock %}
 
-    {% comment %} Robots and Open Graph Meta Tags for social media sharing {% endcomment %}
-    {% block meta_robots %}
-      <meta name="robots" content="index, follow" />
-      <meta name="googlebot" content="index, follow" />
-    {% endblock %}
-
-    {% comment %} Open Graph Tags {% endcomment %}
-    {% block meta_og_tags %}
-      <meta property="og:title" content="{% block og_title %}{% endblock %}" />
+      {% comment %} Open Graph Tags {% endcomment %}
+      <meta property="og:title" content="{% block og_title %}{% if product %}{{ product.name|truncatechars:200|striptags }} | Pointless Impressions{% elif post %}{{ post.title|striptags }} | Pointless Impressions{% elif category %}{{ category.name|truncatechars:200|striptags }} | Pointless Impressions{% elif page_slug == 'about' %}About Us | Pointless Impressions{% else %}Pointless Impressions – Unique Pointillism Art{% endif %}{% endblock %}" />
       <meta property="og:description" content="{% if product %}{{ product.description|striptags|truncatechars:155 }}{% elif post %}{{ post.meta_description|striptags|truncatechars:155 }}{% elif category %}{{ category.description|striptags|truncatechars:155 }}{% elif page_slug == 'about' %}Learn about Pointless Impressions, our mission, values, and the artists we support.{% else %}Discover and buy unique Pointillism art online at Pointless Impressions. Explore curated pieces, artist stories, and art education.{% endif %}" />
-      <meta property="og:image" content="{% block og_image %}{% endblock %}" />
-      <meta property="og:url" content="{{ request.build_absolute_uri }}" />
       <meta property="og:type" content="website" />
       <meta property="og:site_name" content="Pointless Impressions" />
-    {% endblock %}
 
-    {% block og_title %}
-      {% if product %}
-        {{ product.name|truncatechars:200|striptags }} | Pointless Impressions{% elif post %}{{ post.title|striptags }} | Pointless Impressions
-      {% elif category %}
-        {{ category.name|truncatechars:200|striptags }} | Pointless Impressions
-      {% elif page_slug == 'about' %}
-        About Us | Pointless Impressions
-      {% else %}
-        Pointless Impressions – Unique Pointillism Art
-      {% endif %}
-    {% endblock %}
-
-    {% block og_image %}
-      {% if product and product.image %}
-        {{ product.image.url|cloudinary:width=1200,height=630,quality='auto' }}
-    {% elif post and post.featured_image %}
-        {{ post.featured_image.url|cloudinary:width=1200,height=630,quality='auto' }}
-    {% else %}
-        https://res.cloudinary.com/your-cloud-name/image/upload/v123456/default-og.jpg
-    {% endif %}
-
-    {% block og_image %}
-      {% comment %} Open Graph Image Block: Dev uses local files, Prod uses Cloudinary with f_auto {% endcomment %}
-      {% if product and product.image %}
-          {% if production %}
-              {{ product.image.url|cloudinary:width=1200,height=630,quality='auto',fetch_format='auto' }}
+      {% comment %} Open Graph Image Block: Dev uses local files, Prod uses Cloudinary {% endcomment %}
+      {% if production %}
+          {% if product and product.image %}
+              <meta property="og:image" content="https://res.cloudinary.com/{{ CLOUDINARY_STORAGE.CLOUD_NAME }}/image/upload/w_1200,h_630,q_auto,f_auto/{{ product.image.name }}" />
+          {% elif post and post.featured_image %}
+              <meta property="og:image" content="https://res.cloudinary.com/{{ CLOUDINARY_STORAGE.CLOUD_NAME }}/image/upload/w_1200,h_630,q_auto,f_auto/{{ post.featured_image.name }}" />
           {% else %}
-              {{ product.image.url }}
-          {% endif %}
-      {% elif post and post.featured_image %}
-          {% if production %}
-              {{ post.featured_image.url|cloudinary:width=1200,height=630,quality='auto',fetch_format='auto' }}
-          {% else %}
-              {{ post.featured_image.url }}
+              <meta property="og:image" content="https://res.cloudinary.com/{{ CLOUDINARY_STORAGE.CLOUD_NAME }}/image/upload/w_1200,h_630,q_auto,f_auto/default-og.png" />
           {% endif %}
       {% else %}
-          {% if production %}
-              https://res.cloudinary.com/your-cloud-name/image/upload/w_1200,h_630,q_auto,f_auto/default-og.png
+          {% if product and product.image %}
+              <meta property="og:image" content="{{ request.build_absolute_uri }}{{ product.image.url }}" />
+          {% elif post and post.featured_image %}
+              <meta property="og:image" content="{{ request.build_absolute_uri }}{{ post.featured_image.url }}" />
           {% else %}
-              {% static 'images/default-og.jpg' %}
+              <meta property="og:image" content="{{ request.build_absolute_uri }}{% static 'images/default-og.jpg' %}" />
           {% endif %}
       {% endif %}
+
+      {% comment %} Robots Meta Tags {% endcomment %}
+      {% if page_slug == "login" or page_slug == "signup" or page_slug == "checkout" or page_slug == "account" or page_slug == "admin" %}
+          <meta name="robots" content="noindex, nofollow">
+          <meta name="googlebot" content="noindex, nofollow" />
+      {% else %}
+          <meta name="robots" content="index, follow">
+          <meta name="googlebot" content="index, follow" />
+      {% endif %}
+
+      {% comment %} Canonical URL {% endcomment %}
+      <link rel="canonical" href="{{ request.build_absolute_uri }}" />
     {% endblock %}
 
     {% block extra_meta %}
-      <link rel="canonical" href="{{ request.build_absolute_uri }}" />
-      {% if page_slug in ['login','signup','checkout','account','admin'] %}
-        <meta name="robots" content="noindex, nofollow">
+    {% endblock %}
+
+    <title>{% block title %}{% if product %}{{ product.name|striptags }} | Pointless Impressions{% elif post %}{{ post.title|striptags }} | Pointless Impressions{% elif category %}{{ category.name|striptags }} | Pointless Impressions{% elif page_slug == 'about' %}About Us | Pointless Impressions{% else %}Pointless Impressions – Unique Pointillism Art{% endif %}{% endblock %}</title>
+
+    {% tailwind_preload_css %}
+    {% tailwind_css %}
+
+    {% block extra_head %}{% endblock %}
+
+  </head>
+
+  <body class="leading-normal tracking-normal">
+
+    {% comment %} Header Content Area {% endcomment %}
+    <header class="p-4 shadow-md">
+      {% block header %}
+        
+      {% endblock %}
+    </header>
+
+    {% comment %} Main Content Area {% endcomment %}
+    <main class="container mx-auto">
+      {% block content %}
+
+      {% endblock %}
+    </main>
+
+    {% comment %} Modals and Overlays {% endcomment %}
+    {% block modals %}
+    {% endblock %}
+
+    {% comment %} Extra Modals and Overlays {% endcomment %}
+    {% block extramodals %}
+    {% endblock %}
+
+    {% comment %} Notifications Area {% endcomment %}
+    {% block notifications %}
+    {% endblock %}
+
+    {% comment %} Extra Notifications Area {% endcomment %}
+    {% block extranotifications %}
+    {% endblock %}
+
+    {% comment %} Footer Content Area {% endcomment %}
+    <footer class="p-4 mt-8 shadow-inner">
+      {% block footer %}
+        
+      {% endblock %}
+    </footer>
+
+    {% comment %} Core JavaScript Files {% endcomment %}
+    {% block corejs %}
+      {% if production %}
+        <script src="{% static 'js/script.js' %}?v={{ STATIC_VERSION }}" defer></script>
+      {% else %}
+        <script src="{% static 'script.js' %}" defer></script> {# points to dev JS #}
       {% endif %}
     {% endblock %}
 
-  {% endblock %}
-
-  <title>{% block title %}{% if product %}{{ product.name|striptags }} | Pointless Impressions{% elif post %}{{ post.title|striptags }} | Pointless Impressions{% elif category %}{{ category.name|striptags }} | Pointless Impressions{% elif page_slug == 'about' %}About Us | Pointless Impressions{% else %}Pointless Impressions – Unique Pointillism Art{% endif %}{% endblock %}</title>
-
-  {% tailwind_preload_css %}
-  {% tailwind_css %}
-
-  {% block extra_head %}{% endblock %}
-
-</head>
-
-<body class="bg-black text-white font-serif leading-normal tracking-normal">
-
-  <!-- Toast / Alerts -->
-  <div class="toast toast-top toast-end">
-    {% block toast %}{% endblock %}
-  </div>
-
-  <!-- Main Content -->
-  <div class="container mx-auto">
-    {% block content %}
+    {% comment %} Extra JavaScript Files {% endcomment %}
+    {% block extrajs %}
     {% endblock %}
-  </div>
-
-  {% block extra_scripts %}{% endblock %}
-</body>
+  </body>
 
 </html>

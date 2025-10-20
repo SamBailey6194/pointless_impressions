@@ -1,6 +1,7 @@
 from .base import *
 import os
 import dj_database_url
+from datetime import datetime
 
 SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", "staging-secret-key")
 DEBUG = os.getenv("DJANGO_DEBUG", "False") == "True"
@@ -68,5 +69,8 @@ STORAGES = {
 
 # Override static URL in production
 STATIC_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/static/'
+
+# Use timestamp as STATIC_VERSION for cache busting
+STATIC_VERSION = datetime.now().strftime("staging-%Y%m%d%H%M%S")
 
 CACHE_URL = os.getenv("CACHE_URL", "redis://redis:6379/0")

@@ -8,7 +8,7 @@ RUN npm ci --omit=dev
 
 # Copy JS source and build
 COPY pointless_impressions_src/theme/static_src/src/js ./src/js
-RUN npm run build:js  # Output: ./../../static/js
+RUN npm run build:js
 
 # ---------- Stage 2: Python + Django ----------
 FROM python:3.13-slim-bookworm

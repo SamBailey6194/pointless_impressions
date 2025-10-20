@@ -32,6 +32,14 @@ EMAIL_PORT = int(os.getenv("EMAIL_PORT", 1025))
 EMAIL_USE_TLS = os.getenv("EMAIL_USE_TLS", "False") == "True"
 DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL", "dev@example.com")
 
+# Static files
+STATICFILES_DIRS += [
+    BASE_DIR / "pointless_impressions_src/theme/static_src/src/js",
+]
+
+# Use a simple static version for development
+STATIC_VERSION = "dev"
+
 DEFAULT_FILE_STORAGE = "django.core.files.storage.FileSystemStorage"
 
 CACHE_URL = os.getenv("CACHE_URL", "redis://redis:6379/0")
