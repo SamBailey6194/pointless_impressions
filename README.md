@@ -16,6 +16,7 @@
         - [Colours](#colours)
       - [Fonts](#fonts)
   - [Features](#features)
+    - [SEO Features](#seo-features)
     - [Existing Features](#existing-features)
       - [Navbar](#navbar)
     - [Features Left to Implement](#features-left-to-implement)
@@ -183,6 +184,59 @@ As you venture to look at the [Features](#features) you will notice some design 
 
 Below are the features for the website and at the end is listed any features that weren't able to be implemented but would be with more time. Please note as this is a resubmission I have not changed the screenshots of the features as they are essentially the same with minor differences.
 
+### SEO Features
+
+I implemented a comprehensive SEO strategy directly within the Django `base.html` template to ensure every page is optimised for search engines and social media sharing. The following features have been implemented:
+
+1. **Dynamic Meta Description**
+   - Each page automatically generates a unique meta description based on the page type. Each description is truncated to **155 characters** for SEO best practices and uses `striptags` to remove HTML tags:
+     - **Product pages:** Uses the product’s description.  
+     - **Blog posts:** Uses the post’s meta description.  
+     - **Categories:** Uses the category description.  
+     - **About Page:** Uses a custom description highlighting the company’s mission and values.  
+     - **Other pages:** Uses a default description promoting the platform and its Pointillism art focus.  
+   - Ensures search engines display accurate and relevant snippets in search results.
+
+2. **Dynamic Page Titles**
+   - Each page dynamically sets its `<title>` tag and uses `striptags` to remove HTML tags:
+     - Product name for product pages.  
+     - Post title for blog posts.  
+     - Category name for category pages.  
+     - Custom titles for the About page and fallback for other pages.  
+   - Improves SEO relevance and user click-through rates.
+
+3. **Robots Control**
+   - Public pages use `<meta name="robots" content="index, follow" />`.  
+   - Private or sensitive pages (login, signup, checkout, account, admin) use `<meta name="robots" content="noindex, nofollow" />` to prevent indexing.  
+   - Complemented with a `robots.txt` that references a `sitemap.xml` generated via [Sitemap Generator](https://www.xml-sitemaps.com/).
+
+4. **Open Graph (OG) Tags**
+   - OG tags are dynamically generated to optimise social media sharing:
+     - **og:title:** Matches the page title dynamically.  
+     - **og:description:** Matches the page description dynamically, truncated to **200 characters**, with `striptags` applied.  
+     - **og:image:** Uses Cloudinary in production with auto-formatting (`f_auto`) for optimized WebP/AVIF images; local media is used in development.  
+     - **og:url:** Automatically set to the page’s absolute URL.  
+     - **og:type:** Set as `website`.  
+     - **og:site_name:** Set as `Pointless Impressions`.
+
+5. **Canonical URLs**
+   - Each page includes a `<link rel="canonical">` pointing to the current absolute URL.  
+   - Prevents duplicate content issues by signalling the preferred URL to search engines.
+
+6. **Responsive Meta Tags**
+   - `<meta charset="UTF-8" />` ensures proper character encoding.  
+   - `<meta name="viewport" content="width=device-width, initial-scale=1.0" />` ensures mobile-friendly, responsive design.
+
+7. **Centralised Management**
+   - All SEO-related tags are defined in `base.html` with blocks for overriding if needed:
+     - `meta` block for all meta tags.
+     - `meta_description` for dynamic descriptions.
+     - `meta_robots` for dynamic robots control. 
+     - `meta_og_tags` block for Open Graph tags.  
+     - `extra_meta` block for page-specific tags like noindex or canonical overrides.
+
+**Result:** Every page of Pointless Impressions is optimised for search engines, social media sharing, and user experience, while sensitive pages are protected from indexing. This setup reduces maintenance overhead by centralising SEO logic in a single template.
+
 ### Existing Features
 
 #### Navbar
@@ -299,3 +353,6 @@ Please follow this [Cloning and Development](docs/markdowns/DEVELOPMENT.md)
 Below are my credits for where I got inspiration for some of the code and content
 
 - To help me understand how to implement Docker with Django I used [Docker - Django and PostgreSQL setup (with uv) from scratch! by BugBytes](https://www.youtube.com/watch?v=37aNpE-9dD4&t=524s)
+- To help improve my understanding of meta tage I looked at [Meta Tags Google Support](https://www.semrush.com/blog/meta-tag/?g_acctid=152-012-3634&g_adid=767193674768&g_adgroupid=149553965890&g_network=g&g_adtype=search&g_keyword=&g_keywordid=dsa-2185834090056&g_campaignid=18352326857&g_campaign=UK_SRCH_DSA_Blog_EN&kw=&cmp=UK_SRCH_DSA_Blog_EN&label=dsa_pagefeed&Network=g&Device=c&utm_content=767193674768&kwid=dsa-2185834090056&cmpid=18352326857&agpid=149553965890&BU=Core&extid=279889846583&adpos=&matchtype=&gad_source=1&gad_campaignid=18352326857&gclid=CjwKCAjwu9fHBhAWEiwAzGRC_-teJyIG_ANaSCkqwUocd1HZOJeb2tReI3nyEP6C-cOVMI71hg0U6BoCHtYQAvD_BwE)
+- Keywords meta tag is no longer supported or encouraged for SEO, hence why they are minimally used. My source was [Semrush Article](https://www.semrush.com/blog/meta-keywords/?g_acctid=152-012-3634&g_adid=767053397457&g_adgroupid=149553965890&g_network=g&g_adtype=search&g_keyword=&g_keywordid=dsa-2185834090056&g_campaignid=18352326857&g_campaign=UK_SRCH_DSA_Blog_EN&kw=&cmp=UK_SRCH_DSA_Blog_EN&label=dsa_pagefeed&Network=g&Device=c&utm_content=767053397457&kwid=dsa-2185834090056&cmpid=18352326857&agpid=149553965890&BU=Core&extid=279966777342&adpos=&matchtype=&gad_source=1&gad_campaignid=18352326857&gclid=CjwKCAjwu9fHBhAWEiwAzGRC_24eTlVF0HbH8ahzdYsMy02RFznsJt5_Bkz_fcM2fByAM7rYrErlgBoC8bYQAvD_BwE)
+- To underrstand striptags I used [Django Striptags Docs](https://docs.djangoproject.com/en/5.2/ref/templates/builtins/#striptags)

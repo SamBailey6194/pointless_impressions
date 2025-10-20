@@ -7,6 +7,7 @@ DEBUG = os.getenv("DJANGO_DEBUG", "False") == "True"
 ALLOWED_HOSTS = os.getenv(
     "DJANGO_ALLOWED_HOSTS", "staging.example.com"
     ).split(",")
+PRODUCTION = True
 
 DATABASES = {
     "default": dj_database_url.config(
@@ -29,7 +30,11 @@ EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER", "")
 EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD", "")
 DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL", "staging@example.com")
 
-CLOUDINARY_URL = os.getenv("CLOUDINARY_URL")
+CLOUDINARY_STORAGE = {
+    "CLOUD_NAME": os.getenv("CLOUDINARY_CLOUD_NAME"),
+    "API_KEY": os.getenv("CLOUDINARY_API_KEY"),
+    "API_SECRET": os.getenv("CLOUDINARY_API_SECRET"),
+}
 DEFAULT_FILE_STORAGE = "cloudinary_storage.storage.MediaCloudinaryStorage"
 
 # AWS S3 Settings

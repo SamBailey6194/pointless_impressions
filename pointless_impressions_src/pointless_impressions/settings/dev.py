@@ -4,6 +4,7 @@ import os
 SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", "dev-secret-key")
 DEBUG = os.getenv("DJANGO_DEBUG", "True") == "True"
 ALLOWED_HOSTS = ["localhost", "127.0.0.1"]
+PRODUCTION = False
 
 INSTALLED_APPS += [
     "django_browser_reload",
@@ -30,5 +31,7 @@ EMAIL_HOST = os.getenv("EMAIL_HOST", "maildev")
 EMAIL_PORT = int(os.getenv("EMAIL_PORT", 1025))
 EMAIL_USE_TLS = os.getenv("EMAIL_USE_TLS", "False") == "True"
 DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL", "dev@example.com")
+
+DEFAULT_FILE_STORAGE = "django.core.files.storage.FileSystemStorage"
 
 CACHE_URL = os.getenv("CACHE_URL", "redis://redis:6379/0")

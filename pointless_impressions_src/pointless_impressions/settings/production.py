@@ -5,6 +5,7 @@ import dj_database_url
 SECRET_KEY = os.getenv("DJANGO_SECRET_KEY")
 DEBUG = False
 ALLOWED_HOSTS = os.getenv("DJANGO_ALLOWED_HOSTS", "example.com").split(",")
+PRODUCTION = True
 
 DATABASES = {
     "default": dj_database_url.config(
