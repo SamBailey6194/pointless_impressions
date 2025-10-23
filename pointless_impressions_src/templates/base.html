@@ -27,7 +27,7 @@
       {% elif post.featured_image %}
           <meta property="og:image" content="{% cloudinary_url post.featured_image width=1200 height=630 crop='fill' format='auto' quality='auto' %}">
       {% else %}
-          <meta property="og:image" content="{% cloudinary_url 'qzdky29kboidek5sm5qs.png' width=1200 height=630 crop='fill' format='auto' quality='auto' %}">
+          <meta property="og:image" content="{% cloudinary_url 'qzdky29kboidek5sm5qs' width=1200 height=630 crop='fill' format='auto' quality='auto' %}">
       {% endif %}
 
       {% comment %} Robots Meta Tags {% endcomment %}
@@ -43,7 +43,7 @@
       <link rel="canonical" href="{{ request.build_absolute_uri }}" />
       
       {% comment %} Favicon {% endcomment %}
-      <link rel="icon" type="image/png" href="{% if production %}{% cloudinary_url 'qzdky29kboidek5sm5qs.png' width=32 height=32 crop='fit' format='auto' quality='auto' %}{% else %}{{ MEDIA_URL }}logo_white_01.png{% endif %}" />
+      <link rel="icon" type="image/png" href="{% if production %}{% cloudinary_url 'qzdky29kboidek5sm5qs' width=32 height=32 crop='fit' format='auto' quality='auto' %}{% else %}{{ MEDIA_URL }}logo_white_01.png{% endif %}" />
     {% endblock %}
 
     {% block extra_meta %}
