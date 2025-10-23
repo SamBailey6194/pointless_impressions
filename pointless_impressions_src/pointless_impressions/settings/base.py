@@ -78,6 +78,7 @@ ROOT_URLCONF = "pointless_impressions.urls"
 
 # Tailwind CSS
 TAILWIND_APP_NAME = "theme"
+TAILWIND_CSS_PATH = "css/styles.css"
 
 # Session configuration
 SESSION_COOKIE_AGE = 1209600  # 2 weeks
@@ -150,8 +151,7 @@ USE_TZ = True
 STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
 STATICFILES_DIRS = [
-    BASE_DIR / "static/css",
-    BASE_DIR / "static/js",
+    BASE_DIR / "static",
 ]
 
 # Media files

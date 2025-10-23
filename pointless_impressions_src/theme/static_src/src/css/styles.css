@@ -8,6 +8,7 @@
 /* Import Google Fonts and Tailwind CSS plugins */
 @import url("https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap");
 @import "tailwindcss";
+@plugin "daisyui";
 @plugin "@tailwindcss/forms";
 @plugin "@tailwindcss/typography";
 
@@ -15,10 +16,10 @@
   * A catch-all path to Django template files, JavaScript, and Python files
   * that contain Tailwind CSS classes and will be scanned by Tailwind to generate the final CSS file.
   *
-  * If your final CSS file is not being updated after code changes, you may want to broaden or narrow
-  * the scope of this path.
+  * This path is relative to this CSS file location (theme/static_src/src/css/)
+  * and scans the entire Django project root for relevant files.
   */
-@source "{**,**/**}/**/*.{html,htm,js,jsx,ts,tsx,py}";
+@source "../../../../**/*.{html,htm,js,jsx,ts,tsx,py}";
 
 /* Custom CSS for Light Mode */
 @theme {
@@ -48,11 +49,31 @@
 }
 
 @layer base {
+  /* Body Layout */
+  body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  main {
+    flex: 1;
+  }
+
   /* Header & Footer */
   header, footer {
     font-family: var(--font-Poppins);
     background-color: var(--pointless-blue);
     color: var(--pointless-white);
+  }
+
+  /* More specific navbar overrides */
+  header.navbar {
+    background-color: var(--pointless-blue) !important;
+    color: var(--pointless-white) !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: space-between !important;
   }
 
   header {
@@ -65,24 +86,20 @@
   }
 
   footer {
-    position: fixed;
-    bottom: 0;
-    left: 0;
+    position: relative;
     width: 100%;
-    transform: translateY(100%);
-    transition: transform 0.3s ease;
-    z-index: 999;
+    margin-top: auto;
   }
 
   /* Sections */
   .section-blue {
-    background-color: var(--pointless-white);
-    color: var(--pointless-blue);
+    background-color: var(--pointless-blue);
+    color: var(--pointless-white);
   }
 
   .section-alt {
     background-color: var(--pointless-white);
-    color: var(--pointless-black);
+    color: var(--pointless-blue);
   }
 
   /* Form elements */
@@ -110,17 +127,18 @@
   /* Dark Mode Overrides */
   @media (prefers-color-scheme: dark) {
     header, footer {
+      background-color: var(--pointless-blue);
       color: var(--pointless-white);
     }
 
     .section-blue {
-      background-color: var(--pointless-black);
-      color: var(--pointless-blue);
+      background-color: var(--pointless-blue);
+      color: var(--pointless-black);
     }
 
     .section-alt {
       background-color: var(--pointless-black);
-      color: var(--pointless-white);
+      color: var(--pointless-blue);
     }
 
     .custom-input {
@@ -132,11 +150,33 @@
     .custom-input::placeholder {
       color: var(--pointless-white) !important;
     }
+
+    /* Dropdown backgrounds in dark mode */
+    .dropdown-content,
+    .menu {
+      background-color: var(--pointless-black) !important;
+      color: var(--pointless-white) !important;
+      border-color: var(--pointless-blue) !important;
+    }
+
+    .menu li > * {
+      color: var(--pointless-white) !important;
+    }
+
+    .menu li > *:hover {
+      background-color: var(--pointless-yellow) !important;
+      color: var(--pointless-black) !important;
+    }
+
+    .card {
+      background-color: var(--pointless-black) !important;
+      color: var(--pointless-white) !important;
+    }
   }
 }
 
 @layer utilities {
-  /* Buttons */
+  /* Global Button Styles */
   .btn {
     background-color: var(--pointless-yellow);
     border: 1px solid var(--pointless-blue);
@@ -145,6 +185,7 @@
     border-radius: 0.25rem;
     cursor: pointer;
     transition: all 0.2s ease;
+    font-family: var(--font-Poppins);
   }
 
   .btn:hover {
@@ -152,7 +193,6 @@
     border-color: var(--pointless-yellow);
   }
 
-  /* Circular Buttons */
   .btn-circle {
     border-radius: 9999px;
     width: 2.5rem;
@@ -160,19 +200,221 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background-color: var(--pointless-yellow);
-    border: 1px solid var(--pointless-blue);
-    color: var(--pointless-black);
-    cursor: pointer;
-    transition: all 0.2s ease;
+    padding: 0;
   }
 
-  .btn-circle:hover {
-    background-color: var(--pointless-red);
-    border-color: var(--pointless-yellow);
+  /* Unified Navbar Button Styling */
+  header .btn,
+  .navbar-end .btn-ghost.btn-circle,
+  .navbar-center .md\:hidden button.btn-ghost.btn-circle,
+  button[onclick="toggleMobileSearch()"] {
+    background-color: var(--pointless-yellow) !important;
+    border: 1px solid var(--pointless-blue) !important;
+    color: var(--pointless-black) !important;
+    transition: all 0.2s ease !important;
+    font-family: var(--font-Poppins) !important;
+    cursor: pointer !important;
   }
 
-  /* Modals */
+  /* Navigation Links Specific Styling */
+  .navbar-center nav .btn-ghost,
+  .navbar-center nav a.btn-ghost,
+  .navbar-center .flex .btn-ghost,
+  .navbar-center .menu-horizontal li a {
+    background-color: transparent !important;
+    border: none !important;
+    font-weight: 500 !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.5rem !important;
+    color: var(--pointless-white) !important;
+    transition: all 0.2s ease !important;
+    cursor: pointer !important;
+  }
+
+  /* Logo Button Styling */
+  .navbar-start .btn-ghost {
+    background-color: var(--pointless-yellow) !important;
+    border: 1px solid var(--pointless-blue) !important;
+    color: var(--pointless-black) !important;
+    transition: all 0.2s ease !important;
+    font-family: var(--font-Poppins) !important;
+    cursor: pointer !important;
+  }
+
+  /* Unified Hover States */
+  header .btn:hover {
+    background-color: var(--pointless-red) !important;
+    border-color: var(--pointless-yellow) !important;
+    color: var(--pointless-white) !important;
+  }
+
+  /* Navigation Menu Items Hover - Yellow Background */
+  .navbar-center nav .btn-ghost:hover,
+  .navbar-center nav a.btn-ghost:hover,
+  .navbar-center .flex .btn-ghost:hover,
+  .navbar-center .flex a:hover {
+    background-color: var(--pointless-yellow) !important;
+    border: 1px solid var(--pointless-blue) !important;
+    color: var(--pointless-black) !important;
+    cursor: pointer !important;
+  }
+
+  /* Navigation Menu Items Active State */
+  .navbar-center nav .btn-ghost:active,
+  .navbar-center nav a.btn-ghost:active,
+  .navbar-center .flex .btn-ghost:active,
+  .navbar-center .flex a:active,
+  .navbar-center nav .btn-ghost.active,
+  .navbar-center nav a.btn-ghost.active,
+  .navbar-center .flex .btn-ghost.active,
+  .navbar-center .flex a.active {
+    background-color: var(--pointless-yellow) !important;
+    border: 1px solid var(--pointless-blue) !important;
+    color: var(--pointless-black) !important;
+  }
+
+  @media (min-width: 768px) {
+    /* Action Buttons (Cart, Account, Hamburger, Search) Hover */
+    .navbar-end .btn-ghost.btn-circle:hover,
+    button[onclick="toggleMobileSearch()"]:hover {
+      background-color: var(--pointless-red) !important;
+      border-color: var(--pointless-yellow) !important;
+      color: var(--pointless-white) !important;
+      cursor: pointer !important;
+    }
+
+    /* Logo Button Hover */
+    .navbar-start .btn-ghost:hover {
+      background-color: var(--pointless-red) !important;
+      border: 1px solid var(--pointless-yellow) !important;
+      cursor: pointer !important;
+    }
+  }
+
+  /* Mobile Search Button Specific Styling */
+  .navbar-center .md\:hidden button.btn-ghost.btn-circle,
+  .navbar-center button.btn-circle[onclick="toggleMobileSearch()"],
+  button[onclick="toggleMobileSearch()"] {
+    margin-right: 1rem !important;
+    width: 2.5rem !important;
+    height: 2.5rem !important;
+    border-radius: 9999px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 0 !important;
+  }
+
+  /* Clickable Areas */
+  .navbar-center nav a,
+  .navbar-center .flex a {
+    position: relative !important;
+    z-index: 15 !important;
+    pointer-events: auto !important;
+  }
+
+  /* Header Accent Styling */
+  header .badge {
+    background-color: var(--pointless-yellow) !important;
+    color: var(--pointless-black) !important;
+    border-color: var(--pointless-blue) !important;
+  }
+
+  header .border-t,
+  .border-t {
+    border-color: var(--pointless-yellow) !important;
+  }
+
+  /* Responsive Layout */
+  @media (min-width: 768px) {
+    .navbar-center .md\:hidden {
+      display: none !important;
+    }
+
+    .navbar-end .btn-ghost.btn-circle {
+      margin: 0 !important;
+      flex-shrink: 0 !important;
+      width: 2.5rem !important;
+      height: 2.5rem !important;
+    }
+
+    .navbar-end .dropdown {
+      position: relative !important;
+    }
+  }
+
+  @media (max-width: 767px) {
+    /* hide desktop nav on small screens */
+    header.navbar .navbar-center nav {
+      display: none !important;
+    }
+
+    header.navbar .navbar-start {
+      flex-shrink: 0 !important;
+    }
+
+    /* allow center to shrink so it doesn't push the end off-screen */
+    header.navbar .navbar-center {
+      flex: 1 1 auto !important;
+      min-width: 0 !important;
+      margin-right: 0.25rem !important;
+    }
+
+    header.navbar .navbar-end {
+      flex-shrink: 0 !important;
+      margin-left: 0.25rem !important;
+      min-width: auto !important;
+      display: flex !important;
+      gap: 0.5rem !important;
+      align-items: center !important;
+      padding-right: 0.25rem !important;
+    }
+
+    /* dropdown sizing and positioning to prevent overflow */
+    .dropdown-end .dropdown-content {
+      position: absolute !important;
+      right: 0 !important;
+      left: auto !important;
+      transform: translateX(0) !important;
+      max-width: calc(100vw - 2rem) !important;
+      width: auto !important;
+      min-width: 10rem !important;
+      margin-right: 0.5rem !important;
+      z-index: 50 !important;
+      box-sizing: border-box !important;
+      padding-right: 0.5rem !important;
+    }
+
+    .navbar-end .dropdown {
+      position: relative !important;
+    }
+
+    .menu.menu-sm {
+      max-width: calc(100vw - 3rem) !important;
+      font-size: 0.875rem !important;
+      width: auto !important;
+      min-width: 8rem !important;
+    }
+  }
+
+  /* Dropdown and Modal Components */
+  .dropdown-content {
+    background-color: var(--pointless-white) !important;
+    border: 1px solid var(--pointless-blue) !important;
+    color: var(--pointless-black) !important;
+  }
+  
+  .dropdown-content .menu li a {
+    color: var(--pointless-black) !important;
+    transition: all 0.2s ease !important;
+  }
+  
+  .dropdown-content .menu li a:hover {
+    background-color: var(--pointless-yellow) !important;
+    color: var(--pointless-black) !important;
+  }
+
   .modal {
     background-color: var(--pointless-black);
     border: 1px solid var(--pointless-blue);
@@ -217,5 +459,119 @@
       background-color: var(--pointless-black);
       color: var(--pointless-white);
     }
+  }
+}
+
+@layer utilities {
+  /* Horizontal Scrolling Utilities */
+  .scrollbar-hide {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+  }
+
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;  /* Chrome, Safari and Opera */
+  }
+
+  /* Responsive card widths for horizontal scrolling */
+  @media (max-width: 767px) {
+    .scroll-card-mobile {
+      width: calc(100vw - 3rem); /* Almost full width on mobile */
+      max-width: 20rem;
+    }
+  }
+
+  @media (min-width: 768px) and (max-width: 1023px) {
+    .scroll-card-tablet {
+      width: calc(50vw - 3rem); /* Half width on tablets */
+      max-width: 24rem;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .scroll-card-desktop {
+      width: calc(33.333vw - 3rem); /* Third width on desktop */
+      max-width: 28rem;
+    }
+  }
+}
+
+@layer components {
+  /* Yellow Scrollbar Styling - Thick and Always Visible */
+  .artwork-scrollbar::-webkit-scrollbar {
+    height: 14px; /* Thicker scrollbar */
+  }
+
+  .artwork-scrollbar::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.2); /* More visible track */
+    border-radius: 7px;
+  }
+
+  .artwork-scrollbar::-webkit-scrollbar-thumb {
+    background: var(--pointless-yellow);
+    border-radius: 7px;
+    border: 2px solid rgba(0, 0, 0, 0.1); /* Add border for more definition */
+  }
+
+  .artwork-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: oklch(0.65 0.16 93); /* Slightly darker yellow on hover */
+    border: 2px solid rgba(0, 0, 0, 0.2);
+  }
+
+  .blog-scrollbar::-webkit-scrollbar {
+    height: 14px; /* Thicker scrollbar */
+  }
+
+  .blog-scrollbar::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.2); /* More visible track */
+    border-radius: 7px;
+  }
+
+  .blog-scrollbar::-webkit-scrollbar-thumb {
+    background: var(--pointless-yellow);
+    border-radius: 7px;
+    border: 2px solid rgba(0, 0, 0, 0.1); /* Add border for more definition */
+  }
+
+  .blog-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: oklch(0.65 0.16 93); /* Slightly darker yellow on hover */
+    border: 2px solid rgba(0, 0, 0, 0.2);
+  }
+
+  /* Firefox scrollbar styling - Always visible and thicker */
+  .artwork-scrollbar,
+  .blog-scrollbar {
+    scrollbar-width: auto; /* Use browser default thickness (thicker than 'thin') */
+    scrollbar-color: var(--pointless-yellow) rgba(0, 0, 0, 0.2);
+  }
+
+  /* Card styling for light/dark mode */
+  .card-adaptive {
+    /* Light mode: black background with white text */
+    background-color: var(--pointless-black);
+    color: var(--pointless-white);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    .card-adaptive {
+      /* Dark mode: white background with black text */
+      background-color: var(--pointless-white);
+      color: var(--pointless-black);
+    }
+  }
+
+  /* Ensure text elements in cards use the right colors */
+  .card-adaptive .card-title {
+    color: inherit;
+  }
+
+  .card-adaptive .card-description {
+    color: inherit;
+    opacity: 0.8;
+  }
+
+  .card-adaptive .card-meta {
+    color: inherit;
+    opacity: 0.6;
   }
 }

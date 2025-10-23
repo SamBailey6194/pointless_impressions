@@ -213,7 +213,7 @@ run_migrations() {
     fi
     
     print_message $BLUE "🗃️  Running Django migrations in production..."
-    docker-compose -f "$COMPOSE_FILE" -p "$PROJECT_NAME" exec web_prod python manage.py migrate
+    docker-compose -f "$COMPOSE_FILE" -p "$PROJECT_NAME" exec web_prod python /app/manage.py migrate
     
     if [ $? -eq 0 ]; then
         print_message $GREEN "✅ Migrations completed successfully!"
@@ -226,7 +226,7 @@ run_migrations() {
 # Function to run tests
 run_tests() {
     print_message $BLUE "🧪 Running Django tests in production..."
-    docker-compose -f "$COMPOSE_FILE" -p "$PROJECT_NAME" exec web_prod python manage.py test
+    docker-compose -f "$COMPOSE_FILE" -p "$PROJECT_NAME" exec web_prod python /app/manage.py test
     
     if [ $? -eq 0 ]; then
         print_message $GREEN "✅ Tests completed successfully!"

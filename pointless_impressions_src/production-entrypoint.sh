@@ -46,27 +46,27 @@ echo "Database connection successful."
 
 # Check if we can connect to the database
 echo "Testing database connection..."
-python manage.py check --database default || {
+python /app/manage.py check --database default || {
     echo "Error: Cannot connect to database. Please check your DATABASE_URL or production database settings."
     exit 1
 }
 
 # Run database migrations
 echo "Running Django migrations..."
-python manage.py migrate --noinput || {
+python /app/manage.py migrate --noinput || {
     echo "Error: Database migration failed."
     exit 1
 }
 
 # Collect static files
 echo "Collecting static files..."
-python manage.py collectstatic --noinput --clear || {
+python /app/manage.py collectstatic --noinput --clear || {
     echo "Warning: Static file collection failed, continuing..."
 }
 
 # Create cache table if needed (for database cache backend)
 echo "Creating cache tables if needed..."
-python manage.py createcachetable 2>/dev/null || echo "Cache tables already exist or not needed."
+python /app/manage.py createcachetable 2>/dev/null || echo "Cache tables already exist or not needed."
 
 # Show deployment info
 echo "Production deployment information:"

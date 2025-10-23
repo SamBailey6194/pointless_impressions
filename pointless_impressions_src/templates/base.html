@@ -51,6 +51,9 @@
 
       {% comment %} Canonical URL {% endcomment %}
       <link rel="canonical" href="{{ request.build_absolute_uri }}" />
+      
+      {% comment %} Favicon {% endcomment %}
+      <link rel="icon" type="image/png" href="{% if production %}{% cloudinary 'logo_white_01.png' 'w_32,h_32,c_fit,f_auto,q_auto' %}{% else %}{{ MEDIA_URL }}logo_white_01.png{% endif %}" />
     {% endblock %}
 
     {% block extra_meta %}
@@ -72,17 +75,51 @@
   <body class="leading-normal tracking-normal">
 
     {% comment %} Header Content Area {% endcomment %}
-    <header class="shadow-sm sticky top-0 z-50">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <header class="fixed top-0 z-50 w-full">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 p-4">
         {% include "includes/header.html" %}
       </div>
     </header>
 
     {% comment %} Main Content Area {% endcomment %}
-    <main class="flex-1 pt-24 md:pt-28 lg:pt-32 container mx-auto">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {% block content %}{% endblock %}
-      </div>
+    <main class="flex-1 pt-24 md:pt-28 lg:pt-32">
+      {% comment %} Full Content Block for pages that need complete control {% endcomment %}
+      {% block content %}
+        
+        {% comment %} Section 1 - Hero/Primary Section {% endcomment %}
+        {% block section_1 %}
+          {% if section_1_class %}
+          <section class="py-16 {{ section_1_class }} w-full">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+              {% block section_1_content %}{% endblock %}
+            </div>
+          </section>
+          {% endif %}
+        {% endblock %}
+
+        {% comment %} Section 2 - Secondary Section {% endcomment %}
+        {% block section_2 %}
+          {% if section_2_class %}
+          <section class="py-16 {{ section_2_class }} w-full">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+              {% block section_2_content %}{% endblock %}
+            </div>
+          </section>
+          {% endif %}
+        {% endblock %}
+
+        {% comment %} Section 3 - Tertiary Section {% endcomment %}
+        {% block section_3 %}
+          {% if section_3_class %}
+          <section class="py-16 {{ section_3_class }} w-full">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+              {% block section_3_content %}{% endblock %}
+            </div>
+          </section>
+          {% endif %}
+        {% endblock %}
+
+      {% endblock content %}
     </main>
 
     {% comment %} Modals and Overlays {% endcomment %}
@@ -102,7 +139,7 @@
     {% endblock %}
 
     {% comment %} Footer Content Area {% endcomment %}
-    <footer class="p-4 mt-8 shadow-inner">
+    <footer class="p-4 shadow-inner">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 p-4">
         {% include 'includes/footer.html' %}
       </div>
@@ -113,7 +150,7 @@
       {% if production %}
         <script src="{% static 'js/header_footer.js' %}?v={{ STATIC_VERSION }}" defer></script>
       {% else %}
-        <script src="{% static 'header_footer.js' %}" defer></script>
+        <script src="{% static 'js/header_footer.js' %}" defer></script>
       {% endif %}
     {% endblock %}
   </body>

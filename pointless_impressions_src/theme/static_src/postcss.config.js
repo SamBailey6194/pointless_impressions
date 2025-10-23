@@ -1,11 +1,15 @@
+import tailwindcss from '@tailwindcss/postcss';
+import autoprefixer from 'autoprefixer';
+import postcssHash from 'postcss-hash';
+
 const production = process.env.NODE_ENV === 'production';
 
-module.exports = {
+export default {
   plugins: [
-    require('@tailwindcss/postcss'),
-    require('autoprefixer'),
+    tailwindcss,
+    autoprefixer,
     production &&
-      require('postcss-hash')({
+      postcssHash({
         manifest: '../../static/css/manifest.json',
         algorithm: 'md5',
         trim: 8,

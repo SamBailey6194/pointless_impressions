@@ -59,12 +59,6 @@ EMAIL_HOST_USER = ""
 EMAIL_HOST_PASSWORD = ""
 DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL", "dev@example.com")
 
-# Static files configuration for development
-STATICFILES_DIRS = [
-    BASE_DIR / "theme/static_src/src/js",
-    BASE_DIR / "theme" / "static_src" / "static",
-]
-
 # Development cache configuration
 cache_url = os.getenv("CACHE_URL", "redis://redis_dev:6379/0")
 if cache_url.startswith("redis://"):

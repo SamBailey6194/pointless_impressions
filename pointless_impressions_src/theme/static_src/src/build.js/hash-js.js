@@ -3,11 +3,16 @@ import esbuild from 'esbuild';
 import fs from 'fs';
 import path from 'path';
 import crypto from 'crypto';
-import glob from 'glob';
+import { glob } from 'glob';
+import { fileURLToPath } from 'url';
+
+// Get __dirname equivalent in ES modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Define source and output folders
-const srcDir = path.resolve(__dirname, '../js/build'); // only build-ready JS
-const outDir = path.resolve(__dirname, '../../../../../static/js'); // hashed output
+const srcDir = path.resolve(__dirname, '../js'); // source JS files
+const outDir = path.resolve(__dirname, '../../../../static/js'); // hashed output
 
 // Ensure output directory exists
 if (!fs.existsSync(outDir)) {
@@ -15,8 +20,8 @@ if (!fs.existsSync(outDir)) {
 }
 
 async function buildAndHash() {
-  // Find all JS files in build folder
-  const entryPoints = glob.sync(path.join(srcDir, '**/*.js'));
+  // Find all JS files in source folder
+  const entryPoints = await glob(path.join(srcDir, '**/*.js'));
 
   for (const entry of entryPoints) {
     const fileName = path.basename(entry, '.js');

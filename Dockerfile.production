@@ -6,9 +6,8 @@ WORKDIR /app
 COPY pointless_impressions_src/theme/static_src/package*.json ./
 RUN npm ci --omit=dev
 
-# Copy JS source and build
-COPY pointless_impressions_src/theme/static_src/src/js ./src/js
-RUN npm run build:js
+# Copy theme source files (for Django Tailwind to build)
+COPY pointless_impressions_src/theme/static_src/ ./theme/static_src/
 
 # ---------- Stage 2: Python + Django ----------
 FROM python:3.13-slim-bookworm
@@ -35,12 +34,12 @@ RUN uv pip install --upgrade pip --system && \
 COPY pointless_impressions_src/ ./pointless_impressions_src/
 COPY manage.py .
 
-# Copy JS built assets from Node stage
-COPY --from=node_builder /app/src/js ./pointless_impressions_src/static/js
+# Copy theme source from Node stage (includes node_modules)
+COPY --from=node_builder /app/theme/static_src/ ./pointless_impressions_src/theme/static_src/
 
-# Build Tailwind CSS via Python (as root for permissions)
+# Build both CSS and JS via Django Tailwind (as root for permissions)
 RUN python manage.py tailwind install
-RUN python manage.py tailwind build  # Output: ./static/css
+RUN python manage.py tailwind build
 
 # Ensure all files are owned by the app user before switching
 RUN useradd -m appuser && \

@@ -1,84 +1,241 @@
 {% extends "base.html" %}
 {% load static cloudinary tailwind_tags %}
 
-{% block content %}
-<div class="min-h-screen bg-[var(--pointless-blue)] text-[var(--pointless-white)] font-Poppins">
-
-  {% comment %} Hero Section {% endcomment %}
-  <section class="relative bg-[var(--pointless-blue)] text-center py-20 px-4 sm:px-6 lg:px-8">
-    <div class="max-w-4xl mx-auto">
+{% comment %} Define section classes for the three sections {% endcomment %}
+{% block section_1 %}
+<section class="py-20 section-alt text-center w-full">
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+    {% block section_1_content %}
       <h1 class="text-4xl sm:text-5xl font-bold mb-6">
         Welcome to Pointless Impressions
       </h1>
       <p class="text-lg sm:text-xl mb-8">
         Discover unique Pointillism artwork from talented artists. Explore curated collections, artist stories, and educational resources.
       </p>
-      <a href="" class="inline-block px-8 py-3 rounded-xl bg-[var(--pointless-yellow)] text-[var(--pointless-black)] font-semibold hover:bg-[var(--pointless-white)] hover:text-[var(--pointless-black)] transition-colors duration-200 cursor-pointer">
+      <a href="/shop/" class="inline-block px-8 py-3 rounded-xl btn btn-ghost transition-colors duration-200 cursor-pointer">
         Browse Art
       </a>
-    </div>
-  </section>
+    {% endblock %}
+  </div>
+</section>
+{% endblock %}
 
-  {% comment %} Featured Collections {% endcomment %}
-  <section class="py-16 px-4 sm:px-6 lg:px-8 bg-[var(--pointless-white)] text-[var(--pointless-black)]">
-    <div class="max-w-7xl mx-auto">
-      <h2 class="text-3xl font-bold mb-12 text-center">Featured Collections</h2>
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-        {% comment %} Collection Card 1 {% endcomment %}
-        <div class="rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-shadow duration-200 cursor-pointer">
-          <img src="" alt="Collection 1" class="w-full h-64 object-cover">
-          <div class="p-4">
-            <h3 class="text-xl font-semibold mb-2">Abstract Dots</h3>
-            <p class="text-sm">A modern take on classic Pointillism techniques.</p>
+{% block section_2 %}
+<section class="py-16 section-blue w-full">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    {% block section_2_content %}
+      <h2 class="text-3xl font-bold mb-12 text-center">Latest Featured Artwork</h2>
+      
+      {% comment %} Horizontal Scrolling Container {% endcomment %}
+      <div class="relative">
+        <div class="flex overflow-x-auto gap-6 pb-4 snap-x snap-mandatory artwork-scrollbar">
+          {% comment %} Artwork Card 1 {% endcomment %}
+          <div class="shrink-0 w-72 md:w-80 lg:w-96 snap-start">
+            <div class="rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-shadow duration-200 cursor-pointer card-adaptive">
+              <img src="" alt="Featured Artwork 1" class="w-full h-64 object-cover bg-gray-200">
+              <div class="p-6">
+                <h3 class="text-xl font-semibold mb-2 card-title">Sunset Dots</h3>
+                <p class="text-sm mb-3 card-description">By Artist Name</p>
+                <p class="text-lg font-bold text-[var(--pointless-blue)]">£299.00</p>
+              </div>
+            </div>
           </div>
-        </div>
-        {% comment %} Collection Card 2 {% endcomment %}
-        <div class="rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-shadow duration-200 cursor-pointer">
-          <img src="" alt="Collection 2" class="w-full h-64 object-cover">
-          <div class="p-4">
-            <h3 class="text-xl font-semibold mb-2">Nature Inspired</h3>
-            <p class="text-sm">Bring the beauty of nature into your home.</p>
+          
+          {% comment %} Artwork Card 2 {% endcomment %}
+          <div class="shrink-0 w-72 md:w-80 lg:w-96 snap-start">
+            <div class="rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-shadow duration-200 cursor-pointer card-adaptive">
+              <img src="" alt="Featured Artwork 2" class="w-full h-64 object-cover bg-gray-200">
+              <div class="p-6">
+                <h3 class="text-xl font-semibold mb-2 card-title">Ocean Waves</h3>
+                <p class="text-sm mb-3 opacity-70">By Artist Name</p>
+                <p class="text-lg font-bold text-[var(--pointless-blue)]">£425.00</p>
+              </div>
+            </div>
           </div>
-        </div>
-        {% comment %} Collection Card 3 {% endcomment %}
-        <div class="rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-shadow duration-200 cursor-pointer">
-          <img src="" alt="Collection 3" class="w-full h-64 object-cover">
-          <div class="p-4">
-            <h3 class="text-xl font-semibold mb-2">Urban Dots</h3>
-            <p class="text-sm">Cityscapes captured through pointillist detail.</p>
+          
+          {% comment %} Artwork Card 3 {% endcomment %}
+          <div class="shrink-0 w-72 md:w-80 lg:w-96 snap-start">
+            <div class="rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-shadow duration-200 cursor-pointer card-adaptive">
+              <img src="" alt="Featured Artwork 3" class="w-full h-64 object-cover bg-gray-200">
+              <div class="p-6">
+                <h3 class="text-xl font-semibold mb-2 card-title">Forest Path</h3>
+                <p class="text-sm mb-3 opacity-70">By Artist Name</p>
+                <p class="text-lg font-bold text-[var(--pointless-blue)]">£350.00</p>
+              </div>
+            </div>
+          </div>
+          
+          {% comment %} Artwork Card 4 {% endcomment %}
+          <div class="shrink-0 w-72 md:w-80 lg:w-96 snap-start">
+            <div class="rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-shadow duration-200 cursor-pointer card-adaptive">
+              <img src="" alt="Featured Artwork 4" class="w-full h-64 object-cover bg-gray-200">
+              <div class="p-6">
+                <h3 class="text-xl font-semibold mb-2 card-title">City Lights</h3>
+                <p class="text-sm mb-3 opacity-70">By Artist Name</p>
+                <p class="text-lg font-bold text-[var(--pointless-blue)]">£475.00</p>
+              </div>
+            </div>
+          </div>
+          
+          {% comment %} Artwork Card 5 {% endcomment %}
+          <div class="shrink-0 w-72 md:w-80 lg:w-96 snap-start">
+            <div class="rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-shadow duration-200 cursor-pointer card-adaptive">
+              <img src="" alt="Featured Artwork 5" class="w-full h-64 object-cover bg-gray-200">
+              <div class="p-6">
+                <h3 class="text-xl font-semibold mb-2 card-title">Mountain View</h3>
+                <p class="text-sm mb-3 opacity-70">By Artist Name</p>
+                <p class="text-lg font-bold text-[var(--pointless-blue)]">£525.00</p>
+              </div>
+            </div>
+          </div>
+          
+          {% comment %} Artwork Card 6 {% endcomment %}
+          <div class="shrink-0 w-72 md:w-80 lg:w-96 snap-start">
+            <div class="rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-shadow duration-200 cursor-pointer card-adaptive">
+              <img src="" alt="Featured Artwork 6" class="w-full h-64 object-cover bg-gray-200">
+              <div class="p-6">
+                <h3 class="text-xl font-semibold mb-2 card-title">Abstract Patterns</h3>
+                <p class="text-sm mb-3 opacity-70">By Artist Name</p>
+                <p class="text-lg font-bold text-[var(--pointless-blue)]">£375.00</p>
+              </div>
+            </div>
+          </div>
+          
+          {% comment %} Artwork Card 7 {% endcomment %}
+          <div class="shrink-0 w-72 md:w-80 lg:w-96 snap-start">
+            <div class="rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-shadow duration-200 cursor-pointer card-adaptive">
+              <img src="" alt="Featured Artwork 7" class="w-full h-64 object-cover bg-gray-200">
+              <div class="p-6">
+                <h3 class="text-xl font-semibold mb-2 card-title">Colorful Dots</h3>
+                <p class="text-sm mb-3 opacity-70">By Artist Name</p>
+                <p class="text-lg font-bold text-[var(--pointless-blue)]">£450.00</p>
+              </div>
+            </div>
+          </div>
+          
+          {% comment %} Artwork Card 8 {% endcomment %}
+          <div class="shrink-0 w-72 md:w-80 lg:w-96 snap-start">
+            <div class="rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-shadow duration-200 cursor-pointer card-adaptive">
+              <img src="" alt="Featured Artwork 8" class="w-full h-64 object-cover bg-gray-200">
+              <div class="p-6">
+                <h3 class="text-xl font-semibold mb-2 card-title">Evening Glow</h3>
+                <p class="text-sm mb-3 opacity-70">By Artist Name</p>
+                <p class="text-lg font-bold text-[var(--pointless-blue)]">£600.00</p>
+              </div>
+            </div>
           </div>
         </div>
       </div>
-    </div>
-  </section>
+      <div class="text-center mt-8">
+        <a href="/shop/" class="inline-block px-8 py-3 rounded-xl btn btn-ghost transition-colors duration-200 cursor-pointer">
+          Browse Art
+        </a>
+      </div>
+    {% endblock %}
+  </div>
+</section>
+{% endblock %}
 
-  {% comment %} About Section {% endcomment %}
-  <section class="py-16 px-4 sm:px-6 lg:px-8 bg-[var(--pointless-blue)] text-[var(--pointless-white)]">
-    <div class="max-w-4xl mx-auto text-center">
-      <h2 class="text-3xl font-bold mb-6">About Pointless Impressions</h2>
-      <p class="text-lg mb-4">
-        Pointless Impressions is dedicated to showcasing Pointillism art in all its forms. We collaborate with emerging and established artists to bring unique, high-quality artwork to collectors worldwide.
-      </p>
-      <p class="text-lg">
-        Our mission is to make Pointillism accessible, inspire creativity, and connect art lovers with talented artists.
-      </p>
-    </div>
-  </section>
-
-  {% comment %} Newsletter CTA {% endcomment %}
-  <section class="py-16 px-4 sm:px-6 lg:px-8 bg-[var(--pointless-yellow)] text-[var(--pointless-black)]">
-    <div class="max-w-3xl mx-auto text-center">
-      <h2 class="text-2xl sm:text-3xl font-bold mb-4">Stay Updated</h2>
-      <p class="mb-6">Subscribe to our newsletter for the latest collections, artist stories, and exclusive offers.</p>
-      <form class="flex flex-col sm:flex-row gap-4 justify-center">
-        <input type="email" placeholder="Enter your email" class="w-full sm:w-72 px-4 py-3 rounded-xl border border-[var(--pointless-black)] text-[var(--pointless-black)] focus:outline-none" />
-        <button type="submit" class="px-6 py-3 rounded-xl bg-[var(--pointless-black)] text-[var(--pointless-yellow)] font-semibold hover:bg-[var(--pointless-white)] hover:text-[var(--pointless-black)] transition-colors duration-200 cursor-pointer">
-          Subscribe
-        </button>
-      </form>
-    </div>
-  </section>
-
-</div>
-
+{% block section_3 %}
+<section class="py-16 section-alt w-full">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    {% block section_3_content %}
+      <h2 class="text-3xl font-bold mb-12 text-center">Latest Blog Posts</h2>
+      
+      {% comment %} Horizontal Scrolling Container {% endcomment %}
+      <div class="relative">
+        <div class="flex overflow-x-auto gap-6 pb-4 snap-x snap-mandatory blog-scrollbar">
+          {% comment %} Blog Card 1 {% endcomment %}
+          <div class="shrink-0 w-72 md:w-80 lg:w-96 snap-start">
+            <div class="rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-shadow duration-200 cursor-pointer card-adaptive">
+              <img src="" alt="Blog Post 1" class="w-full h-48 object-cover bg-gray-200">
+              <div class="p-6">
+                <h3 class="text-xl font-semibold mb-2 card-title">The History of Pointillism</h3>
+                <p class="text-sm mb-3 opacity-70">Learn about the origins and evolution of this fascinating art technique.</p>
+                <p class="text-xs opacity-60">Posted 2 days ago</p>
+              </div>
+            </div>
+          </div>
+          
+          {% comment %} Blog Card 2 {% endcomment %}
+          <div class="shrink-0 w-72 md:w-80 lg:w-96 snap-start">
+            <div class="rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-shadow duration-200 cursor-pointer card-adaptive">
+              <img src="" alt="Blog Post 2" class="w-full h-48 object-cover bg-gray-200">
+              <div class="p-6">
+                <h3 class="text-xl font-semibold mb-2 card-title">Artist Spotlight: Modern Masters</h3>
+                <p class="text-sm mb-3 opacity-70">Meet contemporary artists pushing the boundaries of Pointillism.</p>
+                <p class="text-xs opacity-60">Posted 5 days ago</p>
+              </div>
+            </div>
+          </div>
+          
+          {% comment %} Blog Card 3 {% endcomment %}
+          <div class="shrink-0 w-72 md:w-80 lg:w-96 snap-start">
+            <div class="rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-shadow duration-200 cursor-pointer card-adaptive">
+              <img src="" alt="Blog Post 3" class="w-full h-48 object-cover bg-gray-200">
+              <div class="p-6">
+                <h3 class="text-xl font-semibold mb-2 card-title">Collecting Tips for Beginners</h3>
+                <p class="text-sm mb-3 opacity-70">Essential advice for starting your art collection journey.</p>
+                <p class="text-xs opacity-60">Posted 1 week ago</p>
+              </div>
+            </div>
+          </div>
+          
+          {% comment %} Blog Card 4 {% endcomment %}
+          <div class="shrink-0 w-72 md:w-80 lg:w-96 snap-start">
+            <div class="rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-shadow duration-200 cursor-pointer card-adaptive">
+              <img src="" alt="Blog Post 4" class="w-full h-48 object-cover bg-gray-200">
+              <div class="p-6">
+                <h3 class="text-xl font-semibold mb-2 card-title">Color Theory in Pointillism</h3>
+                <p class="text-sm mb-3 opacity-70">Understanding how colors interact in dot-based artwork.</p>
+                <p class="text-xs opacity-60">Posted 2 weeks ago</p>
+              </div>
+            </div>
+          </div>
+          
+          {% comment %} Blog Card 5 {% endcomment %}
+          <div class="shrink-0 w-72 md:w-80 lg:w-96 snap-start">
+            <div class="rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-shadow duration-200 cursor-pointer card-adaptive">
+              <img src="" alt="Blog Post 5" class="w-full h-48 object-cover bg-gray-200">
+              <div class="p-6">
+                <h3 class="text-xl font-semibold mb-2 card-title">Digital vs Traditional Pointillism</h3>
+                <p class="text-sm mb-3 opacity-70">Exploring the differences between digital and traditional techniques.</p>
+                <p class="text-xs opacity-60">Posted 3 weeks ago</p>
+              </div>
+            </div>
+          </div>
+          
+          {% comment %} Blog Card 6 {% endcomment %}
+          <div class="shrink-0 w-72 md:w-80 lg:w-96 snap-start">
+            <div class="rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-shadow duration-200 cursor-pointer card-adaptive">
+              <img src="" alt="Blog Post 6" class="w-full h-48 object-cover bg-gray-200">
+              <div class="p-6">
+                <h3 class="text-xl font-semibold mb-2 card-title">Famous Pointillist Masterpieces</h3>
+                <p class="text-sm mb-3 opacity-70">A journey through the most iconic Pointillist artworks in history.</p>
+                <p class="text-xs opacity-60">Posted 1 month ago</p>
+              </div>
+            </div>
+          </div>
+          
+          {% comment %} Blog Card 7 {% endcomment %}
+          <div class="shrink-0 w-72 md:w-80 lg:w-96 snap-start">
+            <div class="rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-shadow duration-200 cursor-pointer card-adaptive">
+              <img src="" alt="Blog Post 7" class="w-full h-48 object-cover bg-gray-200">
+              <div class="p-6">
+                <h3 class="text-xl font-semibold mb-2 card-title">Creating Your First Pointillist Piece</h3>
+                <p class="text-sm mb-3 opacity-70">Step-by-step guide for beginners to create their own artwork.</p>
+                <p class="text-xs opacity-60">Posted 1 month ago</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="text-center mt-8">
+        <a href="/blog/" class="inline-block px-8 py-3 rounded-xl btn btn-ghost transition-colors duration-200 cursor-pointer">
+          Blog
+        </a>
+      </div>
+    {% endblock %}
+  </div>
+</section>
 {% endblock %}

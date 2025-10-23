@@ -1,87 +1,170 @@
 {% load static cloudinary tailwind_tags %}
 
-<nav class="bg-[var(--pointless-blue)] text-[var(--pointless-white)] shadow-lg fixed w-full z-50">
-  <div class="container mx-auto px-4 py-4 flex justify-between items-center">
-
-    {% comment %} Logo {% endcomment %}
-    <a href="/" class="flex-shrink-0">
-      <img src="{{ MEDIA_URL }}logo_white_01.png" alt="Pointless Impressions" class="h-8 md:h-12 w-auto" />
-    </a>
-
-    {% comment %} Desktop Search Bar {% endcomment %}
-    <div class="hidden md:flex flex-1 justify-center px-4">
-      <input type="text" placeholder="Search..." class="w-full max-w-md rounded-xl py-2 px-4 text-black" />
+<div class="w-full">
+  {% comment %} Main Navbar - Logo and Actions {% endcomment %}
+  <nav class="navbar shadow-lg min-h-16">
+    {% comment %} Logo Section {% endcomment %}
+    <div class="navbar-start">
+      <a href="/" class="btn btn-ghost normal-case text-xl h-auto p-2">
+        {% if production %}
+        <img src="{% cloudinary 'logo_white_01.png' 'w_auto,h_32,c_fit,f_auto,q_auto' %}" alt="Pointless Impressions"
+          class="h-8 sm:h-10 md:h-12 w-auto" />
+        {% else %}
+        <img src="{{ MEDIA_URL }}logo_white_01.png" alt="Pointless Impressions" class="h-8 sm:h-10 md:h-12 w-auto" />
+        {% endif %}
+      </a>
     </div>
 
-    {% comment %} Right Section: Account + Cart {% endcomment %}
-    <div class="flex items-center space-x-4">
+    {% comment %} Center Section - Desktop Navigation Menu and Mobile Search {% endcomment %}
+    <div class="navbar-center">
+      {% comment %} Desktop Navigation Menu {% endcomment %}
+      <nav class="hidden md:flex items-center justify-center w-full">
+        <div class="flex flex-row items-center gap-1">
+          <a href="/" class="btn btn-ghost rounded-lg px-4 py-2 flex items-center gap-2">
+            <i class="fa-solid fa-home"></i> Home
+          </a>
+          <a href="/shop/" class="btn btn-ghost rounded-lg px-4 py-2 flex items-center gap-2">
+            <i class="fa-solid fa-store"></i> Shop
+          </a>
+          <a href="/blog/" class="btn btn-ghost rounded-lg px-4 py-2 flex items-center gap-2">
+            <i class="fa-solid fa-blog"></i> Blog
+          </a>
+          <a href="/about/" class="btn btn-ghost rounded-lg px-4 py-2 flex items-center gap-2">
+            <i class="fa-solid fa-info-circle"></i> About
+          </a>
+          <a href="/contact/" class="btn btn-ghost rounded-lg px-4 py-2 flex items-center gap-2">
+            <i class="fa-solid fa-envelope"></i> Contact
+          </a>
+        </div>
+      </nav>
 
-      {% comment %} Account Dropdown {% endcomment %}
-      <div class="relative group">
-        <button class="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-[var(--pointless-yellow)] cursor-pointer">
-          <i class="fa-solid fa-user"></i>
-          <span class="hidden md:block">{% if request.user.is_authenticated %}{{ user.username }}{% else %}Account{% endif %}</span>
+      {% comment %} Mobile Search Button - Hidden on desktop (md+) {% endcomment %}
+      <div class="flex md:hidden items-center justify-center">
+        <button class="btn btn-ghost btn-circle" onclick="toggleMobileSearch()">
+          <i class="fa-solid fa-magnifying-glass text-lg"></i>
         </button>
-        <ul class="absolute right-0 mt-2 w-48 bg-[var(--pointless-white)] text-[var(--pointless-black)] rounded-lg shadow-lg p-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
-          {% if request.user.is_authenticated %}
-            {% if request.user.is_superuser or request.user.is_staff %}
-              <li><a href="#" class="block px-2 py-1 hover:bg-[var(--pointless-yellow)]">Admin Dashboard</a></li>
-            {% endif %}
-            <li><a href="#" class="block px-2 py-1 hover:bg-[var(--pointless-yellow)]">Profile</a></li>
-            <li><a href="#" class="block px-2 py-1 hover:bg-[var(--pointless-yellow)]">Logout</a></li>
-          {% else %}
-            <li><a href="#" class="block px-2 py-1 hover:bg-[var(--pointless-yellow)]">Login</a></li>
-            <li><a href="#" class="block px-2 py-1 hover:bg-[var(--pointless-yellow)]">Sign Up</a></li>
-          {% endif %}
-        </ul>
       </div>
+    </div>
 
-      {% comment %} Cart Dropdown {% endcomment %}
-      <div class="relative group">
-        <button class="relative p-2 rounded-lg hover:bg-[var(--pointless-yellow)]">
-          <i class="fa-solid fa-cart-shopping text-lg"></i>
-          <span class="absolute -top-1 -right-1 bg-[var(--pointless-yellow)] text-[var(--pointless-black)] text-xs font-bold rounded-full px-1">8</span>
-        </button>
-        <div class="absolute right-0 mt-2 w-60 bg-[var(--pointless-white)] text-[var(--pointless-black)] rounded-lg shadow-lg p-3 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
-          <span class="text-lg font-bold block mb-1">8 Items</span>
-          <span class="block text-[var(--pointless-blue)] mb-3">Subtotal: £999</span>
-          <button class="w-full py-2 rounded-lg bg-[var(--pointless-yellow)] text-[var(--pointless-black)] font-semibold hover:bg-[var(--pointless-blue)] hover:text-[var(--pointless-white)] transition-colors duration-200">View Cart</button>
+    {% comment %} Right Section - Actions {% endcomment %}
+    <div class="navbar-end">
+      <div class="flex items-center gap-2">
+
+        {% comment %} Account Dropdown {% endcomment %}
+        <div class="dropdown dropdown-end">
+          <label tabindex="0" class="btn btn-ghost btn-circle">
+            <div class="avatar placeholder">
+              <i class="fa-solid fa-user text-lg"></i>
+            </div>
+          </label>
+          <ul tabindex="0" class="menu menu-sm dropdown-content mt-3 z-10 p-2 shadow-lg rounded-box w-52">
+            {% if request.user.is_authenticated %}
+            <li class="menu-title text-[var(--pointless-blue)]">
+              <span>Welcome, {{ request.user.username|title }}</span>
+            </li>
+            {% if request.user.is_superuser or request.user.is_staff %}
+            <li><a href="#" class="hover:bg-[var(--pointless-yellow)]">
+                <i class="fa-solid fa-cog"></i> Admin Dashboard
+              </a></li>
+            {% endif %}
+            <li><a href="#" class="hover:bg-[var(--pointless-yellow)]">
+                <i class="fa-solid fa-user-circle"></i> My Profile
+              </a></li>
+            <li><a href="#" class="hover:bg-[var(--pointless-yellow)]">
+                <i class="fa-solid fa-box"></i> My Orders
+              </a></li>
+            <li><a href="#" class="hover:bg-[var(--pointless-yellow)]">
+                <i class="fa-solid fa-heart"></i> Wishlist
+              </a></li>
+            <div class="divider my-1"></div>
+            <li><a href="#" class="hover:bg-[var(--pointless-red)] hover:text-white">
+                <i class="fa-solid fa-sign-out-alt"></i> Logout
+              </a></li>
+            {% else %}
+            <li><a href="#" class="hover:bg-[var(--pointless-yellow)]">
+                <i class="fa-solid fa-sign-in-alt"></i> Login
+              </a></li>
+            <li><a href="#" class="hover:bg-[var(--pointless-yellow)]">
+                <i class="fa-solid fa-user-plus"></i> Sign Up
+              </a></li>
+            {% endif %}
+          </ul>
+        </div>
+
+        {% comment %} Cart Dropdown {% endcomment %}
+        <div class="dropdown dropdown-end">
+          <label tabindex="0" class="btn btn-ghost btn-circle">
+            <div class="indicator">
+              <i class="fa-solid fa-cart-shopping text-lg"></i>
+              <span class="badge badge-sm indicator-item translate-x-5 -translate-y-4">8</span>
+            </div>
+          </label>
+          <div tabindex="0" class="card card-compact dropdown-content w-80 shadow-lg mt-3 z-10">
+            <div class="card-body">
+              <span class="font-bold text-lg text-[var(--pointless-blue)]">8 Items in Cart</span>
+              <span class="text-[var(--pointless-blue)]">Subtotal: £999.00</span>
+              <div class="card-actions">
+                <button class="btn w-full hover:bg-[var(--pointless-red)] hover:border-[var(--pointless-yellow)]">
+                  <i class="fa-solid fa-shopping-bag"></i> View Cart
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {% comment %} Mobile Hamburger Menu {% endcomment %}
+        <div class="dropdown dropdown-end md:hidden">
+          <label tabindex="0" class="btn btn-ghost btn-circle">
+            <i class="fa-solid fa-bars text-lg"></i>
+          </label>
+          <ul tabindex="0" class="menu menu-sm dropdown-content mt-3 z-50 p-2 shadow-lg rounded-box w-48 right-0">
+            <li><a href="/" class="hover:bg-[var(--pointless-yellow)]">
+                <i class="fa-solid fa-home"></i> Home
+              </a></li>
+            <li><a href="/shop/" class="hover:bg-[var(--pointless-yellow)]">
+                <i class="fa-solid fa-store"></i> Shop
+              </a></li>
+            <li><a href="/blog/" class="hover:bg-[var(--pointless-yellow)]">
+                <i class="fa-solid fa-blog"></i> Blog
+              </a></li>
+            <li><a href="/about/" class="hover:bg-[var(--pointless-yellow)]">
+                <i class="fa-solid fa-info-circle"></i> About
+              </a></li>
+            <li><a href="/contact/" class="hover:bg-[var(--pointless-yellow)]">
+                <i class="fa-solid fa-envelope"></i> Contact
+              </a></li>
+          </ul>
         </div>
       </div>
+    </div>
+  </nav>
 
-      {% comment %} Mobile Search & Hamburger {% endcomment %}
-      <div class="md:hidden flex items-center space-x-2">
-        <button id="mobile-search-btn" class="p-2 rounded-full hover:bg-[var(--pointless-yellow)]">
+  {% comment %} Full Width Search Bar (desktop only) {% endcomment %}
+  <div class="hidden md:block py-3">
+    <div class="max-w-6xl mx-auto px-4">
+      <div class="max-w-md mx-auto">
+        <div class="flex w-full">
+          <input type="text" placeholder="Search products, artists..." class="custom-input flex-1 rounded-r-none" />
+          <button class="btn rounded-l-none">
+            <i class="fa-solid fa-magnifying-glass"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {% comment %} Mobile Search Bar (toggleable) {% endcomment %}
+  <div id="mobile-search-bar" class="hidden md:hidden pb-4">
+    <div class="max-w-6xl mx-auto px-4">
+      <div class="flex w-full">
+        <input type="text" placeholder="Search products, artists..." class="custom-input flex-1 rounded-r-none" />
+        <button class="btn rounded-l-none">
           <i class="fa-solid fa-magnifying-glass"></i>
-        </button>
-        <button id="mobile-menu-toggle" class="p-2 rounded-full hover:bg-[var(--pointless-yellow)]">
-          <i class="fa-solid fa-bars"></i>
         </button>
       </div>
     </div>
   </div>
 
-  {% comment %} Mobile Search Input {% endcomment %}
-  <div id="mobile-search" class="hidden px-4 py-2 bg-[var(--pointless-white)]">
-    <input type="text" placeholder="Search..." class="w-full rounded-xl py-2 px-4 text-black" />
-  </div>
-
-  {% comment %} Navigation Menu (lg+) under search bar {% endcomment %}
-  <div class="hidden lg:flex justify-center bg-[var(--pointless-blue)] border-t border-[var(--pointless-yellow)]">
-    <ul class="flex space-x-6 py-3">
-      <li><a href="#" class="px-3 py-2 rounded-md hover:bg-[var(--pointless-yellow)] hover:text-[var(--pointless-black)] transition-colors duration-200">Home</a></li>
-      <li><a href="#" class="px-3 py-2 rounded-md hover:bg-[var(--pointless-yellow)] hover:text-[var(--pointless-black)] transition-colors duration-200">Shop</a></li>
-      <li><a href="#" class="px-3 py-2 rounded-md hover:bg-[var(--pointless-yellow)] hover:text-[var(--pointless-black)] transition-colors duration-200">Blog</a></li>
-      <li><a href="#" class="px-3 py-2 rounded-md hover:bg-[var(--pointless-yellow)] hover:text-[var(--pointless-black)] transition-colors duration-200">About</a></li>
-    </ul>
-  </div>
-
-  {% comment %} Mobile Menu {% endcomment %}
-  <ul id="mobile-menu" class="hidden md:hidden bg-[var(--pointless-blue)] px-4 py-4 space-y-2">
-    <li><a href="#" class="block hover:underline">Home</a></li>
-    <li><a href="#" class="block hover:underline">Shop</a></li>
-    <li><a href="#" class="block hover:underline">Blog</a></li>
-    <li><a href="#" class="block hover:underline">About</a></li>
-  </ul>
-</nav>
-
+  {% comment %} Yellow line under the search bar {% endcomment %}
+  <div class="border-t border-[var(--pointless-yellow)]"></div>
+</div>

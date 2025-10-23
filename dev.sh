@@ -118,7 +118,7 @@ case "${1:-help}" in
         ;;
     shell)
         print_status "Accessing Django shell..."
-        docker compose -f docker-compose.dev.yml exec web python manage.py shell
+        docker compose -f docker-compose.dev.yml exec web python /app/manage.py shell
         ;;
     bash)
         print_status "Accessing bash shell..."
@@ -126,25 +126,25 @@ case "${1:-help}" in
         ;;
     migrate)
         print_status "Running migrations..."
-        docker compose -f docker-compose.dev.yml exec web python manage.py migrate
+        docker compose -f docker-compose.dev.yml exec web python /app/manage.py migrate
         print_success "Migrations completed!"
         ;;
     makemigrations)
         print_status "Creating migrations..."
-        docker compose -f docker-compose.dev.yml exec web python manage.py makemigrations
+        docker compose -f docker-compose.dev.yml exec web python /app/manage.py makemigrations
         print_success "Migrations created!"
         ;;
     createsuperuser)
         print_status "Creating superuser..."
-        docker compose -f docker-compose.dev.yml exec web python manage.py createsuperuser
+        docker compose -f docker-compose.dev.yml exec web python /app/manage.py createsuperuser
         ;;
     test)
         print_status "Running tests..."
-        docker compose -f docker-compose.dev.yml exec web python manage.py test
+        docker compose -f docker-compose.dev.yml exec web python /app/manage.py test
         ;;
     collectstatic)
         print_status "Collecting static files..."
-        docker compose -f docker-compose.dev.yml exec web python manage.py collectstatic --noinput
+        docker compose -f docker-compose.dev.yml exec web python /app/manage.py collectstatic --noinput
         print_success "Static files collected!"
         ;;
     clean)
