@@ -16,6 +16,7 @@ Staging is used for QA and client review before deployment to production. All st
   - [Environment Setup](#environment-setup)
     - [Environment Variables](#environment-variables)
   - [Docker Setup](#docker-setup)
+    - [Using the Staging Helper Script](#using-the-staging-helper-script)
   - [Deploying the Staging App](#deploying-the-staging-app)
 
 ---
@@ -99,7 +100,145 @@ cp .env.staging.example .env.staging
 
 4. For the Heroku staging we will need to have a postgres created from Code Institutes Database maker and we will need to create a superuser for the staging Django Web App as well. We will do this later.
 
-5. We will also need to generate a secret key for the staging
+5. **Set up Cloudinary for Staging Media Storage**
+
+    a. Log into your [Cloudinary Dashboard](https://cloudinary.com/console)
+    
+    b. Create a new folder for staging environment:
+       - Navigate to Media Library
+       - Click "Create Folder" 
+       - Name it `pointless-impressions-staging`
+       - Note down your Cloud Name, API Key, and API Secret from the dashboard
+
+6. **Set up Ethereal Email for Staging**
+
+    a. Go to [Ethereal Email](https://ethereal.email/)
+    
+    b. Click "Create Ethereal Account" to generate test credentials
+    
+    c. Note down the SMTP settings:
+       - Host: smtp.ethereal.email
+       - Port: 587
+       - Username: [generated username]
+       - Password: [generated password]
+       - Use TLS: True
+    
+    d. Save the web interface URL to view sent emails during testing
+
+7. **Set up AWS S3 Bucket and IAM for Staging**
+
+    a. **Create S3 Bucket:**
+       - Log into AWS Console
+       - Navigate to S3 service
+       - Click "Create bucket"
+       - Bucket name: `pointless-impressions-staging-static`
+       - Region: Choose closest to your users (e.g., eu-west-2 for UK)
+       - Uncheck "Block all public access" for media files
+       - Enable versioning (optional but recommended)
+       - Click "Create bucket"
+
+    b. **Configure Bucket Policy:**
+       - Go to bucket → Permissions → Bucket Policy
+       - Add policy for public read access to static files:
+       ```json
+       {
+         "Version": "2012-10-17",
+         "Statement": [
+           {
+             "Sid": "PublicReadGetObject",
+             "Effect": "Allow",
+             "Principal": "*",
+             "Action": "s3:GetObject",
+             "Resource": "arn:aws:s3:::pointless-impressions-staging-static/*"
+           }
+         ]
+       }
+       ```
+
+    c. **Configure CORS:**
+       - Go to bucket → Permissions → Cross-origin resource sharing (CORS)
+       - Add CORS configuration:
+       ```json
+       [
+         {
+           "AllowedHeaders": ["*"],
+           "AllowedMethods": ["GET", "POST", "PUT", "DELETE"],
+           "AllowedOrigins": ["*"],
+           "ExposeHeaders": ["ETag"],
+           "MaxAgeSeconds": 3000
+         }
+       ]
+       ```
+
+    c. **Create IAM User Groups:**
+       
+       **Service Group (for applications):**
+       - Navigate to IAM → User groups
+       - Click "Create group"
+       - Group name: `pointless-impressions-staging-services`
+       - Description: `Service accounts for staging applications`
+       - Attach the policy: `PointlessImpressionsStagingS3Policy`
+       - Click "Create group"
+
+       **Developer Group (for human users):**
+       - Click "Create group"
+       - Group name: `pointless-impressions-staging-developers`  
+       - Description: `Developers with access to staging resources`
+       - Attach policies:
+         - `PointlessImpressionsStagingS3Policy` (custom policy created above)
+         - `CloudWatchLogsReadOnlyAccess` (AWS managed - for debugging)
+         - `IAMReadOnlyAccess` (AWS managed - to view their own permissions)
+       - Click "Create group"
+
+    d. **Create IAM User:**
+       - Navigate to IAM → Users
+       - Click "Create user"
+       - Username: `pointless-impressions-staging-service`
+       - Select "Programmatic access"
+       - Click "Next"
+
+    e. **Create IAM Policy:**
+       - Navigate to IAM service → Policies
+       - Click "Create policy"
+       - Select JSON tab and add:
+       ```json
+       {
+         "Version": "2012-10-17",
+         "Statement": [
+           {
+             "Effect": "Allow",
+             "Action": [
+               "s3:GetObject",
+               "s3:PutObject",
+               "s3:DeleteObject",
+               "s3:ListBucket"
+             ],
+             "Resource": [
+               "arn:aws:s3:::pointless-impressions-staging-static",
+               "arn:aws:s3:::pointless-impressions-staging-static/*"
+             ]
+           }
+         ]
+       }
+       ```
+       - Name: `PointlessImpressionsStagingS3Policy`
+       - Click "Create policy"
+
+    f. **Add User to Service Group:**
+       - On the permissions page, select "Add user to group"
+       - Select `pointless-impressions-staging-services`
+       - Click "Next" → "Create user"
+       - **Important:** Download the Access Key ID and Secret Access Key
+       - Store these securely - they won't be shown again
+
+    g. **Group Management Best Practices:**
+       - ✅ Use groups instead of attaching policies directly to users
+       - ✅ Regular access reviews - audit group memberships quarterly  
+       - ✅ Principle of least privilege - start with minimal permissions
+       - ✅ Separate staging and production groups
+       - ❌ Avoid using AWS managed `AdminFullAccess` in production
+
+8. We will also need to generate a secret key for the staging
 
     In the venv in VS Code you can enter:
 
@@ -121,20 +260,29 @@ cp .env.staging.example .env.staging
 
 ### Environment Variables
 
-| Variable           | Purpose                       | Example                                           |
-| ------------------ | ----------------------------- | ------------------------------------------------- |
-| DJANGO_SECRET_KEY  | Django secret key for staging | "staging_secret_key"                              |
-| STAGING_DB_HOST    | Database host                 | db_staging                                        |
-| STAGING_DB_PORT    | Database port                 | 5432                                              |
-| STAGING_DB_NAME    | Database name                 | staging_db                                        |
-| STAGING_DB_USER    | Database username             | staging_user                                      |
-| STAGING_DB_PASS    | Database password             | staging_pass                                      |
-| CACHE_URL          | Redis cache URL               | redis://redis_staging:6379/0                      |
-| EMAIL_BACKEND      | Email backend                 | django.core.mail.backends.smtp.EmailBackend       |
-| EMAIL_HOST         | Email server host             | maildev_staging                                   |
-| EMAIL_PORT         | Email server port             | 1025                                              |
-| EMAIL_USE_TLS      | Enable TLS for email          | False                                             |
-| DEFAULT_FROM_EMAIL | Default sender email          | [staging@example.com](mailto:staging@example.com) |
+| Variable                | Purpose                       | Example                                           |
+| ----------------------- | ----------------------------- | ------------------------------------------------- |
+| DJANGO_SECRET_KEY       | Django secret key for staging | "staging_secret_key"                              |
+| STAGING_DB_HOST         | Database host                 | db_staging                                        |
+| STAGING_DB_PORT         | Database port                 | 5432                                              |
+| STAGING_DB_NAME         | Database name                 | staging_db                                        |
+| STAGING_DB_USER         | Database username             | staging_user                                      |
+| STAGING_DB_PASS         | Database password             | staging_pass                                      |
+| CACHE_URL               | Redis cache URL               | redis://redis_staging:6379/0                      |
+| EMAIL_BACKEND           | Email backend                 | django.core.mail.backends.smtp.EmailBackend      |
+| EMAIL_HOST              | Email server host             | smtp.ethereal.email                               |
+| EMAIL_PORT              | Email server port             | 587                                               |
+| EMAIL_USE_TLS           | Enable TLS for email          | True                                              |
+| EMAIL_HOST_USER         | Ethereal email username       | [generated by ethereal]                           |
+| EMAIL_HOST_PASSWORD     | Ethereal email password       | [generated by ethereal]                           |
+| DEFAULT_FROM_EMAIL      | Default sender email          | [staging@pointlessimpressions.com](mailto:staging@pointlessimpressions.com) |
+| CLOUDINARY_CLOUD_NAME   | Cloudinary cloud name         | your_cloud_name                                   |
+| CLOUDINARY_API_KEY      | Cloudinary API key            | your_api_key                                      |
+| CLOUDINARY_API_SECRET   | Cloudinary API secret         | your_api_secret                                   |
+| AWS_STORAGE_BUCKET_NAME | S3 bucket name               | pointless-impressions-staging-media               |
+| AWS_S3_REGION_NAME      | AWS region                    | eu-west-2                                         |
+| AWS_ACCESS_KEY_ID       | AWS access key               | [from IAM user]                                   |
+| AWS_SECRET_ACCESS_KEY   | AWS secret key               | [from IAM user]                                   |
 
 ---
 
