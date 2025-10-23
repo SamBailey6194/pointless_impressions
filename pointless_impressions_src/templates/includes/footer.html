@@ -1,0 +1,71 @@
+{% load static cloudinary tailwind_tags %}
+
+<div class="py-8">
+  <div class="container mx-auto px-4">
+    
+    {% comment %} Newsletter Section {% endcomment %}
+    <div class="mb-12 text-center">
+      <h3 class="text-2xl font-bold mb-4">Stay Updated</h3>
+      <p class="text-lg mb-6 opacity-90">Subscribe to our newsletter for the latest collections, artist stories, and exclusive offers.</p>
+      <form class="flex flex-col sm:flex-row gap-4 justify-center max-w-md mx-auto">
+        <input type="email" placeholder="Enter your email" class="custom-input flex-1 rounded-r-none" />
+        <button type="submit" class="px-6 py-3 rounded-xl btn font-semiboldtransition-colors duration-200">
+          Subscribe
+        </button>
+      </form>
+    </div>
+    
+    {% comment %} Footer Content {% endcomment %}
+    <div class="grid md:grid-cols-3 gap-8">
+      
+      {% comment %} Company Info {% endcomment %}
+      <div>
+        {% if production %}
+          <img src="{% cloudinary 'logo_white_01.png' 'w_auto,h_48,c_fit,f_auto,q_auto' %}" 
+               alt="Pointless Impressions" 
+               class="h-28 w-auto mb-4" />
+        {% else %}
+          <img src="{{ MEDIA_URL }}logo_white_01.png" 
+               alt="Pointless Impressions" 
+               class="h-28 w-auto mb-4" />
+        {% endif %}
+        <p class="text-sm opacity-90 text-[var(--pointless-white)]">
+          Discover and buy unique Pointillism art online. Explore curated pieces, artist stories, and art education.
+        </p>
+      </div>
+      
+      {% comment %} Quick Links {% endcomment %}
+      <div>
+        <h4 class="font-semibold mb-4 text-[var(--pointless-white)]">Quick Links</h4>
+        <ul class="space-y-2 text-sm">
+          <li><a href="/" class="text-[var(--pointless-white)] hover:text-[var(--pointless-yellow)] transition-colors">Home</a></li>
+          <li><a href="/shop/" class="text-[var(--pointless-white)] hover:text-[var(--pointless-yellow)] transition-colors">Shop</a></li>
+          <li><a href="/blog/" class="text-[var(--pointless-white)] hover:text-[var(--pointless-yellow)] transition-colors">Blog</a></li>
+          <li><a href="/about/" class="text-[var(--pointless-white)] hover:text-[var(--pointless-yellow)] transition-colors">About</a></li>
+          <li><a href="/contact/" class="text-[var(--pointless-white)] hover:text-[var(--pointless-yellow)] transition-colors">Contact</a></li>
+          <li><a href="/privacy/" class="text-[var(--pointless-white)] hover:text-[var(--pointless-yellow)] transition-colors">Privacy Policy</a></li>
+        </ul>
+      </div>
+      
+      {% comment %} Contact Info & Social {% endcomment %}
+      <div>
+        <h4 class="font-semibold mb-4 text-[var(--pointless-white)]">Contact</h4>
+        <div class="space-y-2 text-sm">
+          <p class="opacity-90 text-[var(--pointless-white)]">Email: info@pointlessimpressions.com</p>
+          <div class="flex justify-start mt-4">
+            <a href="#" class="btn btn-circle btn-ghost transition-colors">
+              <i class="fa-brands fa-facebook-f"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    {% comment %} Copyright {% endcomment %}
+    <div class="border-t border-[var(--pointless-yellow)] border-opacity-20 mt-8 pt-6 text-center">
+      <p class="text-sm opacity-90 text-[var(--pointless-white)]">
+        &copy; {% now "Y" %} Pointless Impressions. All rights reserved.
+      </p>
+    </div>
+  </div>
+</div>

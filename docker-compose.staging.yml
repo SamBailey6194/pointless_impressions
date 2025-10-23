@@ -48,16 +48,24 @@ services:
     container_name: pointless_impressions_web_staging
     env_file:
       - .env.staging
+    environment:
+      - DJANGO_SETTINGS_MODULE=pointless_impressions_src.pointless_impressions.settings.staging
+      - DJANGO_DEBUG=False
     ports:
       - "8001:8000"
-    volumes:
-      - .:/app
+    # Note: No volume mounts for staging - we want to use the built image
     depends_on:
       db_staging:
         condition: service_healthy
       redis_staging:
         condition: service_healthy
-    restart: no
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health/", "||", "exit", "1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
     command: /app/pointless_impressions_src/staging-entrypoint.sh
 
 volumes:
