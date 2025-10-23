@@ -4,7 +4,7 @@
   "description": "",
   "scripts": {
     "start": "npm run dev",
-    "dev": "cross-env NODE_ENV=development postcss ./src/css/styles.css -o ../../static/css/styles.css --watch",
+    "dev": "cross-env NODE_ENV=development postcss ./src/css/styles.css -o ../static/css/dist/styles.css --watch",
     "dev:js": "esbuild ./src/js/**/*.js --bundle --sourcemap --outdir=../../static/js --outbase=./src/js --watch",
     "build": "npm run clean && npm run build:tailwind",
     "clean": "rimraf ../../static/css/* ../../static/js/*",
@@ -26,7 +26,6 @@
     "concurrently": "^9.2.1",
     "cross-env": "^7.0.3",
     "cypress": "^15.5.0",
-    "daisyui": "^5.0.43",
     "esbuild": "^0.25.11",
     "jest": "^30.2.0",
     "postcss": "^8.5.6",

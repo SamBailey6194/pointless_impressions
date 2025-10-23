@@ -1,19 +1,36 @@
+"""
+Django settings for development environment.
+"""
+
 from .base import *
 import os
 
-SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", "dev-secret-key")
-DEBUG = os.getenv("DJANGO_DEBUG", "True") == "True"
-ALLOWED_HOSTS = ["localhost", "127.0.0.1"]
+# Environment settings
+ENVIRONMENT = "development"
+SECRET_KEY = os.getenv(
+    "DJANGO_SECRET_KEY",
+    "dev-secret-key-change-in-production"
+)
+DEBUG = True
+ALLOWED_HOSTS = [
+    "localhost",
+    "127.0.0.1",
+    "0.0.0.0",
+    "web",  # Docker service name
+]
 PRODUCTION = False
 
+# Development-specific apps
 INSTALLED_APPS += [
     "django_browser_reload",
 ]
 
+# Development-specific middleware
 MIDDLEWARE += [
     "django_browser_reload.middleware.BrowserReloadMiddleware",
 ]
 
+# Database configuration
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
@@ -22,24 +39,67 @@ DATABASES = {
         "PASSWORD": os.getenv("DEV_DB_PASSWORD", "dev_pass"),
         "HOST": os.getenv("DEV_DB_HOST", "db_dev"),
         "PORT": os.getenv("DEV_DB_PORT", "5432"),
+        "OPTIONS": {
+            "connect_timeout": 10,
+        },
+        "CONN_MAX_AGE": 60,  # Connection pooling
     }
 }
 
+# Email configuration (using MailDev for development)
 EMAIL_BACKEND = os.getenv(
-    "EMAIL_BACKEND", "django.core.mail.backends.smtp.EmailBackend")
-EMAIL_HOST = os.getenv("EMAIL_HOST", "maildev")
+    "EMAIL_BACKEND",
+    "django.core.mail.backends.smtp.EmailBackend"
+)
+EMAIL_HOST = os.getenv("EMAIL_HOST", "maildev_dev")
 EMAIL_PORT = int(os.getenv("EMAIL_PORT", 1025))
 EMAIL_USE_TLS = os.getenv("EMAIL_USE_TLS", "False") == "True"
+EMAIL_USE_SSL = False
+EMAIL_HOST_USER = ""
+EMAIL_HOST_PASSWORD = ""
 DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL", "dev@example.com")
 
-# Static files
-STATICFILES_DIRS += [
-    BASE_DIR / "pointless_impressions_src/theme/static_src/src/js",
+# Static files configuration for development
+STATICFILES_DIRS = [
+    BASE_DIR / "theme/static_src/src/js",
+    BASE_DIR / "theme" / "static_src" / "static",
 ]
+
+# Development cache configuration
+cache_url = os.getenv("CACHE_URL", "redis://redis_dev:6379/0")
+if cache_url.startswith("redis://"):
+    CACHES["default"]["LOCATION"] = cache_url
+else:
+    # Fallback to local memory cache
+    CACHES = {
+        "default": {
+            "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+            "LOCATION": "unique-snowflake-dev",
+        }
+    }
 
 # Use a simple static version for development
 STATIC_VERSION = "dev"
 
+# File storage (local filesystem for development)
 DEFAULT_FILE_STORAGE = "django.core.files.storage.FileSystemStorage"
 
-CACHE_URL = os.getenv("CACHE_URL", "redis://redis:6379/0")
+# Development-specific security settings
+SECURE_SSL_REDIRECT = False
+SECURE_HSTS_SECONDS = 0
+SECURE_HSTS_INCLUDE_SUBDOMAINS = False
+SECURE_HSTS_PRELOAD = False
+CSRF_COOKIE_SECURE = False
+SESSION_COOKIE_SECURE = False
+
+# Debug toolbar configuration (if needed)
+INTERNAL_IPS = [
+    "127.0.0.1",
+    "localhost",
+    "web",  # Docker service name
+]
+
+# Development logging - more verbose
+LOGGING["handlers"]["console"]["level"] = "DEBUG"
+LOGGING["loggers"]["django"]["level"] = "DEBUG"
+LOGGING["root"]["level"] = "DEBUG"

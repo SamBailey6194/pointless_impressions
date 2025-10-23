@@ -1,35 +1,48 @@
+"""
+Django settings for staging environment.
+"""
+
 from .base import *
 import os
 import dj_database_url
 from datetime import datetime
 
-SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", "staging-secret-key")
+# Environment settings
+ENVIRONMENT = "staging"
+SECRET_KEY = os.getenv("DJANGO_SECRET_KEY")
+if not SECRET_KEY:
+    raise ValueError("DJANGO_SECRET_KEY environment variable is required")
+
 DEBUG = os.getenv("DJANGO_DEBUG", "False") == "True"
 ALLOWED_HOSTS = os.getenv(
-    "DJANGO_ALLOWED_HOSTS", "staging.example.com"
-    ).split(",")
+    "DJANGO_ALLOWED_HOSTS",
+    "staging.example.com"
+).split(",")
 PRODUCTION = True
 
+# Database configuration (using course database maker)
 DATABASES = {
     "default": dj_database_url.config(
-        default=f"postgres://{os.getenv('STAGING_DB_USER', 'staging_user')}:"
-        f"{os.getenv('STAGING_DB_PASSWORD', 'staging_pass')}@"
-        f"{os.getenv('STAGING_DB_HOST', 'db_staging')}:"
-        f"5432/{os.getenv('STAGING_DB_NAME', 'staging_db')}",
+        default=os.getenv("DATABASE_URL"),
         conn_max_age=600,
     )
 }
 
-# Email setup (e.g. Mailtrap or SendGrid sandbox)
+# Email configuration (Mailtrap or similar testing service)
 EMAIL_BACKEND = os.getenv(
-    "EMAIL_BACKEND", "django.core.mail.backends.smtp.EmailBackend"
-    )
+    "EMAIL_BACKEND",
+    "django.core.mail.backends.smtp.EmailBackend"
+)
 EMAIL_HOST = os.getenv("EMAIL_HOST", "smtp.mailtrap.io")
-EMAIL_PORT = int(os.getenv("EMAIL_PORT", 1025))
+EMAIL_PORT = int(os.getenv("EMAIL_PORT", 587))
 EMAIL_USE_TLS = os.getenv("EMAIL_USE_TLS", "True") == "True"
+EMAIL_USE_SSL = os.getenv("EMAIL_USE_SSL", "False") == "True"
 EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER", "")
 EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD", "")
-DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL", "staging@example.com")
+DEFAULT_FROM_EMAIL = os.getenv(
+    "DEFAULT_FROM_EMAIL",
+    "staging@example.com"
+)
 
 CLOUDINARY_STORAGE = {
     "CLOUD_NAME": os.getenv("CLOUDINARY_CLOUD_NAME"),
@@ -73,4 +86,33 @@ STATIC_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/static/'
 # Use timestamp as STATIC_VERSION for cache busting
 STATIC_VERSION = datetime.now().strftime("staging-%Y%m%d%H%M%S")
 
-CACHE_URL = os.getenv("CACHE_URL", "redis://redis:6379/0")
+# Cache configuration for staging
+cache_url = os.getenv("CACHE_URL", "redis://redis_staging:6379/0")
+if cache_url.startswith("redis://"):
+    CACHES["default"]["LOCATION"] = cache_url
+else:
+    # Fallback to local memory cache for course development
+    CACHES = {
+        "default": {
+            "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+            "LOCATION": "unique-snowflake-staging",
+        }
+    }
+
+# Security settings for staging (no SSL for Heroku course deployment)
+SECURE_SSL_REDIRECT = os.getenv("SECURE_SSL_REDIRECT", "False") == "True"
+SECURE_HSTS_SECONDS = int(os.getenv("SECURE_HSTS_SECONDS", "0"))
+SECURE_HSTS_INCLUDE_SUBDOMAINS = False
+SECURE_HSTS_PRELOAD = False
+CSRF_COOKIE_SECURE = os.getenv("CSRF_COOKIE_SECURE", "False") == "True"
+SESSION_COOKIE_SECURE = os.getenv("SESSION_COOKIE_SECURE", "False") == "True"
+CSRF_TRUSTED_ORIGINS = [
+    origin.strip()
+    for origin in os.getenv("CSRF_TRUSTED_ORIGINS", "").split(",")
+    if origin.strip()
+]
+
+# Staging-specific logging
+LOGGING["handlers"]["console"]["level"] = "INFO"
+LOGGING["loggers"]["django"]["level"] = "INFO"
+LOGGING["root"]["level"] = "INFO"

@@ -144,6 +144,54 @@ For development you only need to worry about the Dockerfile.staging, docker-comp
 
 Ensure AWS S3, Cloudinary, PostgreSQL, and Stripe are reachable from the staging container.
 
+### Using the Staging Helper Script
+
+A helper script `staging.sh` is provided to simplify staging environment management:
+
+```bash
+# Make the script executable (one time setup)
+chmod +x staging.sh
+
+# Start staging services
+./staging.sh start
+
+# Stop staging services
+./staging.sh stop
+
+# Build staging images
+./staging.sh build
+
+# Rebuild and restart everything
+./staging.sh rebuild
+
+# View logs (all services or specific service)
+./staging.sh logs
+./staging.sh logs web_staging
+
+# Open shell in Django container
+./staging.sh shell
+
+# Run Django migrations
+./staging.sh migrate
+
+# Run Django tests
+./staging.sh test
+
+# Clean up containers and volumes
+./staging.sh clean
+
+# Show service status
+./staging.sh status
+
+# Show service URLs
+./staging.sh urls
+
+# Show help
+./staging.sh help
+```
+
+The helper script provides colored output, error checking, and handles common staging operations automatically.
+
 ---
 
 ## Deploying the Staging App
@@ -158,18 +206,43 @@ Ensure AWS S3, Cloudinary, PostgreSQL, and Stripe are reachable from the staging
 
 4. Build and start staging the containers
 
+    **Option A: Using the helper script (recommended)**
+    ```bash
+    ./staging.sh start
+    ```
+
+    **Option B: Using docker-compose directly**
     ```bash
     docker compose -f docker-compose.staging.yml up --build -d
     ```
 
 5. Verify they are running
 
+    **Option A: Using the helper script**
+    ```bash
+    ./staging.sh status
+    ```
+
+    **Option B: Using docker directly**
     ```bash
     docker ps
     ```
 
 6. Create a superuser for the Django Admin by:
 
+    **Option A: Using the helper script (recommended)**
+    ```bash
+    ./staging.sh shell
+    # Then inside the container:
+    python manage.py createsuperuser
+    ```
+
+    **Option B: Direct docker-compose command**
+    ```bash
+    docker-compose -f docker-compose.staging.yml exec web_staging python manage.py createsuperuser
+    ```
+
+    **Option C: Using local venv (if you prefer)**
     1. Ensure you are in your venv
 
         ```bash
@@ -189,11 +262,7 @@ Ensure AWS S3, Cloudinary, PostgreSQL, and Stripe are reachable from the staging
         python3 manage.py createsuperuser
         ```
 
-    3. Enter the username
-
-    4. Enter an email
-
-    5. Enter a password
+    3. Enter the username, email, and password when prompted
 
 7. Ensure you have Heroku CLI installed, you can check by typing.
 

@@ -1,4 +1,5 @@
-{% load static tailwind_tags %}
+{% load static cloudinary tailwind_tags %}
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -23,11 +24,11 @@
       {% comment %} Open Graph Image Block: Dev uses local files, Prod uses Cloudinary {% endcomment %}
       {% if production %}
           {% if product and product.image %}
-              <meta property="og:image" content="https://res.cloudinary.com/{{ CLOUDINARY_STORAGE.CLOUD_NAME }}/image/upload/w_1200,h_630,q_auto,f_auto/{{ product.image.name }}" />
+              <meta property="og:image" content="{% cloudinary product.image 'w_1200,h_630,c_fill,f_auto,q_auto' %}">
           {% elif post and post.featured_image %}
-              <meta property="og:image" content="https://res.cloudinary.com/{{ CLOUDINARY_STORAGE.CLOUD_NAME }}/image/upload/w_1200,h_630,q_auto,f_auto/{{ post.featured_image.name }}" />
+              <meta property="og:image" content="{% cloudinary post.featured_image 'w_1200,h_630,c_fill,f_auto,q_auto' %}">
           {% else %}
-              <meta property="og:image" content="https://res.cloudinary.com/{{ CLOUDINARY_STORAGE.CLOUD_NAME }}/image/upload/w_1200,h_630,q_auto,f_auto/default-og.png" />
+              <meta property="og:image" content="{% cloudinary 'logo_white_01.png' 'w_1200,h_630,c_fill,f_auto,q_auto' %}">
           {% endif %}
       {% else %}
           {% if product and product.image %}
@@ -35,7 +36,7 @@
           {% elif post and post.featured_image %}
               <meta property="og:image" content="{{ request.build_absolute_uri }}{{ post.featured_image.url }}" />
           {% else %}
-              <meta property="og:image" content="{{ request.build_absolute_uri }}{% static 'images/default-og.jpg' %}" />
+              <meta property="og:image" content="{{ request.build_absolute_uri }}{{ MEDIA_URL }}logo_white_01.png" />
           {% endif %}
       {% endif %}
 
@@ -60,6 +61,10 @@
     {% tailwind_preload_css %}
     {% tailwind_css %}
 
+    {% block corejs %}
+      <script src="https://kit.fontawesome.com/b28d0f6314.js" crossorigin="anonymous"></script>
+    {% endblock %}
+
     {% block extra_head %}{% endblock %}
 
   </head>
@@ -67,17 +72,17 @@
   <body class="leading-normal tracking-normal">
 
     {% comment %} Header Content Area {% endcomment %}
-    <header class="p-4 shadow-md">
-      {% block header %}
-        
-      {% endblock %}
+    <header class="shadow-sm sticky top-0 z-50">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {% include "includes/header.html" %}
+      </div>
     </header>
 
     {% comment %} Main Content Area {% endcomment %}
-    <main class="container mx-auto">
-      {% block content %}
-
-      {% endblock %}
+    <main class="flex-1 pt-24 md:pt-28 lg:pt-32 container mx-auto">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {% block content %}{% endblock %}
+      </div>
     </main>
 
     {% comment %} Modals and Overlays {% endcomment %}
@@ -98,22 +103,18 @@
 
     {% comment %} Footer Content Area {% endcomment %}
     <footer class="p-4 mt-8 shadow-inner">
-      {% block footer %}
-        
-      {% endblock %}
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 p-4">
+        {% include 'includes/footer.html' %}
+      </div>
     </footer>
 
-    {% comment %} Core JavaScript Files {% endcomment %}
-    {% block corejs %}
-      {% if production %}
-        <script src="{% static 'js/script.js' %}?v={{ STATIC_VERSION }}" defer></script>
-      {% else %}
-        <script src="{% static 'script.js' %}" defer></script> {# points to dev JS #}
-      {% endif %}
-    {% endblock %}
-
     {% comment %} Extra JavaScript Files {% endcomment %}
-    {% block extrajs %}
+    {% block postloadjs %}
+      {% if production %}
+        <script src="{% static 'js/header_footer.js' %}?v={{ STATIC_VERSION }}" defer></script>
+      {% else %}
+        <script src="{% static 'header_footer.js' %}" defer></script>
+      {% endif %}
     {% endblock %}
   </body>
 

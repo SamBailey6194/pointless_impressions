@@ -15,7 +15,6 @@ env/
 *.pot
 *.mo
 /staticfiles/
-media/
 docs/
 READEME.md
 

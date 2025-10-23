@@ -5,8 +5,9 @@ FROM python:3.13-slim-bookworm
 # Set environment variables
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
+ENV DEBIAN_FRONTEND=noninteractive
 
-# Wokrking directory
+# Working directory
 WORKDIR /app
 
 # System dependencies
@@ -15,6 +16,9 @@ RUN apt-get update && apt-get install -y \
     netcat-openbsd \
     gcc \
     libpq-dev \
+    git \
+    wget \
+    gnupg \
     && curl -fsSL https://deb.nodesource.com/setup_24.x | bash - \
     && apt-get install -y nodejs \
     && npm install -g npm@11.6.2 \
@@ -24,16 +28,22 @@ RUN apt-get update && apt-get install -y \
 # UV binary
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
 
-# Install dependencies
+# Install Python dependencies
 COPY requirements.txt .
 RUN uv pip install --upgrade pip --system && \
     uv pip install -r requirements.txt --system
 
 # Copy project files
 COPY pointless_impressions_src/ ./pointless_impressions_src/
+COPY manage.py .
 
 # Make entrypoint executable
 RUN chmod +x ./pointless_impressions_src/dev-entrypoint.sh
+
+# Create a non-root user for development (optional but recommended)
+RUN useradd --create-home --shell /bin/bash devuser && \
+    chown -R devuser:devuser /app
+USER devuser
 
 # Expose port
 EXPOSE 8000

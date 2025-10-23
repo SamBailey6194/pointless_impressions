@@ -10,7 +10,6 @@
 @import "tailwindcss";
 @plugin "@tailwindcss/forms";
 @plugin "@tailwindcss/typography";
-@plugin "daisyui";
 
 /**
   * A catch-all path to Django template files, JavaScript, and Python files
@@ -19,36 +18,41 @@
   * If your final CSS file is not being updated after code changes, you may want to broaden or narrow
   * the scope of this path.
   */
-@source "../../../**/*.{html,py,js}";
+@source "{**,**/**}/**/*.{html,htm,js,jsx,ts,tsx,py}";
 
-/* Custom Colours */
+/* Custom CSS for Light Mode */
 @theme {
-  --pointless-bg: oklch(0.98 0 0);
+  /* Custom Colours */
+  --pointless-white: oklch(0.98 0 0);
   --pointless-yellow: oklch(0.68 0.13 93);
   --pointless-blue: oklch(0.16 0.13 260);
   --pointless-red: oklch(0.55 0.17 22);
-  --pointless-text: oklch(0 0 0);
+  --pointless-black: oklch(0 0 0);
+
+  /* Fonts */
+  --font-Poppins: 'Poppins', sans-serif;
+  --font-Montserrat: 'Montserrat', sans-serif;
+  --font-Inter: 'Inter', sans-serif;
 }
 
+/* Custom CSS for Dark Mode */
 @media (prefers-color-scheme: dark) {
   @theme {
-    --pointless-bg: oklch(0.08 0 0); /* Dark background */
-    --pointless-yellow: oklch(
-      0.72 0.18 93
-    ); /* Brighter yellow for contrast */
+    /* Custom Colours */
+    --pointless-white: oklch(0.98 0 0); /* Light text/icons */
+    --pointless-yellow: oklch(0.72 0.18 93); /* Brighter yellow for contrast */
     --pointless-blue: oklch(0.6 0.2 260); /* Lighter blue for visibility */
     --pointless-red: oklch(0.65 0.22 22); /* Brighter red for emphasis */
-    --pointless-text: oklch(0.98 0 0); /* Light text/icons */
+    --pointless-black: oklch(0.08 0 0); /* Dark background */
   }
 }
 
-/* Base typography */
 @layer base {
   /* Header & Footer */
   header, footer {
-    font-family: 'Poppins', sans-serif;
+    font-family: var(--font-Poppins);
     background-color: var(--pointless-blue);
-    color: var(--pointless-bg);
+    color: var(--pointless-white);
   }
 
   header {
@@ -70,24 +74,148 @@
     z-index: 999;
   }
 
-  /* Headings */
-  h1, h2, h3, h4, h5, h6 {
-    font-family: 'Montserrat', sans-serif;
-    color: var(--pointless-text);
-  }
-
-  /* Body text */
-  body, p, span, li, a {
-    font-family: 'Inter', sans-serif;
-  }
-
+  /* Sections */
   .section-blue {
-    background-color: var(--pointless-bg);
+    background-color: var(--pointless-white);
     color: var(--pointless-blue);
   }
 
-  .section-white {
-    background-color: var(--pointless-bg);
-    color: var(--pointless-text);
+  .section-alt {
+    background-color: var(--pointless-white);
+    color: var(--pointless-black);
+  }
+
+  /* Form elements */
+  .custom-input {
+    background-color: var(--pointless-white) !important;
+    border: 1px solid var(--pointless-blue) !important;
+    color: var(--pointless-black) !important;
+    font-family: var(--font-Poppins);
+    padding: 0.5rem;
+    border-radius: 0.25rem;
+    box-shadow: none !important;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;                                                                               
+  }
+
+  .custom-input:focus {
+    outline: none;
+    border-color: var(--pointless-blue) !important;
+    box-shadow: 0 0 0 3px rgba(5, 81, 135, 0.2) !important;
+  }
+
+  .custom-input::placeholder {
+    color: var(--pointless-black) !important;
+  }
+
+  /* Dark Mode Overrides */
+  @media (prefers-color-scheme: dark) {
+    header, footer {
+      color: var(--pointless-white);
+    }
+
+    .section-blue {
+      background-color: var(--pointless-black);
+      color: var(--pointless-blue);
+    }
+
+    .section-alt {
+      background-color: var(--pointless-black);
+      color: var(--pointless-white);
+    }
+
+    .custom-input {
+      background-color: var(--pointless-black) !important;
+      border-color: var(--pointless-blue) !important;
+      color: var(--pointless-white) !important;
+    }
+
+    .custom-input::placeholder {
+      color: var(--pointless-white) !important;
+    }
+  }
+}
+
+@layer utilities {
+  /* Buttons */
+  .btn {
+    background-color: var(--pointless-yellow);
+    border: 1px solid var(--pointless-blue);
+    color: var(--pointless-black);
+    padding: 0.5rem 1rem;
+    border-radius: 0.25rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .btn:hover {
+    background-color: var(--pointless-red);
+    border-color: var(--pointless-yellow);
+  }
+
+  /* Circular Buttons */
+  .btn-circle {
+    border-radius: 9999px;
+    width: 2.5rem;
+    height: 2.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--pointless-yellow);
+    border: 1px solid var(--pointless-blue);
+    color: var(--pointless-black);
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .btn-circle:hover {
+    background-color: var(--pointless-red);
+    border-color: var(--pointless-yellow);
+  }
+
+  /* Modals */
+  .modal {
+    background-color: var(--pointless-black);
+    border: 1px solid var(--pointless-blue);
+    border-radius: 0.5rem;
+    color: var(--pointless-white);
+  }
+
+  .modal-header {
+    background-color: var(--pointless-yellow);
+    color: var(--pointless-black);
+    padding: 0.5rem 1rem;
+    border-bottom: 1px solid var(--pointless-blue);
+  }
+
+  .modal-body {
+    background-color: var(--pointless-white);
+    padding: 1rem;
+    color: var(--pointless-black);
+  }
+
+  /* Dark Mode Overrides */
+  @media (prefers-color-scheme: dark) {
+    .btn,
+    .btn-circle {
+      background-color: var(--pointless-yellow);
+      border-color: var(--pointless-blue);
+      color: var(--pointless-black);
+    }
+
+    .btn:hover,
+    .btn-circle:hover {
+      background-color: var(--pointless-red);
+      border-color: var(--pointless-yellow);
+    }
+
+    .modal {
+      background-color: var(--pointless-black);
+      color: var(--pointless-white);
+    }
+
+    .modal-body {
+      background-color: var(--pointless-black);
+      color: var(--pointless-white);
+    }
   }
 }

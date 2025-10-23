@@ -2,67 +2,80 @@
 set -e
 echo "Starting development container..."
 
+# Change to project root directory
+cd /app
+
 # Load environment variables
 if [ -f .env.dev ]; then
+    echo "Loading environment variables from .env.dev..."
     export $(grep -v '^#' .env.dev | xargs)
 fi
 
 # Wait for database to be ready
-echo "Waiting for database at ${DEV_DB_HOST}:${DEV_DB_PORT}..."
-while ! nc -z $DEV_DB_HOST $DEV_DB_PORT; do
+echo "Waiting for database at ${DEV_DB_HOST:-db_dev}:${DEV_DB_PORT:-5432}..."
+while ! nc -z ${DEV_DB_HOST:-db_dev} ${DEV_DB_PORT:-5432}; do
   sleep 1
 done
+echo "Database is ready!"
 
-# Initialize hash files
-REQ_HASH_FILE=/tmp/requirements.hash
-PKG_HASH_FILE=/tmp/package.hash
-
-touch $REQ_HASH_FILE $PKG_HASH_FILE
-
-if [ -f requirements.txt ]; then
-    md5sum requirements.txt | awk '{print $1}' > $REQ_HASH_FILE
-fi
-
-NODE_DIR=./pointless_impressions_src/theme/static_src
-if [ -f "$NODE_DIR/package.json" ]; then
-    md5sum "$NODE_DIR/package.json" | awk '{print $1}' > $PKG_HASH_FILE
-fi
+# Change to Django project directory
+cd /app/pointless_impressions_src
 
 # Apply Django migrations
 echo "Applying database migrations..."
-python manage.py migrate || true
+python manage.py migrate
 
-# Install Tailwind dependencies and build
-echo "Installing Tailwind and Node..."
-cd $NODE_DIR
-npm install
-cd -
+# Create superuser if it doesn't exist (for development convenience)
+echo "Checking for superuser..."
+python manage.py shell -c "
+from django.contrib.auth import get_user_model
+User = get_user_model()
+if not User.objects.filter(is_superuser=True).exists():
+    User.objects.create_superuser('admin', 'admin@example.com', 'admin123')
+    print('Superuser created: admin/admin123')
+else:
+    print('Superuser already exists')
+" 2>/dev/null || echo "Note: Superuser creation skipped"
+
+# Install Tailwind dependencies
+NODE_DIR=./theme/static_src
+echo "Installing Tailwind and Node dependencies..."
+if [ -f "$NODE_DIR/package.json" ]; then
+    cd $NODE_DIR
+    npm install
+    cd -
+else
+    echo "Warning: package.json not found in $NODE_DIR"
+fi
+
+# Install Tailwind CSS
+echo "Installing Tailwind CSS..."
+python manage.py tailwind install
+
+# Function to handle graceful shutdown
+cleanup() {
+    echo "Shutting down services..."
+    kill $(jobs -p) 2>/dev/null || true
+    exit 0
+}
+trap cleanup SIGTERM SIGINT
 
 # Start Tailwind watcher in background
 echo "Starting Tailwind in watch mode..."
 python manage.py tailwind start &
+TAILWIND_PID=$!
 
-# Start Django dev server in background
+# Wait a moment for Tailwind to start
+sleep 2
+
+# Start Django development server
 echo "Starting Django development server..."
-python manage.py runserver 0.0.0.0:8000 &
+echo "Access the application at: http://localhost:8000"
+echo "Access MailDev at: http://localhost:1080"
+echo "Press Ctrl+C to stop all services"
 
-# Watch requirements.txt and package.json for changes
-echo "Watching requirements.txt and package.json for changes..."
-while inotifywait -e close_write requirements.txt ./pointless_impressions_src/theme/static_src/package.json; do
-    echo "Change detected!"
+# Run Django server in foreground (this keeps the container running)
+python manage.py runserver 0.0.0.0:8000
 
-    # Update Python dependencies if requirements.txt changed
-    if [ -f requirements.txt ]; then
-        echo "Installing Python dependencies..."
-        pip install -r requirements.txt
-    fi
-
-    # Update Node dependencies if package.json changed
-    NODE_DIR=./pointless_impressions_src/theme/static_src
-    if [ -f "$NODE_DIR/package.json" ]; then
-        echo "Installing Node dependencies..."
-        cd $NODE_DIR
-        npm install
-        cd -
-    fi
-done
+# This line should never be reached, but just in case
+wait
