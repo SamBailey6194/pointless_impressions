@@ -3,7 +3,7 @@ set -e
 
 echo "Starting staging container..."
 
-# Change to Django project directory
+# Change to Django project directory for proper imports
 cd /app/pointless_impressions_src
 
 # Load environment variables
@@ -13,16 +13,16 @@ if [ -f "/app/.env.staging" ]; then
 fi
 
 # Set default database connection variables for staging
-DB_HOST=${STAGING_DB_HOST:-${DATABASE_URL:-db_staging}}
+DB_HOST=${STAGING_DB_HOST:-${STAGING_DB_URL:-db_staging}}
 DB_PORT=${STAGING_DB_PORT:-5432}
 
-# Wait for database (supports both manual config and DATABASE_URL)
-if [ -n "$DATABASE_URL" ]; then
-    echo "Using DATABASE_URL for database connection..."
-    # Extract host from DATABASE_URL if needed for health check
-    DB_HOST=$(echo $DATABASE_URL | sed -n 's/.*@\([^:]*\):.*/\1/p')
+# Wait for database (supports both manual config and STAGING_DB_URL)
+if [ -n "$STAGING_DB_URL" ]; then
+    echo "Using STAGING_DB_URL for database connection..."
+    # Extract host from STAGING_DB_URL if needed for health check
+    DB_HOST=$(echo $STAGING_DB_URL | sed -n 's/.*@\([^:]*\):.*/\1/p')
     echo "Waiting for database at $DB_HOST..."
-    # Simple wait for DATABASE_URL connection
+    # Simple wait for STAGING_DB_URL connection
     sleep 5
 else
     echo "Waiting for database at $DB_HOST:$DB_PORT..."
@@ -35,7 +35,7 @@ echo "Database connection ready."
 # Check if we can connect to the database
 echo "Testing database connection..."
 python /app/manage.py check --database default || {
-    echo "Error: Cannot connect to database. Please check your DATABASE_URL or staging database settings."
+    echo "Error: Cannot connect to database. Please check your STAGING_DB_URL or staging database settings."
     exit 1
 }
 
@@ -61,11 +61,13 @@ echo "Staging deployment information:"
 echo "- Django settings module: ${DJANGO_SETTINGS_MODULE:-pointless_impressions_src.pointless_impressions.settings.staging}"
 echo "- Debug mode: ${DJANGO_DEBUG:-False}"
 echo "- Allowed hosts: ${DJANGO_ALLOWED_HOSTS:-not set}"
-echo "- Database: $(echo $DATABASE_URL | sed 's/.*@//' | sed 's/\?.*//' || echo 'Local staging database')"
+echo "- Database: $(echo $STAGING_DB_URL | sed 's/.*@//' | sed 's/\?.*//' || echo 'Local staging database')"
 
 # Start Gunicorn with improved settings for staging
 echo "Starting Gunicorn staging server..."
-exec gunicorn pointless_impressions_src.pointless_impressions.wsgi:application \
+export PYTHONPATH="/app/pointless_impressions_src:$PYTHONPATH"
+export DJANGO_SETTINGS_MODULE="pointless_impressions.settings.staging"
+exec gunicorn pointless_impressions.wsgi:application \
     --bind 0.0.0.0:8000 \
     --workers 3 \
     --max-requests 1000 \

@@ -34,7 +34,6 @@ THIRD_PARTY_APPS = [
     "django_redis",
     # Tailwind CSS integration
     "tailwind",
-    "theme",
     # Storage backends
     "cloudinary_storage",
     "cloudinary",
@@ -43,6 +42,7 @@ THIRD_PARTY_APPS = [
 
 LOCAL_APPS = [
     "home",
+    "theme",
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS

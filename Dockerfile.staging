@@ -1,13 +1,18 @@
-# ---------- Stage 1: Build JS ----------
+# ---------- Stage 1: Build JS and CSS ----------
 FROM node:24-bookworm-slim AS node_builder
 WORKDIR /app
 
-# Copy Node package files and install dependencies
+# Copy Node package files and install dependencies (including dev dependencies for build)
 COPY pointless_impressions_src/theme/static_src/package*.json ./
-RUN npm ci --omit=dev
+RUN npm ci
 
-# Copy theme source files (for Django Tailwind to build)
-COPY pointless_impressions_src/theme/static_src/ ./theme/static_src/
+# Copy theme source files and build assets
+COPY pointless_impressions_src/theme/ ./theme/
+WORKDIR /app/theme/static_src
+RUN npm run build && \
+    echo "Build completed, checking output:" && \
+    ls -la ../../ && \
+    find /app -name "*.css" -o -name "*.js" | head -10
 
 # ---------- Stage 2: Python + Django ----------
 FROM python:3.13-slim-bookworm
@@ -28,18 +33,14 @@ COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
 # Install Python dependencies
 COPY requirements.txt .
 RUN uv pip install --upgrade pip --system && \
-    uv pip install -r requirements.txt --system -- --root-user-action=ignore
+    uv pip install -r requirements.txt --system
 
 # Copy Django project
 COPY pointless_impressions_src/ ./pointless_impressions_src/
 COPY manage.py .
 
-# Copy theme source from Node stage (includes node_modules)
-COPY --from=node_builder /app/theme/static_src/ ./pointless_impressions_src/theme/static_src/
-
-# Build both CSS and JS via Django Tailwind (as root for permissions)
-RUN python manage.py tailwind install
-RUN python manage.py tailwind build
+# Copy built static files from Node stage
+COPY --from=node_builder /app/static/ ./pointless_impressions_src/theme/static/
 
 # Ensure all files are owned by the app user before switching
 RUN useradd -m appuser && \

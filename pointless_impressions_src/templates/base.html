@@ -22,22 +22,12 @@
       <meta property="og:site_name" content="Pointless Impressions" />
 
       {% comment %} Open Graph Image Block: Dev uses local files, Prod uses Cloudinary {% endcomment %}
-      {% if production %}
-          {% if product and product.image %}
-              <meta property="og:image" content="{% cloudinary product.image 'w_1200,h_630,c_fill,f_auto,q_auto' %}">
-          {% elif post and post.featured_image %}
-              <meta property="og:image" content="{% cloudinary post.featured_image 'w_1200,h_630,c_fill,f_auto,q_auto' %}">
-          {% else %}
-              <meta property="og:image" content="{% cloudinary 'logo_white_01.png' 'w_1200,h_630,c_fill,f_auto,q_auto' %}">
-          {% endif %}
+      {% if product.image %}
+          <meta property="og:image" content="{% cloudinary_url product.image width=1200 height=630 crop='fill' format='auto' quality='auto' %}">
+      {% elif post.featured_image %}
+          <meta property="og:image" content="{% cloudinary_url post.featured_image width=1200 height=630 crop='fill' format='auto' quality='auto' %}">
       {% else %}
-          {% if product and product.image %}
-              <meta property="og:image" content="{{ request.build_absolute_uri }}{{ product.image.url }}" />
-          {% elif post and post.featured_image %}
-              <meta property="og:image" content="{{ request.build_absolute_uri }}{{ post.featured_image.url }}" />
-          {% else %}
-              <meta property="og:image" content="{{ request.build_absolute_uri }}{{ MEDIA_URL }}logo_white_01.png" />
-          {% endif %}
+          <meta property="og:image" content="{% cloudinary_url 'qzdky29kboidek5sm5qs.png' width=1200 height=630 crop='fill' format='auto' quality='auto' %}">
       {% endif %}
 
       {% comment %} Robots Meta Tags {% endcomment %}
@@ -53,7 +43,7 @@
       <link rel="canonical" href="{{ request.build_absolute_uri }}" />
       
       {% comment %} Favicon {% endcomment %}
-      <link rel="icon" type="image/png" href="{% if production %}{% cloudinary 'logo_white_01.png' 'w_32,h_32,c_fit,f_auto,q_auto' %}{% else %}{{ MEDIA_URL }}logo_white_01.png{% endif %}" />
+      <link rel="icon" type="image/png" href="{% if production %}{% cloudinary_url 'qzdky29kboidek5sm5qs.png' width=32 height=32 crop='fit' format='auto' quality='auto' %}{% else %}{{ MEDIA_URL }}logo_white_01.png{% endif %}" />
     {% endblock %}
 
     {% block extra_meta %}
