@@ -1,31 +1,58 @@
+"""
+Django settings for production environment.
+"""
+
 from .base import *
 import os
 import dj_database_url
+import subprocess
 
+# Environment settings
+ENVIRONMENT = "production"
 SECRET_KEY = os.getenv("DJANGO_SECRET_KEY")
-DEBUG = False
-ALLOWED_HOSTS = os.getenv("DJANGO_ALLOWED_HOSTS", "example.com").split(",")
+if not SECRET_KEY:
+    raise ValueError("DJANGO_SECRET_KEY environment variable is required")
 
+DEBUG = False
+ALLOWED_HOSTS = os.getenv(
+    "DJANGO_ALLOWED_HOSTS",
+    "example.com"
+).split(",")
+PRODUCTION = True
+
+# Database configuration (using course database maker)
 DATABASES = {
     "default": dj_database_url.config(
-        default=f"postgres://{os.getenv('PROD_DB_USER', 'prod_user')}:"
-        f"{os.getenv('PROD_DB_PASSWORD', 'prod_pass')}@"
-        f"{os.getenv('PROD_DB_HOST', 'db_prod')}:"
-        f"5432/{os.getenv('PROD_DB_NAME', 'prod_db')}",
+        default=os.getenv("DATABASE_URL"),
         conn_max_age=600,
     )
 }
 
-# Email - use real provider (SendGrid, Gmail, etc.)
+# Email configuration (production email service)
 EMAIL_BACKEND = os.getenv(
-    "EMAIL_BACKEND", "django.core.mail.backends.smtp.EmailBackend"
-    )
-EMAIL_HOST = os.getenv("EMAIL_HOST", "smtp.gmail.com")
+    "EMAIL_BACKEND",
+    "django.core.mail.backends.smtp.EmailBackend"
+)
+EMAIL_HOST = os.getenv("EMAIL_HOST")
 EMAIL_PORT = int(os.getenv("EMAIL_PORT", 587))
 EMAIL_USE_TLS = os.getenv("EMAIL_USE_TLS", "True") == "True"
-EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER", "")
-EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD", "")
-DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL", "no-reply@yourdomain.com")
+EMAIL_USE_SSL = os.getenv("EMAIL_USE_SSL", "False") == "True"
+EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
+EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
+DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL")
+
+# Email validation - only validate if email backend is set to SMTP
+if EMAIL_BACKEND == "django.core.mail.backends.smtp.EmailBackend":
+    required_email_vars = [
+        EMAIL_HOST, EMAIL_HOST_USER, EMAIL_HOST_PASSWORD, DEFAULT_FROM_EMAIL
+    ]
+    if not all(required_email_vars):
+        print(
+            "Warning: SMTP email backend requires EMAIL_HOST, "
+            "EMAIL_HOST_USER, EMAIL_HOST_PASSWORD, DEFAULT_FROM_EMAIL"
+        )
+        # Fall back to console backend for development
+        EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 
 # Cloudinary storage
 CLOUDINARY_STORAGE = {
@@ -67,5 +94,56 @@ STORAGES = {
 # Override static URL in production
 STATIC_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/static/'
 
-# Caching
-CACHE_URL = os.getenv("CACHE_URL", "redis://redis:6379/0")
+# Use Git commit hash as STATIC_VERSION for cache busting
+try:
+    STATIC_VERSION = subprocess.check_output(
+        ['git', 'rev-parse', '--short', 'HEAD']
+    ).decode().strip()
+except Exception:
+    STATIC_VERSION = 'prod'
+
+# Cache configuration for production
+cache_url = os.getenv("CACHE_URL", "redis://redis_production:6379/0")
+if cache_url.startswith("redis://"):
+    CACHES["default"]["LOCATION"] = cache_url
+else:
+    # Fallback to local memory cache for course development
+    CACHES = {
+        "default": {
+            "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+            "LOCATION": "unique-snowflake-production",
+        }
+    }
+
+# Production security settings (no SSL for Heroku course deployment)
+SECURE_SSL_REDIRECT = os.getenv("SECURE_SSL_REDIRECT", "False") == "True"
+SECURE_HSTS_SECONDS = int(os.getenv("SECURE_HSTS_SECONDS", "0"))
+SECURE_HSTS_INCLUDE_SUBDOMAINS = False
+SECURE_HSTS_PRELOAD = False
+CSRF_COOKIE_SECURE = os.getenv("CSRF_COOKIE_SECURE", "False") == "True"
+SESSION_COOKIE_SECURE = os.getenv("SESSION_COOKIE_SECURE", "False") == "True"
+CSRF_TRUSTED_ORIGINS = [
+    origin.strip()
+    for origin in os.getenv("CSRF_TRUSTED_ORIGINS", "").split(",")
+    if origin.strip()
+]
+
+# Additional security headers
+SECURE_REFERRER_POLICY = "strict-origin-when-cross-origin"
+SECURE_CROSS_ORIGIN_OPENER_POLICY = "same-origin"
+
+# Production logging - errors and warnings only
+LOGGING["handlers"]["console"]["level"] = "WARNING"
+LOGGING["loggers"]["django"]["level"] = "WARNING"
+LOGGING["loggers"]["django.request"]["level"] = "ERROR"
+LOGGING["root"]["level"] = "WARNING"
+
+# Error reporting (configure as needed)
+ADMINS = [
+    ("Admin", os.getenv("ADMIN_EMAIL", "admin@example.com")),
+]
+MANAGERS = ADMINS
+
+# Performance optimizations
+USE_ETAGS = True
+COMPRESS_ENABLED = os.getenv("COMPRESS_ENABLED", "True") == "True"

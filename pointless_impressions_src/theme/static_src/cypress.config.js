@@ -1,11 +1,11 @@
-const { defineConfig } = require("cypress");
+import { defineConfig } from "cypress";
 
 if (process.env.NODE_ENV !== "development") {
   console.warn("Cypress should only be run in development mode!");
   process.exit(1);
 }
 
-module.exports = defineConfig({
+export default defineConfig({
   e2e: {
     baseUrl: "http://localhost:8000",
     specPattern: "cypress/e2e/**/*.cy.js",

@@ -6,9 +6,8 @@ WORKDIR /app
 COPY pointless_impressions_src/theme/static_src/package*.json ./
 RUN npm ci --omit=dev
 
-# Copy JS source and build
-COPY pointless_impressions_src/theme/static_src/src/js ./src/js
-RUN npm run build:js  # Output: ./../../static/js
+# Copy theme source files (for Django Tailwind to build)
+COPY pointless_impressions_src/theme/static_src/ ./theme/static_src/
 
 # ---------- Stage 2: Python + Django ----------
 FROM python:3.13-slim-bookworm
@@ -33,20 +32,24 @@ RUN uv pip install --upgrade pip --system && \
 
 # Copy Django project
 COPY pointless_impressions_src/ ./pointless_impressions_src/
+COPY manage.py .
 
-# Copy JS built assets from Node stage
-COPY --from=node_builder /app/src/js ./pointless_impressions_src/static/js
+# Copy theme source from Node stage (includes node_modules)
+COPY --from=node_builder /app/theme/static_src/ ./pointless_impressions_src/theme/static_src/
 
-# Add non-root user
-RUN useradd -m appuser
-USER appuser
-
-# Build Tailwind CSS via Python
+# Build both CSS and JS via Django Tailwind (as root for permissions)
 RUN python manage.py tailwind install
-RUN python manage.py tailwind build  # Output: ./static/css
+RUN python manage.py tailwind build
 
-# Make entrypoint executable
+# Ensure all files are owned by the app user before switching
+RUN useradd -m appuser && \
+    chown -R appuser:appuser /app
+
+# Make entrypoint executable before switching user
 RUN chmod +x ./pointless_impressions_src/production-entrypoint.sh
+
+# Switch to non-root user
+USER appuser
 
 EXPOSE 8000
 HEALTHCHECK CMD curl -f http://localhost:8000/health/ || exit 1
