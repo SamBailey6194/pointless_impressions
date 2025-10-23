@@ -1,4 +1,4 @@
-# Staging Environment Guide
+# Production Environment Guide
 
 This document explains how to work with the production environment for the Pointless Impressions project.
 
@@ -8,7 +8,7 @@ Production is the live environment used by clients and end-users. All production
 
 ## Table of Contents
 
-- [Staging Environment Guide](#staging-environment-guide)
+- [Production Environment Guide](#production-environment-guide)
   - [Table of Contents](#table-of-contents)
   - [Purpose](#purpose)
   - [Project Structure](#project-structure)
@@ -16,7 +16,7 @@ Production is the live environment used by clients and end-users. All production
   - [Environment Setup](#environment-setup)
     - [Environment Variables](#environment-variables)
   - [Docker Setup](#docker-setup)
-  - [Deploying the Staging App](#deploying-the-staging-app)
+  - [Deploying the Production App](#deploying-the-production-app)
 
 ---
 
@@ -78,7 +78,7 @@ Production uses the same project structure as development and staging. Relevant 
 cp .env.production.example .env.production
 ```
 
-2. Update the .env.dev with the credentials, secret key and database settings
+3. Update the .env.production with the credentials, secret key and database settings
 
     ### Example
     DJANGO_SECRET_KEY="production_secret_key"
@@ -99,9 +99,9 @@ cp .env.production.example .env.production
 
     For emails on Heroku look to use Gmail, to do this follow the video [SMTP Setup](https://www.youtube.com/watch?v=ZfEK3WP73eY), you don't need to use SMTP Test tool. The video just shows you how to get the password for the config vars.
 
-3. For the Heroku staging we will need to have a postgres created from Code Institutes Database maker and we will need to create a superuser for the staging Django Web App as well. We will do this later.
+4. For the Heroku production we will need to have a postgres created from Code Institutes Database maker and we will need to create a superuser for the production Django Web App as well. We will do this later.
 
-4. We will also need to generate a secret key for the production
+5. We will also need to generate a secret key for the production
 
     In the venv in VS Code you can enter:
 
@@ -111,7 +111,15 @@ cp .env.production.example .env.production
     python -c "from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())"
     ```
 
-    You should get a long string in your terminal. You can then copy it and paste it into the .env.staging and this is your staging secret key for **Pointless Impressions**. Which will also need to go into the Heroku Config Vars.
+    If python doesn't work ensure you can run this as:
+
+    ```bash
+    source .venv/bin/activate  # Linux/Mac
+    .venv\Scripts\activate     # Windows
+    python3 -c "from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())"
+    ```
+
+    You should get a long string in your terminal. You can then copy it and paste it into the .env.production and this is your production secret key for **Pointless Impressions**. Which will also need to go into the Heroku Config Vars.
 
 ### Environment Variables
 
@@ -139,9 +147,63 @@ For development you only need to worry about the Dockerfile.production, docker-c
 
 Ensure AWS S3, Cloudinary, PostgreSQL, and Stripe are reachable from the production container.
 
+### Using the Production Helper Script
+
+A helper script `production.sh` is provided to simplify production environment management with built-in safety warnings:
+
+```bash
+# Make the script executable (one time setup)
+chmod +x production.sh
+
+# Start production services (with confirmation prompt)
+./production.sh start
+
+# Stop production services
+./production.sh stop
+
+# Build production images
+./production.sh build
+
+# Rebuild and restart everything (with confirmation prompt)
+./production.sh rebuild
+
+# View logs (all services or specific service)
+./production.sh logs
+./production.sh logs web_prod
+
+# Open shell in Django container (with production warning)
+./production.sh shell
+
+# Run Django migrations (with confirmation prompt)
+./production.sh migrate
+
+# Run Django tests
+./production.sh test
+
+# Create database backup
+./production.sh backup
+
+# Check service health
+./production.sh health
+
+# Clean up containers and volumes (requires typing "DELETE" to confirm)
+./production.sh clean
+
+# Show service status
+./production.sh status
+
+# Show service URLs
+./production.sh urls
+
+# Show help
+./production.sh help
+```
+
+**⚠️ IMPORTANT:** The production script includes safety prompts and warnings since this affects live users. Always double-check before confirming destructive operations.
+
 ---
 
-## Deploying the Staging App
+## Deploying the Production App
 
 **Important**: Never change or upgrade dependencies or packages, leave this to the lead dev. If there are any warnings at install please contact the lead dev.
 
@@ -152,20 +214,52 @@ Ensure AWS S3, Cloudinary, PostgreSQL, and Stripe are reachable from the product
 
 3. Ensure your Dockerfile.production and production-entrypoint.sh are correctly configured.
 
-4. Build and start staging the containers
+4. Build and start production the containers
 
+    **Option A: Using the helper script (recommended)**
+    ```bash
+    ./production.sh start
+    ```
+    *Note: This will prompt for confirmation since it's production*
+
+    **Option B: Using docker-compose directly**
     ```bash
     docker compose -f docker-compose.production.yml up --build -d
     ```
 
 5. Verify they are running
 
+    **Option A: Using the helper script**
+    ```bash
+    ./production.sh status
+    ```
+
+    **Option B: Check health of all services**
+    ```bash
+    ./production.sh health
+    ```
+
+    **Option C: Using docker directly**
     ```bash
     docker ps
     ```
 
 6. Create a superuser for the Django Admin by:
 
+    **Option A: Using the helper script (recommended)**
+    ```bash
+    ./production.sh shell
+    # Then inside the container:
+    python manage.py createsuperuser
+    ```
+    *Note: This will show a production warning before opening the shell*
+
+    **Option B: Direct docker-compose command**
+    ```bash
+    docker-compose -f docker-compose.production.yml exec web_prod python manage.py createsuperuser
+    ```
+
+    **Option C: Using local venv (if you prefer)**
     1. Ensure you are in your venv
 
         ```bash
@@ -185,11 +279,7 @@ Ensure AWS S3, Cloudinary, PostgreSQL, and Stripe are reachable from the product
         python3 manage.py createsuperuser
         ```
 
-    3. Enter the username
-
-    4. Enter an email
-
-    5. Enter a password
+    3. Enter the username, email, and password when prompted
 
 7. Ensure you have Heroku CLI installed, you can check by typing.
 
@@ -251,7 +341,7 @@ Ensure AWS S3, Cloudinary, PostgreSQL, and Stripe are reachable from the product
     STRIPE_PUBLIC_KEY= \
     STRIPE_SECRET_KEY= \
     STRIPE_WH_SECRET= \
-    --app pointless-impressions-staging
+    --app pointless-impressions
     ```
 
 12. Release the container

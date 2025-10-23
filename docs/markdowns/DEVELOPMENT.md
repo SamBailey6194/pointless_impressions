@@ -19,6 +19,10 @@ Venv is only for managing the `requirements.txt` and the `package.json` so other
     - [Environment Variables](#environment-variables)
   - [Docker Setup](#docker-setup)
   - [Running the Development Environment](#running-the-development-environment)
+    - [Using the Development Helper Script (Recommended)](#using-the-development-helper-script-recommended)
+    - [Manual Docker Setup (Alternative Method)](#manual-docker-setup-alternative-method)
+    - [Creating Additional Superusers](#creating-additional-superusers)
+    - [Accessing the Development Environment](#accessing-the-development-environment)
   - [Git Workflow](#git-workflow)
     - [Testing Guides](#testing-guides)
       - [Writing Tests](#writing-tests)
@@ -241,64 +245,140 @@ Only with permission can you adjust those files.
 
 ## Running the Development Environment
 
-**Important**: Never change or upgrade dependencies or packages, leave this to the lead dev. If there are any warnings at install please contact the lead dev. 
+**Important**: Never change or upgrade dependencies or packages, leave this to the lead dev. If there are any warnings at install please contact the lead dev.
 
-1. Now we have things set up locally you can build and start all Docker containers
+### Using the Development Helper Script (Recommended)
+
+We've created a `dev.sh` script to simplify common development tasks. This script provides easy commands for managing your development environment.
+
+#### Quick Start with dev.sh
+
+1. Make sure the script is executable (already done):
+   ```bash
+   chmod +x dev.sh
+   ```
+
+2. Start the development environment:
+   ```bash
+   ./dev.sh start
+   ```
+   
+   This command will:
+   - Check if Docker and Docker Compose are installed
+   - Create `.env.dev` from example if it doesn't exist
+   - Build and start all Docker containers
+   - Show you the access URLs
+
+3. View all available commands:
+   ```bash
+   ./dev.sh help
+   ```
+
+#### Available dev.sh Commands
+
+| Command | Description | Example |
+|---------|-------------|---------|
+| `start` | Start all development services | `./dev.sh start` |
+| `stop` | Stop all development services | `./dev.sh stop` |
+| `restart` | Restart all development services | `./dev.sh restart` |
+| `build` | Build the development containers | `./dev.sh build` |
+| `logs` | Show logs from all services | `./dev.sh logs` or `./dev.sh logs web` |
+| `shell` | Access Django shell | `./dev.sh shell` |
+| `bash` | Access bash shell in container | `./dev.sh bash` |
+| `migrate` | Run Django migrations | `./dev.sh migrate` |
+| `makemigrations` | Create Django migrations | `./dev.sh makemigrations` |
+| `createsuperuser` | Create Django superuser | `./dev.sh createsuperuser` |
+| `test` | Run Django tests | `./dev.sh test` |
+| `collectstatic` | Collect static files | `./dev.sh collectstatic` |
+| `clean` | Clean up containers and volumes | `./dev.sh clean` |
+| `status` | Show status of all services | `./dev.sh status` |
+
+### Manual Docker Setup (Alternative Method)
+
+If you prefer to run Docker commands manually instead of using the `dev.sh` script:
+
+1. Build and start all Docker containers:
 
     ```bash
     docker compose -f docker-compose.dev.yml up --build
     ```
 
-    It should build in the order of
+    It should build in the order of:
 
     1. db_dev = PostgreSQL
-   
     2. redis_dev = Redis Cache
-
     3. maildev_dev = Email testing
-   
     4. web = Django development server
 
     Important notes: 
-    5. Tailwind and JS files will automatically run in watch mode
-    6. The database will automatically migrate
+    - Tailwind and JS files will automatically run in watch mode
+    - The database will automatically migrate
+    - A superuser (admin/admin123) will be created automatically
 
-5. Create a superuser for the Django Admin by:
+### Creating Additional Superusers
 
-    1. Ensure you are in your venv
+If you need to create additional superusers:
 
-        ```bash
-        source .venv/bin/activate  # Linux/Mac
-        .venv\Scripts\activate     # Windows
-        ```
+1. Using the dev.sh script (recommended):
+   ```bash
+   ./dev.sh createsuperuser
+   ```
 
-    2. Typing:
+2. Manual method - ensure you are in your venv:
+   ```bash
+   source .venv/bin/activate  # Linux/Mac
+   .venv\Scripts\activate     # Windows
+   python manage.py createsuperuser
+   ```
 
-        ```bash
-        python manage.py createsuperuser
-        ```
+   If python doesn't work, use python3:
+   ```bash
+   python3 manage.py createsuperuser
+   ```
 
-        If python doesn't work ensure you can run this as:
+### Accessing the Development Environment
 
-        ```bash
-        python3 manage.py createsuperuser
-        ```
+After starting the development environment, you can access:
 
-    3. Enter the username
+- **Web application**: [http://localhost:8000](http://localhost:8000/)
+- **Django Admin**: [http://localhost:8000/admin](http://localhost:8000/admin) (admin/admin123)
+- **MailDev Interface**: [http://localhost:1080](http://localhost:1080/) (for viewing sent emails)
+- **Database**: localhost:5433 (PostgreSQL)
+- **Redis**: localhost:6379 (Redis Cache)
 
-    4. Enter an email
+### Troubleshooting Development Environment
 
-    5. Enter a password
+#### Common Issues and Solutions
 
-    This now gives you access to [Django Admin](http://localhost:8000/admin)
+1. **Port conflicts**: If you get port binding errors, make sure no other services are running on ports 8000, 5433, 6379, 1025, or 1080.
 
-6. Access the local development by going to [Local Development](http://localhost:8000/)
+2. **Permission errors with dev.sh**: Make sure the script is executable:
+   ```bash
+   chmod +x dev.sh
+   ```
 
-7. Access the maildev development:
+3. **Docker not found**: Ensure Docker and Docker Compose are installed and running.
 
-    1. For seeing the listening server that sends emails use [Maildev Listening](http://localhost:1025/)
+4. **Environment variables not loaded**: The `dev.sh start` command automatically creates `.env.dev` from the example file if it doesn't exist.
 
-    2. For seeing the web interface inbox, where you can also see the sent emails use [Maildev Interface](http://localhost:1080/)
+5. **Containers not starting**: Check the logs:
+   ```bash
+   ./dev.sh logs
+   ```
+
+6. **Clean restart**: If you're having persistent issues, clean everything and start fresh:
+   ```bash
+   ./dev.sh clean
+   ./dev.sh start
+   ```
+
+#### Useful Development Commands
+
+- **View running containers**: `./dev.sh status`
+- **Access Django shell**: `./dev.sh shell`
+- **View logs**: `./dev.sh logs` or `./dev.sh logs web`
+- **Run tests**: `./dev.sh test`
+- **Access container bash**: `./dev.sh bash`
 
 ---
 

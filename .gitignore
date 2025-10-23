@@ -19,7 +19,6 @@ env/
 *.mo
 db.sqlite3
 /staticfiles/
-media/
 
 # -----------------------------
 # Environment / secrets
