@@ -74,6 +74,8 @@ AWS_S3_GZIP = True
 # Public URL for S3 bucket
 AWS_S3_CUSTOM_DOMAIN = f'{AWS_S3_BUCKET_NAME_STATIC}.s3.{AWS_REGION}.amazonaws.com'
 
+AWS_DEFAULT_ACL = None
+
 # Storage backends
 STORAGES = {
     # Media Files (Replaces DEFAULT_FILE_STORAGE)
