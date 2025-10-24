@@ -41,8 +41,8 @@ THIRD_PARTY_APPS = [
 ]
 
 LOCAL_APPS = [
-    "home",
-    "theme",
+    "pointless_impressions_src.home",
+    "pointless_impressions_src.theme",
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
