@@ -22,6 +22,7 @@
       <meta property="og:site_name" content="Pointless Impressions" />
 
       {% comment %} Open Graph Image Block: Dev uses local files, Prod uses Cloudinary {% endcomment %}
+      {% comment %}
       {% if product.image %}
           <meta property="og:image" content="{% cloudinary_url product.image width=1200 height=630 crop='fill' format='auto' quality='auto' %}">
       {% elif post.featured_image %}
@@ -29,6 +30,7 @@
       {% else %}
           <meta property="og:image" content="{% cloudinary_url 'qzdky29kboidek5sm5qs' width=1200 height=630 crop='fill' format='auto' quality='auto' %}">
       {% endif %}
+      {% endcomment %}
 
       {% comment %} Robots Meta Tags {% endcomment %}
       {% if page_slug == "login" or page_slug == "signup" or page_slug == "checkout" or page_slug == "account" or page_slug == "admin" %}

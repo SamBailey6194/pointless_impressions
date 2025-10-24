@@ -68,11 +68,12 @@ services:
       - DEV_DB_HOST=db_dev
       - DEV_DB_PORT=5432
       - CACHE_URL=redis://redis_dev:6379/0
+      - NODE_ENV=development
     ports:
       - "8000:8000"
     volumes:
       - .:/app
-      - /app/pointless_impressions_src/node_modules  # Prevent node_modules conflicts
+      - /app/pointless_impressions_src/theme/static_src/node_modules
     depends_on:
       db_dev:
         condition: service_healthy
@@ -82,8 +83,8 @@ services:
         condition: service_healthy
     restart: unless-stopped
     command: /app/pointless_impressions_src/dev-entrypoint.sh
-    stdin_open: true  # Enable interactive mode
-    tty: true  # Allocate a pseudo-TTY
+    stdin_open: true
+    tty: true
 
 volumes:
   db_dev_data:

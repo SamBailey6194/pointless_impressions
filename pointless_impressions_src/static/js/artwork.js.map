@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["../../theme/static_src/src/js/artwork.js"],
+  "sourcesContent": ["// pointless_impressions/pointless_impressions_src/theme/static_src/src/js/artwork.js\n\nexport function renderArtworkList(artworks) {\n    // TODO: implement rendering\n    return null;\n}\n\nexport function filterAvailableArtworks(artworks) {\n    // TODO: implement filtering\n    return [];\n}\n\nexport function sortArtworksByPrice(artworks) {\n    // TODO: implement sorting\n    return artworks;\n}\n\n// Wait for the DOM to be ready\ndocument.addEventListener(\"DOMContentLoaded\", () => {\n    const artworks = [\n        { name: \"Sunset\", price: 199.99, description: \"A beautiful sunset over the mountains.\", is_available: true, sku: \"SUNSET123\" },\n        { name: \"Starry Night\", price: 299.99, description: \"A night sky full of color and dots.\", is_available: false, sku: \"STARRY123\" },\n    ];\n\n    // Currently just calls the stub, will not render anything\n    renderArtworkList(artworks);\n});\n"],
+  "mappings": ";;AAEO,WAAS,kBAAkB,UAAU;AAExC,WAAO;AAAA,EACX;AAEO,WAAS,wBAAwB,UAAU;AAE9C,WAAO,CAAC;AAAA,EACZ;AAEO,WAAS,oBAAoB,UAAU;AAE1C,WAAO;AAAA,EACX;AAGA,WAAS,iBAAiB,oBAAoB,MAAM;AAChD,UAAM,WAAW;AAAA,MACb,EAAE,MAAM,UAAU,OAAO,QAAQ,aAAa,0CAA0C,cAAc,MAAM,KAAK,YAAY;AAAA,MAC7H,EAAE,MAAM,gBAAgB,OAAO,QAAQ,aAAa,uCAAuC,cAAc,OAAO,KAAK,YAAY;AAAA,IACrI;AAGA,sBAAkB,QAAQ;AAAA,EAC9B,CAAC;",
+  "names": []
+}

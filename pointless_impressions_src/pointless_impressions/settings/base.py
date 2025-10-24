@@ -43,6 +43,7 @@ LOCAL_APPS = [
     "pointless_impressions_src.pointless_impressions",
     "pointless_impressions_src.home",
     "pointless_impressions_src.theme",
+    "pointless_impressions_src.artwork",
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -78,7 +79,7 @@ CACHES = {
 ROOT_URLCONF = "pointless_impressions_src.pointless_impressions.urls"
 
 # Tailwind CSS
-TAILWIND_APP_NAME = "theme"
+TAILWIND_APP_NAME = "pointless_impressions_src.theme"
 TAILWIND_CSS_PATH = "css/styles.css"
 
 # Session configuration

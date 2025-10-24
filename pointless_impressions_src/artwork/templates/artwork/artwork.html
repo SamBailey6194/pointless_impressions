@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% load static cloudinary %}
+
+{% block content %}
+
+  {% block section_1 %}
+    {% if section_1_class %}
+      <section class="py-16 {{ section_1_class }} w-full">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+          <h1 class="text-3xl font-bold mb-8">Pointillism Artwork</h1>
+
+          {# Artwork List Container #}
+          <div id="artwork-list">
+            {% for artwork in artworks %}
+              <div class="artwork-card border rounded-lg p-4 mb-4" data-sku="{{ artwork.sku }}">
+                <h2 class="artwork-name text-xl font-semibold">{{ artwork.name }}</h2>
+                <p class="artwork-description">{{ artwork.description }}</p>
+                <p class="artwork-price">£{{ artwork.price }}</p>
+
+                {% if artwork.is_in_stock %}
+                  <button class="add-to-cart bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-2">
+                    Add to Cart
+                  </button>
+                {% else %}
+                  <span class="sold-out text-red-500 font-semibold mt-2 inline-block">Sold Out</span>
+                {% endif %}
+              </div>
+            {% empty %}
+              <p>No artworks available</p>
+            {% endfor %}
+          </div>
+
+          {# Sort and Filter buttons (non-functional) #}
+          <div id="controls" class="mt-6 space-x-2">
+            <button id="sort-price" class="px-4 py-2 bg-gray-300 rounded">Sort by Price</button>
+            <button id="filter-available" class="px-4 py-2 bg-gray-300 rounded">Show Available Only</button>
+          </div>
+
+        </div>
+      </section>
+    {% endif %}
+  {% endblock section_1 %}
+
+{% endblock content %}
+
+{% block postloadjs %}
+  <script src="{% static 'js/artwork.js' %}" defer></script>
+{% endblock postloadjs %}

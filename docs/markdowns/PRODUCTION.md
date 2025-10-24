@@ -16,6 +16,7 @@ Production is the live environment used by clients and end-users. All production
   - [Environment Setup](#environment-setup)
     - [Environment Variables](#environment-variables)
   - [Docker Setup](#docker-setup)
+    - [Using the Production Helper Script](#using-the-production-helper-script)
   - [Deploying the Production App](#deploying-the-production-app)
 
 ---

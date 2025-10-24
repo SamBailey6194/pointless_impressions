@@ -6,6 +6,8 @@ FROM python:3.13-slim-bookworm
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 ENV DEBIAN_FRONTEND=noninteractive
+ENV NODE_VERSION=24.2.0
+ENV NPM_VERSION=11.3.0
 
 # Working directory
 WORKDIR /app
@@ -16,9 +18,16 @@ RUN apt-get update && apt-get install -y \
     netcat-openbsd \
     gcc \
     libpq-dev \
-    nodejs \
-    npm \
+    xz-utils \
     && rm -rf /var/lib/apt/lists/*
+
+# Install Node.js 24.2.0 and npm 11.3.0 from official binaries
+RUN curl -fsSL https://nodejs.org/dist/v${NODE_VERSION}/node-v${NODE_VERSION}-linux-x64.tar.xz -o node.tar.xz && \
+    tar -xJf node.tar.xz -C /usr/local --strip-components=1 && \
+    rm node.tar.xz && \
+    npm install -g npm@${NPM_VERSION} && \
+    node --version && \
+    npm --version
 
 # UV binary
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
@@ -31,16 +40,22 @@ RUN uv pip install --upgrade pip --system && \
 # Copy project files
 COPY pointless_impressions_src/ ./pointless_impressions_src/
 COPY manage.py .
+COPY package.json package-lock.json* ./
+COPY jest.config.js cypress.config.js ./
+
+# Install Node dependencies at project root
+RUN npm install
 
 # Make entrypoint executable
 RUN chmod +x ./pointless_impressions_src/dev-entrypoint.sh
 
-# Create a non-root user for development (optional but recommended)
+# Create a non-root user for development
 RUN useradd --create-home --shell /bin/bash devuser && \
     chown -R devuser:devuser /app
+
 USER devuser
 
-# Expose port
+# Expose ports
 EXPOSE 8000
 
 # Default command

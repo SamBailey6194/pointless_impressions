@@ -1,5 +1,6 @@
 #!/bin/bash
 set -e
+
 echo "Starting development container..."
 
 # Change to project root directory
@@ -14,7 +15,7 @@ fi
 # Wait for database to be ready
 echo "Waiting for database at ${DEV_DB_HOST:-db_dev}:${DEV_DB_PORT:-5432}..."
 while ! nc -z ${DEV_DB_HOST:-db_dev} ${DEV_DB_PORT:-5432}; do
-  sleep 1
+    sleep 1
 done
 echo "Database is ready!"
 
@@ -34,20 +35,19 @@ else:
     print('Superuser already exists')
 " 2>/dev/null || echo "Note: Superuser creation skipped"
 
-# Install Tailwind dependencies
-NODE_DIR=/app/pointless_impressions_src/theme/static_src
-echo "Installing Tailwind and Node dependencies..."
-if [ -f "$NODE_DIR/package.json" ]; then
-    cd $NODE_DIR
-    npm install
+# Install Node dependencies at project root
+echo "Installing Node dependencies at project root..."
+if [ -f /app/package.json ]; then
     cd /app
+    npm install
 else
-    echo "Warning: package.json not found in $NODE_DIR"
+    echo "Warning: package.json not found in /app"
 fi
 
-# Install Tailwind CSS
-echo "Installing Tailwind CSS..."
-python /app/manage.py tailwind install
+# Build Tailwind CSS and JavaScript assets
+echo "Building Tailwind CSS and JavaScript..."
+cd /app
+npm run build || echo "Warning: Tailwind and JS build failed (check package.json)"
 
 # Function to handle graceful shutdown
 cleanup() {
@@ -55,17 +55,16 @@ cleanup() {
     kill $(jobs -p) 2>/dev/null || true
     exit 0
 }
+
 trap cleanup SIGTERM SIGINT
 
-# Change to Django project directory for Tailwind commands
-cd /app/pointless_impressions_src
+# Start Tailwind and JavaScript watcher in background (from project root)
+echo "Starting Tailwind and JavaScript in watch mode..."
+cd /app
+npm run start &
+WATCH_PID=$!
 
-# Start Tailwind watcher in background
-echo "Starting Tailwind in watch mode..."
-python /app/manage.py tailwind start &
-TAILWIND_PID=$!
-
-# Wait a moment for Tailwind to start
+# Wait a moment for watchers to start
 sleep 2
 
 # Start Django development server
