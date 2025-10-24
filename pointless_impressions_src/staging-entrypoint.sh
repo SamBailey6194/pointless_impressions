@@ -69,7 +69,7 @@ export PYTHONPATH="/app/pointless_impressions_src:$PYTHONPATH"
 export DJANGO_SETTINGS_MODULE="pointless_impressions.settings.staging"
 exec gunicorn pointless_impressions.wsgi:application \
     --bind 0.0.0.0:8000 \
-    --workers 3 \
+    --workers 1 \
     --max-requests 1000 \
     --max-requests-jitter 100 \
     --timeout 120 \

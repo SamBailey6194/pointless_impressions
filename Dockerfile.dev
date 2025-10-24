@@ -16,13 +16,8 @@ RUN apt-get update && apt-get install -y \
     netcat-openbsd \
     gcc \
     libpq-dev \
-    git \
-    wget \
-    gnupg \
-    && curl -fsSL https://deb.nodesource.com/setup_24.x | bash - \
-    && apt-get install -y nodejs \
-    && npm install -g npm@11.6.2 \
-    && apt-get install -y inotify-tools \
+    nodejs \
+    npm \
     && rm -rf /var/lib/apt/lists/*
 
 # UV binary
