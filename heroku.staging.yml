@@ -1,0 +1,17 @@
+build:
+  docker:
+    web:
+      dockerfile: Dockerfile.staging
+      image: registry.heroku.com/pointlessimpressions-staging/web:latest
+  config:
+    NODE_ENV: production
+    DJANGO_ENV: staging
+
+release:
+  image: web
+  command:
+    - python manage.py collectstatic --noinput
+    - python manage.py migrate --noinput
+
+run:
+  web: /app/pointless_impressions_src/staging-entrypoint.sh
