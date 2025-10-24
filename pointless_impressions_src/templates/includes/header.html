@@ -7,8 +7,9 @@
     <div class="navbar-start">
       <a href="/" class="btn btn-ghost normal-case text-xl h-auto p-2">
         {% if production %}
-          <img src="{% cloudinary_url 'qzdky29kboidek5sm5qs' width=auto height=32 crop='fit' format='auto' quality='auto' %}" alt="Pointless Impressions"
-          class="h-8 sm:h-10 md:h-12 w-auto" />
+          <img src="{% cloudinary_url 'qzdky29kboidek5sm5qs' height=32 crop='fit' format='auto' quality='auto' %}" 
+            alt="Pointless Impressions"
+            class="h-8 sm:h-10 md:h-12 w-auto" />
         {% else %}
           <img src="{{ MEDIA_URL }}logo_white_01.png" alt="Pointless Impressions" class="h-8 sm:h-10 md:h-12 w-auto" />
         {% endif %}
