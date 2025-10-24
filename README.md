@@ -294,7 +294,6 @@ Please note for the Jest and Cypress testing there was a need to create html fix
 - **Remove Some Allowed Hosts**: Removed staging.example.com from the allowed hosts in `staging.py` as it was not needed.
 - **Removed Django from ALLOWED_HOSTS**: Removed DJANGO from ALLOWED_HOSTS in `staging.py` as it was not needed.
 - **Static and Media files blocked**: Blocked static and media files being served from cloudinary and S3 due to lack of CSP settings. Installed Django-CSP. Added `csp.middleware.CSPMiddleware` to the MIDDLEWARE list in `base.py`. Added CSP settings to staging and production files.
-- **Issues with Django-Storages**: Encountered problems with Django-Storages so swapped to using Django-S3-Storages to fix the issue and modified the static and media storage settings in staging and production files.
 - **Media Storage**: Django-Cloudinary-Storages is an old community packege that I was having issues with and is no longer maintained. Therefore, I used the official Cloudinary package to configure the media storage instead.
 
 ### Unfixed Bugs

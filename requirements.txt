@@ -20,7 +20,7 @@ Django==5.2.7
 django-browser-reload==1.21.0
 django-csp==4.0
 django-redis==6.0.0
-django-s3-storage==0.15.0
+django-storages==1.14.6
 django-tailwind==4.2.0
 dotenv==0.9.9
 gunicorn==23.0.0
