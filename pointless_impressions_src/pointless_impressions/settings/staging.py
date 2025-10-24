@@ -90,3 +90,30 @@ STATIC_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/static/'
 
 # Use timestamp as STATIC_VERSION for cache busting
 STATIC_VERSION = datetime.now().strftime("staging-%Y%m%d%H%M%S")
+
+# Content Security Policy settings
+CSP_DEFAULT_SRC = ("'none'",) 
+
+CSP_SCRIPT_SRC = (
+    "'self'", 
+    f'https://{AWS_S3_CUSTOM_DOMAIN}',
+    'https://res.cloudinary.com',
+)
+
+CSP_STYLE_SRC = (
+    "'self'", 
+    f'https://{AWS_S3_CUSTOM_DOMAIN}',
+)
+
+CSP_IMG_SRC = (
+    "'self'", 
+    f'https://{AWS_S3_CUSTOM_DOMAIN}',
+    'https://res.cloudinary.com',
+    'data:',
+)
+
+CSP_CONNECT_SRC = (
+    "'self'",
+    f'https://{AWS_S3_CUSTOM_DOMAIN}',
+    'https://res.cloudinary.com',
+)

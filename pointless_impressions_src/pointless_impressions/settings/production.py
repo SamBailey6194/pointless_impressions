@@ -98,3 +98,30 @@ try:
     ).decode().strip()
 except Exception:
     STATIC_VERSION = 'prod'
+
+# Content Security Policy settings
+CSP_DEFAULT_SRC = ("'none'",) 
+
+CSP_SCRIPT_SRC = (
+    "'self'", 
+    f'https://{AWS_S3_CUSTOM_DOMAIN}',
+    'https://res.cloudinary.com',
+)
+
+CSP_STYLE_SRC = (
+    "'self'", 
+    f'https://{AWS_S3_CUSTOM_DOMAIN}',
+)
+
+CSP_IMG_SRC = (
+    "'self'", 
+    f'https://{AWS_S3_CUSTOM_DOMAIN}',
+    'https://res.cloudinary.com',
+    'data:',
+)
+
+CSP_CONNECT_SRC = (
+    "'self'",
+    f'https://{AWS_S3_CUSTOM_DOMAIN}',
+    'https://res.cloudinary.com',
+)

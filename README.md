@@ -293,6 +293,7 @@ Please note for the Jest and Cypress testing there was a need to create html fix
 - **Add Pointless_Impressions_src to INSTALLED_APPS**: Added `pointless_impressions_src` before each of the apps in the `INSTALLED_APPS` list in `base.py` to more more verbose and help with Heroku finding the apps.
 - **Remove Some Allowed Hosts**: Removed staging.example.com from the allowed hosts in `staging.py` as it was not needed.
 - **Removed Django from ALLOWED_HOSTS**: Removed DJANGO from ALLOWED_HOSTS in `staging.py` as it was not needed.
+- **Static and Media files blocked**: Blocked static and media files being served from cloudinary and S3 due to lack of CSP settings. Installed Django-CSP. Added `csp.middleware.CSPMiddleware` to the MIDDLEWARE list in `base.py`. Added CSP settings to staging and production files.
 
 ### Unfixed Bugs
 
