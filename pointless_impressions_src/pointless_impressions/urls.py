@@ -19,15 +19,11 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 from django.views.generic.base import RedirectView
-from pointless_impressions.views import health_check
+from .views import health_check
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('home.urls')),
-    path(
-        'favicon.ico',
-        RedirectView.as_view(url=settings.MEDIA_URL + 'logo_white_01.png')
-    ),
     path('health/', health_check, name='health'),
 ]
 

@@ -41,6 +41,7 @@ THIRD_PARTY_APPS = [
 ]
 
 LOCAL_APPS = [
+    "pointless_impressions_src.pointless_impressions",
     "pointless_impressions_src.home",
     "pointless_impressions_src.theme",
 ]
