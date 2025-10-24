@@ -328,7 +328,378 @@ No errors were returned when passing through the official JS Hint, see images be
 
 ## Deployment
 
-The app deployed via Heroku [here]() following the steps documented in [Production Deployment using Docker Container](docs/markdowns/PRODUCTION.md).
+The app deployed via Heroku [here]() following the steps below:
+
+1. **Ensure you run commands before committing**
+
+   1. Build the requirements files
+
+      1. Navigate to your `.venv` or virtual environment or create one if you haven't already.
+
+        ```bash
+        python -m venv .venv
+        source .venv/bin/activate  # Linux/Mac
+        .venv\Scripts\activate     # Windows
+        ```
+
+        If python or pip don't work ensure you can run this as:
+
+        ```bash
+        python3 -m venv .venv
+        source .venv/bin/activate  # Linux/Mac
+        .venv\Scripts\activate     # Windows
+        ```
+      2. Run the command below to build the `requirements.txt` file
+
+        ```bash
+        pip freeze > requirements.txt
+        ```
+
+        If python or pip don't work ensure you can run this as:
+
+        ```bash
+        pip3 freeze > requirements.txt
+        ```
+
+  2. **Update Packages**
+
+      1. In the `.venv` or virtual environment navigate to the `theme/static_src` folder and run the command below to update the npm packages
+
+        1. Install to update the `package-lock.json` file
+
+        ```bash
+        npm install
+        ```
+
+        2. Run the command below to update the `package.json` file
+
+        ```bash
+        npm update
+        ```
+        3. Build the Tailwind CSS and JS files
+
+        ```bash
+        npm run build
+        ```
+
+        **IMPORTANT** As we are also using Django-Tailwind you can run from the root `python manage.py tailwind build` or `python3 manage.py tailwind build` command to build the Tailwind CSS files as well.
+
+        Either way ensures the `static/css/styles.css` and `static/js/scripts.js` files are updated and hashed for caching purposes on deployment.
+
+        If python or pip don't work ensure you can run this as:
+
+        ```bash
+        pip3 install --upgrade pip setuptools wheel
+        ```
+2. **Create your heroku.yml file**
+
+   1. In the root of your project create a `heroku.yml` file with the following content:
+
+      ```yaml
+      build:
+        languages:
+          - python
+          - nodejs
+        buildpacks:
+          - heroku/nodejs
+          - heroku/python
+
+        config:
+          DJANGO_SETTINGS_MODULE: pointless_impressions_src.pointless_impressions.settings.production # or staging for staging deployment
+          NODE_ENV: production
+          DISABLE_COLLECTSTATIC: 0
+
+        scripts:
+          postbuild:
+            - cd cd pointless_impressions_src/theme/static_src && npm install && npm run build && cd ../../../..
+            - python manage.py collectstatic --noinput
+            - python manage.py migrate --noinput
+
+      run:
+        web: gunicorn pointless_impressions_src.pointless_impressions.wsgi.py
+      ```
+
+3. **Create your .slugignore file**
+   
+   1. In the root of your project create a `.slugignore` file with the following content:
+
+      ```
+      # -----------------------------
+      # Markdown
+      # -----------------------------
+      *.md
+      docs/
+
+      # -----------------------------
+      # Environment Example files 
+      # -----------------------------
+      .env.dev.example
+      .env.staging.example
+      .env.production.example
+
+      # -----------------------------
+      # Docker Files
+      # -----------------------------
+      /**/*-entrypoint.sh
+      .dockerignore
+      Dockerfile.*
+      docker-compose.*.yml
+      *.sh
+      redis.conf
+
+      # -----------------------------
+      # Tests
+      # -----------------------------
+      **/static_src/cypress.config.js
+      **/static_src/jest.config.js
+      **/static_src/src/tests.js
+
+      # -----------------------------
+      # Generated / local CSS (will be hashed in build)
+      # -----------------------------
+      **/static/css/styles.css
+      ```
+
+      **IMPORTANT** This will stop the files being uploaded to Heroku which are not needed for production or staging deployment. As we aren't able to use the Docker images due to having a student Heroku account. We also don't need the tests or markdown files on the live server. We are also hashing the CSS and JS files during the build process so the un-hashed built CSS files are not needed.
+
+4. **Git Commit**
+
+   1. Run the command below to check which branch you are on
+
+      ```bash
+      git branch
+      ```
+
+   2. If you are not on the `staging` branch for staging deployment or the `main` branch for production deployment, run the command below to switch to it
+
+      For Staging:
+      ```bash
+      git checkout staging
+      ```
+
+      For Production:
+      ```bash
+      git checkout main
+      ```
+    3. Run the commands below to add, commit and push the changes to the relevant branch
+
+        For Staging:
+        ```bash
+        git add .
+        git commit -m "Your commit message"
+        git push origin staging
+        ```
+
+        For Production:
+        ```bash
+        git add .
+        git commit -m "Your commit message"
+        git push origin main
+        ```
+
+5. **Set up Cloudinary for Staging Media Storage**
+
+    1. Log into your [Cloudinary Dashboard](https://cloudinary.com/console)
+    
+    2. Create a new folder for staging environment:
+       - Navigate to Media Library
+       - Click "Create Folder" 
+       - Name it something relevant if for staging include staging, if for production just the name of the project
+       - Note down your Cloud Name, API Key, and API Secret from the dashboard
+
+6. **Set up Email for Correct Deployment**
+
+   1. **Staging Environment - Ethereal Email**
+      1. Go to [Ethereal Email](https://ethereal.email/)
+      2. Click "Create Ethereal Account" to generate test credentials
+      3. Note down the SMTP settings:
+       - Host: smtp.ethereal.email
+       - Port: 587
+       - Username: [generated username]
+       - Password: [generated password]
+       - Use TLS: True
+      4. Save the web interface URL to view sent emails during testing
+  
+   2. **Production Environment - Gmail**
+      1. Go to your [Google Account Security Settings](https://myaccount.google.com/security)
+      2. Under "Signing in to Google," enable 2-Step Verification
+      3. After enabling 2-Step Verification, go to "App Passwords"
+      4. Create an app password for "Mail" on "Other (Custom name)" and name it "Django App"
+      5. Note down the generated app password for SMTP use
+      6. Use the following SMTP settings in your production environment:
+       - Host: smtp.gmail.com
+       - Port: 587
+       - Username: your full Gmail address
+       - Password: the generated app password
+       - Use TLS: True
+
+7. **Set up AWS S3 Bucket and IAM for Staging**
+
+   1. **Create AWS Account (if not already done):**
+       - Go to [AWS Signup](https://aws.amazon.com/)
+       - Follow the steps to create a new account
+
+   2. **Create S3 Bucket:**
+       - Log into AWS Console
+       - Navigate to S3 service
+       - Click "Create bucket"
+       - Bucket name: choose a name that is globally unique.
+       - Region: Choose closest to your users (e.g., eu-west-2 for UK)
+       - Uncheck "Block all public access" for media files
+       - Enable versioning (optional but recommended)
+       - Click "Create bucket"
+
+   3. **Configure Bucket Policy:**
+       - Go to bucket → Permissions → Bucket Policy
+       - Add policy for public read access to static files:
+       ```json
+       {
+         "Version": "2012-10-17",
+         "Statement": [
+           {
+             "Sid": "PublicReadGetObject",
+             "Effect": "Allow",
+             "Principal": "*",
+             "Action": "s3:GetObject",
+             "Resource": "arn"
+           }
+         ]
+       }
+       ```
+
+   4. **Configure CORS:**
+       - Go to bucket → Permissions → Cross-origin resource sharing (CORS)
+       - Add CORS configuration:
+       ```json
+       [
+         {
+           "AllowedHeaders": ["*"],
+           "AllowedMethods": ["GET", "POST", "PUT", "DELETE"],
+           "AllowedOrigins": ["*"],
+           "ExposeHeaders": ["ETag"],
+           "MaxAgeSeconds": 3000
+         }
+       ]
+       ```
+
+    5. **Create IAM Policy:**
+       - Navigate to IAM → Policies
+       - Click "Create policy"
+       - Select "JSON" tab and add the following policy (replace `your-bucket-name`):
+       ```json
+       {
+         "Version": "2012-10-17",
+         "Statement": [
+           {
+             "Effect": "Allow",
+             "Action": [
+               "s3:PutObject",
+               "s3:GetObject",
+               "s3:DeleteObject",
+               "s3:ListBucket"
+             ],
+             "Resource": [
+               "arn",
+               "arn/*"
+             ]
+           }
+         ]
+       }
+       ```
+       - Click "Next: Tags" → "Next: Review"
+       - Name: Global Name
+       - Description (optional): Describe whether it is for staging or production
+       - Click "Create policy"
+
+    6. **Create IAM User Groups:**
+
+       **Service Group (for applications):**
+       - Navigate to IAM → User groups
+       - Click "Create group"
+       - Group name: global name
+       - Description: Descriube whether it is for staging or production
+       - Attach the policy: policy name
+       - Click "Create group"
+
+       **Developer Group (for human users):**
+       - Click "Create group"
+       - Group name: global name 
+       - Description: Descriube whether it is for staging or production
+       - Attach policies:
+         - Policy Name (custom policy created above)
+         - `CloudWatchLogsReadOnlyAccess` (AWS managed - for debugging)
+         - `IAMReadOnlyAccess` (AWS managed - to view their own permissions)
+       - Click "Create group"
+
+    7. **Create IAM User:**
+       - Navigate to IAM → Users
+       - Click "Create user"
+       - Username: Global Name
+       - Select "Programmatic access"
+       - Click "Next"
+
+    8. **Add User to Service Group:**
+       - On the permissions page, select "Add user to group"
+       - Select User Groups Global Name you created earlier
+       - Click "Next" → "Create user"
+       - **Important:** Download the Access Key ID and Secret Access Key
+       - Store these securely - they won't be shown again
+
+8. **Create Heroku App:**
+   1. Navigate to Heroku Dashboard
+   2. Click "New" → "Create new app"
+   3. App name: Global Name
+   4. Choose region: EU
+   5. Click "Create app"
+
+9. **Create Config Vars:**
+   1. In the Heroku app dashboard, navigate to "Settings" → "Config Vars"
+   2. Add all necessary environment variables as per your `.env.production.example` or `.env.staging.example` files.
+   3. Ensure to include AWS, Cloudinary, Email, and Django secret key settings.
+   4. Save each variable after adding.
+
+    As an example make sure you have the following variables set:
+
+    ```plaintext
+    ALLOWED_HOSTS=
+    DEBUG=FALSE
+    DJANGO_SECRET_KEY= 
+    DJANGO_DEBUG=False 
+    DJANGO_ALLOWED_HOSTS= 
+    DJANGO_SETTINGS_MODULE= 
+    STAGING/PRODUCTION_DB_URL= 
+    EMAIL_BACKEND= 
+    EMAIL_HOST= 
+    EMAIL_PORT= 
+    EMAIL_USE_TLS= 
+    EMAIL_HOST_USER= 
+    EMAIL_HOST_PASSWORD= 
+    DEFAULT_FROM_EMAIL= 
+    CLOUDINARY_CLOUD_NAME= 
+    CLOUDINARY_API_KEY= 
+    CLOUDINARY_API_SECRET= 
+    AWS_STORAGE_BUCKET_NAME= 
+    AWS_S3_REGION_NAME= 
+    AWS_ACCESS_KEY_ID= 
+    AWS_SECRET_ACCESS_KEY= 
+    STRIPE_PUBLIC_KEY= 
+    STRIPE_SECRET_KEY= 
+    STRIPE_WH_SECRET= 
+    ```
+
+10. **Deploy the App:**
+    1. In the Heroku app dashboard, navigate to "Deploy" tab
+    2. Under "Deployment method," select "GitHub"
+    3. Connect to your GitHub account and select the repository
+    4. Set up automatic deploys if desired using the correct branch (`staging` for staging deployment or `main` for production deployment)
+    5. Choose the branch (`staging` for staging deployment or `main` for production deployment)
+    6. Click "Deploy Branch"
+    7. Monitor the build logs for any errors
+    8. Once deployed, click "View" to see your live application
+
+Due to having a student Heroku account the Docker container deployment option is not available, due to file size limitations.
+
+I have also written how to deploy using the Docker files for [Production Deployment using Docker Container](docs/markdowns/PRODUCTION.md).
 
 It is important to note to simulate a real world environment I also deployed a staging version of the web app via Heroku [here]() and I followed the steps outlined in [Staging Deploymennt using Docker Container](docs/markdowns/STAGING.md)
 
@@ -394,3 +765,7 @@ Below are my credits for where I got inspiration for some of the code and conten
 - For dropdown and menu component implementation I referenced [DaisyUI Dropdown](https://daisyui.com/components/dropdown/) and [DaisyUI Menu](https://daisyui.com/components/menu/)
 - To understand CSS framework override strategies I referenced [CSS-Tricks: Working with CSS Frameworks](https://css-tricks.com/considerations-for-styling-a-modal/)
 - For responsive navbar patterns and mobile-first design I used [A Complete Guide to Flexbox by CSS-Tricks](https://css-tricks.com/snippets/css/a-guide-to-flexbox/)
+- For .slugignore best practices I referenced [Heroku Slugignore Documentation](https://devcenter.heroku.com/articles/slug-compiler#slugignore)
+- For heroku.yml configuration and multi-buildpack setup I used [Heroku Container Registry and Runtime Documentation](https://devcenter.heroku.com/articles/container-registry-and-runtime#heroku-yml)
+- For setting up AWS S3 buckets and IAM policies I referenced [AWS S3 Getting Started Guide](https://docs.aws.amazon.com/AmazonS3/latest/userguide/Welcome.html) and [AWS IAM User Guide](https://docs.aws.amazon.com/IAM/latest/UserGuide/introduction.html)
+- For Django-Cloudinary integration I used [Cloudinary Django Documentation](https://cloudinary.com/documentation/django_integration)

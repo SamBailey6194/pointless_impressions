@@ -66,7 +66,7 @@ echo "- Database: $(echo $STAGING_DB_URL | sed 's/.*@//' | sed 's/\?.*//' || ech
 # Start Gunicorn with improved settings for staging
 echo "Starting Gunicorn staging server..."
 export PYTHONPATH="/app/pointless_impressions_src:$PYTHONPATH"
-export DJANGO_SETTINGS_MODULE="pointless_impressions.settings.staging"
+export DJANGO_SETTINGS_MODULE="pointless_impressions_src.pointless_impressions.settings.staging"
 exec gunicorn pointless_impressions.wsgi:application \
     --bind 0.0.0.0:8000 \
     --workers 1 \

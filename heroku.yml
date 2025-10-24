@@ -1,16 +1,21 @@
 build:
-  docker:
-    web:
-      dockerfile: Dockerfile.staging
-  config:
-    NODE_ENV: production
-    DJANGO_ENV: staging
+  languages:
+    - python
+    - nodejs
+  buildpacks:
+    - heroku/nodejs
+    - heroku/python
 
-release:
-  image: web
-  command:
-    - python manage.py collectstatic --noinput
-    - python manage.py migrate --noinput
+  config:
+    DJANGO_SETTINGS_MODULE: pointless_impressions_src.pointless_impressions.settings.staging
+    NODE_ENV: production
+    DISABLE_COLLECTSTATIC: 0
+
+  scripts:
+    postbuild:
+      - cd cd pointless_impressions_src/theme/static_src && npm install && npm run build && cd ../../../..
+      - python manage.py collectstatic --noinput
+      - python manage.py migrate --noinput
 
 run:
-  web: /app/pointless_impressions_src/staging-entrypoint.sh
+  web: gunicorn pointless_impressions_src.pointless_impressions.wsgi.py
