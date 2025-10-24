@@ -94,34 +94,3 @@ STATIC_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/static/'
 
 # Use timestamp as STATIC_VERSION for cache busting
 STATIC_VERSION = datetime.now().strftime("staging-%Y%m%d%H%M%S")
-
-# Cache configuration for staging
-cache_url = os.getenv("CACHE_URL", "redis://redis_staging:6379/0")
-if cache_url.startswith("redis://"):
-    CACHES["default"]["LOCATION"] = cache_url
-else:
-    # Fallback to local memory cache for course development
-    CACHES = {
-        "default": {
-            "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
-            "LOCATION": "unique-snowflake-staging",
-        }
-    }
-
-# Security settings for staging (no SSL for Heroku course deployment)
-SECURE_SSL_REDIRECT = os.getenv("SECURE_SSL_REDIRECT", "False") == "True"
-SECURE_HSTS_SECONDS = int(os.getenv("SECURE_HSTS_SECONDS", "0"))
-SECURE_HSTS_INCLUDE_SUBDOMAINS = False
-SECURE_HSTS_PRELOAD = False
-CSRF_COOKIE_SECURE = os.getenv("CSRF_COOKIE_SECURE", "False") == "True"
-SESSION_COOKIE_SECURE = os.getenv("SESSION_COOKIE_SECURE", "False") == "True"
-CSRF_TRUSTED_ORIGINS = [
-    origin.strip()
-    for origin in os.getenv("CSRF_TRUSTED_ORIGINS", "").split(",")
-    if origin.strip()
-]
-
-# Staging-specific logging
-LOGGING["handlers"]["console"]["level"] = "INFO"
-LOGGING["loggers"]["django"]["level"] = "INFO"
-LOGGING["root"]["level"] = "INFO"

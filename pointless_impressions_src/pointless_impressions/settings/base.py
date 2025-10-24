@@ -108,7 +108,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = "pointless_impressions.wsgi.application"
+WSGI_APPLICATION = "pointless_impressions_src.pointless_impressions.wsgi.application"
 
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [
@@ -163,57 +163,3 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # Default static version for cache busting
 STATIC_VERSION = os.getenv("STATIC_VERSION", "1.0.0")
-
-# Security settings (can be overridden in specific environments)
-SECURE_BROWSER_XSS_FILTER = True
-SECURE_CONTENT_TYPE_NOSNIFF = True
-X_FRAME_OPTIONS = "DENY"
-SECURE_HSTS_INCLUDE_SUBDOMAINS = False
-SECURE_HSTS_PRELOAD = False
-SECURE_HSTS_SECONDS = 0
-
-# CSRF settings (configured per environment)
-CSRF_COOKIE_HTTPONLY = True
-CSRF_COOKIE_SECURE = False  # Set to True only if using HTTPS
-
-# Logging configuration
-LOGGING = {
-    "version": 1,
-    "disable_existing_loggers": False,
-    "formatters": {
-        "verbose": {
-            "format": (
-                "{levelname} {asctime} {module} {process:d} {thread:d} "
-                "{message}"
-            ),
-            "style": "{",
-        },
-        "simple": {
-            "format": "{levelname} {message}",
-            "style": "{",
-        },
-    },
-    "handlers": {
-        "console": {
-            "level": "INFO",
-            "class": "logging.StreamHandler",
-            "formatter": "simple",
-        },
-    },
-    "root": {
-        "handlers": ["console"],
-        "level": "INFO",
-    },
-    "loggers": {
-        "django": {
-            "handlers": ["console"],
-            "level": "INFO",
-            "propagate": False,
-        },
-        "django.request": {
-            "handlers": ["console"],
-            "level": "ERROR",
-            "propagate": False,
-        },
-    },
-}

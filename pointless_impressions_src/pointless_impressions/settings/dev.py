@@ -77,23 +77,3 @@ STATIC_VERSION = "dev"
 
 # File storage (local filesystem for development)
 DEFAULT_FILE_STORAGE = "django.core.files.storage.FileSystemStorage"
-
-# Development-specific security settings
-SECURE_SSL_REDIRECT = False
-SECURE_HSTS_SECONDS = 0
-SECURE_HSTS_INCLUDE_SUBDOMAINS = False
-SECURE_HSTS_PRELOAD = False
-CSRF_COOKIE_SECURE = False
-SESSION_COOKIE_SECURE = False
-
-# Debug toolbar configuration (if needed)
-INTERNAL_IPS = [
-    "127.0.0.1",
-    "localhost",
-    "web",  # Docker service name
-]
-
-# Development logging - more verbose
-LOGGING["handlers"]["console"]["level"] = "DEBUG"
-LOGGING["loggers"]["django"]["level"] = "DEBUG"
-LOGGING["root"]["level"] = "DEBUG"
