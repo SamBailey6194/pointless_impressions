@@ -3,6 +3,10 @@
   "version": "4.2.0",
   "type": "module",
   "description": "",
+  "engines": {
+    "node": "24.2.0",
+    "npm": "11.3.0"
+  },
   "scripts": {
     "start": "npm run dev:full",
     "dev": "cross-env NODE_ENV=development postcss pointless_impressions_src/theme/static_src/src/css/styles.css -o pointless_impressions_src/static/css/styles.css --watch",
