@@ -513,11 +513,11 @@ The app deployed via Heroku [here]() following the steps below:
       1. Go to [Ethereal Email](https://ethereal.email/)
       2. Click "Create Ethereal Account" to generate test credentials
       3. Note down the SMTP settings:
-       - Host: smtp.ethereal.email
-       - Port: 587
+       - Host: 
+       - Port: 
        - Username: [generated username]
        - Password: [generated password]
-       - Use TLS: True
+       - Use TLS: 
       4. Save the web interface URL to view sent emails during testing
   
    2. **Production Environment - Gmail**
@@ -527,11 +527,11 @@ The app deployed via Heroku [here]() following the steps below:
       4. Create an app password for "Mail" on "Other (Custom name)" and name it "Django App"
       5. Note down the generated app password for SMTP use
       6. Use the following SMTP settings in your production environment:
-       - Host: smtp.gmail.com
-       - Port: 587
+       - Host: 
+       - Port: 
        - Username: your full Gmail address
        - Password: the generated app password
-       - Use TLS: True
+       - Use TLS: 
 
 7. **Set up AWS S3 Bucket and IAM for Staging**
 
