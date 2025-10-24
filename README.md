@@ -292,6 +292,7 @@ Please note for the Jest and Cypress testing there was a need to create html fix
 - **Add __init__.py files**: Added missing `__init__.py` files to ensure proper package structure and module imports.
 - **Add Pointless_Impressions_src to INSTALLED_APPS**: Added `pointless_impressions_src` before each of the apps in the `INSTALLED_APPS` list in `base.py` to more more verbose and help with Heroku finding the apps.
 - **Remove Some Allowed Hosts**: Removed staging.example.com from the allowed hosts in `staging.py` as it was not needed.
+- **Removed Django from ALLOWED_HOSTS**: Removed DJANGO from ALLOWED_HOSTS in `staging.py` as it was not needed.
 
 ### Unfixed Bugs
 
