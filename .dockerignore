@@ -47,7 +47,6 @@ docker-compose.override.*.yml.bak
 # -----------------------------
 node_modules/
 **/node_modules
-package-lock.json
 npm-debug.log
 dist/
 build/
