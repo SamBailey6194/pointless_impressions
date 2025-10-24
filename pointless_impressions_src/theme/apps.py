@@ -2,4 +2,4 @@ from django.apps import AppConfig
 
 
 class ThemeConfig(AppConfig):
-    name = 'theme'
+    name = 'pointless_impressions_src.theme'
