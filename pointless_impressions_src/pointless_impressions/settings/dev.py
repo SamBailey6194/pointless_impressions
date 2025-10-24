@@ -72,8 +72,5 @@ else:
         }
     }
 
-# Use a simple static version for development
-STATIC_VERSION = "dev"
-
 # File storage (local filesystem for development)
 DEFAULT_FILE_STORAGE = "django.core.files.storage.FileSystemStorage"

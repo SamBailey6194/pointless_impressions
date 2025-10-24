@@ -35,9 +35,8 @@ THIRD_PARTY_APPS = [
     # Tailwind CSS integration
     "tailwind",
     # Storage backends
-    "cloudinary_storage",
     "cloudinary",
-    "storages",
+    "django_s3_storages",
 ]
 
 LOCAL_APPS = [

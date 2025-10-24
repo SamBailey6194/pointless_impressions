@@ -41,79 +41,83 @@ DEFAULT_FROM_EMAIL = os.getenv(
     "staging@example.com"
 )
 
-CLOUDINARY_STORAGE = {
-    "CLOUD_NAME": os.getenv("CLOUDINARY_CLOUD_NAME"),
-    "API_KEY": os.getenv("CLOUDINARY_API_KEY"),
-    "API_SECRET": os.getenv("CLOUDINARY_API_SECRET"),
-}
-
-# Cloudinary configuration for template tags
+# Cloudinary storage settings
 cloudinary.config(
     cloud_name=os.getenv("CLOUDINARY_CLOUD_NAME"),
     api_key=os.getenv("CLOUDINARY_API_KEY"),
     api_secret=os.getenv("CLOUDINARY_API_SECRET"),
-    secure=True
+    secure=True,
+    secure_disctribution=ALLOWED_HOSTS,
+    upload_prefix=os.getenv("CLOUDINARY_UPLOAD_PREFIX")
 )
-DEFAULT_FILE_STORAGE = "cloudinary_storage.storage.MediaCloudinaryStorage"
 
 # AWS S3 Settings
-# Cache control
-AWS_S3_OBJECT_PARAMETERS = {
-    'Expires': 'Thu, 31 Dec 2099 20:00:00 GMT',
-    'CacheControl': 'max-age=94608000',
-}
-# Bucket Config
-AWS_STORAGE_BUCKET_NAME = os.getenv('AWS_STORAGE_BUCKET_NAME')
-AWS_S3_REGION_NAME = os.getenv('AWS_S3_REGION_NAME')
+# AWS Bucket configuration
+AWS_REGION = os.getenv('AWS_S3_REGION_NAME')
 AWS_ACCESS_KEY_ID = os.getenv('AWS_ACCESS_KEY_ID')
 AWS_SECRET_ACCESS_KEY = os.getenv('AWS_SECRET_ACCESS_KEY')
-AWS_S3_CUSTOM_DOMAIN = (
-    f'{AWS_STORAGE_BUCKET_NAME}.s3.{AWS_S3_REGION_NAME}.amazonaws.com'
-    )
+AWS_S3_BUCKET_NAME_STATIC = os.getenv('AWS_STORAGE_BUCKET_NAME')
 
-# Static and media files
+# AWS S3 Configuration
+# Defines Subdirectory in bucket to store static files
+AWS_S3_KEY_PREFIX = 'static'
+
+# Make files publicly accessible
+AWS_S3_BUCKET_AUTH_STATIC = False
+
+# Set the maximum age for S3 objects
+AWS_S3_MAX_AGE_SECONDS_STATIC = 60 * 60 * 24 * 365  # 1 year
+
+# Enable Gzip compression for files for performance
+AWS_S3_GZIP = True
+
+# Set ACL to bucket-owner-full-control
+AWS_S3_OBJECT_PARAMETERS = {
+    'ACL': 'bucket-owner-full-control',
+}
+
+# Public URL for S3 bucket
+AWS_S3_CUSTOM_DOMAIN = f'{AWS_S3_BUCKET_NAME_STATIC}.s3.{AWS_REGION}.amazonaws.com'
+
+# Storage backends
 STORAGES = {
+    # Media Files (Replaces DEFAULT_FILE_STORAGE)
+    "default": {
+        "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
+    },
+    # Static Files (Replaces STATICFILES_STORAGE)
     "staticfiles": {
-        "BACKEND": "storages.backends.s3boto3.S3Boto3Storage",
-        "OPTIONS": {
-            "bucket_name": AWS_STORAGE_BUCKET_NAME,
-            "region_name": AWS_S3_REGION_NAME,
-            "custom_domain": AWS_S3_CUSTOM_DOMAIN,
-            "object_parameters": AWS_S3_OBJECT_PARAMETERS,
-            "location": "static",
-        },
+        "BACKEND": "django_s3_storage.storage.ManifestStaticS3Storage",
     },
 }
 
-# Override static URL in production
-STATIC_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/static/'
+STATIC_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/{AWS_S3_KEY_PREFIX}/'
 
-# Use timestamp as STATIC_VERSION for cache busting
-STATIC_VERSION = datetime.now().strftime("staging-%Y%m%d%H%M%S")
+S3_DOMAIN = f'https://{AWS_S3_CUSTOM_DOMAIN}'
 
 # Content Security Policy settings
-CSP_DEFAULT_SRC = ("'none'",) 
+CSP_DEFAULT_SRC = ("'none'",)
 
 CSP_SCRIPT_SRC = (
     "'self'", 
-    f'https://{AWS_S3_CUSTOM_DOMAIN}',
+    S3_DOMAIN,
     'https://res.cloudinary.com',
 )
 
 CSP_STYLE_SRC = (
     "'self'", 
-    f'https://{AWS_S3_CUSTOM_DOMAIN}',
+    S3_DOMAIN,
 )
 
 CSP_IMG_SRC = (
     "'self'", 
-    f'https://{AWS_S3_CUSTOM_DOMAIN}',
+    S3_DOMAIN,
     'https://res.cloudinary.com',
     'data:',
 )
 
 CSP_CONNECT_SRC = (
     "'self'",
-    f'https://{AWS_S3_CUSTOM_DOMAIN}',
+    S3_DOMAIN,
     'https://res.cloudinary.com',
 )

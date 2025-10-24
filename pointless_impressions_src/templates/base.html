@@ -137,11 +137,7 @@
 
     {% comment %} Extra JavaScript Files {% endcomment %}
     {% block postloadjs %}
-      {% if production %}
-        <script src="{% static 'js/header_footer.js' %}?v={{ STATIC_VERSION }}" defer></script>
-      {% else %}
-        <script src="{% static 'js/header_footer.js' %}" defer></script>
-      {% endif %}
+      <script src="{% static 'js/header_footer.js' %}" defer></script>
     {% endblock %}
   </body>
 
