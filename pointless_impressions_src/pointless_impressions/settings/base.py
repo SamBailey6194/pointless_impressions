@@ -74,7 +74,7 @@ CACHES = {
     }
 }
 
-ROOT_URLCONF = "pointless_impressions.urls"
+ROOT_URLCONF = "pointless_impressions_src.pointless_impressions.urls"
 
 # Tailwind CSS
 TAILWIND_APP_NAME = "theme"
