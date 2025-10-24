@@ -20,7 +20,10 @@ PRODUCTION = True
 
 # Database configuration (using course database maker)
 DATABASES = {
-    "default": dj_database_url.config(os.getenv("STAGING_DB_URL"))
+    "default": dj_database_url.config(
+        default=os.getenv("STAGING_DB_URL"),
+        conn_max_age=600,
+    )
 }
 
 # Email configuration (Mailtrap or similar testing service)
