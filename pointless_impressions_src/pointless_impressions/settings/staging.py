@@ -20,10 +20,7 @@ PRODUCTION = True
 
 # Database configuration (using course database maker)
 DATABASES = {
-    "default": dj_database_url.config(
-        default=os.getenv("STAGING_DB_URL"),
-        conn_max_age=600,
-    )
+    "default": dj_database_url.config(os.getenv("STAGING_DB_URL"))
 }
 
 # Email configuration (Mailtrap or similar testing service)
@@ -34,7 +31,6 @@ EMAIL_BACKEND = os.getenv(
 EMAIL_HOST = os.getenv("EMAIL_HOST", "smtp.mailtrap.io")
 EMAIL_PORT = int(os.getenv("EMAIL_PORT", 587))
 EMAIL_USE_TLS = os.getenv("EMAIL_USE_TLS", "True") == "True"
-EMAIL_USE_SSL = os.getenv("EMAIL_USE_SSL", "False") == "True"
 EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER", "")
 EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD", "")
 DEFAULT_FROM_EMAIL = os.getenv(
