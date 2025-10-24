@@ -11,6 +11,6 @@ import os
 
 from django.core.asgi import get_asgi_application
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'pointless_impressions.settings')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'pointless_impressions_src.pointless_impressions.settings')
 
 application = get_asgi_application()
