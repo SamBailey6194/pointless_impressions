@@ -2,7 +2,6 @@ build:
   docker:
     web:
       dockerfile: Dockerfile.staging
-      image: registry.heroku.com/pointlessimpressions-staging/web:latest
   config:
     NODE_ENV: production
     DJANGO_ENV: staging
