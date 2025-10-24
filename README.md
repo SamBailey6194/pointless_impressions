@@ -391,32 +391,18 @@ The app deployed via Heroku [here]() following the steps below:
         ```bash
         pip3 install --upgrade pip setuptools wheel
         ```
-2. **Create your heroku.yml file**
+2. **Create your Procfile file**
 
-   1. In the root of your project create a `heroku.yml` file with the following content:
+   1. In the root of your project create a `Procfile` file with the following content:
 
-      ```yaml
-      build:
-        languages:
-          - python
-          - nodejs
-        buildpacks:
-          - heroku/nodejs
-          - heroku/python
+      ```
+      web: gunicorn pathtosettings.wsgi:application
+      ```
 
-        config:
-          DJANGO_SETTINGS_MODULE: pointless_impressions_src.pointless_impressions.settings.production # or staging for staging deployment
-          NODE_ENV: production
-          DISABLE_COLLECTSTATIC: 0
+   2. In the root of your project create a `.python-version` file with the following content:
 
-        scripts:
-          postbuild:
-            - cd cd pointless_impressions_src/theme/static_src && npm install && npm run build && cd ../../../..
-            - python manage.py collectstatic --noinput
-            - python manage.py migrate --noinput
-
-      run:
-        web: gunicorn pointless_impressions_src.pointless_impressions.wsgi.py
+      ```
+      3.13
       ```
 
 3. **Create your .slugignore file**
@@ -766,6 +752,5 @@ Below are my credits for where I got inspiration for some of the code and conten
 - To understand CSS framework override strategies I referenced [CSS-Tricks: Working with CSS Frameworks](https://css-tricks.com/considerations-for-styling-a-modal/)
 - For responsive navbar patterns and mobile-first design I used [A Complete Guide to Flexbox by CSS-Tricks](https://css-tricks.com/snippets/css/a-guide-to-flexbox/)
 - For .slugignore best practices I referenced [Heroku Slugignore Documentation](https://devcenter.heroku.com/articles/slug-compiler#slugignore)
-- For heroku.yml configuration and multi-buildpack setup I used [Heroku Container Registry and Runtime Documentation](https://devcenter.heroku.com/articles/container-registry-and-runtime#heroku-yml)
 - For setting up AWS S3 buckets and IAM policies I referenced [AWS S3 Getting Started Guide](https://docs.aws.amazon.com/AmazonS3/latest/userguide/Welcome.html) and [AWS IAM User Guide](https://docs.aws.amazon.com/IAM/latest/UserGuide/introduction.html)
 - For Django-Cloudinary integration I used [Cloudinary Django Documentation](https://cloudinary.com/documentation/django_integration)

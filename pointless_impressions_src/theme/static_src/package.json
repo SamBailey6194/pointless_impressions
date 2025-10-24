@@ -24,7 +24,8 @@
     "cypress:run": "cypress run",
     "cypress:open": "cypress open",
     "cypress:home": "cypress run --spec './src/tests.js/cypress/e2e/home/**/*'",
-    "test:all": "npm run test && npm run cypress:run"
+    "test:all": "npm run test && npm run cypress:run",
+    "heroku-postbuild": "npm install && npm run build && cd ../../../.. && python manage.py collectstatic --noinput && python manage.py migrate --noinput"
   },
   "keywords": [],
   "author": "",
