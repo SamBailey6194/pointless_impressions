@@ -71,11 +71,6 @@ AWS_S3_MAX_AGE_SECONDS_STATIC = 60 * 60 * 24 * 365  # 1 year
 # Enable Gzip compression for files for performance
 AWS_S3_GZIP = True
 
-# Set ACL to bucket-owner-full-control
-AWS_S3_OBJECT_PARAMETERS = {
-    'ACL': 'bucket-owner-full-control',
-}
-
 # Public URL for S3 bucket
 AWS_S3_CUSTOM_DOMAIN = f'{AWS_S3_BUCKET_NAME_STATIC}.s3.{AWS_REGION}.amazonaws.com'
 
