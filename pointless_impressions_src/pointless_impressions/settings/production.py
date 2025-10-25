@@ -6,6 +6,8 @@ from .base import *
 import os
 import dj_database_url
 import cloudinary
+import cloudinary.uploader
+import cloudinary.api
 
 # Environment settings
 ENVIRONMENT = "production"
@@ -57,7 +59,6 @@ cloudinary.config(
     api_key=os.getenv("CLOUDINARY_API_KEY"),
     api_secret=os.getenv("CLOUDINARY_API_SECRET"),
     secure=True,
-    secure_disctribution=ALLOWED_HOSTS,
     upload_prefix=os.getenv("CLOUDINARY_UPLOAD_PREFIX")
 )
 

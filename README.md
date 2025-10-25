@@ -760,4 +760,5 @@ Below are my credits for where I got inspiration for some of the code and conten
 - For responsive navbar patterns and mobile-first design I used [A Complete Guide to Flexbox by CSS-Tricks](https://css-tricks.com/snippets/css/a-guide-to-flexbox/)
 - For .slugignore best practices I referenced [Heroku Slugignore Documentation](https://devcenter.heroku.com/articles/slug-compiler#slugignore)
 - For setting up AWS S3 buckets and IAM policies I referenced [AWS S3 Getting Started Guide](https://docs.aws.amazon.com/AmazonS3/latest/userguide/Welcome.html) and [AWS IAM User Guide](https://docs.aws.amazon.com/IAM/latest/UserGuide/introduction.html)
-- For Django-Cloudinary integration I used [Cloudinary Django Documentation](https://cloudinary.com/documentation/django_integration)
+- For Cloudinary integration I used [Cloudinary Django Documentation](https://cloudinary.com/documentation/django_integration)
+- To help with Cloudinary uploading I used [Manage Images in Django App](https://cloudinary.com/documentation/django_helper_methods_tutorial) and [Cloud with Django - Host Uploaded Images from Django with Cloudinary](https://www.youtube.com/watch?v=6Y6U8bW7b0k)
