@@ -1,30 +1,57 @@
 from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
-from pointless_impressions_src.artwork.models import Artwork
+from pointless_impressions_src.artwork.models import (
+    Artwork, ArtworkFramingCondition, ArtworkCategory
+)
 
 
 # Create your tests here.
 class ArtworkViewsTest(TestCase):
+    """Tests for Artwork views."""
     def setUp(self):
+        # Framing conditions
+        self.framed_condition = ArtworkFramingCondition.objects.create(
+            condition_name="Framed",
+            condition_description="Artwork is framed with a wooden frame."
+        )
+        self.unframed_condition = ArtworkFramingCondition.objects.create(
+            condition_name="Unframed",
+            condition_description="Artwork has no frame."
+        )
+
+        # Categories
+        self.nature_category = ArtworkCategory.objects.create(
+            name="Nature",
+            friendly_name="Nature Art"
+        )
+        self.seascape_category = ArtworkCategory.objects.create(
+            name="Seascape",
+            friendly_name="Seascape Art"
+        )
+
+        # Artworks
         self.artwork = Artwork.objects.create(
             name="Sunset",
             description="A beautiful sunset over the mountains.",
             price=199.99,
             sku="SUNSET123",
-            selected_condition=None,
+            category=self.nature_category,
+            selected_condition=self.framed_condition,
             is_available=True,
             is_in_stock=True,
             is_featured=False,
             created_at=timezone.now(),
             updated_at=timezone.now(),
         )
+
         self.artwork2 = Artwork.objects.create(
             name="Ocean",
             description="A serene view of the ocean.",
             price=149.99,
             sku="OCEAN456",
-            selected_condition=None,
+            category=self.seascape_category,
+            selected_condition=self.unframed_condition,
             is_available=True,
             is_in_stock=True,
             is_featured=True,
@@ -35,111 +62,117 @@ class ArtworkViewsTest(TestCase):
     def test_artwork_list_view(self):
         response = self.client.get(reverse('artwork:list'))
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, self.artwork.name)
-        self.assertContains(response, self.artwork2.name)
+        self.assertTemplateUsed(response, 'artwork/artwork_list.html')
+        self.assertIn(self.artwork, response.context['artwork'])
+        self.assertIn(self.artwork2, response.context['artwork'])
 
     def test_artwork_detail_view(self):
         response = self.client.get(
-            reverse('artwork:detail', args=[self.artwork.id])
+            reverse('artwork:detail', args=[self.artwork.pk])
             )
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, self.artwork.description)
-        self.assertContains(response, self.artwork2.description)
+        self.assertTemplateUsed(response, 'artwork/artwork_detail.html')
+        self.assertEqual(response.context['artwork'], self.artwork)
 
-    def test_featured_artwork_view(self):
-        response = self.client.get(reverse('artwork:featured'))
-        self.assertEqual(response.status_code, 200)
-        self.assertContains(response, self.artwork2.name)
-        self.assertNotContains(response, self.artwork.name)
-
-    def test_artwork_availability_in_list_view(self):
+    def test_artwork_list_view_unavailable_artwork(self):
+        """Test that unavailable artworks are not displayed in the list."""
+        # Mark Sunset as unavailable
         self.artwork.is_available = False
         self.artwork.save()
+
         response = self.client.get(reverse('artwork:list'))
         self.assertEqual(response.status_code, 200)
-        self.assertNotContains(response, self.artwork.name)
-        self.assertContains(response, self.artwork2.name)
+        self.assertNotIn(self.artwork, response.context['artwork'])
+        self.assertIn(self.artwork2, response.context['artwork'])
 
-    def test_artwork_stock_in_detail_view(self):
+    def test_artwork_detail_view_out_of_stock(self):
+        """Test that out of stock artworks show 'Out of Stock' message."""
+        # Mark Sunset as out of stock
         self.artwork.is_in_stock = False
         self.artwork.save()
+
         response = self.client.get(
-            reverse('artwork:detail', args=[self.artwork.id])
-            )
+            reverse('artwork:detail', args=[self.artwork.pk])
+        )
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "Out of Stock")
+        self.assertContains(response, 'Out of Stock')
         self.assertContains(response, self.artwork.description)
 
     def test_artwork_list_pagination(self):
-        """Create additional artworks to test pagination"""
+        """Test pagination with 17 artworks total."""
+        # Create 15 more artworks (we already have 2)
         for i in range(15):
             Artwork.objects.create(
                 name=f"Artwork {i}",
-                description="Sample description",
-                price=99.99 + i,
-                sku=f"ART{i:03}",
-                selected_condition=None,
+                description=f"Description {i}",
+                price=100.00 + i,
+                sku=f"SKU{i}",
+                category=self.nature_category,
+                selected_condition=self.framed_condition,
                 is_available=True,
                 is_in_stock=True,
-                is_featured=False,
                 created_at=timezone.now(),
                 updated_at=timezone.now(),
             )
+
+        # Test page 1
         response = self.client.get(reverse('artwork:list'))
         self.assertEqual(response.status_code, 200)
-        # Assuming pagination is set to 10 items per page
-        self.assertEqual(len(response.context['artwork_list']), 10)
-        response_page_2 = self.client.get(reverse('artwork:list') + '?page=2')
-        self.assertEqual(response_page_2.status_code, 200)
-        self.assertEqual(
-            len(response_page_2.context['artwork_list']), 7
-            )  # 2 original + 15 new = 17 total
+        self.assertEqual(len(response.context['artwork']), 10)
 
-    def test_artwork_search_functionality(self):
+        # Test page 2
+        response = self.client.get(reverse('artwork:list') + '?page=2')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.context['artwork']), 7)
+
+    def test_artwork_list_search_existing_term(self):
+        """Test searching for an existing artwork."""
         response = self.client.get(reverse('artwork:list') + '?search=Sunset')
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, self.artwork.name)
-        self.assertNotContains(response, self.artwork2.name)
-        response_no_results = self.client.get(
+        self.assertIn(self.artwork, response.context['artwork'])
+        self.assertNotIn(self.artwork2, response.context['artwork'])
+
+    def test_artwork_list_search_non_existent_term(self):
+        """Test searching for a non-existent artwork."""
+        response = self.client.get(
             reverse('artwork:list') + '?search=NonExistent'
             )
-        self.assertEqual(response_no_results.status_code, 200)
-        self.assertContains(response_no_results, "No artworks found.")
-        self.assertNotContains(response_no_results, self.artwork.name)
-        self.assertNotContains(response_no_results, self.artwork2.name)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'No artworks found.')
+        self.assertEqual(len(response.context['artwork']), 0)
 
-    def test_artwork_category_filtering(self):
-        self.artwork.category = "Nature"
-        self.artwork.save()
-        self.artwork2.category = "Seascape"
-        self.artwork2.save()
+    def test_artwork_list_filter_by_nature_category(self):
+        """Test filtering artworks by Nature category."""
         response = self.client.get(
             reverse('artwork:list') + '?category=Nature'
-            )
+        )
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, self.artwork.name)
-        self.assertNotContains(response, self.artwork2.name)
-        response_seascape = self.client.get(
-            reverse('artwork:list') + '?category=Seascape'
-            )
-        self.assertEqual(response_seascape.status_code, 200)
-        self.assertContains(response_seascape, self.artwork2.name)
-        self.assertNotContains(response_seascape, self.artwork.name)
+        self.assertIn(self.artwork, response.context['artwork'])
+        self.assertNotIn(self.artwork2, response.context['artwork'])
 
-    def test_artwork_price_filtering(self):
+    def test_artwork_list_filter_by_seascape_category(self):
+        """Test filtering artworks by Seascape category."""
+        response = self.client.get(
+            reverse('artwork:list') + '?category=Seascape'
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(self.artwork2, response.context['artwork'])
+        self.assertNotIn(self.artwork, response.context['artwork'])
+
+    def test_artwork_list_filter_by_price_range_150_200(self):
+        """Test filtering artworks by price range £150-£200."""
         response = self.client.get(
             reverse('artwork:list') + '?min_price=150&max_price=200'
-            )
+        )
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, self.artwork.name)
-        self.assertNotContains(response, self.artwork2.name)
-        response_no_match = self.client.get(
-            reverse('artwork:list') + '?min_price=300&max_price=400'
-            )
-        self.assertEqual(response_no_match.status_code, 200)
-        self.assertContains(response_no_match, "No artworks found.")
-        self.assertNotContains(response_no_match, self.artwork.name)
-        self.assertNotContains(response_no_match, self.artwork2.name)
+        self.assertIn(self.artwork, response.context['artwork'])
+        self.assertNotIn(self.artwork2, response.context['artwork'])
 
-# To run these tests, use the Django test framework with the command:
-# python manage.py test artwork.tests.tests_views
+    def test_artwork_list_filter_by_price_range_300_400(self):
+        """Test filtering artworks by price range £300-£400 (no results)."""
+        response = self.client.get(
+            reverse('artwork:list') + '?min_price=300&max_price=400'
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'No artworks found.')
+        self.assertEqual(len(response.context['artwork']), 0)

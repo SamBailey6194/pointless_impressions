@@ -1,6 +1,7 @@
 from django.db import models
 import random
 import string
+from pointless_impressions_src.photo.models import Photo
 
 
 # Create your models here.
@@ -47,6 +48,30 @@ class Artwork(models.Model):
         """Generate a SKU for the artwork."""
         characters = string.ascii_uppercase + string.digits
         return "SKU-" + ''.join(random.choices(characters, k=10))
+
+    def _get_primary_photo(self):
+        """Retrieve the primary photo associated with this artwork."""
+        if not hasattr(self, '_cached_photo'):
+            self._cached_photo = Photo.objects.filter(artwork=self).first()
+        return self._cached_photo
+
+    @property
+    def image(self):
+        """Get the primary photo for this artwork."""
+        photo = self._get_primary_photo()
+        return photo.image if photo else None
+
+    @property
+    def image_url(self):
+        """Get the URL of the primary photo."""
+        photo = self._get_primary_photo()
+        return photo.get_image_url if photo else ''
+
+    @property
+    def image_alt_text(self):
+        """Get the alt text for the primary photo."""
+        photo = self._get_primary_photo()
+        return photo.alt_text_or_default if photo else self.name
 
 
 class ArtworkCategory(models.Model):

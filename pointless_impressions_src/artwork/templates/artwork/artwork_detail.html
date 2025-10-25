@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+{% load static cloudinary tailwind_tags %}
+
+{% block content %}
+<section class="py-16 w-full">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    {% comment %} Breadcrumbs {% endcomment %}
+    <div class="breadcrumbs text-sm mb-6">
+      <ul>
+        <li><a href="/"><i class="fa-solid fa-home"></i> Home</a></li>
+        <li><a href="{% url 'artwork:list' %}"><i class="fa-solid fa-palette"></i> Artworks</a></li>
+        <li>{{ artwork.name }}</li>
+      </ul>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      {% comment %} Image Section {% endcomment %}
+      <div>
+        <figure class="rounded-box overflow-hidden shadow-2xl">
+          {% if artwork.image %}
+            {% cloudinary artwork.image.public_id format="jpg" width=800 height=600 crop="fill" class="w-full" %}
+          {% else %}
+            <div class="bg-base-300 w-full aspect-[4/3] flex items-center justify-center">
+              <i class="fa-solid fa-image text-base-content/20 text-8xl"></i>
+            </div>
+          {% endif %}
+        </figure>
+      </div>
+
+      {% comment %} Details Section {% endcomment %}
+      <div class="space-y-6">
+        <div>
+          <h1 class="text-4xl font-bold mb-2">{{ artwork.name }}</h1>
+          <div class="badge badge-primary badge-lg">{{ artwork.category.friendly_name }}</div>
+        </div>
+        
+        {% if not artwork.is_in_stock %}
+          <div class="alert alert-warning">
+            <i class="fa-solid fa-exclamation-triangle text-xl"></i>
+            <div>
+              <h3 class="font-bold">Out of Stock</h3>
+              <div class="text-xs">This artwork is currently unavailable</div>
+            </div>
+          </div>
+        {% endif %}
+        
+        <div class="card bg-base-200">
+          <div class="card-body">
+            <div class="flex items-baseline gap-2">
+              <span class="text-5xl font-bold text-primary">£{{ artwork.price }}</span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="card bg-base-200">
+          <div class="card-body">
+            <h2 class="card-title">
+              <i class="fa-solid fa-info-circle"></i> Description
+            </h2>
+            <div class="prose max-w-none">
+              <p>{{ artwork.description }}</p>
+            </div>
+          </div>
+        </div>
+        
+        <div class="card bg-base-200">
+          <div class="card-body">
+            <h2 class="card-title">
+              <i class="fa-solid fa-list-ul"></i> Details
+            </h2>
+            <div class="space-y-2">
+              <div class="flex justify-between">
+                <span class="font-semibold">SKU:</span>
+                <span class="font-mono">{{ artwork.sku }}</span>
+              </div>
+              <div class="divider my-1"></div>
+              <div class="flex justify-between">
+                <span class="font-semibold">Category:</span>
+                <span class="badge badge-outline">{{ artwork.category.friendly_name }}</span>
+              </div>
+              <div class="divider my-1"></div>
+              <div class="flex justify-between">
+                <span class="font-semibold">Condition:</span>
+                <span class="badge badge-success">{{ artwork.selected_condition.condition_name }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="space-y-3">
+          {% if artwork.is_in_stock %}
+            <button class="btn btn-primary btn-lg w-full">
+              <i class="fa-solid fa-cart-plus text-xl"></i> Add to Cart
+            </button>
+          {% else %}
+            <button class="btn btn-disabled btn-lg w-full" disabled>
+              <i class="fa-solid fa-ban text-xl"></i> Out of Stock
+            </button>
+          {% endif %}
+          
+          <a href="{% url 'artwork:list' %}" class="btn btn-outline btn-lg w-full">
+            <i class="fa-solid fa-arrow-left"></i> Back to Browse
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock content %}
+
+{% block postloadjs %}
+<script src="{% static 'js/artwork.js' %}" defer></script>
+{% endblock postloadjs %}

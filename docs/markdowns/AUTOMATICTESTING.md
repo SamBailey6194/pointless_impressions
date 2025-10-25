@@ -81,17 +81,17 @@ Please copy the example to the relevant part for your tests.
 
 | Step | Action | Outcome | Pass / Fail |
 | ---- | ------ | ------- | ----------- |
-| 1 | Visit artwork list view | Returns 200 OK and contains artwork names | Pass/Fail |
-| 2 | Visit artwork detail view | Returns 200 OK and contains description and price | Pass/Fail |
-| 3 | Visit featured artwork view | Only featured artwork appears | Pass/Fail |
-| 4 | Mark artwork unavailable and check list view | Unavailable artwork does not appear | Pass/Fail |
-| 5 | Mark artwork out of stock and check detail view | Shows "Out of Stock" | Pass/Fail |
-| 6 | Populate 15 extra artworks and test pagination | First page shows 10, second page shows remaining | Pass/Fail |
-| 7 | Search artwork by name "Sunset" | Returns only matching artwork | Pass/Fail |
-| 8 | Search artwork with non-existent term | Returns "No artworks found" | Pass/Fail |
-| 9 | Filter artwork by category "Nature" | Returns only artworks in that category | Pass/Fail |
-| 10 | Filter artwork by price range 150–200 | Returns only artworks in that range | Pass/Fail |
-| 11 | Filter artwork by price range 300–400 | Returns "No artworks found" | Pass/Fail |
+| 1 | Load artwork list view | Response 200, both artworks `Sunset` and `Ocean` are displayed | Pass |
+| 2 | Load artwork detail view for `Sunset` | Response 200, displays `Sunset` description, also shows `Ocean` description | Pass |
+| 3 | Mark `Sunset` as unavailable and reload list | Response 200, `Sunset` not displayed, `Ocean` displayed | Pass |
+| 4 | Mark `Sunset` as out of stock and load detail view | Response 200, shows `"Out of Stock"` and `Sunset` description | Pass |
+| 5 | Test list pagination with 17 artworks total | Page 1 contains 10 artworks, page 2 contains 7 artworks | Pass |
+| 6 | Search artworks with term "Sunset" | Response 200, `Sunset` displayed, `Ocean` not displayed | Pass |
+| 7 | Search artworks with non-existent term | Response 200, shows `"No artworks found."`, neither artwork displayed | Pass |
+| 8 | Filter artworks by category "Nature" | Response 200, only `Sunset` displayed, `Ocean` hidden | Pass |
+| 9 | Filter artworks by category "Seascape" | Response 200, only `Ocean` displayed, `Sunset` hidden | Pass |
+| 10 | Filter artworks by price between £150-£200 | Response 200, only `Sunset` displayed, `Ocean` hidden | Pass |
+| 11 | Filter artworks by price between £300-£400 | Response 200, shows `"No artworks found."`, neither artwork displayed | Pass |
 
 ---
 

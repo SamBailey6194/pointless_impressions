@@ -13,18 +13,18 @@
       {% comment %} SEO Meta Tags {% endcomment %}
 
       {% comment %} Dynamic Meta Description based on page type {% endcomment %}
-      <meta name="description" content="{% if product %}{{ product.description|striptags|truncatechars:155 }}{% elif post %}{{ post.meta_description|striptags|truncatechars:155 }}{% elif category %}{{ category.description|striptags|truncatechars:155 }}{% elif page_slug == 'about' %}Learn about Pointless Impressions, our mission, values, and the artists we support.{% else %}Discover and buy unique Pointillism art online at Pointless Impressions. Explore curated pieces, artist stories, and art education.{% endif %}" />
+      <meta name="description" content="{% if product %}{{ product.description|striptags|truncatechars:155 }}{% elif post %}{{ post.meta_description|striptags|truncatechars:155 }}{% elif page_slug == 'about' %}Learn about Pointless Impressions, our mission, values, and the artists we support.{% else %}Discover and buy unique Pointillism art online at Pointless Impressions. Explore curated pieces, artist stories, and art education.{% endif %}" />
 
       {% comment %} Open Graph Tags {% endcomment %}
-      <meta property="og:title" content="{% block og_title %}{% if product %}{{ product.name|truncatechars:200|striptags }} | Pointless Impressions{% elif post %}{{ post.title|striptags }} | Pointless Impressions{% elif category %}{{ category.name|truncatechars:200|striptags }} | Pointless Impressions{% elif page_slug == 'about' %}About Us | Pointless Impressions{% else %}Pointless Impressions – Unique Pointillism Art{% endif %}{% endblock %}" />
-      <meta property="og:description" content="{% if product %}{{ product.description|striptags|truncatechars:155 }}{% elif post %}{{ post.meta_description|striptags|truncatechars:155 }}{% elif category %}{{ category.description|striptags|truncatechars:155 }}{% elif page_slug == 'about' %}Learn about Pointless Impressions, our mission, values, and the artists we support.{% else %}Discover and buy unique Pointillism art online at Pointless Impressions. Explore curated pieces, artist stories, and art education.{% endif %}" />
+      <meta property="og:title" content="{% block og_title %}{% if artwork %}{{ artwork.name|truncatechars:200|striptags }} | Pointless Impressions{% elif post %}{{ post.title|striptags }} | Pointless Impressions{% elif page_slug == 'about' %}About Us | Pointless Impressions{% else %}Pointless Impressions – Unique Pointillism Art{% endif %}{% endblock %}" />
+      <meta property="og:description" content="{% if artwork %}{{ artwork.description|striptags|truncatechars:155 }}{% elif post %}{{ post.meta_description|striptags|truncatechars:155 }}{% elif page_slug == 'about' %}Learn about Pointless Impressions, our mission, values, and the artists we support.{% else %}Discover and buy unique Pointillism art online at Pointless Impressions. Explore curated pieces, artist stories, and art education.{% endif %}" />
       <meta property="og:type" content="website" />
       <meta property="og:site_name" content="Pointless Impressions" />
 
       {% comment %} Open Graph Image Block: Dev uses local files, Prod uses Cloudinary {% endcomment %}
       {% comment %}
-      {% if product.image %}
-          <meta property="og:image" content="{% cloudinary_url product.image width=1200 height=630 crop='fill' format='auto' quality='auto' %}">
+      {% if artwork.image %}
+          <meta property="og:image" content="{% cloudinary_url artwork.image width=1200 height=630 crop='fill' format='auto' quality='auto' %}">
       {% elif post.featured_image %}
           <meta property="og:image" content="{% cloudinary_url post.featured_image width=1200 height=630 crop='fill' format='auto' quality='auto' %}">
       {% else %}

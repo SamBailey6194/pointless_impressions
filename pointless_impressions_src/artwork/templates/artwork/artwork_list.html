@@ -1,0 +1,151 @@
+{% extends "base.html" %}
+{% load static cloudinary tailwind_tags %}
+
+{% block content %}
+<section class="py-16 w-full">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <h1 class="text-4xl font-bold mb-8">Browse Artworks</h1>
+
+    {% comment %} Filters Form {% endcomment %}
+    <div class="card bg-base-200 shadow-xl mb-8">
+      <div class="card-body">
+        <h2 class="card-title">Filter Artworks</h2>
+        <form method="get" class="space-y-4">
+          {% if request.GET.search %}
+            <input type="hidden" name="search" value="{{ request.GET.search }}">
+          {% endif %}
+          
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="form-control w-full">
+              <label class="label">
+                <span class="label-text">Category</span>
+              </label>
+              <select name="category" class="select select-bordered w-full">
+                <option value="">All Categories</option>
+                <option value="Nature" {% if request.GET.category == 'Nature' %}selected{% endif %}>Nature</option>
+                <option value="Seascape" {% if request.GET.category == 'Seascape' %}selected{% endif %}>Seascape</option>
+              </select>
+            </div>
+            
+            <div class="form-control w-full">
+              <label class="label">
+                <span class="label-text">Min Price (£)</span>
+              </label>
+              <input type="number" name="min_price" placeholder="0" 
+                     value="{{ request.GET.min_price }}" class="input input-bordered w-full">
+            </div>
+            
+            <div class="form-control w-full">
+              <label class="label">
+                <span class="label-text">Max Price (£)</span>
+              </label>
+              <input type="number" name="max_price" placeholder="1000" 
+                     value="{{ request.GET.max_price }}" class="input input-bordered w-full">
+            </div>
+          </div>
+          
+          <div class="card-actions justify-end">
+            <button type="submit" class="btn btn-primary">
+              <i class="fa-solid fa-filter"></i> Apply Filters
+            </button>
+            <a href="{% url 'artwork:list' %}" class="btn btn-ghost">
+              <i class="fa-solid fa-times"></i> Clear
+            </a>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    {% comment %} Artwork List Container {% endcomment %}
+    <div id="artwork-list">
+      {% if artworks %}
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {% for artwork in artworks %}
+            <div class="artwork-card card bg-base-100 shadow-xl hover:shadow-2xl transition-shadow" data-sku="{{ artwork.sku }}">
+              <figure>
+                {% if artwork.image %}
+                  {% cloudinary artwork.image.public_id format="jpg" width=400 height=300 crop="fill" class="w-full h-64 object-cover" %}
+                {% else %}
+                  <div class="bg-base-300 h-64 w-full flex items-center justify-center">
+                    <i class="fa-solid fa-image text-base-content/20 text-5xl"></i>
+                  </div>
+                {% endif %}
+              </figure>
+              <div class="card-body">
+                <h2 class="artwork-name card-title">{{ artwork.name }}</h2>
+                <p class="artwork-description text-base-content/70">{{ artwork.description|truncatewords:15 }}</p>
+                <div class="divider my-2"></div>
+                <p class="artwork-price text-2xl font-bold text-primary">£{{ artwork.price }}</p>
+                
+                <div class="card-actions justify-between items-center mt-4">
+                  {% if artwork.is_in_stock %}
+                    <button class="add-to-cart btn btn-primary btn-sm">
+                      <i class="fa-solid fa-cart-plus"></i> Add to Cart
+                    </button>
+                    <a href="{% url 'artwork:detail' artwork.pk %}" class="btn btn-outline btn-sm">
+                      <i class="fa-solid fa-eye"></i> Details
+                    </a>
+                  {% else %}
+                    <span class="sold-out badge badge-error">Sold Out</span>
+                    <a href="{% url 'artwork:detail' artwork.pk %}" class="btn btn-outline btn-sm">
+                      <i class="fa-solid fa-eye"></i> Details
+                    </a>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+
+        {% comment %} Pagination {% endcomment %}
+        {% if is_paginated %}
+          <div class="join flex justify-center mt-8">
+            {% if page_obj.has_previous %}
+              <a href="?page=1{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}{% if request.GET.min_price %}&min_price={{ request.GET.min_price }}{% endif %}{% if request.GET.max_price %}&max_price={{ request.GET.max_price }}{% endif %}" 
+                 class="join-item btn">«</a>
+              <a href="?page={{ page_obj.previous_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}{% if request.GET.min_price %}&min_price={{ request.GET.min_price }}{% endif %}{% if request.GET.max_price %}&max_price={{ request.GET.max_price }}{% endif %}" 
+                 class="join-item btn">‹</a>
+            {% endif %}
+            
+            <button class="join-item btn btn-active">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</button>
+            
+            {% if page_obj.has_next %}
+              <a href="?page={{ page_obj.next_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}{% if request.GET.min_price %}&min_price={{ request.GET.min_price }}{% endif %}{% if request.GET.max_price %}&max_price={{ request.GET.max_price }}{% endif %}" 
+                 class="join-item btn">›</a>
+              <a href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}{% if request.GET.min_price %}&min_price={{ request.GET.min_price }}{% endif %}{% if request.GET.max_price %}&max_price={{ request.GET.max_price }}{% endif %}" 
+                 class="join-item btn">»</a>
+            {% endif %}
+          </div>
+        {% endif %}
+      {% else %}
+        <div class="hero min-h-[400px] bg-base-200 rounded-box">
+          <div class="hero-content text-center">
+            <div class="max-w-md">
+              <i class="fa-solid fa-palette text-6xl text-base-content/20 mb-4"></i>
+              <h2 class="text-3xl font-bold">No artworks found.</h2>
+              <p class="py-6 text-base-content/70">Try adjusting your filters or search terms to find what you're looking for.</p>
+              <a href="{% url 'artwork:list' %}" class="btn btn-primary">
+                <i class="fa-solid fa-refresh"></i> Clear Filters
+              </a>
+            </div>
+          </div>
+        </div>
+      {% endif %}
+    </div>
+
+    {% comment %} Sort and Filter controls (for JavaScript enhancement) {% endcomment %}
+    <div id="controls" class="mt-8 flex flex-wrap gap-2">
+      <button id="sort-price" class="btn btn-outline">
+        <i class="fa-solid fa-sort-amount-down"></i> Sort by Price
+      </button>
+      <button id="filter-available" class="btn btn-outline">
+        <i class="fa-solid fa-check-circle"></i> Available Only
+      </button>
+    </div>
+  </div>
+</section>
+{% endblock content %}
+
+{% block postloadjs %}
+<script src="{% static 'js/artwork.js' %}" defer></script>
+{% endblock postloadjs %}
