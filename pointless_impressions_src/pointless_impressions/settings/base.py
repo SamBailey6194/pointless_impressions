@@ -45,6 +45,7 @@ LOCAL_APPS = [
     "pointless_impressions_src.theme",
     "pointless_impressions_src.artwork",
     "pointless_impressions_src.photo",
+    "pointless_impressions_src.account",
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -111,7 +112,11 @@ TEMPLATES = [
     },
 ]
 
+# WSGI application
 WSGI_APPLICATION = "pointless_impressions_src.pointless_impressions.wsgi.application"
+
+# Custom user model
+AUTH_USER_MODEL = "account.CustomUser"
 
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [

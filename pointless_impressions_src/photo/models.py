@@ -1,6 +1,7 @@
 from django.db import models
-from cloudinary.models import CloudinaryField
 from django.forms import ValidationError
+from django.conf import settings
+from cloudinary.models import CloudinaryField
 from pointless_impressions_src.artwork.models import Artwork
 # from pointless_impressions_src.profile.models import Profile
 # from pointless_impressions_src.blog.models import Blog
@@ -15,6 +16,8 @@ def artwork_image_path(instance, filename):
     #     return f"profile/{filename}"
     # elif instance.blog:
     #     return f"blog/{filename}"
+    # elif instance.account:
+    #     return f"account/{filename}"
     # return f"others/{filename}"
     return f"artwork/{filename}"
 
@@ -22,17 +25,37 @@ def artwork_image_path(instance, filename):
 # Photo model to store images associated with Artwork, Profile, or Blog
 class Photo(models.Model):
     artwork = models.ForeignKey(
-        Artwork, null=True, blank=True, on_delete=models.CASCADE
-        )
+        Artwork,
+        null=True,
+        blank=True,
+        on_delete=models.CASCADE
+    )
     # profile = models.ForeignKey(
-    #     Profile, null=True, blank=True, on_delete=models.CASCADE
+    #     Profile,
+    #     null=True,
+    #     blank=True,
+    #     on_delete=models.CASCADE
     # )
     # blog = models.ForeignKey(
-    #     Blog, null=True, blank=True, on_delete=models.CASCADE
+    #     Blog,
+    #     null=True,
+    #     blank=True,
+    #     on_delete=models.CASCADE
     # )
+    account = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        null=True,
+        blank=True,
+        on_delete=models.CASCADE
+    )
     title = models.CharField(max_length=255, blank=True)
     description = models.TextField(blank=True)
-    image = CloudinaryField('image', folder=artwork_image_path)
+    if settings.DEBUG:
+        # Dev: use local file storage
+        image = models.ImageField(upload_to=artwork_image_path)
+    else:
+        # Staging/Prod: use Cloudinary
+        image = CloudinaryField('image', folder=artwork_image_path)
     alt_text = models.CharField(max_length=255, blank=True)
     uploaded_at = models.DateTimeField(auto_now_add=True)
 
@@ -43,9 +66,16 @@ class Photo(models.Model):
     # Validation to ensure only one parent is linked
     def clean(self):
         """Ensure the photo is linked to only one parent at a time."""
-        parents = [bool(self.artwork), bool(self.profile), bool(self.blog)]
+        parents = [
+            bool(self.artwork),
+            bool(self.profile),
+            bool(self.blog),
+            bool(self.account)
+            ]
         if sum(parents) > 1:
-            raise ValidationError("Photo can only be linked to one parent at a time.")
+            raise ValidationError(
+                "Photo can only be linked to one parent at a time."
+                )
 
     # Get the URL of the uploaded image
     @property
