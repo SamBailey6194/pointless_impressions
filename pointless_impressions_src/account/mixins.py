@@ -22,25 +22,39 @@ class ManagerRequiredMixin(UserPassesTestMixin):
         return user.is_authenticated and (user.is_manager or user.is_owner)
 
     def handle_no_permission(self):
-        raise PermissionDenied("Only managers and owners can access this view.")
+        raise PermissionDenied(
+            "Only managers and owners can access this view."
+            )
 
 
-class CustomerRequiredM
 class EmployeeRequiredMixin(UserPassesTestMixin):
     """Employees and above (managers, owners) can access."""
     def test_func(self):
         user = self.request.user
-        return user.is_authenticated and (user.is_employee or user.is_manager or user.is_owner)
+        return user.is_authenticated and (
+            user.is_employee or
+            user.is_manager or
+            user.is_owner
+            )
 
     def handle_no_permission(self):
-        raise PermissionDenied("Only employees, managers, and owners can access this view.")
+        raise PermissionDenied(
+            "Only employees, managers, and owners can access this view."
+            )
 
 
 class CustomerRequiredMixin(UserPassesTestMixin):
     """Customers and above (employees, managers, owners) can access."""
     def test_func(self):
         user = self.request.user
-        return user.is_authenticated and (user.is_customer or user.is_employee or user.is_manager or user.is_owner)
+        return user.is_authenticated and (
+            user.is_customer or
+            user.is_employee or
+            user.is_manager or
+            user.is_owner
+            )
 
     def handle_no_permission(self):
-        raise PermissionDenied("Only authenticated users can access this view.")
+        raise PermissionDenied(
+            "Only authenticated users can access this view."
+            )

@@ -63,18 +63,19 @@ Please copy the example to the relevant part for your tests.
 
 | Step | Action | Outcome | Pass / Fail |
 | ---- | ------ | ------- | ----------- |
-| 1 | Create an `Artwork` instance with name "Sunset" | `Artwork` is created with all fields correctly set | Pass/Fail |
-| 2 | Check `__str__` method of artwork | Returns `"Sunset"` | Pass/Fail |
-| 3 | Toggle `is_available` from `True` to `False` | Field updates and persists | Pass/Fail |
-| 4 | Toggle `is_in_stock` from `True` to `False` | Field updates and persists | Pass/Fail |
-| 5 | Toggle `is_featured` from `False` to `True` | Field updates and persists | Pass/Fail |
-| 6 | Update artwork price from 199.99 to 249.99 | Price updates correctly | Pass/Fail |
-| 7 | Update artwork description | Description updates correctly | Pass/Fail |
-| 8 | Attempt to create artwork with duplicate SKU "SUNSET123" | Raises an exception (unique constraint) | Pass/Fail |
-| 9 | Update artwork image | Image updates correctly | Pass/Fail |
-| 10 | Check timestamps after updating name | `created_at` remains, `updated_at` changes | Pass/Fail |
-| 11 | Create a second artwork instance | Two artworks exist with different IDs | Pass/Fail |
-| 12 | Create another instance with same/different data | Multiple instances can coexist with correct fields | Pass/Fail |
+| 1 | Create an `Artwork` instance with name "Sunset" | `Artwork` is created with all fields correctly set | Pass |
+| 2 | Check `selected_condition` initially | `selected_condition` is `None` | Pass |
+| 3 | Assign a `FramingCondition` to artwork | `selected_condition` is set and persists | Pass |
+| 4 | Assign a `Category` to artwork | `category` is set and persists | Pass |
+| 5 | Check `__str__` method of artwork | Returns `"Sunset"` | Pass |
+| 6 | Toggle `is_available` from `True` to `False` | Field updates and persists | Pass |
+| 7 | Toggle `is_in_stock` from `True` to `False` | Field updates and persists | Pass |
+| 8 | Toggle `is_featured` from `False` to `True` | Field updates and persists | Pass |
+| 9 | Update artwork price from 199.99 to 249.99 | Price updates correctly | Pass |
+| 10 | Update artwork description | Description updates correctly | Pass |
+| 11 | Attempt to create artwork with duplicate SKU "SUNSET1234" | Raises an exception (unique constraint) | Pass |
+| 12 | Check timestamps after updating artwork name | `created_at` remains, `updated_at` changes | Pass |
+| 13 | Create a second artwork instance | Two artworks exist with different IDs and fields set correctly | Pass |
 
 #### Artwork Views Tests
 
@@ -167,11 +168,11 @@ Please copy the example to the relevant part for your tests.
 
 | Step | Action | Outcome | Pass / Fail |
 | ---- | ------ | ------- | ----------- |
-| 1 | Render artwork list | Available artwork `Sunset` is displayed with description `A beautiful sunset over the mountains.` and price `£199.99` | Fail |
-| 2 | Render artwork list | Sold-out artwork `Starry Night` is displayed and clearly marked as `Sold Out` | Fail |
-| 3 | Sort artworks by price ascending | Artworks are sorted with lowest price first (`Sunset` before `Starry Night`) | Fail |
-| 4 | Filter available artworks | Only available artworks are returned (`Sunset`) | Fail |
-| 5 | Click on artwork | Artwork detail shows name, description, price, and `Add to Cart` button | Fail |
+| 1 | Render artwork list | Available artwork `Sunset` is displayed with description `A beautiful sunset over the mountains.` and price `£199.99` | Pass |
+| 2 | Render artwork list | Sold-out artwork `Starry Night` is displayed and clearly marked as `Sold Out` | Pass |
+| 3 | Sort artworks by price ascending | Artworks are sorted with lowest price first (`Sunset` before `Starry Night`) | Pass |
+| 4 | Filter available artworks | Only available artworks are returned (`Sunset`) | Pass |
+| 5 | Click on artwork | Artwork detail shows name, description, price, and `Add to Cart` button | Pass |
 
 ### BDD Testing via Cypress
 

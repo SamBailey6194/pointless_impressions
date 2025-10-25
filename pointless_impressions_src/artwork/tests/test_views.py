@@ -1,7 +1,7 @@
 from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
-from artwork.models import Artwork
+from pointless_impressions_src.artwork.models import Artwork
 
 
 # Create your tests here.
@@ -12,7 +12,7 @@ class ArtworkViewsTest(TestCase):
             description="A beautiful sunset over the mountains.",
             price=199.99,
             sku="SUNSET123",
-            image="sunset.jpg",
+            selected_condition=None,
             is_available=True,
             is_in_stock=True,
             is_featured=False,
@@ -24,7 +24,7 @@ class ArtworkViewsTest(TestCase):
             description="A serene view of the ocean.",
             price=149.99,
             sku="OCEAN456",
-            image="ocean.jpg",
+            selected_condition=None,
             is_available=True,
             is_in_stock=True,
             is_featured=True,
@@ -71,14 +71,14 @@ class ArtworkViewsTest(TestCase):
         self.assertContains(response, self.artwork.description)
 
     def test_artwork_list_pagination(self):
-        # Create additional artworks to test pagination
+        """Create additional artworks to test pagination"""
         for i in range(15):
             Artwork.objects.create(
                 name=f"Artwork {i}",
                 description="Sample description",
                 price=99.99 + i,
                 sku=f"ART{i:03}",
-                image=f"artwork_{i}.jpg",
+                selected_condition=None,
                 is_available=True,
                 is_in_stock=True,
                 is_featured=False,
