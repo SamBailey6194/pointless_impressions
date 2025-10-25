@@ -11,6 +11,7 @@ class ArtworkModelTest(TestCase):
             description="A beautiful sunset over the mountains.",
             price=199.99,
             sku="SUNSET123",
+            category=None,
             image="sunset.jpg",
             is_available=True,
             is_in_stock=True,
@@ -26,6 +27,7 @@ class ArtworkModelTest(TestCase):
             )
         self.assertEqual(self.artwork.price, 199.99)
         self.assertEqual(self.artwork.sku, "SUNSET123")
+        self.assertIsNone(self.artwork.category)
         self.assertEqual(self.artwork.image, "sunset.jpg")
         self.assertTrue(self.artwork.is_available)
         self.assertTrue(self.artwork.is_in_stock)
@@ -72,6 +74,7 @@ class ArtworkModelTest(TestCase):
                 description="A beautiful sunrise over the ocean.",
                 price=149.99,
                 sku="SUNSET123",
+                category=None,
                 image="sunrise.jpg",
                 is_available=True,
                 is_in_stock=True,
@@ -101,6 +104,7 @@ class ArtworkModelTest(TestCase):
             description="A calming view of the ocean.",
             price=179.99,
             sku="OCEAN456",
+            category=None,
             image="ocean.jpg",
             is_available=True,
             is_in_stock=True,
@@ -113,6 +117,7 @@ class ArtworkModelTest(TestCase):
         self.assertEqual(artwork2.name, "Ocean Breeze")
         self.assertTrue(artwork2.is_featured)
         self.assertEqual(artwork2.sku, "OCEAN456")
+        self.assertIsNone(artwork2.category)
         self.assertEqual(artwork2.image, "ocean.jpg")
         self.assertTrue(artwork2.created_at)
         self.assertTrue(artwork2.updated_at)
@@ -123,6 +128,7 @@ class ArtworkModelTest(TestCase):
             description="A calming view of the ocean.",
             price=179.99,
             sku="OCEAN456",
+            category=None,
             image="ocean.jpg",
             is_available=True,
             is_in_stock=True,
@@ -135,6 +141,7 @@ class ArtworkModelTest(TestCase):
         self.assertEqual(artwork2.name, "Ocean Breeze")
         self.assertTrue(artwork2.is_featured)
         self.assertEqual(artwork2.sku, "OCEAN456")
+        self.assertIsNone(artwork2.category)
         self.assertEqual(artwork2.image, "ocean.jpg")
         self.assertTrue(artwork2.created_at)
         self.assertTrue(artwork2.updated_at)
