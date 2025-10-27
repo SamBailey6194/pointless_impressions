@@ -2,85 +2,87 @@
 {% load static cloudinary tailwind_tags %}
 
 {% block content %}
-<section class="py-16 w-full">
+<section class="py-16 section-alt w-full">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <h1 class="text-4xl font-bold mb-8">Browse Artworks</h1>
 
     {% comment %} Filters Form {% endcomment %}
-    <div class="card bg-base-200 shadow-xl mb-8">
-      <div class="card-body">
-        <h2 class="card-title">Filter Artworks</h2>
-        <form method="get" class="space-y-4">
-          {% if request.GET.search %}
-            <input type="hidden" name="search" value="{{ request.GET.search }}">
-          {% endif %}
-          
-          <div class="flex flex-col md:flex-row gap-4 justify-center items-center">
-            <div class="form-control w-full md:w-1/2 max-w-xs">
-              <label class="label">
-                <span class="label-text">Artwork Category</span>
-              </label>
-              <select name="category" class="select select-bordered w-full">
-                <option value="">All Categories</option>
-                {% for category in artwork_categories %}
-                    <option value="{{ category.slug }}"
-                      {% if request.GET.category == category.slug %}selected{% endif %}>
-                        {{ category.friendly_name|default:category.name }}
-                    </option>
-                {% endfor %}
-              </select>
+    <div class="mb-8 shadow-xl rounded-2xl">
+      <div class="card rounded-2xl">
+        <div class="card-body bg-gray-300 dark:bg-gray-700 rounded-2xl">
+          <h2 class="card-title">Filter Artworks</h2>
+          <form method="get" class="space-y-4">
+            {% if request.GET.search %}
+              <input type="hidden" name="search" value="{{ request.GET.search }}">
+            {% endif %}
+            
+            <div class="flex flex-col md:flex-row gap-4 justify-center items-center">
+              <div class="form-control w-full md:w-1/2 max-w-xs">
+                <label class="label">
+                  <span class="label-text">Artwork Category</span>
+                </label>
+                <select name="category" class="select select-bordered w-full">
+                  <option value="">All Categories</option>
+                  {% for category in artwork_categories %}
+                      <option value="{{ category.slug }}"
+                        {% if request.GET.category == category.slug %}selected{% endif %}>
+                          {{ category.friendly_name|default:category.name }}
+                      </option>
+                  {% endfor %}
+                </select>
+              </div>
+              <div class="form-control w-full md:w-1/2 max-w-xs">
+                <label class="label">
+                  <span class="label-text">Framing Condition</span>
+                </label>
+                <select name="selected_condition" class="select select-bordered w-full">
+                  <option value="">All Conditions</option>
+                  {% for condition in framing_conditions %}
+                      <option value="{{ condition.slug }}"
+                        {% if request.GET.selected_condition == condition.slug %}selected{% endif %}>
+                          {{ condition.friendly_name|default:condition.name }}
+                      </option>
+                  {% endfor %}
+                </select>
+              </div>
             </div>
-            <div class="form-control w-full md:w-1/2 max-w-xs">
-              <label class="label">
-                <span class="label-text">Framing Condition</span>
-              </label>
-              <select name="selected_condition" class="select select-bordered w-full">
-                <option value="">All Conditions</option>
-                {% for condition in framing_conditions %}
-                    <option value="{{ condition.slug }}"
-                      {% if request.GET.selected_condition == condition.slug %}selected{% endif %}>
-                        {{ condition.friendly_name|default:condition.name }}
-                    </option>
-                {% endfor %}
-              </select>
-            </div>
-          </div>
-          <div class="flex flex-col md:flex-row gap-4 justify-center items-center">
-            <div class="form-control w-full md:w-1/2 max-w-xs">
-              <label class="label">
-                <span class="label-text">Min Price (£)</span>
-              </label>
-              <input type="number" name="min_price" placeholder="0" 
-                     value="{{ request.GET.min_price }}" class="input input-bordered w-full">
+            <div class="flex flex-col md:flex-row gap-4 justify-center items-center">
+              <div class="form-control w-full md:w-1/2 max-w-xs">
+                <label class="label">
+                  <span class="label-text">Min Price (£)</span>
+                </label>
+                <input type="number" name="min_price" placeholder="0" 
+                      value="{{ request.GET.min_price }}" class="input input-bordered w-full">
+              </div>
+              
+              <div class="form-control w-full md:w-1/2 max-w-xs">
+                <label class="label">
+                  <span class="label-text">Max Price (£)</span>
+                </label>
+                <input type="number" name="max_price" placeholder="1000" 
+                      value="{{ request.GET.max_price }}" class="input input-bordered w-full">
+              </div>
             </div>
             
-            <div class="form-control w-full md:w-1/2 max-w-xs">
-              <label class="label">
-                <span class="label-text">Max Price (£)</span>
-              </label>
-              <input type="number" name="max_price" placeholder="1000" 
-                     value="{{ request.GET.max_price }}" class="input input-bordered w-full">
+            <div class="card-actions justify-end">
+              <button type="submit" class="btn btn-primary">
+                <i class="fa-solid fa-filter"></i> Apply Filters
+              </button>
+              <a href="{% url 'artwork:list' %}" class="btn btn-ghost">
+                <i class="fa-solid fa-times"></i> Clear
+              </a>
             </div>
-          </div>
-          
-          <div class="card-actions justify-end">
-            <button type="submit" class="btn btn-primary">
-              <i class="fa-solid fa-filter"></i> Apply Filters
-            </button>
-            <a href="{% url 'artwork:list' %}" class="btn btn-ghost">
-              <i class="fa-solid fa-times"></i> Clear
-            </a>
-          </div>
-        </form>
+          </form>
+        </div>
       </div>
     </div>
 
     {% comment %} Artwork List Container {% endcomment %}
-    <div id="artwork-list">
+    <div id="artwork-list" class="bg-gray-300 dark:bg-gray-700 shadow-xl rounded-2xl">
       {% if artworks %}
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {% for artwork in artworks %}
-            <div class="artwork-card card bg-base-100 shadow-xl hover:shadow-2xl transition-shadow" data-sku="{{ artwork.sku }}">
+            <div class="artwork-card card shadow-xl hover:shadow-2xl transition-shadow" data-sku="{{ artwork.sku }}">
               <figure>
                 {% if artwork.image %}
                   {% cloudinary artwork.image.public_id format="jpg" width=400 height=300 crop="fill" class="w-full h-64 object-cover" %}
@@ -101,12 +103,12 @@
                     <button class="add-to-cart btn btn-primary btn-sm">
                       <i class="fa-solid fa-cart-plus"></i> Add to Cart
                     </button>
-                    <a href="{% url 'artwork:detail' artwork.pk %}" class="btn btn-outline btn-sm">
+                    <a href="{% url 'artwork:detail' artwork.slug %}" class="btn btn-outline btn-sm">
                       <i class="fa-solid fa-eye"></i> Details
                     </a>
                   {% else %}
                     <span class="sold-out badge badge-error">Sold Out</span>
-                    <a href="{% url 'artwork:detail' artwork.pk %}" class="btn btn-outline btn-sm">
+                    <a href="{% url 'artwork:detail' artwork.slug %}" class="btn btn-outline btn-sm">
                       <i class="fa-solid fa-eye"></i> Details
                     </a>
                   {% endif %}
@@ -137,10 +139,10 @@
           </div>
         {% endif %}
       {% else %}
-        <div class="hero min-h-[400px] bg-base-200 rounded-box">
+        <div class="hero min-h-[400px]">
           <div class="hero-content text-center">
             <div class="max-w-md">
-              <i class="fa-solid fa-palette text-6xl text-base-content/20 mb-4"></i>
+              <i class="fa-solid fa-palette text-6xl text-base-content mb-4"></i>
               <h2 class="text-3xl font-bold">No artworks found.</h2>
               <p class="py-6 text-base-content/70">Try adjusting your filters or search terms to find what you're looking for.</p>
               <a href="{% url 'artwork:list' %}" class="btn btn-primary">
