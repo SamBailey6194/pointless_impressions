@@ -2,6 +2,8 @@ from django.db import models
 from django.core.exceptions import ValidationError
 from django.conf import settings
 from cloudinary.models import CloudinaryField
+import cloudinary.uploader
+from .storage import OverwriteStorage
 
 
 # Create your models here.
@@ -73,7 +75,10 @@ class Photo(models.Model):
 
     if settings.DEBUG:
         # Dev: use local file storage
-        image = models.ImageField(upload_to=artwork_image_path)
+        image = models.ImageField(
+            upload_to=artwork_image_path,
+            storage=OverwriteStorage()
+            )
     else:
         # Staging/Prod: use Cloudinary
         image = CloudinaryField(
@@ -135,6 +140,18 @@ class Photo(models.Model):
             # 'blog': 'blog',
         }
         return folder_map.get(self.photo_type, 'others')
+
+    def upload_options(self, overwrite=None):
+        """Generate Cloudinary upload options based on photo type."""
+        options = {
+            'folder': self.get_folder(),
+            'use_filename': True,
+            'unique_filename': not (
+                overwrite if overwrite is not None else False
+                ),
+            'resource_type': 'image',
+        }
+        return options
 
     @property
     def get_image_url(self):

@@ -7,8 +7,6 @@ import os
 import dj_database_url
 from datetime import datetime
 import cloudinary
-import cloudinary.uploader
-import cloudinary.api
 
 # Environment settings
 ENVIRONMENT = "staging"

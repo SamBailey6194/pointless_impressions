@@ -6,8 +6,6 @@ from .base import *
 import os
 import dj_database_url
 import cloudinary
-import cloudinary.uploader
-import cloudinary.api
 
 # Environment settings
 ENVIRONMENT = "production"
