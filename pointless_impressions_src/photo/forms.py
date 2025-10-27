@@ -10,8 +10,8 @@ class PhotoForm(ModelForm):
         required=False,
         initial=False,
         label="Overwrite existing file with same name?",
-        help_text="If checked, this upload will replace any existing file with "
-        "the same name/public_id."
+        help_text="If checked, this upload will replace any existing file with"
+        " the same name/public_id."
     )
 
     class Meta:

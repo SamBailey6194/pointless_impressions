@@ -21,11 +21,9 @@
       {% comment %} Company Info {% endcomment %}
       <div>
         {% if production %}
-          <img src="{% cloudinary_url 'qzdky29kboidek5sm5qs' height=48 crop='fit' format='auto' quality='auto' %}"
-            alt="Pointless Impressions"
-            class="h-28 w-auto mb-4" />
+          {% cloudinary site_logo.image height=48 crop='fit' format='auto' quality='auto' alt=site_logo.alt_text_or_default class="h-28 w-auto mb-4" %}
         {% else %}
-          <img src="{{ MEDIA_URL }}logo_white_01.png" 
+          <img src="{{ MEDIA_URL }}site_assets/pointless_impressions_logo.png" 
                alt="Pointless Impressions" 
                class="h-28 w-auto mb-4" />
         {% endif %}

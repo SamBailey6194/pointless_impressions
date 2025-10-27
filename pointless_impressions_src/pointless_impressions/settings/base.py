@@ -106,7 +106,7 @@ TEMPLATES = [
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
                 "pointless_impressions.context_processors.environment",
-                "pointless_impressions.context_processors.static_version",
+                "pointless_impressions_src.photo.context_processors.site_assets",
             ],
         },
     },

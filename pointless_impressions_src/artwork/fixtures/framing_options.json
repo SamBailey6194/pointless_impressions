@@ -1,0 +1,34 @@
+[
+    {
+        "pk": 1,
+        "model": "artwork.ArtworkFramingCondition",
+        "fields": {
+            "condition_name": "original framed",
+            "condition_description": "Item is framed as original by the artist."
+        }
+    },
+    {
+        "pk": 2,
+        "model": "artwork.ArtworkFramingCondition",
+        "fields": {
+            "condition_name": "original non-framed",
+            "condition_description": "Item is not framed as original by the artist."
+        }
+    },
+    {
+        "pk": 3,
+        "model": "artwork.ArtworkFramingCondition",
+        "fields": {
+            "condition_name": "print limited edition framed",
+            "condition_description": "Item is framed as a limited edition print."
+        }
+    },
+    {
+        "pk": 4,
+        "model": "artwork.ArtworkFramingCondition",
+        "fields": {
+            "condition_name": "print limited edition non-framed",
+            "condition_description": "Item is not framed as a limited edition print."
+        }
+    }
+]

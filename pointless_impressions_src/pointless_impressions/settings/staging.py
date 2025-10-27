@@ -90,18 +90,18 @@ S3_DOMAIN = f'https://{AWS_S3_CUSTOM_DOMAIN}'
 CSP_DEFAULT_SRC = ("'none'",)
 
 CSP_SCRIPT_SRC = (
-    "'self'", 
+    "'self'",
     S3_DOMAIN,
     'https://res.cloudinary.com',
 )
 
 CSP_STYLE_SRC = (
-    "'self'", 
+    "'self'",
     S3_DOMAIN,
 )
 
 CSP_IMG_SRC = (
-    "'self'", 
+    "'self'",
     S3_DOMAIN,
     'https://res.cloudinary.com',
     'data:',

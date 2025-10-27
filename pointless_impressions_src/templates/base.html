@@ -13,7 +13,7 @@
       {% comment %} SEO Meta Tags {% endcomment %}
 
       {% comment %} Dynamic Meta Description based on page type {% endcomment %}
-      <meta name="description" content="{% if product %}{{ product.description|striptags|truncatechars:155 }}{% elif post %}{{ post.meta_description|striptags|truncatechars:155 }}{% elif page_slug == 'about' %}Learn about Pointless Impressions, our mission, values, and the artists we support.{% else %}Discover and buy unique Pointillism art online at Pointless Impressions. Explore curated pieces, artist stories, and art education.{% endif %}" />
+      <meta name="description" content="{% if product %}{{ artwork.description|striptags|truncatechars:155 }}{% elif post %}{{ post.meta_description|striptags|truncatechars:155 }}{% elif page_slug == 'about' %}Learn about Pointless Impressions, our mission, values, and the artists we support.{% else %}Discover and buy unique Pointillism art online at Pointless Impressions. Explore curated pieces, artist stories, and art education.{% endif %}" />
 
       {% comment %} Open Graph Tags {% endcomment %}
       <meta property="og:title" content="{% block og_title %}{% if artwork %}{{ artwork.name|truncatechars:200|striptags }} | Pointless Impressions{% elif post %}{{ post.title|striptags }} | Pointless Impressions{% elif page_slug == 'about' %}About Us | Pointless Impressions{% else %}Pointless Impressions – Unique Pointillism Art{% endif %}{% endblock %}" />
@@ -27,8 +27,8 @@
           <meta property="og:image" content="{% cloudinary_url artwork.image width=1200 height=630 crop='fill' format='auto' quality='auto' %}">
       {% elif post.featured_image %}
           <meta property="og:image" content="{% cloudinary_url post.featured_image width=1200 height=630 crop='fill' format='auto' quality='auto' %}">
-      {% else %}
-          <meta property="og:image" content="{% cloudinary_url 'qzdky29kboidek5sm5qs' width=1200 height=630 crop='fill' format='auto' quality='auto' %}">
+      {% elif site_logo %}
+          <meta property="og:image" content="{% cloudinary_url site_logo.image width=1200 height=630 crop='fill' format='auto' quality='auto' %}">
       {% endif %}
       {% endcomment %}
 
@@ -45,11 +45,24 @@
       <link rel="canonical" href="{{ request.build_absolute_uri }}" />
       
       {% comment %} Favicon {% endcomment %}
-      {% if production %}
-        {% cloudinary_url 'qzdky29kboidek5sm5qs' width=32 height=32 crop='fit' format='png' quality='auto' as favicon_url %}
-        <link rel="icon" type="image/png" href="{{ favicon_url }}" />
+      {% if production and site_logo %}
+          {# Modern browsers with auto format (AVIF/WebP/PNG fallback) #}
+          {% cloudinary_url site_logo_white_bg.image width=32 height=32 crop='fit' format='auto' quality='auto' as favicon_32 %}
+          <link rel="icon" type="image/png" sizes="32x32" href="{{ favicon_32 }}">
+          
+          {% cloudinary_url site_logo_white_bg.image width=16 height=16 crop='fit' format='auto' quality='auto' as favicon_16 %}
+          <link rel="icon" type="image/png" sizes="16x16" href="{{ favicon_16 }}">
+          
+          {# Apple Touch Icon #}
+          {% cloudinary_url site_logo_white_bg.image width=180 height=180 crop='fit' format='auto' quality='auto' as apple_touch %}
+          <link rel="apple-touch-icon" href="{{ apple_touch }}">
+          
+          {# Android Chrome #}
+          {% cloudinary_url site_logo_white_bg.image width=192 height=192 crop='fit' format='auto' quality='auto' as android_192 %}
+          <link rel="icon" type="image/png" sizes="192x192" href="{{ android_192 }}">
       {% else %}
-        <link rel="icon" type="image/png" href="{{ MEDIA_URL }}logo_white_01.png" />
+          {# Fallback for dev #}
+          <link rel="icon" type="image/png" href="{{ MEDIA_URL }}site_assets/pointless_impressions_logo_white_bg.png">
       {% endif %}
     {% endblock %}
 

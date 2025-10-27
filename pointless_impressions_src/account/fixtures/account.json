@@ -1,0 +1,116 @@
+[
+    {
+        "pk": 1,
+        "model": "account.CustomUser",
+        "fields": {
+            "username": "owneruser",
+            "email": "owner@example.com",
+            "first_name": "Owner",
+            "last_name": "User",
+            "date_joined": "2023-01-01T00:00:00Z",
+            "is_active": true,
+            "is_staff": false,
+            "is_superuser": false,
+            "is_owner": true,
+            "is_manager": false,
+            "is_employee": false,
+            "is_customer": false,
+            "password": "pbkdf2_sha256$1000000$1Z2b4djF01rV6cVWYW1SGl$oqImLkh3QptrU3TnvLilkhkxdmOmYrjb1toRI4OFt7A="
+        }
+    },
+    {
+        "pk": 2,
+        "model": "account.CustomUser",
+        "fields": {
+            "username": "manageruser",
+            "email": "manager@example.com",
+            "first_name": "Manager",
+            "last_name": "User",
+            "date_joined": "2023-01-02T00:00:00Z",
+            "is_active": true,
+            "is_staff": false,
+            "is_superuser": false,
+            "is_owner": false,
+            "is_manager": true,
+            "is_employee": false,
+            "is_customer": false,
+            "password": "pbkdf2_sha256$1000000$AHIos8VFyqFEiWFshtOYob$W9RRKePual1xydPyPRYqYd+PRJGzdtYLWKGIesY/3Ec="
+        }
+    },
+    {
+        "pk": 3,
+        "model": "account.CustomUser",
+        "fields": {
+            "username": "employeeuser",
+            "email": "employee@example.com",
+            "first_name": "Employee",
+            "last_name": "User",
+            "date_joined": "2023-01-03T00:00:00Z",
+            "is_active": true,
+            "is_staff": false,
+            "is_superuser": false,
+            "is_owner": false,
+            "is_manager": false,
+            "is_employee": true,
+            "is_customer": false,
+            "password": "pbkdf2_sha256$1000000$W6DoIe8BpClQEmWzmF1p3q$lkmGt4ANQnIX9/OZfTtAeDhA/yDeog44zAMalwcb+vI="
+        }
+    },
+    {
+        "pk": 4,
+        "model": "account.CustomUser",
+        "fields": {
+            "username": "customeruser",
+            "email": "customer@example.com",
+            "first_name": "Customer",
+            "last_name": "User",
+            "date_joined": "2023-01-04T00:00:00Z",
+            "is_active": true,
+            "is_staff": false,
+            "is_superuser": false,
+            "is_owner": false,
+            "is_manager": false,
+            "is_employee": false,
+            "is_customer": true,
+            "password": "pbkdf2_sha256$1000000$BdzplkWLFQjcSM7Cd2lcRU$7v2o+WduA5G5Iz9ZfCy5EJ9XOr1ahZBPkBrHYVnSN5A="
+        }
+    },
+    {
+        "pk": 5,
+        "model": "account.CustomUser",
+        "fields": {
+            "username": "superuser",
+            "email": "superuser@example.com",
+            "first_name": "Super",
+            "last_name": "User",
+            "date_joined": "2023-01-05T00:00:00Z",
+            "is_active": true,
+            "is_staff": true,
+            "is_superuser": true,
+            "is_owner": false,
+            "is_manager": false,
+            "is_employee": false,
+            "is_customer": false,
+            "password": "pbkdf2_sha256$1000000$tzN8NuULoo7fpVsSuV0ej7$pOjmGNXn75H+uPvUjjmEDB6wrYqjHXm5sqtUzO70oH8="
+        }
+    },
+    {
+        "pk": 6,
+        "model": "account.CustomUser",
+        "fields": {
+            "username": "staffuser",
+            "email": "staffuser@example.com",
+            "first_name": "Staff",
+            "last_name": "User",
+            "date_joined": "2023-01-06T00:00:00Z",
+            "is_active": true,
+            "is_staff": true,
+            "is_superuser": false,
+            "is_owner": false,
+            "is_manager": false,
+            "is_employee": false,
+            "is_customer": false,
+            "password": "pbkdf2_sha256$1000000$TZbFiWUHqlMjs0jFVQC8CT$K/iIV+fI6utwnEzt1uiqshgfgqHpmo1LQy+LqVYNICQ="
+        }
+    }
+]

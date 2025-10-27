@@ -12,4 +12,5 @@ class HomeView(TemplateView):
         context['section_1_class'] = 'py-20 section-blue w-full'
         context['section_2_class'] = 'py-16 section-alt w-full'
         context['section_3_class'] = 'py-16 section-alt w-full'
+
         return context

@@ -1,0 +1,82 @@
+[
+    {
+        "pk": 1,
+        "model": "artwork.Artwork",
+        "fields": {
+            "name": "Autumn Reflections",
+            "description": "A autumn scene of trees at sunset reflected in a lake.",
+            "price": 155.00,
+            "sku": "autumn001",
+            "category": 1,
+            "selected_condition": 1,
+            "is_available": true,
+            "is_in_stock": true,
+            "is_featured": false,
+            "created_at": "2023-10-23T00:00:00Z",
+            "updated_at": "2023-10-23T00:00:00Z",
+            "photo": [
+                1
+            ]
+        }
+    },
+    {
+        "pk": 2,
+        "model": "artwork.Artwork",
+        "fields": {
+            "name": "Purification By Fire",
+            "description": "A photograph of a soul being purified by holy fire.",
+            "price": 1200.00,
+            "sku": "PURITY001",
+            "category": 2,
+            "selected_condition": 2,
+            "is_available": true,
+            "is_in_stock": true,
+            "is_featured": true,
+            "created_at": "2020-02-26T00:00:00Z",
+            "updated_at": "2020-02-26T00:00:00Z",
+            "photo": [
+                4
+            ]
+        }
+    },
+    {
+        "pk": 3,
+        "model": "artwork.Artwork",
+        "fields": {
+            "name": "The Beauty of Genesis",
+            "description": "A detailed picture of a snake using pointillism.",
+            "price": 125.00,
+            "sku": "snake001",
+            "category": 1,
+            "selected_condition": 1,
+            "is_available": true,
+            "is_in_stock": true,
+            "is_featured": true,
+            "created_at": "2020-02-26T00:00:00Z",
+            "updated_at": "2020-02-26T00:00:00Z",
+            "photo": [
+                5
+            ]
+        }
+    },
+    {
+        "pk": 4,
+        "model": "artwork.Artwork",
+        "fields": {
+            "name": "The Lady of Shalott",
+            "description": "A photograph of The Lady of Shalott in the lake",
+            "price": 800.00,
+            "sku": "SHALOTT001",
+            "category": 2,
+            "selected_condition": 3,
+            "is_available": true,
+            "is_in_stock": true,
+            "is_featured": true,
+            "created_at": "2019-05-24T00:00:00Z",
+            "updated_at": "2019-10-24T00:00:00Z",
+            "photo": [
+                6
+            ]
+        }
+    }
+]

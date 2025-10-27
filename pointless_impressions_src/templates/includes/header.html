@@ -6,12 +6,10 @@
     {% comment %} Logo Section {% endcomment %}
     <div class="navbar-start">
       <a href="/" class="btn btn-ghost normal-case text-xl h-auto p-2">
-        {% if production %}
-          <img src="{% cloudinary_url 'qzdky29kboidek5sm5qs' height=32 crop='fit' format='auto' quality='auto' %}" 
-            alt="Pointless Impressions"
-            class="h-8 sm:h-10 md:h-12 w-auto" />
+        {% if production and site_logo %}
+          {% cloudinary site_logo.image height=60 crop='fit' format='auto' quality='auto' alt=site_logo.alt_text_or_default class="h-8 sm:h-10 md:h-12 w-auto" %}
         {% else %}
-          <img src="{{ MEDIA_URL }}logo_white_01.png" alt="Pointless Impressions" class="h-8 sm:h-10 md:h-12 w-auto" />
+          <img src="{{ MEDIA_URL }}site_assets/pointless_impressions_logo.png" alt="Pointless Impressions" class="h-8 sm:h-10 md:h-12 w-auto" />
         {% endif %}
       </a>
     </div>
