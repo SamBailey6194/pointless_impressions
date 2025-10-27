@@ -15,19 +15,38 @@
             <input type="hidden" name="search" value="{{ request.GET.search }}">
           {% endif %}
           
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div class="form-control w-full">
+          <div class="flex flex-col md:flex-row gap-4 justify-center items-center">
+            <div class="form-control w-full md:w-1/2 max-w-xs">
               <label class="label">
-                <span class="label-text">Category</span>
+                <span class="label-text">Artwork Category</span>
               </label>
               <select name="category" class="select select-bordered w-full">
                 <option value="">All Categories</option>
-                <option value="Nature" {% if request.GET.category == 'Nature' %}selected{% endif %}>Nature</option>
-                <option value="Seascape" {% if request.GET.category == 'Seascape' %}selected{% endif %}>Seascape</option>
+                {% for category in artwork_categories %}
+                    <option value="{{ category.slug }}"
+                      {% if request.GET.category == category.slug %}selected{% endif %}>
+                        {{ category.friendly_name|default:category.name }}
+                    </option>
+                {% endfor %}
               </select>
             </div>
-            
-            <div class="form-control w-full">
+            <div class="form-control w-full md:w-1/2 max-w-xs">
+              <label class="label">
+                <span class="label-text">Framing Condition</span>
+              </label>
+              <select name="selected_condition" class="select select-bordered w-full">
+                <option value="">All Conditions</option>
+                {% for condition in framing_conditions %}
+                    <option value="{{ condition.slug }}"
+                      {% if request.GET.selected_condition == condition.slug %}selected{% endif %}>
+                        {{ condition.friendly_name|default:condition.name }}
+                    </option>
+                {% endfor %}
+              </select>
+            </div>
+          </div>
+          <div class="flex flex-col md:flex-row gap-4 justify-center items-center">
+            <div class="form-control w-full md:w-1/2 max-w-xs">
               <label class="label">
                 <span class="label-text">Min Price (£)</span>
               </label>
@@ -35,7 +54,7 @@
                      value="{{ request.GET.min_price }}" class="input input-bordered w-full">
             </div>
             
-            <div class="form-control w-full">
+            <div class="form-control w-full md:w-1/2 max-w-xs">
               <label class="label">
                 <span class="label-text">Max Price (£)</span>
               </label>
@@ -147,5 +166,10 @@
 {% endblock content %}
 
 {% block postloadjs %}
+{{  block.super }}
+<script>
+  const ARTWORK_API_URL = "{% url 'artwork:api_artworks' %}";
+  const ARTWORK_DETAIL_BASE_PATH = "{% url 'artwork:detail' slug='placeholder' %}".replace('placeholder', '');
+</script>
 <script src="{% static 'js/artwork.js' %}" defer></script>
 {% endblock postloadjs %}

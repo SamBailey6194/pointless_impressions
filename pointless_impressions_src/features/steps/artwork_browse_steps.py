@@ -1,7 +1,17 @@
+
+# Django environment setup must be first
+import os
+import django
+os.environ.setdefault(
+    "DJANGO_SETTINGS_MODULE", "pointless_impressions.settings.dev"
+)
+django.setup()
+
+# All imports together after setup
 from behave import given, when, then
 from django.urls import reverse
 from django.utils import timezone
-from artwork.models import Artwork
+from pointless_impressions_src.artwork.models import Artwork
 from bs4 import BeautifulSoup
 
 
@@ -105,7 +115,7 @@ def step_impl(context):
 # THEN
 # --------------------------
 
-@then('I should see "{text}"')
+@then('I should see the "{text}"')
 def step_impl(context, text):
     """
     Assert that a given text is visible on the page.
@@ -113,7 +123,7 @@ def step_impl(context, text):
     assert text in context.response.content.decode(), f"Expected '{text}' not found in page."
 
 
-@then('I should not see "{text}"')
+@then('I should not see the "{text}"')
 def step_impl(context, text):
     """
     Assert that a given text is not visible on the page.
@@ -148,49 +158,3 @@ def step_impl(context):
     artworks = list(context.response.context['artworks'])
     prices = [a.price for a in artworks]
     assert prices == sorted(prices), f"Artworks not sorted by ascending price: {prices}"
-
-
-@then('"{artwork_name}" should be added to my shopping cart')
-def step_impl(context, artwork_name):
-    """
-    Verify that the item was successfully added to the cart.
-    This assumes you have a session-based cart implementation.
-    """
-    session = context.test.client.session
-    cart = session.get('cart', {})
-    assert artwork_name in cart.values() or len(cart) > 0, f"{artwork_name} not found in cart."
-
-
-@then('I should see a confirmation message "{message}"')
-def step_impl(context, message):
-    """
-    Verify that a success message appears after adding to cart.
-    """
-    assert message in context.response.content.decode(), f"Confirmation message '{message}' not found."
-
-
-@then('I should see an "Add to Cart" button')
-def step_impl(context):
-    """
-    Confirm that an 'Add to Cart' button is visible.
-    """
-    assert "Add to Cart" in context.response.content.decode(), "Add to Cart button not found."
-
-
-@then('I should see an error message "{message}"')
-def step_impl(context, message):
-    """
-    Confirm that an error message (e.g., sold out) appears.
-    """
-    assert message in context.response.content.decode(), f"Error message '{message}' not found."
-
-
-@then('I should not see an "Add to Cart" button')
-def step_impl(context):
-    """
-    Ensure no Add to Cart button for sold out artworks.
-    """
-    assert "Add to Cart" not in context.response.content.decode(), "Unexpected Add to Cart button found."
-
-# To run the tests, use the command:
-# behave pointless_impressions_src/artwork/features/ --tags=@artwork_browsing

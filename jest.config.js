@@ -34,7 +34,11 @@ const config = {
   watchPathIgnorePatterns: [
     "/.venv/",
     "/\\.venv/"
-  ]
+  ],
+
+  transform: {
+    '^.+\\.js$': 'babel-jest',
+  },
 };
 
 export default config;

@@ -22,9 +22,53 @@
           <a href="/" class="btn btn-ghost rounded-lg px-4 py-2 flex items-center gap-2">
             <i class="fa-solid fa-home"></i> Home
           </a>
-          <a href="/shop/" class="btn btn-ghost rounded-lg px-4 py-2 flex items-center gap-2">
-            <i class="fa-solid fa-store"></i> Shop
-          </a>
+          <div class="dropdown dropdown-hover">
+            <label tabindex="0" class="btn btn-ghost rounded-lg px-4 py-2 flex items-center gap-2">
+              <i class="fa-solid fa-store"></i> Shop
+              <i class="fa-solid fa-circle-chevron-down"></i>
+            </label>
+            <ul tabindex="0" class="menu menu-sm dropdown-content z-10 p-2 shadow-lg rounded-box w-52">
+              <li>
+                <a href="{% url 'artwork:list' %}">
+                  <i class="fa-solid fa-list"></i>All Categories
+                </a>
+              </li>
+              <li>
+                <div class="dropdown dropdown-hover dropdown-right">
+                    <label tabindex="0" class="rounded-lg flex items-center gap-2">
+                        <i class="fa-solid fa-palette"></i>Artwork Categories
+                        <i class="fa-solid fa-circle-chevron-down"></i>
+                    </label>
+                    <ul tabindex="0" class="menu menu-sm dropdown-content z-10 p-2 shadow-lg rounded-box w-52">
+                        {% for category in artwork_categories %}
+                            <li>
+                                <a href="{% url 'artwork:list' category.slug %}" class="hover:bg-[var(--pointless-yellow)]">
+                                    {{ category.friendly_name|default:category.name }}
+                                </a>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+              </li>
+              <li>
+                <div class="dropdown dropdown-hover dropdown-right">
+                    <label tabindex="0" class="rounded-lg flex items-center gap-2">
+                        <i class="fa-solid fa-crop-simple"></i>Framing Options
+                        <i class="fa-solid fa-circle-chevron-down"></i>
+                    </label>
+                    <ul tabindex="0" class="menu menu-sm dropdown-content z-10 p-2 shadow-lg rounded-box w-52">
+                        {% for framing in framing_options %}
+                            <li>
+                                <a href="{% url 'artwork:list' framing.slug %}" class="hover:bg-[var(--pointless-yellow)]">
+                                    {{ framing.friendly_name|default:framing.name }}
+                                </a>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+              </li>
+            </ul>
+          </div>
           <a href="/blog/" class="btn btn-ghost rounded-lg px-4 py-2 flex items-center gap-2">
             <i class="fa-solid fa-blog"></i> Blog
           </a>
@@ -117,21 +161,62 @@
             <i class="fa-solid fa-bars text-lg"></i>
           </label>
           <ul tabindex="0" class="menu menu-sm dropdown-content mt-3 z-50 p-2 shadow-lg rounded-box w-48 right-0">
-            <li><a href="/" class="hover:bg-[var(--pointless-yellow)]">
+            <li>
+              <a href="/" class="hover:bg-[var(--pointless-yellow)]">
                 <i class="fa-solid fa-home"></i> Home
-              </a></li>
-            <li><a href="/shop/" class="hover:bg-[var(--pointless-yellow)]">
+              </a>
+            </li>
+            <li class="dropdown">
+              <a tabindex="0" class="hover:bg-[var(--pointless-yellow)]">
                 <i class="fa-solid fa-store"></i> Shop
-              </a></li>
+                <i class="fa-solid fa-circle-chevron-down"></i>
+              </a>
+              <ul tabindex="0" class="menu menu-sm dropdown-content z-10 shadow-lg rounded-box w-52">
+                <li><a href="{% url 'artwork:list' %}">All Categories</a></li>
+                <li class="dropdown">
+                  <a tabindex="0">
+                    <i class="fa-solid fa-palette"></i>Artwork Categories
+                    <i class="fa-solid fa-circle-chevron-down"></i>
+                  </a>
+                </li>
+                <ul tabindex="0">
+                {% for category in artwork_categories %}
+                  <li>
+                    <a href="{% url 'artwork:list' category.slug %}">
+                      {{ category.friendly_name|default:category.name }}
+                    </a>
+                  </li>
+                {% endfor %}
+                </ul>
+                <li class="dropdown">
+                  <a tabindex="0">
+                    <i class="fa-solid fa-crop-simple"></i>Framing Options
+                    <i class="fa-solid fa-circle-chevron-down"></i>
+                  </a>
+                </li>
+                <ul tabindex="0">
+                {% for framing in framing_options %}
+                  <li>
+                    <a href="{% url 'artwork:list' framing.slug %}">
+                      {{ framing.condition_friendly_name|default:framing.condition_name }}
+                    </a>
+                  </li>
+                {% endfor %}
+                </ul>
+              </ul>
+            </li>
             <li><a href="/blog/" class="hover:bg-[var(--pointless-yellow)]">
                 <i class="fa-solid fa-blog"></i> Blog
-              </a></li>
+              </a>
+            </li>
             <li><a href="/about/" class="hover:bg-[var(--pointless-yellow)]">
                 <i class="fa-solid fa-info-circle"></i> About
-              </a></li>
+              </a>
+            </li>
             <li><a href="/contact/" class="hover:bg-[var(--pointless-yellow)]">
                 <i class="fa-solid fa-envelope"></i> Contact
-              </a></li>
+              </a>
+            </li>
           </ul>
         </div>
       </div>
@@ -143,23 +228,27 @@
     <div class="max-w-6xl mx-auto px-4">
       <div class="max-w-md mx-auto">
         <div class="flex w-full">
-          <input type="text" placeholder="Search products, artists..." class="custom-input flex-1 rounded-r-none" />
-          <button class="btn rounded-l-none">
-            <i class="fa-solid fa-magnifying-glass"></i>
-          </button>
+          <form method="get" action="{% url 'artwork:list' %}" class="flex w-full">
+            <input type="text" name="search" placeholder="Search products, artists..." class="custom-input flex-1 rounded-r-none" />
+            <button type="submit" class="btn rounded-l-none">
+              <i class="fa-solid fa-magnifying-glass"></i>
+            </button>
+          </form>
         </div>
       </div>
     </div>
   </div>
 
   {% comment %} Mobile Search Bar (toggleable) {% endcomment %}
-  <div id="mobile-search-bar" class="hidden md:hidden pb-4">
-    <div class="max-w-6xl mx-auto px-4">
+  <div id="mobile-search-bar" class="hidden md:hidden pb-4 w-full">
+    <div class="w-full px-2">
       <div class="flex w-full">
-        <input type="text" placeholder="Search products, artists..." class="custom-input flex-1 rounded-r-none" />
-        <button class="btn rounded-l-none">
-          <i class="fa-solid fa-magnifying-glass"></i>
-        </button>
+        <form method="get" action="{% url 'artwork:list' %}" class="flex w-full">
+          <input type="text" name="search" placeholder="Search products, artists..." class="custom-input w-full rounded-r-none" />
+          <button type="submit" class="btn rounded-l-none">
+            <i class="fa-solid fa-magnifying-glass"></i>
+          </button>
+        </form>
       </div>
     </div>
   </div>

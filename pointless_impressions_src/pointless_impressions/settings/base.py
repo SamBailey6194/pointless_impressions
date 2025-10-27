@@ -27,6 +27,7 @@ DJANGO_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "django_behave",
 ]
 
 THIRD_PARTY_APPS = [
@@ -106,6 +107,7 @@ TEMPLATES = [
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
                 "pointless_impressions.context_processors.environment",
+                "pointless_impressions.context_processors.navbar_categories",
                 "pointless_impressions_src.photo.context_processors.site_assets",
             ],
         },

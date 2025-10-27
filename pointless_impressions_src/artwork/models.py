@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils.text import slugify
 import random
 import string
 from pointless_impressions_src.photo.models import Photo
@@ -21,11 +22,19 @@ class Artwork(models.Model):
         blank=False,
         related_name='artwork_condition'
     )
+    main_photo = models.ForeignKey(
+        'photo.Photo',
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name='main_for_artwork'
+    )
     is_available = models.BooleanField(default=True)
     is_in_stock = models.BooleanField(default=True)
     is_featured = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    slug = models.SlugField(max_length=255, unique=True, blank=True, null=True)
 
     def __str__(self):
         """String representation of the Artwork model."""
@@ -36,6 +45,9 @@ class Artwork(models.Model):
         if not self.sku:
             self.sku = self.generate_sku()
         super().save(*args, **kwargs)
+        if not self.slug:
+            self.slug = slugify(self.name)
+        super().save(update_fields=['slug'])
 
     def generate_unique_sku(self):
         """Generate a unique SKU for the artwork."""
@@ -52,6 +64,10 @@ class Artwork(models.Model):
     def _get_primary_photo(self):
         """Retrieve the primary photo associated with this artwork."""
         if not hasattr(self, '_cached_photo'):
+            return self._cached_photo
+        if self.main_photo:
+            self._cached_photo = self.main_photo
+        else:
             self._cached_photo = Photo.objects.filter(artwork=self).first()
         return self._cached_photo
 
@@ -84,6 +100,12 @@ class ArtworkCategory(models.Model):
         max_length=255, blank=False, null=True
     )
     description = models.TextField(blank=False)
+    slug = models.SlugField(max_length=255, unique=True, blank=True, null=True)
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.name)
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return self.name
@@ -95,7 +117,19 @@ class ArtworkCategory(models.Model):
 class ArtworkFramingCondition(models.Model):
     """Model to represent framing options for artworks."""
     condition_name = models.CharField(max_length=255, blank=False)
+    condition_friendly_name = models.CharField(
+        max_length=255, blank=False, null=True
+        )
     condition_description = models.TextField(blank=False)
+    slug = models.SlugField(max_length=255, unique=True, blank=True, null=True)
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.name)
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"{self.condition_name}: {self.condition_description}"
+
+    def get_friendly_name(self):
+        return self.condition_friendly_name

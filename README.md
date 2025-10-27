@@ -17,6 +17,7 @@
       - [Fonts](#fonts)
   - [Features](#features)
     - [SEO Features](#seo-features)
+    - [Server Side Rendering (SSR) and API for fetching artwork, blog and profile information quickly and efficiently.](#server-side-rendering-ssr-and-api-for-fetching-artwork-blog-and-profile-information-quickly-and-efficiently)
     - [Existing Features](#existing-features)
       - [Navbar](#navbar)
     - [Features Left to Implement](#features-left-to-implement)
@@ -237,6 +238,13 @@ I implemented a comprehensive SEO strategy directly within the Django `base.html
 
 **Result:** Every page of Pointless Impressions is optimised for search engines, social media sharing, and user experience, while sensitive pages are protected from indexing. This setup reduces maintenance overhead by centralising SEO logic in a single template.
 
+### Server Side Rendering (SSR) and API for fetching artwork, blog and profile information quickly and efficiently.
+
+- To better enable SEO and improve initial page load times, I implemented server-side rendering (SSR) for key pages such as artwork listings, blog posts, and user profiles. This ensures that search engine crawlers can easily index the content, and users experience faster load times.
+- I also created a RESTful API using Django REST Framework to serve artwork, blog, and user profile data. This API is consumed by the frontend to dynamically render content without requiring full page reloads.
+- Additionally, I employed caching strategies to further enhance performance, reducing the load on the server and speeding up response times for users.
+- All of this also helps with AJAX functionality for filtering and searching artworks without full page reloads on searching, filtering and pagination.
+
 ### Existing Features
 
 #### Navbar
@@ -295,6 +303,8 @@ Please note for the Jest and Cypress testing there was a need to create html fix
 - **Removed Django from ALLOWED_HOSTS**: Removed DJANGO from ALLOWED_HOSTS in `staging.py` as it was not needed.
 - **Static and Media files blocked**: Blocked static and media files being served from cloudinary and S3 due to lack of CSP settings. Installed Django-CSP. Added `csp.middleware.CSPMiddleware` to the MIDDLEWARE list in `base.py`. Added CSP settings to staging and production files.
 - **Media Storage**: Django-Cloudinary-Storages is an old community packege that I was having issues with and is no longer maintained. Therefore, I used the official Cloudinary package to configure the media storage instead.
+- **Heroku Deployment Issues**: Fixed various Heroku deployment issues by ensuring proper Procfile, .slugignore, and environment variable configurations.
+- **Testing Configuration**: Updated Jest configuration to properly handle ES6 modules and added Babel support for JavaScript files.
 
 ### Unfixed Bugs
 
@@ -725,7 +735,7 @@ Please follow this [Cloning and Development](docs/markdowns/DEVELOPMENT.md)
  
 ## Credits 
 
-Below are my credits for where I got inspiration for some of the code and content
+Below are my credits for where I got inspiration for some of the code and content. Please note a lot of this is just inspiration and not copied code.
 
 - To help me understand how to implement Docker with Django I used [Docker - Django and PostgreSQL setup (with uv) from scratch! by BugBytes](https://www.youtube.com/watch?v=37aNpE-9dD4&t=524s)
 - To understand uv package manager and modern Python dependency management I used [uv: Python's New Package Manager by BugBytes](https://www.youtube.com/watch?v=_FdjW47Au30)
@@ -762,3 +772,10 @@ Below are my credits for where I got inspiration for some of the code and conten
 - For setting up AWS S3 buckets and IAM policies I referenced [AWS S3 Getting Started Guide](https://docs.aws.amazon.com/AmazonS3/latest/userguide/Welcome.html) and [AWS IAM User Guide](https://docs.aws.amazon.com/IAM/latest/UserGuide/introduction.html)
 - For Cloudinary integration I used [Cloudinary Django Documentation](https://cloudinary.com/documentation/django_integration)
 - To help with Cloudinary uploading I used [Manage Images in Django App](https://cloudinary.com/documentation/django_helper_methods_tutorial) and [Cloud with Django - Host Uploaded Images from Django with Cloudinary](https://www.youtube.com/watch?v=6Y6U8bW7b0k)
+- To help with SSR and API for fetching artwork, blog and profile information quickly and efficiently I used [Django REST Framework Documentation](https://www.django-rest-framework.org/) and [Building APIs with Django REST Framework by Pretty Printed](https://www.youtube.com/playlist?list=PLXmMXHVSvS-DdJHq3jE4wA3Y1l2R6pAGV)
+- Writing Jest tests for JavaScript I used [Jest Documentation](https://jestjs.io/docs/getting-started)
+- Writing Cypress tests for end to end testing I used [Cypress Documentation](https://docs.cypress.io/guides/overview/why-cypress)
+- Writing Behave tests for BDD in Django I used [Behave Documentation](https://behave.readthedocs.io/en/latest/) and [BDD with Behave and Django by Pretty Printed](https://www.youtube.com/watch?v=Z1v3gY6p6xA)
+- Writing TestCase tests for Django I used [Django Testing Documentation](https://docs.djangoproject.com/en/5.2/topics/testing/) and [Django Testing Tutorial by Pretty Printed](https://www.youtube.com/playlist?list=PLXmMXHVSvS-CjH8Yd4mJ6s8u0n1c2r3ZV)
+- Writing Jest inside JavaScript without affecting Django templating I used [Testing Django Templates with Jest by Simple is Better Than Complex](https://simpleisbetterthancomplex.com/tutorial/2020/03/30/testing-django-templates-with-jest.html)
+- For writing CBVs I followed [Bug Bytes - Django Class Based Views from Scratch!](https://www.youtube.com/watch?v=Z3Z8h6_2b0M) and used the official [Django Class Based Views Documentation](https://docs.djangoproject.com/en/5.2/topics/class-based-views/)

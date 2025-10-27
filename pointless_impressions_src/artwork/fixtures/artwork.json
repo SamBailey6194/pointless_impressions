@@ -9,11 +9,13 @@
             "sku": "autumn001",
             "category": 1,
             "selected_condition": 1,
+            "main_photo": 1,
             "is_available": true,
             "is_in_stock": true,
             "is_featured": false,
             "created_at": "2023-10-23T00:00:00Z",
             "updated_at": "2023-10-23T00:00:00Z",
+            "slug": "autumn-reflections",
             "photo": [
                 1
             ]
@@ -29,11 +31,13 @@
             "sku": "PURITY001",
             "category": 2,
             "selected_condition": 2,
+            "main_photo": 4,
             "is_available": true,
             "is_in_stock": true,
             "is_featured": true,
             "created_at": "2020-02-26T00:00:00Z",
             "updated_at": "2020-02-26T00:00:00Z",
+            "slug": "purification-by-fire",
             "photo": [
                 4
             ]
@@ -49,11 +53,13 @@
             "sku": "snake001",
             "category": 1,
             "selected_condition": 1,
+            "main_photo": 5,
             "is_available": true,
             "is_in_stock": true,
             "is_featured": true,
             "created_at": "2020-02-26T00:00:00Z",
             "updated_at": "2020-02-26T00:00:00Z",
+            "slug": "the-beauty-of-genesis",
             "photo": [
                 5
             ]
@@ -69,11 +75,13 @@
             "sku": "SHALOTT001",
             "category": 2,
             "selected_condition": 3,
+            "main_photo": 6,
             "is_available": true,
             "is_in_stock": true,
             "is_featured": true,
             "created_at": "2019-05-24T00:00:00Z",
             "updated_at": "2019-10-24T00:00:00Z",
+            "slug": "the-lady-of-shalott",
             "photo": [
                 6
             ]

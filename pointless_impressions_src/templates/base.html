@@ -157,6 +157,27 @@
 
     {% comment %} Extra JavaScript Files {% endcomment %}
     {% block postloadjs %}
+      <script>
+        // Accessing the Django settings directly
+        const IS_CLOUD_HOSTED = "{{ PRODUCTION }}" === "True";
+        const CLOUD_NAME = "{{ settings.CLOUDINARY_CLOUD_NAME|default:'' }}";
+        
+        // Set the base URL dynamically
+        const MEDIA_BASE_URL = IS_CLOUD_HOSTED 
+          ? `https://res.cloudinary.com/${CLOUD_NAME}/image/upload/`
+          : "{{ settings.MEDIA_URL }}";
+
+        // Global helper function (uses the base environment variables)
+        function getCloudinaryUrl(publicId, transformations) {
+            if (!IS_CLOUD_HOSTED || !publicId) {
+                // Fallback for local dev/missing ID
+                return `${MEDIA_BASE_URL}${publicId || 'placeholder.png'}`; 
+            }
+            
+            const tx = transformations || 'w_400,h_300,c_fill';
+            return `${MEDIA_BASE_URL}${tx},f_auto,q_auto/${publicId}`; 
+        }
+      </script>
       <script src="{% static 'js/header_footer.js' %}" defer></script>
     {% endblock %}
   </body>

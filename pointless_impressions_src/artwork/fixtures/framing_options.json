@@ -4,7 +4,9 @@
         "model": "artwork.ArtworkFramingCondition",
         "fields": {
             "condition_name": "original framed",
-            "condition_description": "Item is framed as original by the artist."
+            "condition_friendly_name": "Original Framed",
+            "condition_description": "Item is framed as original by the artist.",
+            "slug": "original-framed"
         }
     },
     {
@@ -12,7 +14,9 @@
         "model": "artwork.ArtworkFramingCondition",
         "fields": {
             "condition_name": "original non-framed",
-            "condition_description": "Item is not framed as original by the artist."
+            "condition_friendly_name": "Original Non-Framed",
+            "condition_description": "Item is not framed as original by the artist.",
+            "slug": "original-non-framed"
         }
     },
     {
@@ -20,7 +24,9 @@
         "model": "artwork.ArtworkFramingCondition",
         "fields": {
             "condition_name": "print limited edition framed",
-            "condition_description": "Item is framed as a limited edition print."
+            "condition_friendly_name": "Print Limited Edition Framed",
+            "condition_description": "Item is framed as a limited edition print.",
+            "slug": "print-limited-edition-framed"
         }
     },
     {
@@ -28,7 +34,9 @@
         "model": "artwork.ArtworkFramingCondition",
         "fields": {
             "condition_name": "print limited edition non-framed",
-            "condition_description": "Item is not framed as a limited edition print."
+            "condition_friendly_name": "Print Limited Edition Non-Framed",
+            "condition_description": "Item is not framed as a limited edition print.",
+            "slug": "print-limited-edition-non-framed"
         }
     }
 ]

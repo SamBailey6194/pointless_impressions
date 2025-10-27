@@ -4,7 +4,9 @@
         "model": "artwork.ArtworkCategory",
         "fields": {
             "name": "paintings",
-            "description": "Images that use water based medium of acrylic and watercolours."
+            "friendly_name": "Paintings",
+            "description": "Images that use water based medium of acrylic and watercolours.",
+            "slug": "paintings"
         }
     },
     {
@@ -12,7 +14,9 @@
         "model": "artwork.ArtworkCategory",
         "fields": {
             "name": "Photography",
-            "description": "Created images that utilise light and reflect a theme."
+            "friendly_name": "Photography",
+            "description": "Created images that utilise light and reflect a theme.",
+            "slug": "photography"
         }
     },
     {
@@ -20,7 +24,9 @@
         "model": "artwork.ArtworkCategory",
         "fields": {
             "name": "Pointillism",
-            "description": "Detailed studies using fine line pen in the style of pointillism."
+            "friendly_name": "Pointillism",
+            "description": "Detailed studies using fine line pen in the style of pointillism.",
+            "slug": "pointillism"
         }
     }
 ]

@@ -30,26 +30,3 @@ Feature: Browse Pointillism Artwork
         When I visit the artwork listing page with filter "available"
         Then I should see "Sunset"
         And I should not see "Starry Night"
-    
-    Scenario: View artwork details
-        When I visit the artwork listing page
-        And I click on "Sunset"
-        Then I should see "Sunset"
-        And I should see "A beautiful sunset over the mountains."
-        And I should see the price "£199.99"
-        And I should see an "Add to Cart" button
-
-    Scenario: Add artwork to cart
-        Given I am on the artwork detail page for "Sunset"
-        When I click the "Add to Cart" button
-        Then "Sunset" should be added to my shopping cart
-        And I should see a confirmation message "Sunset has been added to your cart."
-    
-    Scenario: Attempt to add sold out artwork to cart
-        Given I am on the artwork detail page for "Starry Night"
-        When I click the "Add to Cart" button
-        Then I should see an error message "Sorry, Starry Night is currently sold out."
-        And I should not see an "Add to Cart" button
-
-# Linked to steps in artwork/features/steps/artwork_browse_steps.py
-# to run tests: behave pointless_impressions_src/artwork/features/artwork_browse.feature

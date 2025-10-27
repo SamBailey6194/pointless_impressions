@@ -2,12 +2,7 @@
  * @jest-environment jsdom
  */
 
-import { renderArtworkList, filterAvailableArtworks, sortArtworksByPrice } from '../../../../js/artwork.js';
-
-const html = fs.readFileSync(
-  path.resolve(__dirname, '../fixtures/artwork.html'),
-  'utf8'
-);
+import { renderArtworkList, filterAvailableArtworks, sortArtworksByPrice } from '../src/js/artwork.js';
 
 describe('US001: Browse Pointillism Artwork (Frontend)', () => {
   let artworks;
