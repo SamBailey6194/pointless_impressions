@@ -3,6 +3,7 @@ from django.utils import timezone
 from pointless_impressions_src.artwork.models import (
     Artwork, ArtworkFramingCondition, ArtworkCategory
 )
+from pointless_impressions_src.photo.models import Photo
 
 
 # Create your tests here.
@@ -15,7 +16,8 @@ class ArtworkModelTest(TestCase):
 
         self.category = ArtworkCategory.objects.create(
             name="Nature",
-            friendly_name="Nature Art"
+            friendly_name="Nature Art",
+            description="Art depicting scenes from nature."
         )
 
         self.artwork = Artwork.objects.create(
@@ -23,12 +25,24 @@ class ArtworkModelTest(TestCase):
             description="A beautiful sunset over the mountains.",
             price=199.99,
             sku="SUNSET1234",
+            category=self.category,
+            selected_condition=self.framing_condition,
             is_available=True,
             is_in_stock=True,
             is_featured=False,
-            created_at=timezone.now(),
-            updated_at=timezone.now(),
+            slug="sunset",
         )
+
+        self.main_photo = Photo.objects.create(
+            artwork=self.artwork,
+            title="Sunset Main Photo",
+            description="Main photo of the sunset artwork.",
+            image='test_image.jpg',
+            alt_text='Test Image'
+        )
+
+        self.artwork.main_photo = self.main_photo
+        self.artwork.save()
 
     def test_artwork_creation(self):
         self.assertEqual(self.artwork.name, "Sunset")
@@ -37,10 +51,11 @@ class ArtworkModelTest(TestCase):
         )
         self.assertEqual(self.artwork.price, 199.99)
         self.assertEqual(self.artwork.sku, "SUNSET1234")
-        self.assertIsNone(self.artwork.category)
-        self.assertIsNone(
-            self.artwork.selected_condition
-        )
+        self.assertEqual(self.artwork.category, self.category)
+        self.assertEqual(
+            self.artwork.selected_condition, self.framing_condition
+            )
+        self.assertEqual(self.artwork.main_photo, self.main_photo)
         self.assertTrue(self.artwork.is_available)
         self.assertTrue(self.artwork.is_in_stock)
         self.assertFalse(self.artwork.is_featured)
@@ -48,7 +63,6 @@ class ArtworkModelTest(TestCase):
         self.assertIsNotNone(self.artwork.updated_at)
 
     def test_artwork_selected_condition(self):
-        self.assertIsNone(self.artwork.selected_condition)
         self.artwork.selected_condition = self.framing_condition
         self.artwork.save()
         self.assertEqual(
@@ -60,7 +74,6 @@ class ArtworkModelTest(TestCase):
         )
 
     def test_artwork_category(self):
-        self.assertIsNone(self.artwork.category)
         self.artwork.category = self.category
         self.artwork.save()
         self.assertEqual(self.artwork.category.name, "Nature")
@@ -107,6 +120,7 @@ class ArtworkModelTest(TestCase):
                 sku="SUNSET1234",
                 category=None,
                 selected_condition=None,
+                main_photo=None,
                 is_available=True,
                 is_in_stock=True,
                 is_featured=False,
@@ -131,6 +145,7 @@ class ArtworkModelTest(TestCase):
             sku="OCEAN45678",
             category=None,
             selected_condition=None,
+            main_photo=None,
             is_available=True,
             is_in_stock=True,
             is_featured=True,
@@ -146,3 +161,59 @@ class ArtworkModelTest(TestCase):
         self.assertIsNone(artwork2.selected_condition)
         self.assertIsNotNone(artwork2.created_at)
         self.assertIsNotNone(artwork2.updated_at)
+
+    def test_artwork_slug_generation(self):
+        """Test that the slug is automatically generated from the name."""
+        artwork_no_slug = Artwork.objects.create(
+            name="New Art Test Piece",
+            description="A test.",
+            price=10.00,
+            sku="SLUGTEST1",
+            category=self.category,
+            selected_condition=self.framing_condition,
+            is_available=True,
+            is_in_stock=True,
+            is_featured=False,
+        )
+        self.assertEqual(artwork_no_slug.slug, "new-art-test-piece")
+
+    def test_artwork_sku_auto_generation(self):
+        """Test that a unique SKU is generated if none is provided."""
+        artwork_no_sku = Artwork.objects.create(
+            name="No SKU Art",
+            description="A test.",
+            price=10.00,
+            category=self.category,
+            selected_condition=self.framing_condition,
+            is_available=True,
+            is_in_stock=True,
+            is_featured=False,
+            slug="no-sku-art",
+        )
+        self.assertIsNotNone(artwork_no_sku.sku)
+        self.assertTrue(artwork_no_sku.sku.startswith("SKU-"))
+        self.assertGreater(len(artwork_no_sku.sku), 4)
+
+    def test_artwork_image_properties(self):
+        """
+        Test that computed properties correctly retrieve image data from
+        main_photo.
+        """
+        self.assertEqual(self.artwork.image.name, 'test_image.jpg')
+        self.assertEqual(self.artwork.image_alt_text, 'Test Image')
+
+    def test_artwork_image_properties_fallback(self):
+        """Test fallback behavior when the main_photo link is missing."""
+        self.main_photo.delete()
+        self.artwork.main_photo = None
+        self.artwork.save()
+        self.assertEqual(self.artwork.image_alt_text, 'Sunset')
+
+    def test_category_str_representation(self):
+        """Test the __str__ method of ArtworkCategory."""
+        self.assertEqual(str(self.category), "Nature")
+
+    def test_framing_condition_str_representation(self):
+        """Test the __str__ method of ArtworkFramingCondition."""
+        expected_str = "framed: Artwork is framed with a wooden frame."
+        self.assertEqual(str(self.framing_condition), expected_str)

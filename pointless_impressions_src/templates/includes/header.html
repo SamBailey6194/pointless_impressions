@@ -5,7 +5,7 @@
   <nav class="navbar shadow-lg min-h-16">
     {% comment %} Logo Section {% endcomment %}
     <div class="navbar-start">
-      <a href="/" class="btn btn-ghost normal-case text-xl h-auto p-2">
+      <a href="{% url 'home' %}" class="btn btn-ghost normal-case text-xl h-auto p-2">
         {% if production and site_logo %}
           {% cloudinary site_logo.image height=60 crop='fit' format='auto' quality='auto' alt=site_logo.alt_text_or_default class="h-8 sm:h-10 md:h-12 w-auto" %}
         {% else %}
@@ -19,7 +19,7 @@
       {% comment %} Desktop Navigation Menu {% endcomment %}
       <nav class="hidden md:flex items-center justify-center w-full">
         <div class="flex flex-row items-center gap-1">
-          <a href="/" class="btn btn-ghost rounded-lg px-4 py-2 flex items-center gap-2">
+          <a href="{% url 'home' %}" class="btn btn-ghost rounded-lg px-4 py-2 flex items-center gap-2">
             <i class="fa-solid fa-home"></i> Home
           </a>
           <div class="dropdown dropdown-hover">
@@ -42,7 +42,7 @@
                     <ul tabindex="0" class="menu menu-sm dropdown-content z-10 p-2 shadow-lg rounded-box w-52">
                         {% for category in artwork_categories %}
                             <li>
-                                <a href="{% url 'artwork:list' category.slug %}" class="hover:bg-[var(--pointless-yellow)]">
+                                <a href="{% url 'artwork:list' %}?category={{ category.slug }}" class="hover:bg-[var(--pointless-yellow)]">
                                     {{ category.friendly_name|default:category.name }}
                                 </a>
                             </li>
@@ -59,8 +59,8 @@
                     <ul tabindex="0" class="menu menu-sm dropdown-content z-10 p-2 shadow-lg rounded-box w-52">
                         {% for framing in framing_options %}
                             <li>
-                                <a href="{% url 'artwork:list' framing.slug %}" class="hover:bg-[var(--pointless-yellow)]">
-                                    {{ framing.friendly_name|default:framing.name }}
+                                <a href="{% url 'artwork:list' %}?selected_condition={{ framing.slug }}" class="hover:bg-[var(--pointless-yellow)]">
+                                    {{ framing.condition_friendly_name|default:framing.condition_name }}
                                 </a>
                             </li>
                         {% endfor %}
@@ -162,7 +162,7 @@
           </label>
           <ul tabindex="0" class="menu menu-sm dropdown-content mt-3 z-50 p-2 shadow-lg rounded-box w-48 right-0">
             <li>
-              <a href="/" class="hover:bg-[var(--pointless-yellow)]">
+              <a href="{% url 'home' %}" class="hover:bg-[var(--pointless-yellow)]">
                 <i class="fa-solid fa-home"></i> Home
               </a>
             </li>
@@ -182,7 +182,7 @@
                 <ul tabindex="0">
                 {% for category in artwork_categories %}
                   <li>
-                    <a href="{% url 'artwork:list' category.slug %}">
+                    <a href="{% url 'artwork:list' %}?category={{ category.slug }}">
                       {{ category.friendly_name|default:category.name }}
                     </a>
                   </li>
@@ -197,7 +197,7 @@
                 <ul tabindex="0">
                 {% for framing in framing_options %}
                   <li>
-                    <a href="{% url 'artwork:list' framing.slug %}">
+                    <a href="{% url 'artwork:list' %}?selected_condition={{ framing.slug }}">
                       {{ framing.condition_friendly_name|default:framing.condition_name }}
                     </a>
                   </li>
@@ -228,8 +228,8 @@
     <div class="max-w-6xl mx-auto px-4">
       <div class="max-w-md mx-auto">
         <div class="flex w-full">
-          <form method="get" action="{% url 'artwork:list' %}" class="flex w-full">
-            <input type="text" name="search" placeholder="Search products, artists..." class="custom-input flex-1 rounded-r-none" />
+          <form method="get" action="{% url 'search:search_results' %}" class="flex w-full">
+            <input type="text" name="q" id="global-search-input" placeholder="Search products, artists..." class="custom-input flex-1 rounded-r-none" />
             <button type="submit" class="btn rounded-l-none">
               <i class="fa-solid fa-magnifying-glass"></i>
             </button>
@@ -243,8 +243,8 @@
   <div id="mobile-search-bar" class="hidden md:hidden pb-4 w-full">
     <div class="w-full px-2">
       <div class="flex w-full">
-        <form method="get" action="{% url 'artwork:list' %}" class="flex w-full">
-          <input type="text" name="search" placeholder="Search products, artists..." class="custom-input w-full rounded-r-none" />
+        <form method="get" action="{% url 'search:search_results' %}" class="flex w-full">
+          <input type="text" name="q" id="global-search-input" placeholder="Search products, artists..." class="custom-input w-full rounded-r-none" />
           <button type="submit" class="btn rounded-l-none">
             <i class="fa-solid fa-magnifying-glass"></i>
           </button>

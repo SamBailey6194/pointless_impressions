@@ -62,36 +62,39 @@ Please copy the example to the relevant part for your tests.
 ##### Artwork Model Tests
 
 | Step | Action | Outcome | Pass / Fail |
-| ---- | ------ | ------- | ----------- |
-| 1 | Create an `Artwork` instance with name "Sunset" | `Artwork` is created with all fields correctly set | Pass |
-| 2 | Check `selected_condition` initially | `selected_condition` is `None` | Pass |
-| 3 | Assign a `FramingCondition` to artwork | `selected_condition` is set and persists | Pass |
-| 4 | Assign a `Category` to artwork | `category` is set and persists | Pass |
-| 5 | Check `__str__` method of artwork | Returns `"Sunset"` | Pass |
-| 6 | Toggle `is_available` from `True` to `False` | Field updates and persists | Pass |
-| 7 | Toggle `is_in_stock` from `True` to `False` | Field updates and persists | Pass |
-| 8 | Toggle `is_featured` from `False` to `True` | Field updates and persists | Pass |
-| 9 | Update artwork price from 199.99 to 249.99 | Price updates correctly | Pass |
-| 10 | Update artwork description | Description updates correctly | Pass |
-| 11 | Attempt to create artwork with duplicate SKU "SUNSET1234" | Raises an exception (unique constraint) | Pass |
-| 12 | Check timestamps after updating artwork name | `created_at` remains, `updated_at` changes | Pass |
-| 13 | Create a second artwork instance | Two artworks exist with different IDs and fields set correctly | Pass |
+| :--- | :--- | :--- | :--- |
+| 1 | Create new Artwork and check initial state | Verifies all initial fields and Foreign Key relationships are correctly set. | Pass |
+| 2 | Check string representation of the Artwork | Confirms the `Artwork.__str__` method returns the correct name string. | Pass |
+| 3 | Update the Artwork's price | Confirms updates to the `price` field are correctly saved. | Pass |
+| 4 | Update the Artwork's description | Confirms updates to the `description` field are correctly saved. | Pass |
+| 5 | Change Artwork availability status | Confirms the boolean flag `is_available` can be toggled and persists. | Pass |
+| 6 | Change Artwork stock status | Confirms the boolean flag `is_in_stock` can be toggled and persists. | Pass |
+| 7 | Change Artwork featured status | Confirms the boolean flag `is_featured` can be toggled and persists. | Pass |
+| 8 | Update the Artwork's Category | Confirms assigning and updating the `category` foreign key works correctly. | Pass |
+| 9 | Update the Artwork's Framing Condition | Confirms assigning and updating the `selected_condition` foreign key works correctly. | Pass |
+| 10 | Check string representation of a Category | Verifies the `ArtworkCategory.__str__` method returns the correct string. | Pass |
+| 11 | Check string representation of a Condition | Verifies the `ArtworkFramingCondition.__str__` returns the correct formatted string. | Pass |
+| 12 | Modify the Artwork's name and save | Verifies `created_at` remains fixed and `updated_at` changes. | Pass |
+| 13 | Attempt to create item with a duplicate SKU | Verifies the unique constraint is enforced by asserting an exception is raised. | Pass |
+| 14 | Create a new Artwork without providing a slug | Verifies automatic slug generation from the name is successful. | Pass |
+| 15 | Create a new Artwork without providing an SKU | Verifies automatic SKU generation is successful and starts with `"SKU-"`. | Pass |
+| 16 | Access Artwork image and alt text properties | Verifies computed image properties retrieve data correctly from the linked photo. | Pass |
+| 17 | Remove all photos and access alt text | Verifies the deepest fallback logic: defaults to Artwork name when no related photo exists. | Pass |
+| 18 | Create a second, independent Artwork | Confirms integrity when creating a new, distinct artwork instance. | Pass |
 
 #### Artwork Views Tests
 
 | Step | Action | Outcome | Pass / Fail |
-| ---- | ------ | ------- | ----------- |
-| 1 | Load artwork list view | Response 200, both artworks `Sunset` and `Ocean` are displayed | Pass |
-| 2 | Load artwork detail view for `Sunset` | Response 200, displays `Sunset` description, also shows `Ocean` description | Pass |
-| 3 | Mark `Sunset` as unavailable and reload list | Response 200, `Sunset` not displayed, `Ocean` displayed | Pass |
-| 4 | Mark `Sunset` as out of stock and load detail view | Response 200, shows `"Out of Stock"` and `Sunset` description | Pass |
-| 5 | Test list pagination with 17 artworks total | Page 1 contains 10 artworks, page 2 contains 7 artworks | Pass |
-| 6 | Search artworks with term "Sunset" | Response 200, `Sunset` displayed, `Ocean` not displayed | Pass |
-| 7 | Search artworks with non-existent term | Response 200, shows `"No artworks found."`, neither artwork displayed | Pass |
-| 8 | Filter artworks by category "Nature" | Response 200, only `Sunset` displayed, `Ocean` hidden | Pass |
-| 9 | Filter artworks by category "Seascape" | Response 200, only `Ocean` displayed, `Sunset` hidden | Pass |
-| 10 | Filter artworks by price between £150-£200 | Response 200, only `Sunset` displayed, `Ocean` hidden | Pass |
-| 11 | Filter artworks by price between £300-£400 | Response 200, shows `"No artworks found."`, neither artwork displayed | Pass |
+| :--- | :--- | :--- | :--- |
+| 1 | Load the general **Shop** (Artworks List) page. | **Response 200**, displays both available artworks. | Pass |
+| 2 | Load the list after marking an artwork as unavailable. | **Response 200**, unavailable artwork not displayed, available artwork displayed. | Pass |
+| 3 | Test list navigation across multiple pages (17 items). | Page 1 displays 10 artworks, and Page 2 displays the remaining 7 artworks. | Pass |
+| 4 | Search the list using the existing term **"Sunset"**. | **Response 200**, only `Sunset` is displayed. | Pass |
+| 5 | Search the list using a non-existent term. | **Response 200**, displays the message **"No artworks found."**. | Pass |
+| 6 | Filter the list by category **"Nature"**. | **Response 200**, only `Sunset` (Nature) is displayed. | Pass |
+| 7 | Filter the list by category **"Seascape"**. | **Response 200**, only `Ocean` (Seascape) is displayed. | Pass |
+| 8 | Filter the list by price range **£150-£200**. | **Response 200**, only `Sunset` (price 199.99) is displayed. | Pass |
+| 9 | Filter the list by price range **£300-£400**. | **Response 200**, displays the message **"No artworks found."**. | Pass |
 
 ---
 

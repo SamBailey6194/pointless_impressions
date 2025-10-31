@@ -36,8 +36,8 @@
       <div>
         <h4 class="font-semibold mb-4 text-[var(--pointless-white)]">Quick Links</h4>
         <ul class="space-y-2 text-sm">
-          <li><a href="/" class="text-[var(--pointless-white)] hover:text-[var(--pointless-yellow)] transition-colors">Home</a></li>
-          <li><a href="/shop/" class="text-[var(--pointless-white)] hover:text-[var(--pointless-yellow)] transition-colors">Shop</a></li>
+          <li><a href="{% url 'home' %}" class="text-[var(--pointless-white)] hover:text-[var(--pointless-yellow)] transition-colors">Home</a></li>
+          <li><a href="{% url 'artwork:list' %}" class="text-[var(--pointless-white)] hover:text-[var(--pointless-yellow)] transition-colors">Shop</a></li>
           <li><a href="/blog/" class="text-[var(--pointless-white)] hover:text-[var(--pointless-yellow)] transition-colors">Blog</a></li>
           <li><a href="/about/" class="text-[var(--pointless-white)] hover:text-[var(--pointless-yellow)] transition-colors">About</a></li>
           <li><a href="/contact/" class="text-[var(--pointless-white)] hover:text-[var(--pointless-yellow)] transition-colors">Contact</a></li>

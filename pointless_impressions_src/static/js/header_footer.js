@@ -7,17 +7,85 @@
     const dropdowns = document.querySelectorAll(".dropdown");
     let lastScroll = 0;
     let ticking = false;
+    const AUTOCOMPLETE_API_URL = window.GLOBAL_URLS && window.GLOBAL_URLS.AUTOCOMPLETE_API;
     window.toggleMobileSearch = function() {
       if (mobileSearchBar) {
         mobileSearchBar.classList.toggle("hidden");
         if (!mobileSearchBar.classList.contains("hidden")) {
-          const searchInput = mobileSearchBar.querySelector("input");
+          const searchInput = mobileSearchBar.querySelector('input[name="q"]');
           if (searchInput) {
             setTimeout(() => searchInput.focus(), 100);
           }
         }
       }
     };
+    function performSearch(query, inputElement) {
+      const trimmedQuery = query.trim();
+      if (trimmedQuery) {
+        const form = inputElement.closest("form");
+        if (form) {
+          const queryInput = form.querySelector('input[name="q"]');
+          if (queryInput) {
+            queryInput.value = trimmedQuery;
+          }
+          form.submit();
+        }
+      }
+    }
+    function initAutoComplete(selector) {
+      if (!AUTOCOMPLETE_API_URL) {
+        console.warn("Autocomplete API URL is missing. Autocomplete feature disabled.");
+        return;
+      }
+      new autoComplete({
+        selector,
+        placeHolder: "Search products, categories...",
+        data: {
+          src: async (query) => {
+            try {
+              const response = await fetch(`${AUTOCOMPLETE_API_URL}?term=${query}`);
+              const data = await response.json();
+              return data;
+            } catch (error) {
+              console.error("Autocomplete fetch failed:", error);
+              return [];
+            }
+          }
+        },
+        resultItem: {
+          highlight: true
+        },
+        threshold: 2,
+        events: {
+          input: {
+            selection: (event) => {
+              const inputElement = event.target;
+              const selectedValue = event.detail.selection.value;
+              inputElement.value = selectedValue;
+              performSearch(selectedValue, inputElement);
+            }
+          }
+        }
+      });
+    }
+    const searchInputs = document.querySelectorAll('input[type="text"][name="q"]');
+    searchInputs.forEach((input) => {
+      initAutoComplete(input);
+      input.addEventListener("keypress", (e) => {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          performSearch(input.value, input);
+        }
+      });
+      const form = input.closest("form");
+      const searchBtn = form ? form.querySelector('button[type="submit"]') : null;
+      if (searchBtn) {
+        searchBtn.addEventListener("click", (e) => {
+          e.preventDefault();
+          performSearch(input.value, input);
+        });
+      }
+    });
     if (header) {
       window.addEventListener("scroll", () => {
         if (!ticking) {
@@ -56,25 +124,6 @@
         });
       }
     });
-    const searchInputs = document.querySelectorAll('input[type="text"][placeholder*="Search"]');
-    searchInputs.forEach((input) => {
-      input.addEventListener("keypress", (e) => {
-        if (e.key === "Enter") {
-          performSearch(input.value);
-        }
-      });
-      const searchBtn = input.parentElement.querySelector("button");
-      if (searchBtn) {
-        searchBtn.addEventListener("click", () => {
-          performSearch(input.value);
-        });
-      }
-    });
-    function performSearch(query) {
-      if (query.trim()) {
-        console.log("Searching for:", query);
-      }
-    }
     if (mobileSearchBar) {
       let mobileSearchTimeout;
       window.addEventListener("scroll", () => {

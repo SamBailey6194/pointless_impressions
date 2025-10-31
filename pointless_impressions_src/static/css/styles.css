@@ -8,13 +8,10 @@
       "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
     --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
       "Courier New", monospace;
-    --color-gray-100: oklch(96.7% 0.003 264.542);
+    --color-red-500: oklch(63.7% 0.237 25.331);
     --color-gray-200: oklch(92.8% 0.006 264.531);
     --color-gray-300: oklch(87.2% 0.01 258.338);
     --color-gray-700: oklch(37.3% 0.034 259.733);
-    --color-gray-800: oklch(27.8% 0.033 256.848);
-    --color-stone-200: oklch(92.3% 0.003 48.717);
-    --color-stone-900: oklch(21.6% 0.006 56.043);
     --color-black: #000;
     --color-white: #fff;
     --spacing: 0.25rem;
@@ -2508,6 +2505,9 @@
   .mt-8 {
     margin-top: calc(var(--spacing) * 8);
   }
+  .mt-12 {
+    margin-top: calc(var(--spacing) * 12);
+  }
   .breadcrumbs {
     @layer daisyui.component {
       max-width: 100%;
@@ -2564,6 +2564,9 @@
         }
       }
     }
+  }
+  .mb-1 {
+    margin-bottom: calc(var(--spacing) * 1);
   }
   .mb-2 {
     margin-bottom: calc(var(--spacing) * 2);
@@ -3126,6 +3129,9 @@
   .border-\[var\(--pointless-yellow\)\] {
     border-color: var(--pointless-yellow);
   }
+  .bg-\[var\(--pointless-blue\)\] {
+    background-color: var(--pointless-blue);
+  }
   .bg-base-100 {
     background-color: var(--color-base-100);
   }
@@ -3135,17 +3141,11 @@
   .bg-base-300 {
     background-color: var(--color-base-300);
   }
-  .bg-gray-100 {
-    background-color: var(--color-gray-100);
-  }
   .bg-gray-200 {
     background-color: var(--color-gray-200);
   }
   .bg-gray-300 {
     background-color: var(--color-gray-300);
-  }
-  .bg-white {
-    background-color: var(--color-white);
   }
   .object-cover {
     -o-object-fit: cover;
@@ -3324,6 +3324,12 @@
   .text-primary {
     color: var(--color-primary);
   }
+  .text-red-500 {
+    color: var(--color-red-500);
+  }
+  .text-white {
+    color: var(--color-white);
+  }
   .normal-case {
     text-transform: none;
   }
@@ -3435,6 +3441,12 @@
       --badge-fg: var(--color-error-content);
     }
   }
+  .badge-info {
+    @layer daisyui.modifier {
+      --badge-color: var(--color-info);
+      --badge-fg: var(--color-info-content);
+    }
+  }
   .badge-primary {
     @layer daisyui.modifier {
       --badge-color: var(--color-primary);
@@ -3505,6 +3517,11 @@
   .sm\:h-10 {
     @media (width >= 40rem) {
       height: calc(var(--spacing) * 10);
+    }
+  }
+  .sm\:grid-cols-2 {
+    @media (width >= 40rem) {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
     }
   }
   .sm\:flex-row {
@@ -3604,44 +3621,9 @@
       padding-top: calc(var(--spacing) * 32);
     }
   }
-  .dark\:bg-base-100 {
-    @media (prefers-color-scheme: dark) {
-      background-color: var(--color-base-100);
-    }
-  }
-  .dark\:bg-base-200 {
-    @media (prefers-color-scheme: dark) {
-      background-color: var(--color-base-200);
-    }
-  }
-  .dark\:bg-black {
-    @media (prefers-color-scheme: dark) {
-      background-color: var(--color-black);
-    }
-  }
-  .dark\:bg-gray-200 {
-    @media (prefers-color-scheme: dark) {
-      background-color: var(--color-gray-200);
-    }
-  }
   .dark\:bg-gray-700 {
     @media (prefers-color-scheme: dark) {
       background-color: var(--color-gray-700);
-    }
-  }
-  .dark\:bg-gray-800 {
-    @media (prefers-color-scheme: dark) {
-      background-color: var(--color-gray-800);
-    }
-  }
-  .dark\:bg-stone-200 {
-    @media (prefers-color-scheme: dark) {
-      background-color: var(--color-stone-200);
-    }
-  }
-  .dark\:bg-stone-900 {
-    @media (prefers-color-scheme: dark) {
-      background-color: var(--color-stone-900);
     }
   }
 }

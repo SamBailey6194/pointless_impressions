@@ -37,15 +37,14 @@ Please copy the example to the relevant part for your tests.
 ### US001: Browse Available Artworks - In Artwork App
 
 | Step | Action | Expected Outcome | Pass / Fail |
-| ---- | ------ | ---------------- | ----------- |
-| 1 | Query artwork model for all artworks | Returns all artworks in the database | Fail |
-| 2 | Query artwork model for available artworks only | Returns only artworks with `is_available=True` and/or `is_in_stock=True` | Fail |
-| 3 | Sort artworks by price ascending | Artworks returned are sorted correctly by `price` | Fail |
-| 4 | Sort artworks by price descending | Artworks returned are sorted correctly by `price` descending | Fail |
-| 5 | Retrieve artwork details by SKU or ID | Returns the correct `name`, `description`, `price`, and `availability` | Fail |
-| 6 | Attempt to retrieve a non-existent artwork | Returns 404 or raises appropriate exception | Fail |
-| 7 | Add available artwork to cart | Cart database or session updates correctly | Fail |
-| 8 | Attempt to add sold-out artwork to cart | Operation is rejected, cart does not update | Fail |
+| :--- | :--- | :--- | :--- |
+| 1 | Query artwork model for all items (without filters) | Returns all artwork records (e.g., 2 records) in the database. | Fail |
+| 2 | Query artwork model for **available only** (`is_available=True` and `is_in_stock=True`) | Returns only artwork records marked as available and in stock. | Fail |
+| 3 | Query artworks filtered by **Category Name** (`Nature`) | Returns only artworks linked to the `Nature` category. | Fail |
+| 4 | Query artworks filtered by **Framing Condition** (`Framed`) | Returns only artworks linked to the `Framed` condition. | Fail |
+| 5 | Query artworks filtered by **Price Range** (e.g., £150-£200) | Returns only artworks whose price falls within the specified range. | Fail |
+| 6 | Retrieve artwork details by **Slug** (e.g., `sunset-painting`) | Returns the correct single `Artwork` object with the matching name, description, and price. | Fail |
+| 7 | Attempt to retrieve a non-existent artwork (by non-existent slug) | Returns 404 or raises appropriate `DoesNotExist` exception. | Fail |
 
 ---
 
@@ -54,13 +53,13 @@ Please copy the example to the relevant part for your tests.
 ### US001: Browse Available Artworks - In Artwork App
 
 | Step | Action | Expected Outcome | Pass / Fail |
-| ---- | ------ | ---------------- | ----------- |
-| 1 | Navigate to `/artworks/` page | Page loads successfully | Fail |
-| 2 | Observe available artworks | `Sunset` is displayed with description and price | Fail |
-| 3 | Observe sold-out artworks | `Starry Night` is displayed and marked as `Sold Out` | Fail |
-| 4 | Click "Sort by Price" button | Artworks are sorted ascending | Fail |
-| 5 | Click "Filter Available" button | Only available artworks are visible | Fail |
-| 6 | Click on `Sunset` artwork | Artwork detail appears with name, description, price, and `Add to Cart` button | Fail |
-| 7 | Add `Sunset` to cart | Cart updates and confirmation message appears | Fail |
-| 8 | Attempt to add `Starry Night` | Sold-out message appears; `Add to Cart` button is not visible | Fail |
-| 9 | Verify cart updates | Cart displays correct items after adding artwork | Fail |
+| :--- | :--- | :--- | :--- |
+| 1 | Navigate to `/artworks/` page | Page loads successfully, and all available/in-stock artworks are displayed. | Fail |
+| 2 | Search with existing term (`Sunset`) | Only the `Sunset` artwork is displayed; the other items are filtered out. | Fail |
+| 3 | Search with non-existent term | Page loads, displays a "No artworks found." message. | Fail |
+| 4 | Apply **Category** filter (e.g., select "Nature") | Only artworks matching the selected category are displayed. | Fail |
+| 5 | Apply **Price** filter (e.g., Min 150, Max 200) | Only artworks within the price range are displayed. | Fail |
+| 6 | Test **Pagination** (must have > 10 items) | Only 10 items are shown initially; navigation controls lead to remaining items on the next page. | Fail |
+| 7 | Observe an **Out of Stock** artwork's display | The item is visible (if not filtered out by availability) but marked with a clear "Sold Out" status. | Fail |
+| 8 | Click on an available artwork's image or title from the list | Loads the Detail Page with the artwork's full name, description, price, and an **Add to Cart** button. | Fail |
+| 9 | Attempt to add a **Sold Out** artwork to cart (if button is visible) | Operation is blocked or button is visibly disabled/missing. | Fail |

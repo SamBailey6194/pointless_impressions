@@ -43,11 +43,10 @@ class Artwork(models.Model):
     def save(self, *args, **kwargs):
         """Override save to generate SKU if not provided."""
         if not self.sku:
-            self.sku = self.generate_sku()
-        super().save(*args, **kwargs)
+            self.sku = self.generate_unique_sku()
         if not self.slug:
             self.slug = slugify(self.name)
-        super().save(update_fields=['slug'])
+        super().save(*args, **kwargs)
 
     def generate_unique_sku(self):
         """Generate a unique SKU for the artwork."""
@@ -64,11 +63,10 @@ class Artwork(models.Model):
     def _get_primary_photo(self):
         """Retrieve the primary photo associated with this artwork."""
         if not hasattr(self, '_cached_photo'):
-            return self._cached_photo
-        if self.main_photo:
-            self._cached_photo = self.main_photo
-        else:
-            self._cached_photo = Photo.objects.filter(artwork=self).first()
+            if self.main_photo:
+                self._cached_photo = self.main_photo
+            else:
+                self._cached_photo = Photo.objects.filter(artwork=self).first()
         return self._cached_photo
 
     @property
@@ -125,7 +123,7 @@ class ArtworkFramingCondition(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.slug:
-            self.slug = slugify(self.name)
+            self.slug = slugify(self.condition_name)
         super().save(*args, **kwargs)
 
     def __str__(self):

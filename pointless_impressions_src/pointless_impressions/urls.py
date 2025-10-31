@@ -28,6 +28,7 @@ urlpatterns = [
         ),
     path('health/', health_check, name='health'),
     path('photos/', include('pointless_impressions_src.photo.urls')),
+    path('search/', include('pointless_impressions_src.search.urls')),
 ]
 
 if settings.DEBUG:

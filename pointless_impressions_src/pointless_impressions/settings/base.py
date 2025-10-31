@@ -47,6 +47,7 @@ LOCAL_APPS = [
     "pointless_impressions_src.artwork",
     "pointless_impressions_src.photo",
     "pointless_impressions_src.account",
+    "pointless_impressions_src.search",
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS

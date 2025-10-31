@@ -37,10 +37,10 @@
                 </label>
                 <select name="selected_condition" class="select select-bordered w-full">
                   <option value="">All Conditions</option>
-                  {% for condition in framing_conditions %}
-                      <option value="{{ condition.slug }}"
-                        {% if request.GET.selected_condition == condition.slug %}selected{% endif %}>
-                          {{ condition.friendly_name|default:condition.name }}
+                  {% for framing in framing_conditions %}
+                      <option value="{{ framing.slug }}"
+                        {% if request.GET.selected_condition == framing.slug %}selected{% endif %}>
+                          {{ framing.condition_friendly_name|default:framing.condition_name }}
                       </option>
                   {% endfor %}
                 </select>

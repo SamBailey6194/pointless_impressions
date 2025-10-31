@@ -1,5 +1,5 @@
 document.addEventListener("DOMContentLoaded", () => {
-  // --- Elements ---
+  // Elements
   const header = document.querySelector("header");
   const footer = document.querySelector("footer");
   
@@ -10,14 +10,16 @@ document.addEventListener("DOMContentLoaded", () => {
   let lastScroll = 0;
   let ticking = false;
 
-  // --- Mobile search toggle functionality ---
+  // Global URL from window object (defined in base.html)
+  const AUTOCOMPLETE_API_URL = window.GLOBAL_URLS && window.GLOBAL_URLS.AUTOCOMPLETE_API;
+
+  // Mobile search toggle functionality
   window.toggleMobileSearch = function() {
     if (mobileSearchBar) {
       mobileSearchBar.classList.toggle('hidden');
-      
-      // Focus on search input when opened
+
       if (!mobileSearchBar.classList.contains('hidden')) {
-        const searchInput = mobileSearchBar.querySelector('input');
+        const searchInput = mobileSearchBar.querySelector('input[name="q"]');
         if (searchInput) {
           setTimeout(() => searchInput.focus(), 100);
         }
@@ -25,7 +27,90 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   };
 
-  // --- Header hide on scroll ---
+  // Search submission function
+  // This function replaces the placeholder logic and submits the actual form.
+  function performSearch(query, inputElement) {
+    const trimmedQuery = query.trim();
+    if (trimmedQuery) {
+
+      const form = inputElement.closest('form');
+      if (form) {
+
+        const queryInput = form.querySelector('input[name="q"]');
+        if (queryInput) {
+            queryInput.value = trimmedQuery;
+        }
+        form.submit();
+      }
+    }
+  }
+
+  // Autocomplete Initialization Function
+  function initAutoComplete(selector) {
+    if (!AUTOCOMPLETE_API_URL) {
+      console.warn("Autocomplete API URL is missing. Autocomplete feature disabled.");
+      return;
+    }
+
+    new autoComplete({
+      selector: selector,
+      placeHolder: "Search products, categories...",
+      data: {
+        src: async (query) => {
+          try {
+            // Use the global API URL defined in base.html
+            const response = await fetch(`${AUTOCOMPLETE_API_URL}?term=${query}`);
+            const data = await response.json();
+            return data;
+          } catch (error) {
+            console.error("Autocomplete fetch failed:", error);
+            return [];
+          }
+        }
+      },
+      resultItem: {
+        highlight: true
+      },
+      threshold: 2,
+      events: {
+        input: {
+          selection: (event) => {
+            const inputElement = event.target;
+            const selectedValue = event.detail.selection.value;
+            inputElement.value = selectedValue;
+
+            performSearch(selectedValue, inputElement);
+          }
+        }
+      }
+    });
+  }
+  
+  // Initialise search inputs and Autocomplete
+  const searchInputs = document.querySelectorAll('input[type="text"][name="q"]');
+  searchInputs.forEach(input => {
+    initAutoComplete(input);
+
+    input.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        performSearch(input.value, input);
+      }
+    });
+
+    const form = input.closest('form');
+    const searchBtn = form ? form.querySelector('button[type="submit"]') : null;
+    
+    if (searchBtn) {
+      searchBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        performSearch(input.value, input);
+      });
+    }
+  });
+
+
+  // Header hide on scroll
   if (header) {
     window.addEventListener("scroll", () => {
       if (!ticking) {
@@ -41,7 +126,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // --- DaisyUI Dropdown enhancements ---
+  // DaisyUI Dropdown enhancements
   dropdowns.forEach(dropdown => {
     const trigger = dropdown.querySelector('[tabindex="0"]');
     const menu = dropdown.querySelector('.dropdown-content');
@@ -50,7 +135,7 @@ document.addEventListener("DOMContentLoaded", () => {
       // Close dropdown when clicking outside
       document.addEventListener('click', (e) => {
         if (!dropdown.contains(e.target)) {
-          trigger.blur(); // This closes DaisyUI dropdowns
+          trigger.blur();
         }
       });
 
@@ -61,7 +146,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
       });
 
-      // Auto-focus search inputs in dropdowns
+      // Auto-focus search inputs in dropdowns (Currently disabled in HTML, but kept here)
       trigger.addEventListener('click', () => {
         setTimeout(() => {
           const searchInput = menu.querySelector('input[type="text"]');
@@ -73,35 +158,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // --- Search functionality ---
-  const searchInputs = document.querySelectorAll('input[type="text"][placeholder*="Search"]');
-  searchInputs.forEach(input => {
-    // Add search functionality
-    input.addEventListener('keypress', (e) => {
-      if (e.key === 'Enter') {
-        performSearch(input.value);
-      }
-    });
-
-    // Add search button click handlers
-    const searchBtn = input.parentElement.querySelector('button');
-    if (searchBtn) {
-      searchBtn.addEventListener('click', () => {
-        performSearch(input.value);
-      });
-    }
-  });
-
-  // --- Search function ---
-  function performSearch(query) {
-    if (query.trim()) {
-      console.log('Searching for:', query);
-      // TODO: Implement actual search functionality
-      // window.location.href = `/search/?q=${encodeURIComponent(query)}`;
-    }
-  }
-
-  // --- Mobile search bar auto-close on scroll ---
+  // Mobile search bar auto-close on scroll
   if (mobileSearchBar) {
     let mobileSearchTimeout;
     window.addEventListener('scroll', () => {
@@ -110,12 +167,11 @@ document.addEventListener("DOMContentLoaded", () => {
         if (!mobileSearchBar.classList.contains('hidden')) {
           mobileSearchBar.classList.add('hidden');
         }
-      }, 2000); // Close after 2 seconds of scroll inactivity
+      }, 2000);
     });
   }
 
-  // --- Accessibility enhancements ---
-  // Add keyboard navigation for dropdowns
+  // Accessibility enhancements
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Tab') {
       // Close mobile search when tabbing away
@@ -132,11 +188,10 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // --- Cart functionality placeholders ---
+  // Cart functionality placeholders
   const cartButtons = document.querySelectorAll('[class*="cart"]');
   cartButtons.forEach(button => {
     button.addEventListener('click', (e) => {
-      // Prevent default for demo
       if (button.textContent.includes('View Cart')) {
         e.preventDefault();
         console.log('Navigate to cart page');

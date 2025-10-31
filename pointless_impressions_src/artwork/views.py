@@ -1,9 +1,9 @@
 from django.views.generic import ListView, DetailView, View
-from django.db.models import Prefetch
+from django.db.models import Q
 import json
 from django.http import JsonResponse
 from django.core.serializers.json import DjangoJSONEncoder
-from .models import Artwork
+from .models import Artwork, ArtworkCategory, ArtworkFramingCondition
 from pointless_impressions_src.photo.models import Photo
 
 
@@ -17,7 +17,8 @@ class ArtworkListView(ListView):
 
     If `GET`, returns a paginated list of available artworks filtered by query
     parameters:
-    - ``search``: searches by artwork name
+    - ``search``: searches artwork name, category, and framing condition and
+        ensures distinct results
     - ``category``: filters by artwork category
     - ``selected_condition``: filters by framing condition
     - ``min_price`` / ``max_price``: filters artworks by price range
@@ -34,22 +35,28 @@ class ArtworkListView(ListView):
 
     model = Artwork
     template_name = 'artwork/artwork_list.html'
-    context_object_name = 'artwork'
+    context_object_name = 'artworks'
     paginate_by = 10
 
     def get_queryset(self):
         queryset = Artwork.objects.filter(is_available=True).select_related(
             'category', 'selected_condition', 'main_photo'
-        ).prefetch_related(
-            Prefetch(
-                'photo_set', queryset=Photo.objects.all(), to_attr='photos'
-                )
-        ).order_by('id')
+        ).prefetch_related('photos').order_by('id')
 
         # Search functionality
         search_term = self.request.GET.get('search')
         if search_term:
-            queryset = queryset.filter(name__icontains=search_term)
+            # Build Q objects for searching across multiple fields
+            name_q = Q(name__icontains=search_term)
+            category_q = Q(category__name__icontains=search_term)
+            condition_q = Q(
+                selected_condition__condition_name__icontains=search_term
+                )
+
+            # Combine Q objects with OR logic
+            queryset = queryset.filter(
+                name_q | category_q | condition_q
+                ).distinct()
 
         # Category filtering
         category = self.request.GET.get('category')
@@ -59,7 +66,9 @@ class ArtworkListView(ListView):
         # Framing filtering
         framing = self.request.GET.get('selected_condition')
         if framing:
-            queryset = queryset.filter(selected_condition__name=framing)
+            queryset = queryset.filter(
+                selected_condition__condition_name=framing
+                )
 
         # Price filtering
         min_price = self.request.GET.get('min_price')
@@ -73,32 +82,37 @@ class ArtworkListView(ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        all_filtered_artworks = self.get_queryset()
-        artworks_data = list(all_filtered_artworks.values(
-            'id',
-            'name',
-            'description',
-            'price',
-            'is_available',
-            'is_in_stock',
-            'sku',
-            'slug',
-            'main_photo__image',
-            'main_photo__alt_text'
-        ))
+        context['artwork_categories'] = (
+            ArtworkCategory.objects.all()
+            )
+        context['framing_conditions'] = (
+            ArtworkFramingCondition.objects.all()
+            )
+        artworks_on_page = context['artworks']
         cleaned_artwork_data = []
-        for item in artworks_data:
+        for artwork in artworks_on_page:
+            # Safely get the image path (which is a string, suitable for JSON)
+            image_name = None
+            image_alt_text = artwork.name
+
+            if artwork.main_photo:
+                # Check if the image file exists
+                if artwork.main_photo.image:
+                    image_name = artwork.main_photo.image.name
+
+                # Use the photo's alt text if available
+                image_alt_text = artwork.main_photo.alt_text or artwork.name
             cleaned_artwork_data.append({
-                'id': item['id'],
-                'name': item['name'],
-                'description': item['description'],
-                'price': float(item['price']),
-                'is_available': item['is_available'],
-                'is_in_stock': item['is_in_stock'],
-                'sku': item['sku'],
-                'slug': item['slug'],
-                'image_public_id': item['main_photo__image'],
-                'image_alt_text': item['main_photo__alt_text']
+                'id': artwork.id,
+                'name': artwork.name,
+                'description': artwork.description,
+                'price': float(artwork.price),
+                'is_available': artwork.is_available,
+                'is_in_stock': artwork.is_in_stock,
+                'sku': artwork.sku,
+                'slug': artwork.slug,
+                'image_public_id': image_name,
+                'image_alt_text': image_alt_text
             })
         context['artworks_json_data'] = json.dumps(
             cleaned_artwork_data, cls=DjangoJSONEncoder
@@ -133,11 +147,14 @@ class ArtworkDetailView(DetailView):
     def get_queryset(self):
         return Artwork.objects.select_related(
             'category', 'selected_condition'
-        ).prefetch_related(
-            Prefetch(
-                'photo_set', queryset=Photo.objects.all(), to_attr='photos'
-                )
-        )
+        ).prefetch_related('photos')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        artwork = self.get_object()
+        photos = artwork.photos.all()
+        context['photos'] = photos
+        return context
 
 
 # ---------------------------
