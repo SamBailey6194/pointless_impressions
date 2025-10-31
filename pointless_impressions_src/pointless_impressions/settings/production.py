@@ -20,7 +20,7 @@ PRODUCTION = True
 # Database configuration (using course database maker)
 DATABASES = {
     "default": dj_database_url.config(
-        default=os.getenv("DATABASE_URL"),
+        default=os.getenv("PRODUCTION_DB_URL"),
         conn_max_age=600,
     )
 }

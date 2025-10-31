@@ -9,7 +9,7 @@
   },
   "scripts": {
     "start": "npm run dev:full",
-    "dev": "cross-env NODE_ENV=development postcss pointless_impressions_src/theme/static_src/src/css/styles.css -o pointless_impressions_src/static/css/styles.css --watch",
+    "dev": "cross-env NODE_ENV=development postcss --config pointless_impressions_src/theme/static_src/postcss.config.js pointless_impressions_src/theme/static_src/src/css/styles.css -o pointless_impressions_src/static/css/styles.css --watch",
     "dev:js": "esbuild pointless_impressions_src/theme/static_src/src/js/**/*.js --bundle --sourcemap --outdir=pointless_impressions_src/static/js --outbase=pointless_impressions_src/theme/static_src/src/js --watch",
     "dev:full": "concurrently \"npm run dev\" \"npm run dev:js\"",
     "build": "npm run clean && npm run build:tailwind && npm run build:js:prod",
@@ -17,8 +17,8 @@
     "clean": "node pointless_impressions_src/theme/static_src/src/build.js/clean.js",
     "build:js:prod": "cross-env NODE_ENV=production esbuild pointless_impressions_src/theme/static_src/src/js/**/*.js --bundle --minify --outdir=pointless_impressions_src/static/js --outbase=pointless_impressions_src/theme/static_src/src/js",
     "finalize:js": "node pointless_impressions_src/theme/static_src/src/build.js/copy-final-js.js",
-    "build:tailwind": "cross-env NODE_ENV=production postcss pointless_impressions_src/theme/static_src/src/css/styles.css -o pointless_impressions_src/static/css/styles.css",
-    "build:tailwind:dev": "cross-env NODE_ENV=development postcss pointless_impressions_src/theme/static_src/src/css/styles.css -o pointless_impressions_src/static/css/styles.css",
+    "build:tailwind": "cross-env NODE_ENV=production postcss --config pointless_impressions_src/theme/static_src/postcss.config.js pointless_impressions_src/theme/static_src/src/css/styles.css -o pointless_impressions_src/static/css/styles.css",
+    "build:tailwind:dev": "cross-env NODE_ENV=development postcss --config pointless_impressions_src/theme/static_src/postcss.config.js pointless_impressions_src/theme/static_src/src/css/styles.css -o pointless_impressions_src/static/css/styles.css",
     "test": "jest --config=jest.config.js",
     "test:watch": "jest --config=jest.config.js --watch",
     "test:coverage": "jest --config=jest.config.js --coverage",
@@ -34,13 +34,6 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "@tailwindcss/postcss": "^4.1.11",
-    "autoprefixer": "^10.4.21",
-    "cross-env": "^7.0.3",
-    "esbuild": "^0.25.11",
-    "glob": "^11.0.3",
-    "postcss": "^8.5.6",
-    "postcss-cli": "^11.0.1"
   },
   "devDependencies": {
     "@babel/preset-env": "^7.28.5",
@@ -54,6 +47,13 @@
     "jest-environment-jsdom": "^30.2.0",
     "postcss-nested": "^7.0.2",
     "postcss-simple-vars": "^7.0.1",
-    "tailwindcss": "^4.1.11"
+    "tailwindcss": "^4.1.11",
+    "@tailwindcss/postcss": "^4.1.11",
+    "autoprefixer": "^10.4.21",
+    "cross-env": "^7.0.3",
+    "esbuild": "^0.25.11",
+    "glob": "^11.0.3",
+    "postcss": "^8.5.6",
+    "postcss-cli": "^11.0.1"
   }
 }
