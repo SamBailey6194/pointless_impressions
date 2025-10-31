@@ -1,0 +1,48 @@
+{% if is_paginated %}
+    <div class="join shadow-md">
+    
+    {% comment %} 'Previous' Button {% endcomment %}
+    {% if page_obj.has_previous %}
+        <a href="?page={{ page_obj.previous_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}"
+        class="join-item btn btn-ghost" aria-label="Previous Page">
+        <i class="fa-solid fa-angles-left"></i>
+        </a>
+    {% else %}
+        <button class="join-item btn btn-ghost btn-disabled" aria-hidden="true">
+            <i class="fa-solid fa-angles-left"></i>
+        </button>
+    {% endif %}
+
+    {% comment %} 
+        Page Numbers with Ellipsis.
+        Uses 'get_elided_page_range' to automatically add '...'
+    {% endcomment %}
+    {% for i in page_obj.paginator.get_elided_page_range %}
+        {% if i == page_obj.paginator.ELLIPSIS %}
+        <button class="join-item btn btn-disabled">...</button>
+        {% else %}
+            {% if i == page_obj.number %}
+                {% comment %} Current, active page {% endcomment %}
+                <button class="join-item btn btn-active">{{ i }}</button>
+            {% else %}
+                {% comment %} Other page links {% endcomment %}
+                <a href="?page={{ i }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}"
+                class="join-item btn btn-ghost">{{ i }}</a>
+            {% endif %}
+        {% endif %}
+    {% endfor %}
+
+    {% comment %} 'Next' Button {% endcomment %}
+    {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}"
+        class="join-item btn btn-ghost" aria-label="Next Page">
+            <i class="fa-solid fa-angles-right"></i>
+        </a>
+    {% else %}
+        <button class="join-item btn btn-ghost btn-disabled" aria-hidden="true">
+            <i class="fa-solid fa-angles-right"></i>
+        </button>
+    {% endif %}
+
+    </div>
+{% endif %}
