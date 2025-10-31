@@ -1,0 +1,51 @@
+[
+    {
+        "model": "auth.Group",
+        "pk": 1,
+        "fields": {
+            "name": "Owner"
+        }
+    },
+    {
+        "model": "auth.Group",
+        "pk": 2,
+        "fields": {
+            "name": "Manager"
+        }
+    },
+    {
+        "model": "auth.Group",
+        "pk": 3,
+        "fields": {
+            "name": "Employee"
+        }
+    },
+    {
+        "model": "account.CustomUser_groups",
+        "fields": {
+            "customuser_id": 1,
+            "group_id": 1
+        }
+    },
+    {
+        "model": "account.CustomUser_groups",
+        "fields": {
+            "customuser_id": 2,
+            "group_id": 2
+        }
+    },
+    {
+        "model": "account.CustomUser_groups",
+        "fields": {
+            "customuser_id": 3,
+            "group_id": 3
+        }
+    },
+    {
+        "model": "account.CustomUser_groups",
+        "fields": {
+            "customuser_id": 5,
+            "group_id": 1
+        }
+    }
+]

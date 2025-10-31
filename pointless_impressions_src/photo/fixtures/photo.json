@@ -3,20 +3,6 @@
         "pk": 1,
         "model": "photo.Photo",
         "fields": {
-            "artwork": 1,
-            "photo_type": "artwork",
-            "title": "Autumn Reflections Main Image",
-            "description": "Main image for Autumn Reflections artwork.",
-            "image": "artwork/autumn_reflections.jpg",
-            "alt_text": "Autumn Reflections at sunset",
-            "uploaded_by": 1,
-            "uploaded_at": "2023-10-23T00:00:00Z"
-        }
-    },
-    {
-        "pk": 2,
-        "model": "photo.Photo",
-        "fields": {
             "photo_type": "site_asset",
             "asset_identifier": "pointless_impressions_logo",
             "title": "Pointless Impressions Logo",
@@ -28,7 +14,7 @@
         }
     },
     {
-        "pk": 3,
+        "pk": 2,
         "model": "photo.Photo",
         "fields": {
             "photo_type": "site_asset",
@@ -40,5 +26,8 @@
             "uploaded_by": 1,
             "uploaded_at": "2023-10-23T00:00:00Z"
         }
+    },
+    {
+
     }
 ]

@@ -28,5 +28,15 @@
             "description": "Detailed studies using fine line pen in the style of pointillism.",
             "slug": "pointillism"
         }
+    },
+    {
+        "pk": 4,
+        "model": "artwork.ArtworkCategory",
+        "fields": {
+            "name": "Digital",
+            "friendly_name": "Digital",
+            "description": "Artworks created using digital tools and techniques.",
+            "slug": "digital"
+        }
     }
 ]

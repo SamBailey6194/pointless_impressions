@@ -44,13 +44,6 @@ class Photo(models.Model):
     #     on_delete=models.CASCADE,
     #     related_name='photos'
     # )
-    account = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
-        null=True,
-        blank=True,
-        on_delete=models.CASCADE,
-        related_name='photos'
-    )
 
     # For site assets (logos, banners, etc.)
     photo_type = models.CharField(
@@ -106,11 +99,6 @@ class Photo(models.Model):
         if self.photo_type == 'artwork' and not self.artwork:
             raise ValidationError(
                 "Artwork photos must be linked to an Artwork."
-                )
-
-        if self.photo_type == 'profile' and not self.account:
-            raise ValidationError(
-                "Profile pictures must be linked to an Account."
                 )
 
         if self.photo_type == 'site_asset' and not self.asset_identifier:
