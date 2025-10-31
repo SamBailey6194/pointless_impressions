@@ -23,25 +23,41 @@ echo "Database is ready!"
 echo "Applying database migrations..."
 python /app/manage.py migrate
 
-# --- NEW: Load all fixture data ---
-# This populates the database with users, profiles, groups, and art.
-echo "Loading initial data fixtures..."
-# (Make sure your fixture files are in the 'fixtures' dir of each app)
-python /app/manage.py loaddata account.json
-echo "Loaded the accounts fixture."
-python /app/manage.py loaddata account_group.json
-echo "Loaded the account groups fixture."
-python /app/manage.py loaddata profiles.json
-echo "Loaded the profiles fixture."
-python /app/manage.py loaddata artwork_categories.json
-echo "Loaded the artwork categories fixture."
-python /app/manage.py loaddata artwork_framing_conditions.json
-echo "Loaded the artwork framing conditions fixture."
-python /app/manage.py loaddata photo.json
-echo "Loaded the photos fixture."
-python /app/manage.py loaddata artwork.json
-echo "Loaded the artwork fixture."
-echo "All fixtures loaded successfully."
+# Load initial data fixtures if database is empty
+echo "Checking if database is populated..."
+python /app/manage.py shell -c "
+from django.contrib.auth import get_user_model
+from django.core.management import call_command
+import os
+
+User = get_user_model()
+
+if User.objects.filter(username='superuser').exists():
+    print('Database already populated. Skipping fixture loading.')
+else:
+    print('Database is empty. Loading fixtures...')
+    try:
+        call_command('loaddata', 'account.json')
+        print('Loaded account.json')
+        call_command('loaddata', 'account_group.json')
+        print('Loaded account_group.json')
+        call_command('loaddata', 'profiles.json')
+        print('Loaded profiles.json')
+        call_command('loaddata', 'artwork_categories.json')
+        print('Loaded artwork_categories.json')
+        call_command('loaddata', 'artwork_framing_conditions.json')
+        print('Loaded artwork_framing_conditions.json')
+        call_command('loaddata', 'photo.json')
+        print('Loaded photo.json')
+        call_command('loaddata', 'artwork.json')
+        print('Loaded artwork.json')
+        print('All fixtures loaded successfully.')
+    except Exception as e:
+        print(f'Error loading fixtures: {e}')
+        print('Please check your fixture files and paths.')
+        os._exit(1) # Exit with an error code
+"
+
 
 # Install Node dependencies at project root
 echo "Installing Node dependencies at project root..."

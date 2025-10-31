@@ -73,7 +73,7 @@ services:
       - "8000:8000"
     volumes:
       - .:/app
-      - /app/pointless_impressions_src/theme/static_src/node_modules
+      - /app/node_modules
     depends_on:
       db_dev:
         condition: service_healthy
