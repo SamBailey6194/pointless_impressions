@@ -2,9 +2,9 @@
 
 This document explains how to set up and contribute to the **Pointless Impressions** project in a development environment. All development work should branch off `dev`.
 
-In the guide there is mention of venv and Docker. You won't need to run ```python manage.py runserver``` as the local host will be run via the Docker Container we build later.
+As we are running Docker, you won't need to run ```python manage.py runserver``` as the local host will be run via the Docker Container we build later.
 
-Venv is only for managing the `requirements.txt` and the `package.json` so other devs get your updated packages and dependencies.
+You will need to manage `requirements.txt` and the `package.json` in the Docker console, this will be explained later.
 
 ---
 
@@ -12,7 +12,6 @@ Venv is only for managing the `requirements.txt` and the `package.json` so other
 
 - [Development Guide](#development-guide)
   - [Table of Contents](#table-of-contents)
-  - [Project Structure](#project-structure)
   - [Prerequisites](#prerequisites)
   - [Cloning the Repository](#cloning-the-repository)
   - [Environment Setup](#environment-setup)
@@ -20,9 +19,14 @@ Venv is only for managing the `requirements.txt` and the `package.json` so other
   - [Docker Setup](#docker-setup)
   - [Running the Development Environment](#running-the-development-environment)
     - [Using the Development Helper Script (Recommended)](#using-the-development-helper-script-recommended)
+      - [Quick Start with dev.sh](#quick-start-with-devsh)
+      - [Available dev.sh Commands](#available-devsh-commands)
     - [Manual Docker Setup (Alternative Method)](#manual-docker-setup-alternative-method)
     - [Creating Additional Superusers](#creating-additional-superusers)
     - [Accessing the Development Environment](#accessing-the-development-environment)
+    - [Troubleshooting Development Environment](#troubleshooting-development-environment)
+      - [Common Issues and Solutions](#common-issues-and-solutions)
+      - [Useful Development Commands](#useful-development-commands)
   - [Git Workflow](#git-workflow)
     - [Testing Guides](#testing-guides)
       - [Writing Tests](#writing-tests)
@@ -38,83 +42,15 @@ Venv is only for managing the `requirements.txt` and the `package.json` so other
         - [For JavaScript Cypress](#for-javascript-cypress)
     - [Installing Packages and Dependencies](#installing-packages-and-dependencies)
       - [Django Packages and Dependencies](#django-packages-and-dependencies)
-      - [Django-Tailwind Plugins](#django-tailwind-plugins)
+      - [Django-Tailwind / Tailwind Plugins](#django-tailwind--tailwind-plugins)
       - [Node Packages and Dependencies for JavaScript](#node-packages-and-dependencies-for-javascript)
     - [Commit Guide](#commit-guide)
-      - [Local Commands to Run](#local-commands-to-run)
+      - [In the Docker Container Bash](#in-the-docker-container-bash)
       - [Git Commit Template](#git-commit-template)
         - [Definitions](#definitions)
       - [Git Commit Commands](#git-commit-commands)
     - [Pull Request Flow](#pull-request-flow)
       - [PR Template](#pr-template)
-
----
-
-## Project Structure
-
-    POINTLESS_IMPRESSIONS
-    ├── DEVELOPMENT.md
-    ├── docker-compose.dev.yml
-    ├── docker-compose.production.yml
-    ├── docker-compose.staging.yml
-    ├── Dockerfile.dev
-    ├── Dockerfile.production
-    ├── Dockerfile.staging
-    ├── docs
-    │   └── markdowns
-    │       ├── AUTOMATICTESTING.md
-    │       ├── DEVELOPMENT.md
-    │       └── MANUALTESTING.md
-    ├── manage.py
-    ├── pointless_impressions_src
-    │   ├── dev-entrypoint.sh
-    │   ├── home
-    │   │   ├── __init__.py
-    │   │   ├── apps.py
-    │   │   ├── admin.py
-    │   │   ├── migrations
-    │   │   ├── models.py
-    │   │   ├── tests.py
-    │   │   └── views.py
-    │   ├── pointless_impressions
-    │   │   ├── __init__.py
-    │   │   ├── settings
-    │   │   │   ├── __init__.py
-    │   │   │   ├── base.py
-    │   │   │   ├── dev.py
-    │   │   │   ├── production.py
-    │   │   │   └── staging.py
-    │   │   ├── asgi.py
-    │   │   ├── urls.py
-    │   │   └── wsgi.py
-    │   ├── production-entrypoint.sh
-    │   ├── staging-entrypoint.sh
-    │   ├── static
-    │   │   ├── css
-    │   │   └── js
-    │   └── theme
-    │       ├── __init__.py
-    │       ├── apps.py
-    │       ├── static
-    │       │   └── css
-    │       │       └── dist
-    │       │           └── style.css
-    │       ├── static_src
-    │       │   ├── src
-    │       │   │   ├── build.js
-    │       │   │   │   └── hash-js.js
-    │       │   │   ├── css
-    │       │   │   │   └── style.css (TAILWIND FILE)
-    │       │   │   └── js
-    │       │   │       └── 
-    │       │   ├── cypress.config.js 
-    │       │   ├── jest.config.js
-    │       │   ├── package.json 
-    │       │   └── postcss.config.js      
-    │       └── templates
-    │           └── base.html (TAILWIND BASE.HTML)
-    ├── README.md
-    └── requirements.txt
 
 ---
 
@@ -124,10 +60,7 @@ Make sure you have the following installed:
 
 - [Docker](https://www.docker.com/get-started)
 - [Docker Compose](https://docs.docker.com/compose/install/)
-- Git
-- Python 3.13
-- Node.js 24.10
-- nvm 11.6
+- [Git](https://git-scm.com/downloads)
 
 ---
 
@@ -153,66 +86,27 @@ Ensure you pick the correct guide for your OS.
 
 ## Environment Setup
 
-1. Ensure you create a local venv to be able to manage the requirements.txt and install the requirements.txt into your venv.
-
-    ```bash
-    python -m venv .venv
-    source .venv/bin/activate  # Linux/Mac
-    .venv\Scripts\activate     # Windows
-    pip install -r requirements.txt
-    ```
-
-    If python or pip don't work ensure you can run this as:
-
-    ```bash
-    python3 -m venv .venv
-    source .venv/bin/activate  # Linux/Mac
-    .venv\Scripts\activate     # Windows
-    pip3 install -r requirements.txt
-    ```
-
-2. Copy the environment template
+1. Copy the environment template
 
     ```bash
     cp .env.example .env.dev
     ```
 
-3. Update the .env.dev with the credentials, secret key and database settings
+2. Update the .env.dev with the credentials, secret key and database settings
 
     ### Example
-    DJANGO_SECRET_KEY="your_generated_secret_key"
-    DEV_DB_HOST=db_dev
-    DEV_DB_PORT=5432
-    DEV_DB_NAME=dev_db
-    DEV_DB_USER=dev_user
-    DEV_DB_PASS=dev_pass
-    CACHE_URL=redis://redis_dev:6379/0
-    EMAIL_BACKEND=django.core.mail.backends.smtp.EmailBackend
-    EMAIL_HOST=maildev_dev
-    EMAIL_PORT=1025
-    EMAIL_USE_TLS=False
-    DEFAULT_FROM_EMAIL=dev@example.com
-
-4. Now let us create a secret key for local .env.dev:
-
-    ```bash
-    python -c "from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())"
-    ```
-
-    If python doesn't work ensure you can run this as:
-
-    ```bash
-    python3 -c "from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())"
-    ```
-
-    You should get a long string in your terminal. You can then copy it and paste it into the .env.dev and this is your local secret key for **Pointless Impressions**
-
-5. Ensure you have a terminal pointing to pointless_impressions/pointless_impressions_src/theme/static_src and install npm into the venv
-
-    ```bash
-    cd pointless_impressions_src/theme/static_src
-    npm install
-    ```
+    - DJANGO_SECRET_KEY="your_generated_secret_key"
+    - DEV_DB_HOST=db_dev
+    - DEV_DB_PORT=5432
+    - DEV_DB_NAME=dev_db
+    - DEV_DB_USER=dev_user
+    - DEV_DB_PASS=dev_pass
+    - CACHE_URL=redis://redis_dev:6379/0
+    - EMAIL_BACKEND=django.core.mail.backends.smtp.EmailBackend
+    - EMAIL_HOST=maildev_dev
+    - EMAIL_PORT=1025
+    - EMAIL_USE_TLS=False
+    - DEFAULT_FROM_EMAIL=dev@example.com
 
 ### Environment Variables
 
@@ -254,11 +148,13 @@ We've created a `dev.sh` script to simplify common development tasks. This scrip
 #### Quick Start with dev.sh
 
 1. Make sure the script is executable (already done):
+
    ```bash
    chmod +x dev.sh
    ```
 
 2. Start the development environment:
+
    ```bash
    ./dev.sh start
    ```
@@ -268,6 +164,17 @@ We've created a `dev.sh` script to simplify common development tasks. This scrip
    - Create `.env.dev` from example if it doesn't exist
    - Build and start all Docker containers
    - Show you the access URLs
+
+  It should build in the order of:
+  1. db_dev = PostgreSQL
+  2. redis_dev = Redis Cache
+  3. maildev_dev = Email testing
+  4. web = Django development server
+
+  Important notes: 
+  - Tailwind and JS files will automatically run in watch mode
+  - The database will automatically migrate
+  - All data will be created automatically from the fixture files
 
 3. View all available commands:
    ```bash
@@ -320,21 +227,26 @@ If you prefer to run Docker commands manually instead of using the `dev.sh` scri
 If you need to create additional superusers:
 
 1. Using the dev.sh script (recommended):
+
    ```bash
    ./dev.sh createsuperuser
    ```
 
-2. Manual method - ensure you are in your venv:
-   ```bash
-   source .venv/bin/activate  # Linux/Mac
-   .venv\Scripts\activate     # Windows
-   python manage.py createsuperuser
-   ```
+2. Once in the Docker container we can generate the Secret Key by running
 
-   If python doesn't work, use python3:
-   ```bash
-   python3 manage.py createsuperuser
-   ```
+  ```bash
+  ./dev.sh bash
+  python -c "from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())"
+  ```
+
+  If python doesn't work, use python3:
+
+  ```bash
+  ./dev.sh bash
+  python3 -c "from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())"
+  ```
+
+  You should then get a string output which you can then copy and paste into your `.env.dev` file for the `DJANGO_SECRET_KEY` variable.
 
 ### Accessing the Development Environment
 
@@ -359,7 +271,7 @@ After starting the development environment, you can access:
 
 3. **Docker not found**: Ensure Docker and Docker Compose are installed and running.
 
-4. **Environment variables not loaded**: The `dev.sh start` command automatically creates `.env.dev` from the example file if it doesn't exist.
+4. **Environment variables not loaded**: The `./dev.sh start` command automatically creates `.env.dev` from the example file if it doesn't exist.
 
 5. **Containers not starting**: Check the logs:
    ```bash
@@ -383,6 +295,8 @@ After starting the development environment, you can access:
 ---
 
 ## Git Workflow
+
+**Important Notes** To run git commands you will need to use a terminal that is outside of the Docker container, as git isn't installed in the container for security reasons.
 
 There are four core branches
 
@@ -507,53 +421,61 @@ To run the tests please use:
 
 ##### For Django TestCase
 
-1. For all tests run in your venv:
+1. For all tests run in your Docker container bash by:
     
     ```bash
+    ./dev.sh bash
     python manage.py test
     ```
 
     If python doesn't work then run the below
 
     ```bash
+    ./dev.sh bash
     python3 manage.py test
     ```
 
-2. For app specific tests run in your venv:
+2. For app specific tests run in your Docker container bash by:
 
     ```bash
+    ./dev.sh bash
     python manage.py test app_name
     ```
 
     If python doesn't work then run the below
 
     ```bash
+    ./dev.sh bash
     python3 manage.py test app_name
     ```
 
 ##### For Django Behave
 
-1. For tests run in your venv:
+1. For tests run in your Docker container bash:
 
     ```bash
+    ./dev.sh bash
     python manage.py behave
     ```
 
     If python doesn't work then run the below
 
     ```bash
+    ./dev.sh bash
     python3 manage.py behave
     ```
 
-2. For specific feature file tests run in your venv:
+2. For specific feature file tests run in your Docker container bash:
 
     ```bash
+    ./dev.sh bash
     python manage.py behave pointless_impressions_src/app_name/features/my_feature.feature
     ```
 
     If python doesn't work then run the below
 
     ```bash
+    ./dev.sh bash
     python3 manage.py behave pointless_impressions_src/app_name/features/my_feature.feature
     ```    
 
@@ -561,29 +483,25 @@ To run the tests please use:
 
 1. You will need to make dummy HTML files for the Jest tests
 
-2. You will also need to be in pointless_impressions/pointless_impressions_src/theme/static_src you can do this by:
+2. For tests run:
 
     ```bash
-    cd pointless_impressions_src/theme/static_src
-    ```
-
-3. For tests run:
-
-    ```bash
+    ./dev.sh bash
     npm run test
     ```
 
-4. For app specific tests run:
+3. For app specific tests run:
 
     1. Ensure you add the line below to package.json:
 
-        ```bash
+        ```json
         "test:app_name": "jest ./src/tests.js/jest/app_name/__tests__/",
         ```
 
     2. Then you can run the below command for app specific tests:
 
         ```bash
+        ./dev.sh bash
         npm run test:app_name
         ```
 
@@ -591,10 +509,10 @@ To run the tests please use:
 
 1. You will need to have dummy HTML files for the Cypress tests
 
-2. You will also need to be in pointless_impressions/pointless_impressions_src/theme/static_src you can do this by:
+2. You will also need to be in the Docker Container bash:
 
     ```bash
-    cd pointless_impressions_src/theme/static_src
+    ./dev.sh bash
     ```
 
 3. For tests run
@@ -607,7 +525,7 @@ To run the tests please use:
 
     1. Ensure you add the line below to package.json:
 
-        ```bash
+        ```json
         "cypress:app_name": "cypress run --spec './src/tests.js/cypress/e2e/app_name/**/*'",
         ```
 
@@ -624,32 +542,37 @@ To get certain aspects working you may need to install dependencies and packages
 
 #### Django Packages and Dependencies
 
-1. Ensure you are in project root `YOUR-REPO-STORAGE-PATH/pointless_impressions` and you can then type `pip install package-name` or `pip3 install package-name`
+**Important Note**: Ensure you are in the Docker container bash when you run your development server so the packages are installed in the correct environment. Run `./dev.sh bash` to get into the container bash.
+
+1. You can then type `pip install package-name` or `pip3 install package-name`
 2. This should then install the package and you can then run `pip freeze > requirements.txt` or `pip3 freeze > requirements.txt` and the Docker Dev Container should be able to read the updated `requirements.txt` due to the settings in the `dev.entrypoint.sh`
 
-#### Django-Tailwind Plugins
+#### Django-Tailwind / Tailwind Plugins
 
-1. Ensure you are in project root `YOUR-REPO-STORAGE-PATH/pointless_impressions` and you can then type `python manage.py tailwind plugin_install TAILWIND-PLUGIN` or `python3 manage.py tailwind plugin_install TAILWIND-PLUGIN`
-2. This should automatically update your `package.json` in `pointless_impressions_src/theme/static_src` and the Docker Dev Container should be able to read the updated `package.json` due to the settings in the `dev.entrypoint.sh`
+1. You can then type `python manage.py tailwind plugin_install TAILWIND-PLUGIN` or `python3 manage.py tailwind plugin_install TAILWIND-PLUGIN` or `npm install TAILWIND-PLUGIN` or `yarn add TAILWIND-PLUGIN`.
+2. This should automatically update your `package.json` and the Docker Dev Container should be able to read the updated `package.json` due to the settings in the `dev.entrypoint.sh`
 
 #### Node Packages and Dependencies for JavaScript
 
-1. Ensure you are in the theme app `pointless_impressions_src/theme/static_src`, if not you can run `cd pointless_impressions_src/theme/static_src`
-and you can then type `npm install PACKAGE-NAME`
-2. This should automatically update your `package.json` in `pointless_impressions_src/theme/static_src` and the Docker Dev Container should be able to read the updated `package.json` due to the settings in the `dev.entrypoint.sh`
+1. You can type `npm install PACKAGE-NAME`
+2. This should automatically update your `package.json` and the Docker Dev Container should be able to read the updated `package.json` due to the settings in the `dev.entrypoint.sh`
 
 If you follow the above you should then be able to access and see changes at [Local Development](http://localhost:8000/). If they aren't taking place you may need to run exit the container and rebuild it by following the below
 
 1. In the terminal with the container open press `Ctrl + C` or `Cmd + C`, this will exit the container
-2. Then run `docker compose -f docker-compose.dev.yml up --build` this will build the container and start it up. Alternatively you can run the build and up separately.
-   1. Build first, run `docker compose -f docker-compose.dev.yml build`
-   2. Start up, run `docker compose -f docker-compose.dev.yml up`
+2. Then run `./dev.sh build` or `docker compose -f docker-compose.dev.yml build` this will build the container.
+3. Then run `./dev.sh start` or `docker compose -f docker-compose.dev.yml up` to start the container again.
+  Alternatively you can just run `./dev.sh restart` to do both steps 2 and 3 in one command.
 
 ### Commit Guide
 
-#### Local Commands to Run
+#### In the Docker Container Bash
 
-Before you commit always run `pip freeze > requirements.txt` or `pip3 freeze > requirements.txt`
+```bash
+./dev.sh bash
+```
+
+Before you commit always run `pip freeze > requirements.txt` or `pip3 freeze > requirements.txt` and `npm install` or `yarn install` to ensure all dependencies are up to date along with `npm run update` to ensure packages are updated fully.
 
 #### Git Commit Template 
 

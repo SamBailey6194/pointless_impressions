@@ -4,9 +4,10 @@
         "model": "artwork.Artwork",
         "fields": {
             "name": "Autumn Reflections",
+            "artist": 1,
             "description": "A autumn scene of trees at sunset reflected in a lake.",
             "price": 155.00,
-            "sku": "autumn001",
+            "sku": "SKU-FE02QD339H",
             "category": 1,
             "selected_condition": 1,
             "main_photo": 1,
@@ -26,9 +27,10 @@
         "model": "artwork.Artwork",
         "fields": {
             "name": "Purification By Fire",
+            "artist": 1,
             "description": "A photograph of a soul being purified by holy fire.",
             "price": 1200.00,
-            "sku": "PURITY001",
+            "sku": "SKU-TQXBMZ60WG",
             "category": 2,
             "selected_condition": 2,
             "main_photo": 4,
@@ -48,9 +50,10 @@
         "model": "artwork.Artwork",
         "fields": {
             "name": "The Beauty of Genesis",
+            "artist": 1,
             "description": "A detailed picture of a snake using pointillism.",
             "price": 125.00,
-            "sku": "snake001",
+            "sku": "SKU-L9PV9BCTP1",
             "category": 1,
             "selected_condition": 1,
             "main_photo": 5,
@@ -70,9 +73,10 @@
         "model": "artwork.Artwork",
         "fields": {
             "name": "The Lady of Shalott",
+            "artist": 1,
             "description": "A photograph of The Lady of Shalott in the lake",
             "price": 800.00,
-            "sku": "SHALOTT001",
+            "sku": "SKU-EZ88BBHH0U",
             "category": 2,
             "selected_condition": 3,
             "main_photo": 6,
@@ -84,6 +88,1409 @@
             "slug": "the-lady-of-shalott",
             "photo": [
                 6
+            ]
+        }
+    },
+    {
+        "pk": 5,
+        "model": "artwork.Artwork",
+        "fields": {
+            "name": "Midnight Bloom",
+            "artist": 1,
+            "description": "A compelling artwork titled 'Midnight Bloom'.",
+            "price": "345.50",
+            "sku": "SKU-96ICDCVXVG",
+            "category": 1,
+            "selected_condition": 1,
+            "main_photo": 7,
+            "is_available": true,
+            "is_in_stock": true,
+            "is_featured": false,
+            "created_at": "2020-01-01T00:00:00Z",
+            "updated_at": "2020-01-01T00:00:00Z",
+            "slug": "midnight-bloom",
+            "photo": [
+                7
+            ]
+        }
+    },
+    {
+        "pk": 6,
+        "model": "artwork.Artwork",
+        "fields": {
+            "name": "City Rain",
+            "artist": 1,
+            "description": "A compelling artwork titled 'City Rain'.",
+            "price": "780.00",
+            "sku": "SKU-RB83GJSEAZ",
+            "category": 2,
+            "selected_condition": 2,
+            "main_photo": 8,
+            "is_available": true,
+            "is_in_stock": true,
+            "is_featured": false,
+            "created_at": "2020-01-02T00:00:00Z",
+            "updated_at": "2020-01-02T00:00:00Z",
+            "slug": "city-rain",
+            "photo": [
+                8
+            ]
+        }
+    },
+    {
+        "pk": 7,
+        "model": "artwork.Artwork",
+        "fields": {
+            "name": "Lost in Thought",
+            "artist": 1,
+            "description": "A compelling artwork titled 'Lost in Thought'.",
+            "price": "1200.00",
+            "sku": "SKU-RB83GJSEAZ",
+            "category": 3,
+            "selected_condition": 3,
+            "main_photo": 9,
+            "is_available": true,
+            "is_in_stock": true,
+            "is_featured": false,
+            "created_at": "2020-01-03T00:00:00Z",
+            "updated_at": "2020-01-03T00:00:00Z",
+            "slug": "lost-in-thought",
+            "photo": [
+                9
+            ]
+        }
+    },
+    {
+        "pk": 8,
+        "model": "artwork.Artwork",
+        "fields": {
+            "name": "Crimson Sky",
+            "artist": 1,
+            "description": "A compelling artwork titled 'Crimson Sky'.",
+            "price": "450.20",
+            "sku": "SKU-UWMRZZWNQF",
+            "category": 4,
+            "selected_condition": 4,
+            "main_photo": 10,
+            "is_available": true,
+            "is_in_stock": true,
+            "is_featured": false,
+            "created_at": "2020-01-04T00:00:00Z",
+            "updated_at": "2020-01-04T00:00:00Z",
+            "slug": "crimson-sky",
+            "photo": [
+                10
+            ]
+        }
+    },
+    {
+        "pk": 9,
+        "model": "artwork.Artwork",
+        "fields": {
+            "name": "Echoes of Silence",
+            "artist": 1,
+            "description": "A compelling artwork titled 'Echoes of Silence'.",
+            "price": "920.00",
+            "sku": "SKU-Z4KV0JSGJA",
+            "category": 5,
+            "selected_condition": 1,
+            "main_photo": 11,
+            "is_available": true,
+            "is_in_stock": true,
+            "is_featured": false,
+            "created_at": "2020-01-05T00:00:00Z",
+            "updated_at": "2020-01-05T00:00:00Z",
+            "slug": "echoes-of-silence",
+            "photo": [
+                11
+            ]
+        }
+    },
+    {
+        "pk": 10,
+        "model": "artwork.Artwork",
+        "fields": {
+            "name": "Coastal Fog",
+            "artist": 1,
+            "description": "A compelling artwork titled 'Coastal Fog'.",
+            "price": "610.75",
+            "sku": "SKU-Q5D1AIAAWT",
+            "category": 1,
+            "selected_condition": 2,
+            "main_photo": 12,
+            "is_available": true,
+            "is_in_stock": true,
+            "is_featured": true,
+            "created_at": "2020-01-06T00:00:00Z",
+            "updated_at": "2020-01-06T00:00:00Z",
+            "slug": "coastal-fog",
+            "photo": [
+                12
+            ]
+        }
+    },
+    {
+        "pk": 11,
+        "model": "artwork.Artwork",
+        "fields": {
+            "name": "Golden Hour",
+            "artist": 1,
+            "description": "A compelling artwork titled 'Golden Hour'.",
+            "price": "1400.00",
+            "sku": "SKU-W4UNSOD7D1",
+            "category": 2,
+            "selected_condition": 3,
+            "main_photo": 13,
+            "is_available": true,
+            "is_in_stock": true,
+            "is_featured": false,
+            "created_at": "2020-01-07T00:00:00Z",
+            "updated_at": "2020-01-07T00:00:00Z",
+            "slug": "golden-hour",
+            "photo": [
+                13
+            ]
+        }
+    },
+    {
+        "pk": 12,
+        "model": "artwork.Artwork",
+        "fields": {
+            "name": "Urban Jungle",
+            "artist": 1,
+            "description": "A compelling artwork titled 'Urban Jungle'.",
+            "price": "880.00",
+            "sku": "SKU-06TE7L19GB",
+            "category": 3,
+            "selected_condition": 4,
+            "main_photo": 14,
+            "is_available": true,
+            "is_in_stock": true,
+            "is_featured": false,
+            "created_at": "2020-01-08T00:00:00Z",
+            "updated_at": "2020-01-08T00:00:00Z",
+            "slug": "urban-jungle",
+            "photo": [
+                14
+            ]
+        }
+    },
+    {
+        "pk": 13,
+        "model": "artwork.Artwork",
+        "fields": {
+            "name": "Fading Light",
+            "artist": 1,
+            "description": "A compelling artwork titled 'Fading Light'.",
+            "price": "315.00",
+            "sku": "SKU-GCOGEPWMX7",
+            "category": 4,
+            "selected_condition": 1,
+            "main_photo": 15,
+            "is_available": true,
+            "is_in_stock": true,
+            "is_featured": false,
+            "created_at": "2020-01-09T00:00:00Z",
+            "updated_at": "2020-01-09T00:00:00Z",
+            "slug": "fading-light",
+            "photo": [
+                15
+            ]
+        }
+    },
+    {
+        "pk": 14,
+        "model": "artwork.Artwork",
+        "fields": {
+            "name": "Winters Grasp",
+            "artist": 1,
+            "description": "A compelling artwork titled 'Winters Grasp'.",
+            "price": "750.50",
+            "sku": "SKU-AWQ3HU0ONU",
+            "category": 5,
+            "selected_condition": 2,
+            "main_photo": 16,
+            "is_available": true,
+            "is_in_stock": true,
+            "is_featured": false,
+            "created_at": "2020-01-10T00:00:00Z",
+            "updated_at": "2020-01-10T00:00:00Z",
+            "slug": "winters-grasp",
+            "photo": [
+                16
+            ]
+        }
+    },
+    {
+        "pk": 15,
+        "model": "artwork.Artwork",
+        "fields": {
+            "name": "Abstract No. 5",
+            "artist": 1,
+            "description": "A compelling artwork titled 'Abstract No. 5'.",
+            "price": "1300.00",
+            "sku": "SKU-9FFX81FDIN",
+            "category": 1,
+            "selected_condition": 3,
+            "main_photo": 17,
+            "is_available": true,
+            "is_in_stock": true,
+            "is_featured": false,
+            "created_at": "2020-01-11T00:00:00Z",
+            "updated_at": "2020-01-11T00:00:00Z",
+            "slug": "abstract-no-5",
+            "photo": [
+                17
+            ]
+        }
+    },
+    {
+        "pk": 16,
+        "model": "artwork.Artwork",
+        "fields": {
+            "name": "Still Life with Fruit",
+            "artist": 1,
+            "description": "A compelling artwork titled 'Still Life with Fruit'.",
+            "price": "490.00",
+            "sku": "SKU-VFWDOR75JA",
+            "category": 2,
+            "selected_condition": 4,
+            "main_photo": 18,
+            "is_available": true,
+            "is_in_stock": true,
+            "is_featured": false,
+            "created_at": "2020-01-12T00:00:00Z",
+            "updated_at": "2020-01-12T00:00:00Z",
+            "slug": "still-life-with-fruit",
+            "photo": [
+                18
+            ]
+        }
+    },
+    {
+        "pk": 17,
+        "model": "artwork.Artwork",
+        "fields": {
+            "name": "Mountain Peak",
+            "artist": 1,
+            "description": "A compelling artwork titled 'Mountain Peak'.",
+            "price": "800.00",
+            "sku": "SKU-OTIMOFC7K2",
+            "category": 3,
+            "selected_condition": 1,
+            "main_photo": 19,
+            "is_available": true,
+            "is_in_stock": true,
+            "is_featured": false,
+            "created_at": "2020-01-13T00:00:00Z",
+            "updated_at": "2020-01-13T00:00:00Z",
+            "slug": "mountain-peak",
+            "photo": [
+                19
+            ]
+        }
+    },
+    {
+        "pk": 18,
+        "model": "artwork.Artwork",
+        "fields": {
+            "name": "Forest Stream",
+            "artist": 1,
+            "description": "A compelling artwork titled 'Forest Stream'.",
+            "price": "620.25",
+            "sku": "SKU-NGIGTRYI6Q",
+            "category": 4,
+            "selected_condition": 2,
+            "main_photo": 20,
+            "is_available": true,
+            "is_in_stock": true,
+            "is_featured": false,
+            "created_at": "2020-01-14T00:00:00Z",
+            "updated_at": "2020-01-14T00:00:00Z",
+            "slug": "forest-stream",
+            "photo": [
+                20
+            ]
+        }
+    },
+    {
+        "pk": 19,
+        "model": "artwork.Artwork",
+        "fields": {
+            "name": "Oceans Fury",
+            "artist": 1,
+            "description": "A compelling artwork titled 'Oceans Fury'.",
+            "price": "1150.00",
+            "sku": "SKU-RP7S3MDL4F",
+            "category": 5,
+            "selected_condition": 3,
+            "main_photo": 21,
+            "is_available": true,
+            "is_in_stock": true,
+            "is_featured": false,
+            "created_at": "2020-01-15T00:00:00Z",
+            "updated_at": "2020-01-15T00:00:00Z",
+            "slug": "oceans-fury",
+            "photo": [
+                21
+            ]
+        }
+    },
+    {
+        "pk": 20,
+        "model": "artwork.Artwork",
+        "fields": {
+            "name": "Portrait of a Stranger",
+            "artist": 1,
+            "description": "A compelling artwork titled 'Portrait of a Stranger'.",
+            "price": "990.00",
+            "sku": "SKU-LB8SXQVSXK",
+            "category": 1,
+            "selected_condition": 4,
+            "main_photo": 22,
+            "is_available": true,
+            "is_in_stock": true,
+            "is_featured": true,
+            "created_at": "2020-01-16T00:00:00Z",
+            "updated_at": "2020-01-16T00:00:00Z",
+            "slug": "portrait-of-a-stranger",
+            "photo": [
+                22
+            ]
+        }
+    },
+    {
+        "pk": 21,
+        "model": "artwork.Artwork",
+        "fields": {
+            "name": "Geometric Dreams",
+            "artist": 1,
+            "description": "A compelling artwork titled 'Geometric Dreams'.",
+            "price": "730.00",
+            "sku": "SKU-BN31B1ACTD",
+            "category": 2,
+            "selected_condition": 1,
+            "main_photo": 23,
+            "is_available": true,
+            "is_in_stock": true,
+            "is_featured": false,
+            "created_at": "2020-01-17T00:00:00Z",
+            "updated_at": "2020-01-17T00:00:00Z",
+            "slug": "geometric-dreams",
+            "photo": [
+                23
+            ]
+        }
+    },
+    {
+        "pk": 22,
+        "model": "artwork.Artwork",
+        "fields": {
+            "name": "Retro Diner",
+            "artist": 1,
+            "description": "A compelling artwork titled 'Retro Diner'.",
+            "price": "480.80",
+            "sku": "SKU-LSJ4L9JTYY",
+            "category": 3,
+            "selected_condition": 2,
+            "main_photo": 24,
+            "is_available": true,
+            "is_in_stock": true,
+            "is_featured": false,
+            "created_at": "2020-01-18T00:00:00Z",
+            "updated_at": "2020-01-18T00:00:00Z",
+            "slug": "retro-diner",
+            "photo": [
+                24
+            ]
+        }
+    },
+    {
+        "pk": 23,
+        "model": "artwork.Artwork",
+        "fields": {
+            "name": "Cybernetic Future",
+            "artist": 1,
+            "description": "A compelling artwork titled 'Cybernetic Future'.",
+            "price": "1450.00",
+            "sku": "SKU-665Q8AFHQT",
+            "category": 4,
+            "selected_condition": 3,
+            "main_photo": 25,
+            "is_available": true,
+            "is_in_stock": true,
+            "is_featured": false,
+            "created_at": "2020-01-19T00:00:00Z",
+            "updated_at": "2020-01-19T00:00:00Z",
+            "slug": "cybernetic-future",
+            "photo": [
+                25
+            ]
+        }
+    },
+    {
+        "pk": 24,
+        "model": "artwork.Artwork",
+        "fields": {
+            "name": "Forgotten Path",
+            "artist": 1,
+            "description": "A compelling artwork titled 'Forgotten Path'.",
+            "price": "560.00",
+            "sku": "SKU-8X64L4QY7Z",
+            "category": 5,
+            "selected_condition": 4,
+            "main_photo": 26,
+            "is_available": true,
+            "is_in_stock": true,
+            "is_featured": false,
+            "created_at": "2020-01-20T00:00:00Z",
+            "updated_at": "2020-01-20T00:00:00Z",
+            "slug": "forgotten-path",
+            "photo": [
+                26
+            ]
+        }
+    },
+    {
+        "pk": 25,
+        "model": "artwork.Artwork",
+        "fields": {
+            "name": "The Old Library",
+            "artist": 1,
+            "description": "A compelling artwork titled 'The Old Library'.",
+            "price": "900.00",
+            "sku": "SKU-O923O9EK09",
+            "category": 1,
+            "selected_condition": 1,
+            "main_photo": 27,
+            "is_available": true,
+            "is_in_stock": true,
+            "is_featured": false,
+            "created_at": "2020-01-21T00:00:00Z",
+            "updated_at": "2020-01-21T00:00:00Z",
+            "slug": "the-old-library",
+            "photo": [
+                27
+            ]
+        }
+    },
+    {
+        "pk": 26,
+        "model": "artwork.Artwork",
+        "fields": {
+            "name": "Starry Night Lake",
+            "artist": 1,
+            "description": "A compelling artwork titled 'Starry Night Lake'.",
+            "price": "1100.00",
+            "sku": "SKU-EEY3AEBMXH",
+            "category": 2,
+            "selected_condition": 2,
+            "main_photo": 28,
+            "is_available": true,
+            "is_in_stock": true,
+            "is_featured": false,
+            "created_at": "2020-01-22T00:00:00Z",
+            "updated_at": "2020-01-22T00:00:00Z",
+            "slug": "starry-night-lake",
+            "photo": [
+                28
+            ]
+        }
+    },
+    {
+        "pk": 27,
+        "model": "artwork.Artwork",
+        "fields": {
+            "name": "Autumns Fire",
+            "artist": 1,
+            "description": "A compelling artwork titled 'Autumns Fire'.",
+            "price": "680.00",
+            "sku": "SKU-NBIXG4IBEW",
+            "category": 3,
+            "selected_condition": 3,
+            "main_photo": 29,
+            "is_available": true,
+            "is_in_stock": true,
+            "is_featured": false,
+            "created_at": "2020-01-23T00:00:00Z",
+            "updated_at": "2020-01-23T00:00:00Z",
+            "slug": "autumns-fire",
+            "photo": [
+                29
+            ]
+        }
+    },
+    {
+        "pk": 28,
+        "model": "artwork.Artwork",
+        "fields": {
+            "name": "Cobblestone Alley",
+            "artist": 1,
+            "description": "A compelling artwork titled 'Cobblestone Alley'.",
+            "price": "510.60",
+            "sku": "SKU-RMJM2J4CDV",
+            "category": 4,
+            "selected_condition": 4,
+            "main_photo": 30,
+            "is_available": true,
+            "is_in_stock": true,
+            "is_featured": false,
+            "created_at": "2020-01-24T00:00:00Z",
+            "updated_at": "2020-01-24T00:00:00Z",
+            "slug": "cobblestone-alley",
+            "photo": [
+                30
+            ]
+        }
+    },
+    {
+        "pk": 29,
+        "model": "artwork.Artwork",
+        "fields": {
+            "name": "Quiet Morning",
+            "artist": 1,
+            "description": "A compelling artwork titled 'Quiet Morning'.",
+            "price": "320.00",
+            "sku": "SKU-VOAE96DCXX",
+            "category": 5,
+            "selected_condition": 1,
+            "main_photo": 31,
+            "is_available": true,
+            "is_in_stock": true,
+            "is_featured": false,
+            "created_at": "2020-01-25T00:00:00Z",
+            "updated_at": "2020-01-25T00:00:00Z",
+            "slug": "quiet-morning",
+            "photo": [
+                31
+            ]
+        }
+    },
+    {
+        "pk": 30,
+        "model": "artwork.Artwork",
+        "fields": {
+            "name": "Desert Mirage",
+            "artist": 1,
+            "description": "A compelling artwork titled 'Desert Mirage'.",
+            "price": "850.00",
+            "sku": "SKU-7QQUEF48I1",
+            "category": 1,
+            "selected_condition": 2,
+            "main_photo": 32,
+            "is_available": true,
+            "is_in_stock": true,
+            "is_featured": true,
+            "created_at": "2020-01-26T00:00:00Z",
+            "updated_at": "2020-01-26T00:00:00Z",
+            "slug": "desert-mirage",
+            "photo": [
+                32
+            ]
+        }
+    },
+    {
+        "pk": 31,
+        "model": "artwork.Artwork",
+        "fields": {
+            "name": "Industrial Heart",
+            "artist": 1,
+            "description": "A compelling artwork titled 'Industrial Heart'.",
+            "price": "1050.00",
+            "sku": "SKU-RR9LX88Y9W",
+            "category": 2,
+            "selected_condition": 3,
+            "main_photo": 33,
+            "is_available": true,
+            "is_in_stock": true,
+            "is_featured": false,
+            "created_at": "2020-01-27T00:00:00Z",
+            "updated_at": "2020-01-27T00:00:00Z",
+            "slug": "industrial-heart",
+            "photo": [
+                33
+            ]
+        }
+    },
+    {
+        "pk": 32,
+        "model": "artwork.Artwork",
+        "fields": {
+            "name": "Reflections in Glass",
+            "artist": 1,
+            "description": "A compelling artwork titled 'Reflections in Glass'.",
+            "price": "940.00",
+            "sku": "SKU-VKZH8674MR",
+            "category": 3,
+            "selected_condition": 4,
+            "main_photo": 34,
+            "is_available": true,
+            "is_in_stock": true,
+            "is_featured": false,
+            "created_at": "2020-01-28T00:00:00Z",
+            "updated_at": "2020-01-28T00:00:00Z",
+            "slug": "reflections-in-glass",
+            "photo": [
+                34
+            ]
+        }
+    },
+    {
+        "pk": 33,
+        "model": "artwork.Artwork",
+        "fields": {
+            "name": "Emerald Isle",
+            "artist": 1,
+            "description": "A compelling artwork titled 'Emerald Isle'.",
+            "price": "670.30",
+            "sku": "SKU-ECJYC1XFTV",
+            "category": 4,
+            "selected_condition": 1,
+            "main_photo": 35,
+            "is_available": true,
+            "is_in_stock": true,
+            "is_featured": false,
+            "created_at": "2020-01-29T00:00:00Z",
+            "updated_at": "2020-01-29T00:00:00Z",
+            "slug": "emerald-isle",
+            "photo": [
+                35
+            ]
+        }
+    },
+    {
+        "pk": 34,
+        "model": "artwork.Artwork",
+        "fields": {
+            "name": "Solar Flare",
+            "artist": 1,
+            "description": "A compelling artwork titled 'Solar Flare'.",
+            "price": "1220.00",
+            "sku": "SKU-XCW88N5PLZ",
+            "category": 5,
+            "selected_condition": 2,
+            "main_photo": 36,
+            "is_available": true,
+            "is_in_stock": true,
+            "is_featured": false,
+            "created_at": "2020-01-30T00:00:00Z",
+            "updated_at": "2020-01-30T00:00:00Z",
+            "slug": "solar-flare",
+            "photo": [
+                36
+            ]
+        }
+    },
+    {
+        "pk": 35,
+        "model": "artwork.Artwork",
+        "fields": {
+            "name": "Moonlit Garden",
+            "artist": 1,
+            "description": "A compelling artwork titled 'Moonlit Garden'.",
+            "price": "790.00",
+            "sku": "SKU-FHL7PQZGIK",
+            "category": 1,
+            "selected_condition": 3,
+            "main_photo": 37,
+            "is_available": true,
+            "is_in_stock": true,
+            "is_featured": false,
+            "created_at": "2020-02-01T00:00:00Z",
+            "updated_at": "2020-02-01T00:00:00Z",
+            "slug": "moonlit-garden",
+            "photo": [
+                37
+            ]
+        }
+    },
+    {
+        "pk": 36,
+        "model": "artwork.Artwork",
+        "fields": {
+            "name": "Whimsical Forest",
+            "artist": 1,
+            "description": "A compelling artwork titled 'Whimsical Forest'.",
+            "price": "530.00",
+            "sku": "SKU-1P6Q5R0FRX",
+            "category": 2,
+            "selected_condition": 4,
+            "main_photo": 38,
+            "is_available": true,
+            "is_in_stock": true,
+            "is_featured": false,
+            "created_at": "2020-02-02T00:00:00Z",
+            "updated_at": "2020-02-02T00:00:00Z",
+            "slug": "whimsical-forest",
+            "photo": [
+                38
+            ]
+        }
+    },
+    {
+        "pk": 37,
+        "model": "artwork.Artwork",
+        "fields": {
+            "name": "The Wanderer",
+            "artist": 1,
+            "description": "A compelling artwork titled 'The Wanderer'.",
+            "price": "980.00",
+            "sku": "SKU-U5KE19M254",
+            "category": 3,
+            "selected_condition": 1,
+            "main_photo": 39,
+            "is_available": true,
+            "is_in_stock": true,
+            "is_featured": false,
+            "created_at": "2020-02-03T00:00:00Z",
+            "updated_at": "2020-02-03T00:00:00Z",
+            "slug": "the-wanderer",
+            "photo": [
+                39
+            ]
+        }
+    },
+    {
+        "pk": 38,
+        "model": "artwork.Artwork",
+        "fields": {
+            "name": "Iron Bridge",
+            "artist": 1,
+            "description": "A compelling artwork titled 'Iron Bridge'.",
+            "price": "610.90",
+            "sku": "SKU-LJ4PCVKJNY",
+            "category": 4,
+            "selected_condition": 2,
+            "main_photo": 40,
+            "is_available": true,
+            "is_in_stock": true,
+            "is_featured": false,
+            "created_at": "2020-02-04T00:00:00Z",
+            "updated_at": "2020-02-04T00:00:00Z",
+            "slug": "iron-bridge",
+            "photo": [
+                40
+            ]
+        }
+    },
+    {
+        "pk": 39,
+        "model": "artwork.Artwork",
+        "fields": {
+            "name": "Sakura Blossom",
+            "artist": 1,
+            "description": "A compelling artwork titled 'Sakura Blossom'.",
+            "price": "850.00",
+            "sku": "SKU-CLJKW9E4BT",
+            "category": 5,
+            "selected_condition": 3,
+            "main_photo": 41,
+            "is_available": true,
+            "is_in_stock": true,
+            "is_featured": false,
+            "created_at": "2020-02-05T00:00:00Z",
+            "updated_at": "2020-02-05T00:00:00Z",
+            "slug": "sakura-blossom",
+            "photo": [
+                41
+            ]
+        }
+    },
+    {
+        "pk": 40,
+        "model": "artwork.Artwork",
+        "fields": {
+            "name": "Vivid Memories",
+            "artist": 1,
+            "description": "A compelling artwork titled 'Vivid Memories'.",
+            "price": "420.00",
+            "sku": "SKU-0L3JDUVXSW",
+            "category": 1,
+            "selected_condition": 4,
+            "main_photo": 42,
+            "is_available": true,
+            "is_in_stock": true,
+            "is_featured": true,
+            "created_at": "2020-02-06T00:00:00Z",
+            "updated_at": "2020-02-06T00:00:00Z",
+            "slug": "vivid-memories",
+            "photo": [
+                42
+            ]
+        }
+    },
+    {
+        "pk": 41,
+        "model": "artwork.Artwork",
+        "fields": {
+            "name": "Electric Sheep",
+            "artist": 1,
+            "description": "A compelling artwork titled 'Electric Sheep'.",
+            "price": "1350.00",
+            "sku": "SKU-ZAQ9YE880T",
+            "category": 2,
+            "selected_condition": 1,
+            "main_photo": 43,
+            "is_available": true,
+            "is_in_stock": true,
+            "is_featured": false,
+            "created_at": "2020-02-07T00:00:00Z",
+            "updated_at": "2020-02-07T00:00:00Z",
+            "slug": "electric-sheep",
+            "photo": [
+                43
+            ]
+        }
+    },
+    {
+        "pk": 42,
+        "model": "artwork.Artwork",
+        "fields": {
+            "name": "Blue Period",
+            "artist": 1,
+            "description": "A compelling artwork titled 'Blue Period'.",
+            "price": "960.00",
+            "sku": "SKU-EILOTKEHOF",
+            "category": 3,
+            "selected_condition": 2,
+            "main_photo": 44,
+            "is_available": true,
+            "is_in_stock": true,
+            "is_featured": false,
+            "created_at": "2020-02-08T00:00:00Z",
+            "updated_at": "2020-02-08T00:00:00Z",
+            "slug": "blue-period",
+            "photo": [
+                44
+            ]
+        }
+    },
+    {
+        "pk": 43,
+        "model": "artwork.Artwork",
+        "fields": {
+            "name": "Silent Watcher",
+            "artist": 1,
+            "description": "A compelling artwork titled 'Silent Watcher'.",
+            "price": "710.00",
+            "sku": "SKU-XVQBJEYFQB",
+            "category": 4,
+            "selected_condition": 3,
+            "main_photo": 45,
+            "is_available": true,
+            "is_in_stock": true,
+            "is_featured": false,
+            "created_at": "2020-02-09T00:00:00Z",
+            "updated_at": "2020-02-09T00:00:00Z",
+            "slug": "silent-watcher",
+            "photo": [
+                45
+            ]
+        }
+    },
+    {
+        "pk": 44,
+        "model": "artwork.Artwork",
+        "fields": {
+            "name": "Harbor Lights",
+            "artist": 1,
+            "description": "A compelling artwork titled 'Harbor Lights'.",
+            "price": "580.00",
+            "sku": "SKU-JLV5ZGOPP7",
+            "category": 5,
+            "selected_condition": 4,
+            "main_photo": 46,
+            "is_available": true,
+            "is_in_stock": true,
+            "is_featured": false,
+            "created_at": "2020-02-10T00:00:00Z",
+            "updated_at": "2020-02-10T00:00:00Z",
+            "slug": "harbor-lights",
+            "photo": [
+                46
+            ]
+        }
+    },
+    {
+        "pk": 45,
+        "model": "artwork.Artwork",
+        "fields": {
+            "name": "Clockwork City",
+            "artist": 1,
+            "description": "A compelling artwork titled 'Clockwork City'.",
+            "price": "1480.00",
+            "sku": "SKU-QF91XEE3E6",
+            "category": 1,
+            "selected_condition": 1,
+            "main_photo": 47,
+            "is_available": true,
+            "is_in_stock": true,
+            "is_featured": false,
+            "created_at": "2020-02-11T00:00:00Z",
+            "updated_at": "2020-02-11T00:00:00Z",
+            "slug": "clockwork-city",
+            "photo": [
+                47
+            ]
+        }
+    },
+    {
+        "pk": 46,
+        "model": "artwork.Artwork",
+        "fields": {
+            "name": "The Jester",
+            "artist": 1,
+            "description": "A compelling artwork titled 'The Jester'.",
+            "price": "930.00",
+            "sku": "SKU-Y0EJIS4LSI",
+            "category": 2,
+            "selected_condition": 2,
+            "main_photo": 48,
+            "is_available": true,
+            "is_in_stock": true,
+            "is_featured": false,
+            "created_at": "2020-02-12T00:00:00Z",
+            "updated_at": "2020-02-12T00:00:00Z",
+            "slug": "the-jester",
+            "photo": [
+                48
+            ]
+        }
+    },
+    {
+        "pk": 47,
+        "model": "artwork.Artwork",
+        "fields": {
+            "name": "Fallen Petals",
+            "artist": 1,
+            "description": "A compelling artwork titled 'Fallen Petals'.",
+            "price": "390.00",
+            "sku": "SKU-6U4PYZ1DXL",
+            "category": 3,
+            "selected_condition": 3,
+            "main_photo": 49,
+            "is_available": true,
+            "is_in_stock": true,
+            "is_featured": false,
+            "created_at": "2020-02-13T00:00:00Z",
+            "updated_at": "2020-02-13T00:00:00Z",
+            "slug": "fallen-petals",
+            "photo": [
+                49
+            ]
+        }
+    },
+    {
+        "pk": 48,
+        "model": "artwork.Artwork",
+        "fields": {
+            "name": "Northern Lights",
+            "artist": 1,
+            "description": "A compelling artwork titled 'Northern Lights'.",
+            "price": "1120.00",
+            "sku": "SKU-8GESGXUGSB",
+            "category": 4,
+            "selected_condition": 4,
+            "main_photo": 50,
+            "is_available": true,
+            "is_in_stock": true,
+            "is_featured": false,
+            "created_at": "2020-02-14T00:00:00Z",
+            "updated_at": "2020-02-14T00:00:00Z",
+            "slug": "northern-lights",
+            "photo": [
+                50
+            ]
+        }
+    },
+    {
+        "pk": 49,
+        "model": "artwork.Artwork",
+        "fields": {
+            "name": "Mystic River",
+            "artist": 1,
+            "description": "A compelling artwork titled 'Mystic River'.",
+            "price": "760.50",
+            "sku": "SKU-VE7IUC00UV",
+            "category": 5,
+            "selected_condition": 1,
+            "main_photo": 51,
+            "is_available": true,
+            "is_in_stock": true,
+            "is_featured": false,
+            "created_at": "2020-02-15T00:00:00Z",
+            "updated_at": "2020-02-15T00:00:00Z",
+            "slug": "mystic-river",
+            "photo": [
+                51
+            ]
+        }
+    },
+    {
+        "pk": 50,
+        "model": "artwork.Artwork",
+        "fields": {
+            "name": "Kings Gambit",
+            "artist": 1,
+            "description": "A compelling artwork titled 'Kings Gambit'.",
+            "price": "830.00",
+            "sku": "SKU-9XNFDGNL13",
+            "category": 1,
+            "selected_condition": 2,
+            "main_photo": 52,
+            "is_available": true,
+            "is_in_stock": true,
+            "is_featured": true,
+            "created_at": "2020-02-16T00:00:00Z",
+            "updated_at": "2020-02-16T00:00:00Z",
+            "slug": "kings-gambit",
+            "photo": [
+                52
+            ]
+        }
+    },
+    {
+        "pk": 51,
+        "model": "artwork.Artwork",
+        "fields": {
+            "name": "The Alchemist",
+            "artist": 1,
+            "description": "A compelling artwork titled 'The Alchemist'.",
+            "price": "1490.00",
+            "sku": "SKU-TCP5TIBN58",
+            "category": 2,
+            "selected_condition": 3,
+            "main_photo": 53,
+            "is_available": true,
+            "is_in_stock": true,
+            "is_featured": false,
+            "created_at": "2020-02-17T00:00:00Z",
+            "updated_at": "2020-02-17T00:00:00Z",
+            "slug": "the-alchemist",
+            "photo": [
+                53
+            ]
+        }
+    },
+    {
+        "pk": 52,
+        "model": "artwork.Artwork",
+        "fields": {
+            "name": "Gilded Cage",
+            "artist": 1,
+            "description": "A compelling artwork titled 'Gilded Cage'.",
+            "price": "999.00",
+            "sku": "SKU-6VETNRV55Y",
+            "category": 3,
+            "selected_condition": 4,
+            "main_photo": 54,
+            "is_available": true,
+            "is_in_stock": true,
+            "is_featured": false,
+            "created_at": "2020-02-18T00:00:00Z",
+            "updated_at": "2020-02-18T00:00:00Z",
+            "slug": "gilded-cage",
+            "photo": [
+                54
+            ]
+        }
+    },
+    {
+        "pk": 53,
+        "model": "artwork.Artwork",
+        "fields": {
+            "name": "Summers End",
+            "artist": 1,
+            "description": "A compelling artwork titled 'Summers End'.",
+            "price": "620.00",
+            "sku": "SKU-8YFBYKM7R9",
+            "category": 4,
+            "selected_condition": 1,
+            "main_photo": 55,
+            "is_available": true,
+            "is_in_stock": true,
+            "is_featured": false,
+            "created_at": "2020-02-19T00:00:00Z",
+            "updated_at": "2020-02-19T00:00:00Z",
+            "slug": "summers-end",
+            "photo": [
+                55
+            ]
+        }
+    },
+    {
+        "pk": 54,
+        "model": "artwork.Artwork",
+        "fields": {
+            "name": "Ancient Ruins",
+            "artist": 1,
+            "description": "A compelling artwork titled 'Ancient Ruins'.",
+            "price": "880.00",
+            "sku": "SKU-UKODHAZKPW",
+            "category": 5,
+            "selected_condition": 2,
+            "main_photo": 56,
+            "is_available": true,
+            "is_in_stock": true,
+            "is_featured": false,
+            "created_at": "2020-02-20T00:00:00Z",
+            "updated_at": "2020-02-20T00:00:00Z",
+            "slug": "ancient-ruins",
+            "photo": [
+                56
+            ]
+        }
+    },
+    {
+        "pk": 55,
+        "model": "artwork.Artwork",
+        "fields": {
+            "name": "Nebula Rising",
+            "artist": 1,
+            "description": "A compelling artwork titled 'Nebula Rising'.",
+            "price": "1300.00",
+            "sku": "SKU-A6V3BRI89Q",
+            "category": 1,
+            "selected_condition": 3,
+            "main_photo": 57,
+            "is_available": true,
+            "is_in_stock": true,
+            "is_featured": false,
+            "created_at": "2020-02-21T00:00:00Z",
+            "updated_at": "2020-02-21T00:00:00Z",
+            "slug": "nebula-rising",
+            "photo": [
+                57
+            ]
+        }
+    },
+    {
+        "pk": 56,
+        "model": "artwork.Artwork",
+        "fields": {
+            "name": "Coral Dreams",
+            "artist": 1,
+            "description": "A compelling artwork titled 'Coral Dreams'.",
+            "price": "490.00",
+            "sku": "SKU-R4UB55UMW3",
+            "category": 2,
+            "selected_condition": 4,
+            "main_photo": 58,
+            "is_available": true,
+            "is_in_stock": true,
+            "is_featured": false,
+            "created_at": "2020-02-22T00:00:00Z",
+            "updated_at": "2020-02-22T00:00:00Z",
+            "slug": "coral-dreams",
+            "photo": [
+                58
+            ]
+        }
+    },
+    {
+        "pk": 57,
+        "model": "artwork.Artwork",
+        "fields": {
+            "name": "The Philosopher",
+            "artist": 1,
+            "description": "A compelling artwork titled 'The Philosopher'.",
+            "price": "950.00",
+            "sku": "SKU-EI1M1VPRDX",
+            "category": 3,
+            "selected_condition": 1,
+            "main_photo": 59,
+            "is_available": true,
+            "is_in_stock": true,
+            "is_featured": false,
+            "created_at": "2020-02-23T00:00:00Z",
+            "updated_at": "2020-02-23T00:00:00Z",
+            "slug": "the-philosopher",
+            "photo": [
+                59
+            ]
+        }
+    },
+    {
+        "pk": 58,
+        "model": "artwork.Artwork",
+        "fields": {
+            "name": "Quantum Leap",
+            "artist": 1,
+            "description": "A compelling artwork titled 'Quantum Leap'.",
+            "price": "1420.00",
+            "sku": "SKU-TZTN15F9HH",
+            "category": 4,
+            "selected_condition": 2,
+            "main_photo": 60,
+            "is_available": true,
+            "is_in_stock": true,
+            "is_featured": false,
+            "created_at": "2020-02-24T00:00:00Z",
+            "updated_at": "2020-02-24T00:00:00Z",
+            "slug": "quantum-leap",
+            "photo": [
+                60
+            ]
+        }
+    },
+    {
+        "pk": 59,
+        "model": "artwork.Artwork",
+        "fields": {
+            "name": "Venetian Mask",
+            "artist": 1,
+            "description": "A compelling artwork titled 'Venetian Mask'.",
+            "price": "780.00",
+            "sku": "SKU-YLFRXCJGEB",
+            "category": 5,
+            "selected_condition": 3,
+            "main_photo": 61,
+            "is_available": true,
+            "is_in_stock": true,
+            "is_featured": false,
+            "created_at": "2020-02-25T00:00:00Z",
+            "updated_at": "2020-02-25T00:00:00Z",
+            "slug": "venetian-mask",
+            "photo": [
+                61
+            ]
+        }
+    },
+    {
+        "pk": 60,
+        "model": "artwork.Artwork",
+        "fields": {
+            "name": "Dragons Lair",
+            "artist": 1,
+            "description": "A compelling artwork titled 'Dragons Lair'.",
+            "price": "1150.00",
+            "sku": "SKU-379J1EGJWW",
+            "category": 1,
+            "selected_condition": 4,
+            "main_photo": 62,
+            "is_available": true,
+            "is_in_stock": true,
+            "is_featured": true,
+            "created_at": "2020-02-26T00:00:00Z",
+            "updated_at": "2020-02-26T00:00:00Z",
+            "slug": "dragons-lair",
+            "photo": [
+                62
+            ]
+        }
+    },
+    {
+        "pk": 61,
+        "model": "artwork.Artwork",
+        "fields": {
+            "name": "Hidden Cove",
+            "artist": 1,
+            "description": "A compelling artwork titled 'Hidden Cove'.",
+            "price": "560.00",
+            "sku": "SKU-LM064H95N4",
+            "category": 2,
+            "selected_condition": 1,
+            "main_photo": 63,
+            "is_available": true,
+            "is_in_stock": true,
+            "is_featured": false,
+            "created_at": "2020-02-27T00:00:00Z",
+            "updated_at": "2020-02-27T00:00:00Z",
+            "slug": "hidden-cove",
+            "photo": [
+                63
+            ]
+        }
+    },
+    {
+        "pk": 62,
+        "model": "artwork.Artwork",
+        "fields": {
+            "name": "Midnight Train",
+            "artist": 1,
+            "description": "A compelling artwork titled 'Midnight Train'.",
+            "price": "890.00",
+            "sku": "SKU-01PM0UANYD",
+            "category": 3,
+            "selected_condition": 2,
+            "main_photo": 64,
+            "is_available": true,
+            "is_in_stock": true,
+            "is_featured": false,
+            "created_at": "2020-02-28T00:00:00Z",
+            "updated_at": "2020-02-28T00:00:00Z",
+            "slug": "midnight-train",
+            "photo": [
+                64
+            ]
+        }
+    },
+    {
+        "pk": 63,
+        "model": "artwork.Artwork",
+        "fields": {
+            "name": "Sunrise Peak",
+            "artist": 1,
+            "description": "A compelling artwork titled 'Sunrise Peak'.",
+            "price": "710.00",
+            "sku": "SKU-011HXB21VM",
+            "category": 4,
+            "selected_condition": 3,
+            "main_photo": 65,
+            "is_available": true,
+            "is_in_stock": true,
+            "is_featured": false,
+            "created_at": "2020-03-01T00:00:00Z",
+            "updated_at": "2020-03-01T00:00:00Z",
+            "slug": "sunrise-peak",
+            "photo": [
+                65
+            ]
+        }
+    },
+    {
+        "pk": 64,
+        "model": "artwork.Artwork",
+        "fields": {
+            "name": "Wilted Rose",
+            "artist": 1,
+            "description": "A compelling artwork titled 'Wilted Rose'.",
+            "price": "390.00",
+            "sku": "SKU-LINB3LR81Y",
+            "category": 5,
+            "selected_condition": 4,
+            "main_photo": 66,
+            "is_available": true,
+            "is_in_stock": true,
+            "is_featured": false,
+            "created_at": "2020-03-02T00:00:00Z",
+            "updated_at": "2020-03-02T00:00:00Z",
+            "slug": "wilted-rose",
+            "photo": [
+                66
+            ]
+        }
+    },
+    {
+        "pk": 65,
+        "model": "artwork.Artwork",
+        "fields": {
+            "name": "Mechanical Heart",
+            "artist": 1,
+            "description": "A compelling artwork titled 'Mechanical Heart'.",
+            "price": "1450.00",
+            "sku": "SKU-FXMB68VLNG",
+            "category": 1,
+            "selected_condition": 1,
+            "main_photo": 67,
+            "is_available": true,
+            "is_in_stock": true,
+            "is_featured": false,
+            "created_at": "2020-03-03T00:00:00Z",
+            "updated_at": "2020-03-03T00:00:00Z",
+            "slug": "mechanical-heart",
+            "photo": [
+                67
             ]
         }
     }

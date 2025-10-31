@@ -3,7 +3,7 @@ from django.core.exceptions import PermissionDenied
 
 
 # Mixins for role-based access control
-class StaffRequiredMixin(UserPassesTestMixin):
+class AdminRequiredMixin(UserPassesTestMixin):
     """
     Checks if the user is authenticated and is a staff member.
     """
@@ -24,12 +24,12 @@ class StaffRequiredMixin(UserPassesTestMixin):
             )
 
 
-class OwnerRequiredMixin(UserPassesTestMixin):
+class OwnerRequiredMixin(AdminRequiredMixin):
     """
     Checks if the user is authenticated and is an owner.
     """
     def test_func(self):
-        if not self.request.user.is_authenticated:
+        if not super().test_func():
             return False
 
         return self.request.user.groups.filter(name='Owner').exists()
@@ -38,12 +38,12 @@ class OwnerRequiredMixin(UserPassesTestMixin):
         raise PermissionDenied("This view is for owners only.")
 
 
-class ManagerRequiredMixin(UserPassesTestMixin):
+class ManagerRequiredMixin(AdminRequiredMixin):
     """
     Checks if the user is authenticated and is a manager or owner.
     """
     def test_func(self):
-        if not self.request.user.is_authenticated:
+        if not super().test_func():
             return False
 
         allowed_groups = ['Manager', 'Owner']

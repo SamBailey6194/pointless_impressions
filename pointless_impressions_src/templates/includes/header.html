@@ -6,11 +6,18 @@
     {% comment %} Logo Section {% endcomment %}
     <div class="navbar-start">
       <a href="{% url 'home' %}" class="btn btn-ghost normal-case text-xl h-auto p-2">
-        {% if production and site_logo %}
-          {% cloudinary site_logo.image height=60 crop='fit' format='auto' quality='auto' alt=site_logo.alt_text_or_default class="h-8 sm:h-10 md:h-12 w-auto" %}
-        {% else %}
-          <img src="{{ MEDIA_URL }}site_assets/pointless_impressions_logo.png" alt="Pointless Impressions" class="h-8 sm:h-10 md:h-12 w-auto" />
-        {% endif %}
+        {% with image_to_render=site_logo %}
+          {% if image_to_render %}
+            {% if production %}
+              {% cloudinary image_to_render.image height=60 crop='fit' format='auto' quality='auto' alt=image_to_render.alt_text_or_default class="h-8 sm:h-10 md:h-12 w-auto" %}
+            {% else %}
+              <img src="{{ image_to_render }}" alt="{{ image_to_render.alt_text_or_default }}" class="h-8 sm:h-10 md:h-12 w-auto" />
+            {% endif %}
+          {% else %}
+            {% comment %} Fallback if no logo is set {% endcomment %}
+            <span class="font-bold">Pointless Impressions</span>
+          {% endif %}
+        {% endwith %}
       </a>
     </div>
 
@@ -30,7 +37,7 @@
             <ul tabindex="0" class="menu menu-sm dropdown-content z-10 p-2 shadow-lg rounded-box w-52">
               <li>
                 <a href="{% url 'artwork:list' %}">
-                  <i class="fa-solid fa-list"></i>All Categories
+                  <i class="fa-solid fa-list"></i>All Artwork
                 </a>
               </li>
               <li>
@@ -65,6 +72,23 @@
                             </li>
                         {% endfor %}
                     </ul>
+                </div>  
+              </li>
+              <li>
+                <div class="dropdown dropdown-hover dropdown-right">
+                  <label tabindex="0" class="rounded-lg flex items-center gap-2">
+                      <i class="fa-solid fa-palette"></i>Artists
+                      <i class="fa-solid fa-circle-chevron-down"></i>
+                  </label>
+                  <ul tabindex="0" class="menu menu-sm dropdown-content z-10 p-2 shadow-lg rounded-box w-52">
+                      {% for artist in artists %}
+                          <li>
+                              <a href="{% url 'artwork:list' %}?artist={{ artist.user.username }}" class="hover:bg-[var(--pointless-yellow)]">
+                                  {{ artist.user.username|title }}
+                              </a>
+                          </li>
+                      {% endfor %}
+                  </ul>
                 </div>
               </li>
             </ul>
@@ -93,43 +117,104 @@
     <div class="navbar-end">
       <div class="flex items-center gap-2">
 
+        <div class="hidden md:flex flex-col items-end text-sm mr-2">
+          {% if request.user.is_authenticated %}
+            <span class="font-medium">Welcome, {{ request.user.username|title }}</span>
+          {% else %}
+            <span class="font-medium">Welcome, Guest</span>
+          {% endif %}
+        </div>
+
         {% comment %} Account Dropdown {% endcomment %}
         <div class="dropdown dropdown-end">
-          <label tabindex="0" class="btn btn-ghost btn-circle">
-            <div class="avatar placeholder">
-              <i class="fa-solid fa-user text-lg"></i>
-            </div>
+          <label tabindex="0" class="btn btn-ghost btn-circle avatar">
+            {% if request.user.is_authenticated and request.user.userprofile.profile_picture %}
+              {% comment %} 
+                Display user's profile picture if logged in and has one 
+              {% endcomment %}
+              {% with image_to_render=request.user.userprofile.profile_picture %}
+                {% if production %}
+                  {% cloudinary image_to_render.image format="auto" quality="auto" width=80 height=80 crop="fill" class="w-10 rounded-full" alt=image_to_render.alt_text_or_default %}
+                {% else %}
+                  <img src="{{ image_to_render.image.url }}" alt="{{ image_to_render.alt_text_or_default }}" class="w-10 rounded-full" />
+                {% endif %}
+              {% endwith %}
+
+            {% else %}
+              {% comment %} 
+                Fallback for logged-out users OR users with no profile pic
+              {% endcomment %}
+              <div class="avatar placeholder">
+                <i class="fa-solid fa-user text-lg"></i>
+              </div>
+            {% endif %}
           </label>
           <ul tabindex="0" class="menu menu-sm dropdown-content mt-3 z-10 p-2 shadow-lg rounded-box w-52">
             {% if request.user.is_authenticated %}
-            <li class="menu-title text-[var(--pointless-blue)]">
-              <span>Welcome, {{ request.user.username|title }}</span>
-            </li>
-            {% if request.user.is_superuser or request.user.is_staff %}
-            <li><a href="#" class="hover:bg-[var(--pointless-yellow)]">
-                <i class="fa-solid fa-cog"></i> Admin Dashboard
-              </a></li>
-            {% endif %}
-            <li><a href="#" class="hover:bg-[var(--pointless-yellow)]">
-                <i class="fa-solid fa-user-circle"></i> My Profile
-              </a></li>
-            <li><a href="#" class="hover:bg-[var(--pointless-yellow)]">
-                <i class="fa-solid fa-box"></i> My Orders
-              </a></li>
-            <li><a href="#" class="hover:bg-[var(--pointless-yellow)]">
-                <i class="fa-solid fa-heart"></i> Wishlist
-              </a></li>
-            <div class="divider my-1"></div>
-            <li><a href="#" class="hover:bg-[var(--pointless-red)] hover:text-white">
-                <i class="fa-solid fa-sign-out-alt"></i> Logout
-              </a></li>
+              <li class="menu-title text-[var(--pointless-blue)] md:hidden">
+                <span>Welcome, {{ request.user.username|title }}</span>
+              </li>
+              {% comment %} Django Site Admin for Developers {% endcomment %}
+              {% if request.user.is_staff %}
+                <li>
+                  <a href="#" class="hover:bg-[var(--pointless-yellow)]">
+                    <i class="fa-solid fa-shield-halved"></i> Site Admin (Dev)
+                  </a>
+                </li>
+              {% endif %}
+              {% comment %} Custom Dashboard Access for Admin {% endcomment %}
+              {% if request.user.is_dashboard_admin %}
+                <li>
+                  <a href="#" class="hover:bg-[var(--pointless-yellow)]">
+                    <i class="fa-solid fa-cog"></i> Admin Dashboard
+                  </a>
+                </li>
+              {% endif %}
+              {% comment %} Artist Dashboard Link if user is an artist {% endcomment %}
+              {% comment %}
+              {% if hasattr(request.user, 'artist_profile') %}
+                <li>
+                  <a href="#" class="hover:bg-[var(--pointless-yellow)]">
+                    <i class="fa-solid fa-paint-brush"></i> Artist Dashboard
+                  </a>
+                </li>
+              {% endif %}
+              {% endcomment %}
+              <li>
+                <a href="#" class="hover:bg-[var(--pointless-yellow)]">
+                  <i class="fa-solid fa-user-circle"></i> My Profile
+                </a>
+              </li>
+              <li>
+                <a href="#" class="hover:bg-[var(--pointless-yellow)]">
+                  <i class="fa-solid fa-box"></i> My Orders
+                </a>
+              </li>
+              <li>
+                <a href="#" class="hover:bg-[var(--pointless-yellow)]">
+                  <i class="fa-solid fa-heart"></i> Wishlist
+                </a>
+              </li>
+              <div class="divider my-1"></div>
+              <li>
+                <a href="#" class="hover:bg-[var(--pointless-red)] hover:text-white">
+                  <i class="fa-solid fa-sign-out-alt"></i> Logout
+                </a>
+              </li>
             {% else %}
-            <li><a href="#" class="hover:bg-[var(--pointless-yellow)]">
-                <i class="fa-solid fa-sign-in-alt"></i> Login
-              </a></li>
-            <li><a href="#" class="hover:bg-[var(--pointless-yellow)]">
-                <i class="fa-solid fa-user-plus"></i> Sign Up
-              </a></li>
+              <li class="menu-title text-[var(--pointless-blue)] md:hidden">
+                <span>Welcome, Guest</span>
+              </li>
+              <li>
+                <a href="#" class="hover:bg-[var(--pointless-yellow)]">
+                  <i class="fa-solid fa-sign-in-alt"></i> Login
+                </a>
+              </li>
+              <li>
+                <a href="#" class="hover:bg-[var(--pointless-yellow)]">
+                  <i class="fa-solid fa-user-plus"></i> Sign Up
+                </a>
+              </li>
             {% endif %}
           </ul>
         </div>
@@ -172,7 +257,11 @@
                 <i class="fa-solid fa-circle-chevron-down"></i>
               </a>
               <ul tabindex="0" class="menu menu-sm dropdown-content z-10 shadow-lg rounded-box w-52">
-                <li><a href="{% url 'artwork:list' %}">All Categories</a></li>
+                <li>
+                  <a href="{% url 'artwork:list' %}">
+                    <i class="fa-solid fa-list"></i>All Artwork
+                  </a>
+                </li>
                 <li class="dropdown">
                   <a tabindex="0">
                     <i class="fa-solid fa-palette"></i>Artwork Categories
@@ -199,6 +288,21 @@
                   <li>
                     <a href="{% url 'artwork:list' %}?selected_condition={{ framing.slug }}">
                       {{ framing.condition_friendly_name|default:framing.condition_name }}
+                    </a>
+                  </li>
+                {% endfor %}
+                </ul>
+                <li class="dropdown">
+                  <a tabindex="0">
+                    <i class="fa-solid fa-palette"></i>Artists
+                    <i class="fa-solid fa-circle-chevron-down"></i>
+                  </a>
+                </li>
+                <ul tabindex="0">
+                {% for artist in artists %}
+                  <li>
+                    <a href="{% url 'artwork:list' %}?artist={{ artist.user.username }}">
+                      {{ artist.user.username|title }}
                     </a>
                   </li>
                 {% endfor %}

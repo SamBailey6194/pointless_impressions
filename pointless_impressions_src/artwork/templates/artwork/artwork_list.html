@@ -2,162 +2,196 @@
 {% load static cloudinary tailwind_tags %}
 
 {% block content %}
-<section class="py-16 section-alt w-full">
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-    <h1 class="text-4xl font-bold mb-8">Browse Artworks</h1>
+  <section class="py-16 section-alt w-full">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <h1 class="text-4xl font-bold mb-8">Browse Artworks</h1>
 
-    {% comment %} Filters Form {% endcomment %}
-    <div class="mb-8 shadow-xl rounded-2xl">
-      <div class="card rounded-2xl">
-        <div class="card-body bg-gray-300 dark:bg-gray-700 rounded-2xl">
-          <h2 class="card-title">Filter Artworks</h2>
-          <form method="get" class="space-y-4">
-            {% if request.GET.search %}
-              <input type="hidden" name="search" value="{{ request.GET.search }}">
-            {% endif %}
-            
-            <div class="flex flex-col md:flex-row gap-4 justify-center items-center">
-              <div class="form-control w-full md:w-1/2 max-w-xs">
-                <label class="label">
-                  <span class="label-text">Artwork Category</span>
-                </label>
-                <select name="category" class="select select-bordered w-full">
-                  <option value="">All Categories</option>
-                  {% for category in artwork_categories %}
-                      <option value="{{ category.slug }}"
-                        {% if request.GET.category == category.slug %}selected{% endif %}>
-                          {{ category.friendly_name|default:category.name }}
-                      </option>
-                  {% endfor %}
-                </select>
-              </div>
-              <div class="form-control w-full md:w-1/2 max-w-xs">
-                <label class="label">
-                  <span class="label-text">Framing Condition</span>
-                </label>
-                <select name="selected_condition" class="select select-bordered w-full">
-                  <option value="">All Conditions</option>
-                  {% for framing in framing_conditions %}
-                      <option value="{{ framing.slug }}"
-                        {% if request.GET.selected_condition == framing.slug %}selected{% endif %}>
-                          {{ framing.condition_friendly_name|default:framing.condition_name }}
-                      </option>
-                  {% endfor %}
-                </select>
-              </div>
-            </div>
-            <div class="flex flex-col md:flex-row gap-4 justify-center items-center">
-              <div class="form-control w-full md:w-1/2 max-w-xs">
-                <label class="label">
-                  <span class="label-text">Min Price (£)</span>
-                </label>
-                <input type="number" name="min_price" placeholder="0" 
-                      value="{{ request.GET.min_price }}" class="input input-bordered w-full">
-              </div>
+      {% comment %} Filters Form {% endcomment %}
+      <div class="mb-8 shadow-xl rounded-2xl">
+        <div class="card rounded-2xl">
+          <div class="card-body bg-gray-300 dark:bg-gray-700 rounded-2xl">
+            <h2 class="card-title">Filter Artworks</h2>
+            <form method="get" class="space-y-4">
               
-              <div class="form-control w-full md:w-1/2 max-w-xs">
-                <label class="label">
-                  <span class="label-text">Max Price (£)</span>
-                </label>
-                <input type="number" name="max_price" placeholder="1000" 
-                      value="{{ request.GET.max_price }}" class="input input-bordered w-full">
-              </div>
-            </div>
-            
-            <div class="card-actions justify-end">
-              <button type="submit" class="btn btn-primary">
-                <i class="fa-solid fa-filter"></i> Apply Filters
-              </button>
-              <a href="{% url 'artwork:list' %}" class="btn btn-ghost">
-                <i class="fa-solid fa-times"></i> Clear
-              </a>
-            </div>
-          </form>
-        </div>
-      </div>
-    </div>
+              <div class="flex flex-col md:flex-row gap-4 justify-center items-center">
 
-    {% comment %} Artwork List Container {% endcomment %}
-    <div id="artwork-list" class="bg-gray-300 dark:bg-gray-700 shadow-xl rounded-2xl">
-      {% if artworks %}
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {% for artwork in artworks %}
-            <div class="artwork-card card shadow-xl hover:shadow-2xl transition-shadow" data-sku="{{ artwork.sku }}">
-              <figure>
-                {% if artwork.image %}
-                  {% cloudinary artwork.image.public_id format="jpg" width=400 height=300 crop="fill" class="w-full h-64 object-cover" %}
-                {% else %}
-                  <div class="bg-base-300 h-64 w-full flex items-center justify-center">
-                    <i class="fa-solid fa-image text-base-content/20 text-5xl"></i>
-                  </div>
-                {% endif %}
-              </figure>
-              <div class="card-body">
-                <h2 class="artwork-name card-title">{{ artwork.name }}</h2>
-                <p class="artwork-description text-base-content/70">{{ artwork.description|truncatewords:15 }}</p>
-                <div class="divider my-2"></div>
-                <p class="artwork-price text-2xl font-bold text-primary">£{{ artwork.price }}</p>
-                
-                <div class="card-actions justify-between items-center mt-4">
-                  {% if artwork.is_in_stock %}
-                    <button class="add-to-cart btn btn-primary btn-sm">
-                      <i class="fa-solid fa-cart-plus"></i> Add to Cart
-                    </button>
-                    <a href="{% url 'artwork:detail' artwork.slug %}" class="btn btn-outline btn-sm">
-                      <i class="fa-solid fa-eye"></i> Details
-                    </a>
-                  {% else %}
-                    <span class="sold-out badge badge-error">Sold Out</span>
-                    <a href="{% url 'artwork:detail' artwork.slug %}" class="btn btn-outline btn-sm">
-                      <i class="fa-solid fa-eye"></i> Details
-                    </a>
-                  {% endif %}
+                {% comment %} Artist Filter {% endcomment %}
+                <div class="form-control w-full md:w-1/3 max-w-xs">
+                  <label class="label">
+                    <span class="label-text">Artist</span>
+                  </label>
+                  <select name="artist" class="select select-bordered w-full">
+                    <option value="">All Artists</option>
+                    {% for artist in all_artists %}
+                        <option value="{{ artist.user.username }}"
+                          {% if request.GET.artist == artist.user.username %}selected{% endif %}>
+                            {{ artist.get_full_name }}
+                        </option>
+                    {% endfor %}
+                  </select>
+                </div>
+
+                {% comment %} Artwork Category Filter {% endcomment %}
+                <div class="form-control w-full md:w-1/3 max-w-xs">
+                  <label class="label">
+                    <span class="label-text">Artwork Category</span>
+                  </label>
+                  <select name="category" class="select select-bordered w-full">
+                    <option value="">All Categories</option>
+                    {% for category in artwork_categories %}
+                        <option value="{{ category.slug }}"
+                          {% if request.GET.category == category.slug %}selected{% endif %}>
+                            {{ category.friendly_name|default:category.name }}
+                        </option>
+                    {% endfor %}
+                  </select>
+                </div>
+
+                {% comment %} Framing Condition Filter {% endcomment %}
+                <div class="form-control w-full md:w-1/3 max-w-xs">
+                  <label class="label">
+                    <span class="label-text">Framing Condition</span>
+                  </label>
+                  <select name="selected_condition" class="select select-bordered w-full">
+                    <option value="">All Conditions</option>
+                    {% for framing in framing_conditions %}
+                        <option value="{{ framing.slug }}"
+                          {% if request.GET.selected_condition == framing.slug %}selected{% endif %}>
+                            {{ framing.condition_friendly_name|default:framing.condition_name }}
+                        </option>
+                    {% endfor %}
+                  </select>
                 </div>
               </div>
-            </div>
-          {% endfor %}
-        </div>
 
-        {% comment %} Pagination {% endcomment %}
-        {% if is_paginated %}
-          <div class="flex justify-center mt-8">
-            {% include "includes/pagination.html" %}
+              {% comment %} Price Range Filter {% endcomment %}
+              <div class="flex flex-col md:flex-row gap-4 justify-center items-center">
+                <div class="form-control w-full md:w-1/2 max-w-xs">
+                  <label class="label">
+                    <span class="label-text">Min Price (£)</span>
+                  </label>
+                  <input type="number" name="min_price" placeholder="0" 
+                        value="{{ request.GET.min_price }}" class="input input-bordered w-full">
+                </div>
+                
+                <div class="form-control w-full md:w-1/2 max-w-xs">
+                  <label class="label">
+                    <span class="label-text">Max Price (£)</span>
+                  </label>
+                  <input type="number" name="max_price" placeholder="1000" 
+                        value="{{ request.GET.max_price }}" class="input input-bordered w-full">
+                </div>
+              </div>
+              
+              <div class="card-actions justify-end">
+                <button type="submit" class="btn btn-primary">
+                  <i class="fa-solid fa-filter"></i> Apply Filters
+                </button>
+                <a href="{% url 'artwork:list' %}" class="btn btn-ghost">
+                  <i class="fa-solid fa-times"></i> Clear
+                </a>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      {% comment %} Artwork List Container {% endcomment %}
+      <div id="artwork-list" class="bg-gray-300 dark:bg-gray-700 shadow-xl rounded-2xl">
+        {% if artworks %}
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {% for artwork in artworks %}
+              <div class="artwork-card card shadow-xl hover:shadow-2xl transition-shadow" data-sku="{{ artwork.sku }}">
+                {% with image_to_render=artwork.main_photo|default:placeholder_image %}
+                <figure>
+                  {% if image_to_render %}
+                    {% comment %} An image exists for this artwork {% endcomment %}
+                    {% if production %}
+                      {% cloudinary image_to_render.image format="auto" quality="auto" width=400 height=300 crop="fill" class="w-full h-64 object-cover" alt=image_to_render.alt_text_or_default %}
+                    {% else %}
+                      {% comment %} LOCAL: Use the artwork's local image URL {% endcomment %}
+                      <img src="{{ image_to_render.get_image_url }}" 
+                          alt="{{ image_to_render.alt_text_or_default }}" 
+                          class="w-full h-64 object-cover">
+                    {% endif %}
+                  {% else %}
+                    {% comment %} No image or placeholder exists, use the favicon {% endcomment %}
+                    <div class="h-64 w-full flex items-center justify-center">
+                      <i class="fa-solid fa-image text-5xl text-base-content/50"></i>
+                    </div>
+                  {% endif %}
+                </figure>
+                <div class="card-body">
+                  <h2 class="artwork-name card-title">{{ artwork.name }}</h2>
+                  {% if artwork.artist %}
+                    <p class="text-sm -mt-2 mb-2 text-base-content/70">
+                      By: <a href="{% url 'artwork:list' %}?artist={{ artwork.artist.user.username }}" class="link link-hover">{{ artwork.artist.user.username|title }}</a>
+                    </p>
+                  {% endif %}
+                  <p class="artwork-description text-base-content/70">{{ artwork.description|truncatewords:15 }}</p>
+                  <div class="divider my-2"></div>
+                  <p class="artwork-price text-2xl font-bold text-primary">£{{ artwork.price }}</p>
+                  
+                  <div class="card-actions justify-between items-center mt-4">
+                    {% if artwork.is_in_stock %}
+                      <button class="add-to-cart btn btn-primary btn-sm">
+                        <i class="fa-solid fa-cart-plus"></i> Add to Cart
+                      </button>
+                      <a href="{% url 'artwork:detail' artwork.slug %}" class="btn btn-outline btn-sm">
+                        <i class="fa-solid fa-eye"></i> Details
+                      </a>
+                    {% else %}
+                      <span class="sold-out badge badge-error">Sold Out</span>
+                      <a href="{% url 'artwork:detail' artwork.slug %}" class="btn btn-outline btn-sm">
+                        <i class="fa-solid fa-eye"></i> Details
+                      </a>
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+
+          {% comment %} Pagination {% endcomment %}
+          {% if is_paginated %}
+            <div class="flex justify-center mt-8">
+              {% include "includes/pagination.html" %}
+            </div>
+          {% endif %}
+        {% else %}
+          <div class="hero min-h-[400px]">
+            <div class="hero-content text-center">
+              <div class="max-w-md">
+                <i class="fa-solid fa-palette text-6xl text-base-content mb-4"></i>
+                <h2 class="text-3xl font-bold">No artworks found.</h2>
+                <p class="py-6 text-base-content/70">Try adjusting your filters or search terms to find what you're looking for.</p>
+                <a href="{% url 'artwork:list' %}" class="btn btn-primary">
+                  <i class="fa-solid fa-refresh"></i> Clear Filters
+                </a>
+              </div>
+            </div>
           </div>
         {% endif %}
-      {% else %}
-        <div class="hero min-h-[400px]">
-          <div class="hero-content text-center">
-            <div class="max-w-md">
-              <i class="fa-solid fa-palette text-6xl text-base-content mb-4"></i>
-              <h2 class="text-3xl font-bold">No artworks found.</h2>
-              <p class="py-6 text-base-content/70">Try adjusting your filters or search terms to find what you're looking for.</p>
-              <a href="{% url 'artwork:list' %}" class="btn btn-primary">
-                <i class="fa-solid fa-refresh"></i> Clear Filters
-              </a>
-            </div>
-          </div>
-        </div>
-      {% endif %}
-    </div>
+      </div>
 
-    {% comment %} Sort and Filter controls (for JavaScript enhancement) {% endcomment %}
-    <div id="controls" class="mt-8 flex flex-wrap gap-2">
-      <button id="sort-price" class="btn btn-outline">
-        <i class="fa-solid fa-sort-amount-down"></i> Sort by Price
-      </button>
-      <button id="filter-available" class="btn btn-outline">
-        <i class="fa-solid fa-check-circle"></i> Available Only
-      </button>
+      {% comment %} Sort and Filter controls (for JavaScript enhancement) {% endcomment %}
+      <div id="controls" class="mt-8 flex flex-wrap gap-2">
+        <button id="sort-price" class="btn btn-outline">
+          <i class="fa-solid fa-sort-amount-down"></i> Sort by Price
+        </button>
+        <button id="filter-available" class="btn btn-outline">
+          <i class="fa-solid fa-check-circle"></i> Available Only
+        </button>
+      </div>
     </div>
-  </div>
-</section>
+  </section>
 {% endblock content %}
 
 {% block postloadjs %}
 {{  block.super }}
-<script>
-  const ARTWORK_API_URL = "{% url 'artwork:api_artworks' %}";
-  const ARTWORK_DETAIL_BASE_PATH = "{% url 'artwork:detail' slug='placeholder' %}".replace('placeholder', '');
-</script>
-<script src="{% static 'js/artwork.js' %}" defer></script>
+  <script>
+    const ARTWORK_API_URL = "{% url 'artwork:api_artworks' %}";
+    const ARTWORK_DETAIL_BASE_PATH = "{% url 'artwork:detail' slug='placeholder' %}".replace('placeholder', '');
+  </script>
+  <script src="{% static 'js/artwork.js' %}" defer></script>
 {% endblock postloadjs %}

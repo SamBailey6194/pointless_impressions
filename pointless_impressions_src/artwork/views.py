@@ -1,10 +1,22 @@
 from django.views.generic import ListView, DetailView, View
-from django.db.models import Q
+from django.conf import settings
 import json
 from django.http import JsonResponse
 from django.core.serializers.json import DjangoJSONEncoder
 from .models import Artwork, ArtworkCategory, ArtworkFramingCondition
 from pointless_impressions_src.photo.models import Photo
+from pointless_impressions_src.profiles.models import Artist
+
+
+# ----------------------------
+# Helper Functions
+# ---------------------------
+def get_placeholder_image():
+    """Returns a placeholder image data."""
+    try:
+        return Photo.objects.get(asset_identifier='noimage_placeholder')
+    except Photo.DoesNotExist:
+        return None
 
 
 # ---------------------------
@@ -43,32 +55,22 @@ class ArtworkListView(ListView):
             'category', 'selected_condition', 'main_photo'
         ).prefetch_related('photos').order_by('id')
 
-        # Search functionality
-        search_term = self.request.GET.get('search')
-        if search_term:
-            # Build Q objects for searching across multiple fields
-            name_q = Q(name__icontains=search_term)
-            category_q = Q(category__name__icontains=search_term)
-            condition_q = Q(
-                selected_condition__condition_name__icontains=search_term
-                )
-
-            # Combine Q objects with OR logic
-            queryset = queryset.filter(
-                name_q | category_q | condition_q
-                ).distinct()
+        # Artist filtering
+        artist_username = self.request.GET.get('artist')
+        if artist_username:
+            queryset = queryset.filter(artist__user__username=artist_username)
 
         # Category filtering
-        category = self.request.GET.get('category')
-        if category:
-            queryset = queryset.filter(category__name=category)
+        category_slug = self.request.GET.get('category')
+        if category_slug:
+            queryset = queryset.filter(category__slug=category_slug)
 
         # Framing filtering
-        framing = self.request.GET.get('selected_condition')
-        if framing:
+        framing_slug = self.request.GET.get('selected_condition')
+        if framing_slug:
             queryset = queryset.filter(
-                selected_condition__condition_name=framing
-                )
+                selected_condition__slug=framing_slug
+            )
 
         # Price filtering
         min_price = self.request.GET.get('min_price')
@@ -77,31 +79,38 @@ class ArtworkListView(ListView):
             queryset = queryset.filter(
                 price__gte=min_price, price__lte=max_price
                 )
+        elif min_price:
+            queryset = queryset.filter(price__gte=min_price)
+        elif max_price:
+            queryset = queryset.filter(price__lte=max_price)
 
         return queryset
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        context['production'] = not settings.DEBUG
+        context['placeholder_image'] = get_placeholder_image()
         context['artwork_categories'] = (
             ArtworkCategory.objects.all()
             )
         context['framing_conditions'] = (
             ArtworkFramingCondition.objects.all()
             )
+        context['all_artists'] = Artist.objects.select_related(
+            'user').filter(user__is_active=True).order_by('user__username')
+        # Prepare JSON data for artworks on the current page
         artworks_on_page = context['artworks']
+        placeholder = context['placeholder_image']
         cleaned_artwork_data = []
         for artwork in artworks_on_page:
             # Safely get the image path (which is a string, suitable for JSON)
-            image_name = None
+            image_url = None
             image_alt_text = artwork.name
+            image_obj = artwork.main_photo or placeholder
 
-            if artwork.main_photo:
-                # Check if the image file exists
-                if artwork.main_photo.image:
-                    image_name = artwork.main_photo.image.name
-
-                # Use the photo's alt text if available
-                image_alt_text = artwork.main_photo.alt_text or artwork.name
+            if image_obj:
+                image_url = image_obj.get_image_url
+                image_alt_text = image_obj.alt_text_or_default
             cleaned_artwork_data.append({
                 'id': artwork.id,
                 'name': artwork.name,
@@ -111,7 +120,7 @@ class ArtworkListView(ListView):
                 'is_in_stock': artwork.is_in_stock,
                 'sku': artwork.sku,
                 'slug': artwork.slug,
-                'image_public_id': image_name,
+                'image_public_id': image_url,
                 'image_alt_text': image_alt_text
             })
         context['artworks_json_data'] = json.dumps(
@@ -151,8 +160,12 @@ class ArtworkDetailView(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        context['production'] = not settings.DEBUG
+        context['placeholder_image'] = get_placeholder_image()
         artwork = self.get_object()
         photos = artwork.photos.all()
+        if artwork.main_photo:
+            photos = photos.exclude(pk=artwork.main_photo.pk)
         context['photos'] = photos
         return context
 
@@ -182,32 +195,36 @@ class ArtworkAPIView(View):
     """
 
     def get(self, request, *args, **kwargs):
-        artworks_queryset = Artwork.objects.filter(is_available=True).values(
-            'id',
-            'name',
-            'description',
-            'price',
-            'is_available',
-            'is_in_stock',
-            'sku',
-            'slug',
-            'main_photo__image',
-            'main_photo__alt_text'
+        artworks_queryset = Artwork.objects.filter(
+            is_available=True
+            ).select_related(
+            'main_photo'
         )
+
+        placeholder = get_placeholder_image()
 
         final_list = []
         for artwork_data in artworks_queryset:
+            image_url = None
+            image_alt_text = artwork_data.name
+            image_obj = artwork_data.main_photo or placeholder
+
+            if image_obj:
+                image_url = image_obj.get_image_url
+                image_alt_text = image_obj.alt_text_or_default
+
             cleaned_artworks_item = {
                 'id': artwork_data['id'],
                 'name': artwork_data['name'],
+                'artist': artwork_data['artist'],
                 'description': artwork_data['description'],
                 'price': float(artwork_data['price']),
                 'is_available': artwork_data['is_available'],
                 'is_in_stock': artwork_data['is_in_stock'],
                 'sku': artwork_data['sku'],
                 'slug': artwork_data['slug'],
-                'image_public_id': artwork_data['main_photo__image'],
-                'image_alt_text': artwork_data['main_photo__alt_text'],
+                'image_url': image_url,
+                'image_alt_text': image_alt_text,
             }
             final_list.append(cleaned_artworks_item)
         return JsonResponse(final_list, safe=False)

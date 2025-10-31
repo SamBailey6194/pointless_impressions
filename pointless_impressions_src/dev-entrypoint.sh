@@ -23,17 +23,25 @@ echo "Database is ready!"
 echo "Applying database migrations..."
 python /app/manage.py migrate
 
-# Create superuser if it doesn't exist (for development convenience)
-echo "Checking for superuser..."
-python /app/manage.py shell -c "
-from django.contrib.auth import get_user_model
-User = get_user_model()
-if not User.objects.filter(is_superuser=True).exists():
-    User.objects.create_superuser('admin', 'admin@example.com', 'admin123')
-    print('Superuser created: admin/admin123')
-else:
-    print('Superuser already exists')
-" 2>/dev/null || echo "Note: Superuser creation skipped"
+# --- NEW: Load all fixture data ---
+# This populates the database with users, profiles, groups, and art.
+echo "Loading initial data fixtures..."
+# (Make sure your fixture files are in the 'fixtures' dir of each app)
+python /app/manage.py loaddata account.json
+echo "Loaded the accounts fixture."
+python /app/manage.py loaddata account_group.json
+echo "Loaded the account groups fixture."
+python /app/manage.py loaddata profiles.json
+echo "Loaded the profiles fixture."
+python /app/manage.py loaddata artwork_categories.json
+echo "Loaded the artwork categories fixture."
+python /app/manage.py loaddata artwork_framing_conditions.json
+echo "Loaded the artwork framing conditions fixture."
+python /app/manage.py loaddata photo.json
+echo "Loaded the photos fixture."
+python /app/manage.py loaddata artwork.json
+echo "Loaded the artwork fixture."
+echo "All fixtures loaded successfully."
 
 # Install Node dependencies at project root
 echo "Installing Node dependencies at project root..."

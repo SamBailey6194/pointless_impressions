@@ -157,7 +157,7 @@
 
     {% comment %} Extra JavaScript Files {% endcomment %}
     {% block postloadjs %}
-    {% block.super %}
+    { block.super }
       <script>
         // Accessing the Django settings directly
         const IS_CLOUD_HOSTED = "{{ PRODUCTION }}" === "True";

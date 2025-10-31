@@ -107,11 +107,10 @@ class Photo(models.Model):
                 )
 
         # Ensure only one parent for non-site-asset photos
-        if self.photo_type != 'site_asset':
+        if self.photo_type not in ['site_asset', 'profile']:
             parents = [
                 bool(self.artwork),
                 # bool(self.blog),
-                bool(self.account)
             ]
             if sum(parents) > 1:
                 raise ValidationError(
@@ -157,8 +156,11 @@ class Photo(models.Model):
             return self.artwork.name
         # elif self.photo_type == 'blog' and self.blog:
         #     return self.blog.title
-        elif self.photo_type == 'profile' and self.account:
-            return f"{self.account.username}'s profile picture"
+        elif self.photo_type == 'profile':
+            if hasattr(self, 'user_profile'):
+                username = self.user_profile.user.username
+                return f"{username}'s profile picture"
+            return "Profile picture"
         elif self.photo_type == 'site_asset':
             return self.asset_identifier or "Site asset"
 

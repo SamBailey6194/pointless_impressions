@@ -308,6 +308,7 @@ Please note for the Jest and Cypress testing there was a need to create html fix
 - **Models and Views for Artwork**: Views didn't properly filter artworks by category. Fixed the views to correctly filter artworks based on the selected category slug.
 - **Search Functionality**: To make search global across all relevant apps and a fail safe for if a search result isn't in an app it searches all apps. Created a search app to ensure it is global across all apps.
 - **CustomUser Model**: Restrictive management across the web app, instead used Groups for Owner, Manager and Employee roles and linked it to the CustomUser model. Added a profile app to manage Customer profiles separately along with Artists and linked it to the CustomUser model and Artists to the Artwork.
+- **Photo Fetching**: Implemented proper fetching of photos for all apps by ensuring related objects are selected in queries to avoid N+1 query problems and ensure images display correctly.
 
 ### Unfixed Bugs
 

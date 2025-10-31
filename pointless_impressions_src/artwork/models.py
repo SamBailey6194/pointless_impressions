@@ -3,12 +3,20 @@ from django.utils.text import slugify
 import random
 import string
 from pointless_impressions_src.photo.models import Photo
+from pointless_impressions_src.profiles.models import Artist
 
 
 # Create your models here.
 class Artwork(models.Model):
     """Model to represent an artwork item."""
     name = models.CharField(max_length=255, unique=True, blank=False)
+    artist = models.ForeignKey(
+        Artist,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='artworks'
+    )
     description = models.TextField(blank=False)
     price = models.DecimalField(max_digits=10, decimal_places=2, blank=False)
     sku = models.CharField(max_length=100, unique=True, blank=False)

@@ -78,3 +78,16 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
 
     def __str__(self):
         return self.username
+
+    @property
+    def is_dashboard_admin(self):
+        """
+        Check if the user is one of the dashboard staff groups.
+        This is separate from the Django is_staff flag.
+        """
+        if not self.is_authenticated:
+            return False
+
+        allowed_groups = ['Employee', 'Manager', 'Owner']
+
+        return self.groups.filter(name__in=allowed_groups).exists()
