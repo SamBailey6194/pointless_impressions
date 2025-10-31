@@ -11,7 +11,7 @@
             {% if production %}
               {% cloudinary image_to_render.image height=60 crop='fit' format='auto' quality='auto' alt=image_to_render.alt_text_or_default class="h-8 sm:h-10 md:h-12 w-auto" %}
             {% else %}
-              <img src="{{ image_to_render }}" alt="{{ image_to_render.alt_text_or_default }}" class="h-8 sm:h-10 md:h-12 w-auto" />
+              <img src="{{ image_to_render.image.url }}" alt="{{ image_to_render.alt_text_or_default }}" class="h-8 sm:h-10 md:h-12 w-auto" />
             {% endif %}
           {% else %}
             {% comment %} Fallback if no logo is set {% endcomment %}
@@ -63,7 +63,7 @@
                         <i class="fa-solid fa-crop-simple"></i>Framing Options
                         <i class="fa-solid fa-circle-chevron-down"></i>
                     </label>
-                    <ul tabindex="0" class="menu menu-sm dropdown-content z-10 p-2 shadow-lg rounded-box w-52">
+                    <ul tabindex="0" class="menu menu-sm dropdown-content shadow-lg rounded-box w-52">
                         {% for framing in framing_options %}
                             <li>
                                 <a href="{% url 'artwork:list' %}?selected_condition={{ framing.slug }}" class="hover:bg-[var(--pointless-yellow)]">
@@ -77,7 +77,7 @@
               <li>
                 <div class="dropdown dropdown-hover dropdown-right">
                   <label tabindex="0" class="rounded-lg flex items-center gap-2">
-                      <i class="fa-solid fa-palette"></i>Artists
+                      <i class="fa-solid fa-brush"></i>Artists
                       <i class="fa-solid fa-circle-chevron-down"></i>
                   </label>
                   <ul tabindex="0" class="menu menu-sm dropdown-content z-10 p-2 shadow-lg rounded-box w-52">
@@ -117,126 +117,136 @@
     <div class="navbar-end">
       <div class="flex items-center gap-2">
 
-        <div class="hidden md:flex flex-col items-end text-sm mr-2">
-          {% if request.user.is_authenticated %}
-            <span class="font-medium">Welcome, {{ request.user.username|title }}</span>
-          {% else %}
-            <span class="font-medium">Welcome, Guest</span>
-          {% endif %}
-        </div>
-
         {% comment %} Account Dropdown {% endcomment %}
-        <div class="dropdown dropdown-end">
-          <label tabindex="0" class="btn btn-ghost btn-circle avatar">
-            {% if request.user.is_authenticated and request.user.userprofile.profile_picture %}
-              {% comment %} 
-                Display user's profile picture if logged in and has one 
-              {% endcomment %}
-              {% with image_to_render=request.user.userprofile.profile_picture %}
-                {% if production %}
-                  {% cloudinary image_to_render.image format="auto" quality="auto" width=80 height=80 crop="fill" class="w-10 rounded-full" alt=image_to_render.alt_text_or_default %}
-                {% else %}
-                  <img src="{{ image_to_render.image.url }}" alt="{{ image_to_render.alt_text_or_default }}" class="w-10 rounded-full" />
-                {% endif %}
-              {% endwith %}
+        <div class="flex flex-col items-center">
+          <div class="dropdown dropdown-end">
+            <label tabindex="0" class="btn btn-ghost btn-circle flex flex-col items-center h-auto px-2 py-1 normal-case">
+              {% if request.user.is_authenticated and request.user.userprofile.profile_picture %}
+                {% comment %} 
+                  Display user's profile picture if logged in and has one 
+                {% endcomment %}
+                {% with image_to_render=request.user.userprofile.profile_picture %}
+                  {% if production %}
+                    {% cloudinary image_to_render.image format="auto" quality="auto" width=80 height=80 crop="fill" class="w-10 rounded-full" alt=image_to_render.alt_text_or_default %}
+                  {% else %}
+                    <img src="{{ image_to_render.image.url }}" alt="{{ image_to_render.alt_text_or_default }}" class="w-10 rounded-full" />
+                  {% endif %}
+                {% endwith %}
 
-            {% else %}
-              {% comment %} 
-                Fallback for logged-out users OR users with no profile pic
-              {% endcomment %}
-              <div class="avatar placeholder">
-                <i class="fa-solid fa-user text-lg"></i>
-              </div>
-            {% endif %}
-          </label>
-          <ul tabindex="0" class="menu menu-sm dropdown-content mt-3 z-10 p-2 shadow-lg rounded-box w-52">
+              {% else %}
+                {% comment %} 
+                  Fallback for logged-out users OR users with no profile pic
+                {% endcomment %}
+                <div class="avatar placeholder">
+                  <i class="fa-solid fa-user text-lg"></i>
+                </div>
+              {% endif %}
+            </label>      
+            <ul tabindex="0" class="menu menu-sm dropdown-content mt-3 z-10 p-2 shadow-lg rounded-box w-52">
+              {% if request.user.is_authenticated %}
+                <li class="menu-title text-[var(--pointless-blue)] md:hidden">
+                  <span>Welcome, {{ request.user.username|title }}</span>
+                </li>
+                {% comment %} Django Site Admin for Developers {% endcomment %}
+                {% if request.user.is_staff %}
+                  <li>
+                    <a href="#" class="hover:bg-[var(--pointless-yellow)]">
+                      <i class="fa-solid fa-shield-halved"></i> Site Admin (Dev)
+                    </a>
+                  </li>
+                {% endif %}
+                {% comment %} Custom Dashboard Access for Admin {% endcomment %}
+                {% if request.user.is_dashboard_admin %}
+                  <li>
+                    <a href="#" class="hover:bg-[var(--pointless-yellow)]">
+                      <i class="fa-solid fa-cog"></i> Admin Dashboard
+                    </a>
+                  </li>
+                {% endif %}
+                {% comment %} Artist Dashboard Link if user is an artist {% endcomment %}
+                {% comment %}
+                {% if hasattr(request.user, 'artist_profile') %}
+                  <li>
+                    <a href="#" class="hover:bg-[var(--pointless-yellow)]">
+                      <i class="fa-solid fa-paint-brush"></i> Artist Dashboard
+                    </a>
+                  </li>
+                {% endif %}
+                {% endcomment %}
+                <li>
+                  <a href="#" class="hover:bg-[var(--pointless-yellow)]">
+                    <i class="fa-solid fa-user-circle"></i> My Profile
+                  </a>
+                </li>
+                <li>
+                  <a href="#" class="hover:bg-[var(--pointless-yellow)]">
+                    <i class="fa-solid fa-box"></i> My Orders
+                  </a>
+                </li>
+                <li>
+                  <a href="#" class="hover:bg-[var(--pointless-yellow)]">
+                    <i class="fa-solid fa-heart"></i> Wishlist
+                  </a>
+                </li>
+                <div class="divider my-1"></div>
+                <li>
+                  <a href="#" class="hover:bg-[var(--pointless-red)] hover:text-white">
+                    <i class="fa-solid fa-sign-out-alt"></i> Logout
+                  </a>
+                </li>
+              {% else %}
+                <li class="menu-title text-[var(--pointless-blue)] md:hidden">
+                  <span>Welcome, Guest</span>
+                </li>
+                <li>
+                  <a href="#" class="hover:bg-[var(--pointless-yellow)]">
+                    <i class="fa-solid fa-sign-in-alt"></i> Login
+                  </a>
+                </li>
+                <li>
+                  <a href="#" class="hover:bg-[var(--pointless-yellow)]">
+                    <i class="fa-solid fa-user-plus"></i> Sign Up
+                  </a>
+                </li>
+              {% endif %}
+            </ul>
+          </div>
+          <div class="hidden md:block text-sm mt-1">
             {% if request.user.is_authenticated %}
-              <li class="menu-title text-[var(--pointless-blue)] md:hidden">
-                <span>Welcome, {{ request.user.username|title }}</span>
-              </li>
-              {% comment %} Django Site Admin for Developers {% endcomment %}
-              {% if request.user.is_staff %}
-                <li>
-                  <a href="#" class="hover:bg-[var(--pointless-yellow)]">
-                    <i class="fa-solid fa-shield-halved"></i> Site Admin (Dev)
-                  </a>
-                </li>
-              {% endif %}
-              {% comment %} Custom Dashboard Access for Admin {% endcomment %}
-              {% if request.user.is_dashboard_admin %}
-                <li>
-                  <a href="#" class="hover:bg-[var(--pointless-yellow)]">
-                    <i class="fa-solid fa-cog"></i> Admin Dashboard
-                  </a>
-                </li>
-              {% endif %}
-              {% comment %} Artist Dashboard Link if user is an artist {% endcomment %}
-              {% comment %}
-              {% if hasattr(request.user, 'artist_profile') %}
-                <li>
-                  <a href="#" class="hover:bg-[var(--pointless-yellow)]">
-                    <i class="fa-solid fa-paint-brush"></i> Artist Dashboard
-                  </a>
-                </li>
-              {% endif %}
-              {% endcomment %}
-              <li>
-                <a href="#" class="hover:bg-[var(--pointless-yellow)]">
-                  <i class="fa-solid fa-user-circle"></i> My Profile
-                </a>
-              </li>
-              <li>
-                <a href="#" class="hover:bg-[var(--pointless-yellow)]">
-                  <i class="fa-solid fa-box"></i> My Orders
-                </a>
-              </li>
-              <li>
-                <a href="#" class="hover:bg-[var(--pointless-yellow)]">
-                  <i class="fa-solid fa-heart"></i> Wishlist
-                </a>
-              </li>
-              <div class="divider my-1"></div>
-              <li>
-                <a href="#" class="hover:bg-[var(--pointless-red)] hover:text-white">
-                  <i class="fa-solid fa-sign-out-alt"></i> Logout
-                </a>
-              </li>
+              <span class="font-medium">{{ request.user.username|title }}'s Account</span>
             {% else %}
-              <li class="menu-title text-[var(--pointless-blue)] md:hidden">
-                <span>Welcome, Guest</span>
-              </li>
-              <li>
-                <a href="#" class="hover:bg-[var(--pointless-yellow)]">
-                  <i class="fa-solid fa-sign-in-alt"></i> Login
-                </a>
-              </li>
-              <li>
-                <a href="#" class="hover:bg-[var(--pointless-yellow)]">
-                  <i class="fa-solid fa-user-plus"></i> Sign Up
-                </a>
-              </li>
+              <span class="font-medium">Account</span>
             {% endif %}
-          </ul>
+          </div>
         </div>
 
         {% comment %} Cart Dropdown {% endcomment %}
-        <div class="dropdown dropdown-end">
-          <label tabindex="0" class="btn btn-ghost btn-circle">
-            <div class="indicator">
-              <i class="fa-solid fa-cart-shopping text-lg"></i>
-              <span class="badge badge-sm indicator-item translate-x-5 -translate-y-4">8</span>
-            </div>
-          </label>
-          <div tabindex="0" class="card card-compact dropdown-content w-80 shadow-lg mt-3 z-10">
-            <div class="card-body">
-              <span class="font-bold text-lg text-[var(--pointless-blue)]">8 Items in Cart</span>
-              <span class="text-[var(--pointless-blue)]">Subtotal: £999.00</span>
-              <div class="card-actions">
-                <button class="btn w-full hover:bg-[var(--pointless-red)] hover:border-[var(--pointless-yellow)]">
-                  <i class="fa-solid fa-shopping-bag"></i> View Cart
-                </button>
+        <div class="flex flex-col items-center">
+          <div class="dropdown dropdown-end">
+            <label tabindex="0" class="btn btn-ghost btn-circle">
+              <div class="indicator">
+                <i class="fa-solid fa-cart-shopping text-lg"></i>
+                <span class="badge badge-sm indicator-item translate-x-5 -translate-y-4">8</span>
+              </div>
+            </label>
+            <div tabindex="0" class="card card-compact dropdown-content w-80 shadow-lg mt-3 z-10">
+              <div class="card-body">
+                <span class="font-bold text-lg text-[var(--pointless-blue)]">8 Items in Cart</span>
+                <span class="text-[var(--pointless-blue)]">Subtotal: £999.00</span>
+                <div class="card-actions">
+                  <button class="btn w-full hover:bg-[var(--pointless-red)] hover:border-[var(--pointless-yellow)]">
+                    <i class="fa-solid fa-shopping-bag"></i> View Cart
+                  </button>
+                </div>
               </div>
             </div>
+          </div>
+          <div class="hidden md:block text-sm mt-1">
+            {% if request.user.is_authenticated %}
+              <span class="font-medium">{{ request.user.username|title }}'s Cart</span>
+            {% else %}
+              <span class="font-medium">Your Cart</span>
+            {% endif %}
           </div>
         </div>
 

@@ -17,14 +17,14 @@ def global_context(request):
     # --- Logo fetching logic ---
     try:
         site_logo = Photo.objects.get(
-            asset_identifier='site_logo_main'
+            asset_identifier='pointless_impressions_logo'
         )
     except Photo.DoesNotExist:
         site_logo = None
 
     try:
         site_logo_white_bg = Photo.objects.get(
-            asset_identifier='site_logo_white_bg'
+            asset_identifier='pointless_impressions_logo_white_bg'
         )
     except Photo.DoesNotExist:
         site_logo_white_bg = None
