@@ -1,4 +1,5 @@
 from django.views.generic import ListView, DetailView, View
+from django.db.models import Prefetch
 from django.conf import settings
 import json
 from django.http import JsonResponse
@@ -24,22 +25,31 @@ def get_placeholder_image():
 # ---------------------------
 class ArtworkListView(ListView):
     """
-    Renders the public artwork list page with optional search, category,
-    and price filters.
+    Renders the public artwork list page with optional category,
+    price, artist, and framing condition filters.
 
     If `GET`, returns a paginated list of available artworks filtered by query
     parameters:
-    - ``search``: searches artwork name, category, and framing condition and
-        ensures distinct results
     - ``category``: filters by artwork category
     - ``selected_condition``: filters by framing condition
     - ``min_price`` / ``max_price``: filters artworks by price range
+    - ``artist``: filters by artist username
 
     **Context**
     ``artworks``
         A queryset of available Artwork objects, filtered and paginated.
-    ``page_obj``
-        Pagination object for navigating pages.
+    ``production``
+        Boolean indicating if the site is in production mode.
+    ``placeholder_image``
+        A Photo object used as a placeholder for artworks without images.
+    ``artwork_categories``
+        A queryset of all ArtworkCategory objects for filtering.
+    ``framing_conditions``
+        A queryset of all ArtworkFramingCondition objects for filtering.
+    ``all_artists``
+        A queryset of all active Artist objects for filtering.
+    ``artworks_json_data``
+        A JSON string containing artwork data for use in frontend scripts.
 
     **Template:**
     :template:`artwork/artwork.html`
@@ -48,12 +58,20 @@ class ArtworkListView(ListView):
     model = Artwork
     template_name = 'artwork/artwork_list.html'
     context_object_name = 'artworks'
-    paginate_by = 10
+    paginate_by = 12
 
     def get_queryset(self):
         queryset = Artwork.objects.filter(is_available=True).select_related(
-            'category', 'selected_condition', 'main_photo'
-        ).prefetch_related('photos').order_by('id')
+            'category', 'main_photo', 'artist__user'
+        ).prefetch_related(
+            'photos',
+            Prefetch(
+                'selected_conditions',
+                queryset=ArtworkFramingCondition.objects.only(
+                    'condition_name', 'id', 'slug'
+                    ), to_attr='prefetched_conditions'
+            )
+            ).order_by('id')
 
         # Artist filtering
         artist_username = self.request.GET.get('artist')
@@ -66,10 +84,10 @@ class ArtworkListView(ListView):
             queryset = queryset.filter(category__slug=category_slug)
 
         # Framing filtering
-        framing_slug = self.request.GET.get('selected_condition')
+        framing_slug = self.request.GET.get('selected_conditions')
         if framing_slug:
             queryset = queryset.filter(
-                selected_condition__slug=framing_slug
+                selected_conditions__slug=framing_slug
             )
 
         # Price filtering
@@ -103,7 +121,7 @@ class ArtworkListView(ListView):
         placeholder = context['placeholder_image']
         cleaned_artwork_data = []
         for artwork in artworks_on_page:
-            # Safely get the image path (which is a string, suitable for JSON)
+            # Safely get the image path
             image_url = None
             image_alt_text = artwork.name
             image_obj = artwork.main_photo or placeholder
@@ -111,13 +129,23 @@ class ArtworkListView(ListView):
             if image_obj:
                 image_url = image_obj.get_image_url
                 image_alt_text = image_obj.alt_text_or_default
+
+            # Get framing condition names
+            condition_names = [
+                cond.condition_name for cond in
+                artwork.prefetched_conditions
+            ]
+
             cleaned_artwork_data.append({
                 'id': artwork.id,
                 'name': artwork.name,
                 'description': artwork.description,
                 'price': float(artwork.price),
+                'category': artwork.category.name,
+                'selected_conditions': condition_names,
                 'is_available': artwork.is_available,
                 'is_in_stock': artwork.is_in_stock,
+                'is_featured': artwork.is_featured,
                 'sku': artwork.sku,
                 'slug': artwork.slug,
                 'image_public_id': image_url,
@@ -155,8 +183,16 @@ class ArtworkDetailView(DetailView):
 
     def get_queryset(self):
         return Artwork.objects.select_related(
-            'category', 'selected_condition'
-        ).prefetch_related('photos')
+            'category', 'main_photo'
+        ).prefetch_related(
+            'photos',
+            Prefetch(
+                'selected_conditions',
+                queryset=ArtworkFramingCondition.objects.only(
+                    'condition_name', 'id', 'slug'
+                    ), to_attr='prefetched_conditions'
+            )
+        ).order_by('id')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -183,12 +219,18 @@ class ArtworkAPIView(View):
     A JSON array of artwork objects with fields:
     - ``id``
     - ``name``
+    - ``artist``
     - ``description``
     - ``price``
+    - ``category``
+    - ``selected_conditions``
+    - ``main_photo``
     - ``is_available``
     - ``is_in_stock``
     - ``sku``
     - ``slug``
+    - ``created_at``
+    - ``updated_at``
 
     **URL:**
     /api/artworks/
@@ -198,8 +240,15 @@ class ArtworkAPIView(View):
         artworks_queryset = Artwork.objects.filter(
             is_available=True
             ).select_related(
-            'main_photo'
-        )
+            'main_photo', 'category', 'artist__user'
+            ).prefetch_related(
+            Prefetch(
+                'selected_conditions',
+                queryset=ArtworkFramingCondition.objects.only(
+                    'condition_name', 'id', 'slug'
+                    ), to_attr='prefetched_conditions'
+                )
+        ).order_by('id')
 
         placeholder = get_placeholder_image()
 
@@ -211,18 +260,45 @@ class ArtworkAPIView(View):
 
             if image_obj:
                 image_url = image_obj.get_image_url
-                image_alt_text = image_obj.alt_text_or_default
+                image_alt_text = getattr(
+                    image_obj,
+                    'alt_text_or_default',
+                    artwork_data.name
+                    )
+
+            artist_data = {}
+            if artwork_data.artist:
+                user = artwork_data.artist.user
+                artist_data = {
+                    'username': user.username,
+                    'first_name': user.first_name,
+                    'last_name': user.last_name,
+                    'full_name': user.get_full_name(),
+                }
 
             cleaned_artworks_item = {
-                'id': artwork_data['id'],
-                'name': artwork_data['name'],
-                'artist': artwork_data['artist'],
-                'description': artwork_data['description'],
-                'price': float(artwork_data['price']),
-                'is_available': artwork_data['is_available'],
-                'is_in_stock': artwork_data['is_in_stock'],
-                'sku': artwork_data['sku'],
-                'slug': artwork_data['slug'],
+                'id': artwork_data.id,
+                'name': artwork_data.name,
+                'artist': artist_data,
+                'description': artwork_data.description,
+                'price': float(artwork_data.price),
+                'category': artwork_data.category.name,
+                'selected_conditions': [
+                    {'name': cond.condition_name, 'slug': cond.slug}
+                    for cond in artwork_data.prefetched_conditions
+                ],
+                'is_available': artwork_data.is_available,
+                'is_in_stock': artwork_data.is_in_stock,
+                'sku': artwork_data.sku,
+                'slug': artwork_data.slug,
+                'created_at': (
+                    artwork_data.created_at.isoformat() if
+                    artwork_data.created_at else None
+                    ),
+                'updated_at': (
+                    artwork_data.updated_at.isoformat() if
+                    artwork_data.updated_at else None
+                ),
                 'image_url': image_url,
                 'image_alt_text': image_alt_text,
             }

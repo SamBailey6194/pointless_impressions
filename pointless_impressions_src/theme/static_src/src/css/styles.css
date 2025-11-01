@@ -188,9 +188,15 @@
     font-family: var(--font-Poppins);
   }
 
-  .btn:hover {
+  .btn:hover,
+  .btn-active-sort {
     background-color: var(--pointless-red);
     border-color: var(--pointless-yellow);
+  }
+
+  .btn-active-sort:hover {
+    background-color: var(--pointless-yellow);
+    border-color: var(--pointless-blue);
   }
 
   .btn-circle {
@@ -438,14 +444,16 @@
   /* Dark Mode Overrides */
   @media (prefers-color-scheme: dark) {
     .btn,
-    .btn-circle {
+    .btn-circle,
+    .btn-active-sort:hover {
       background-color: var(--pointless-yellow);
       border-color: var(--pointless-blue);
       color: var(--pointless-black);
     }
 
     .btn:hover,
-    .btn-circle:hover {
+    .btn-circle:hover,
+    .btn-active-sort {
       background-color: var(--pointless-red);
       border-color: var(--pointless-yellow);
     }
