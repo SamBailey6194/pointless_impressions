@@ -23,12 +23,12 @@ class Artwork(models.Model):
     category = models.ForeignKey(
         'ArtworkCategory', on_delete=models.SET_NULL, null=True, blank=True
     )
-    selected_condition = models.ForeignKey(
+    selected_conditions = models.ManyToManyField(
         'ArtworkFramingCondition',
-        on_delete=models.SET_NULL,
-        null=True,
         blank=False,
-        related_name='artwork_condition'
+        related_name='available_conditions',
+        help_text="The set of framing/condition options available for "
+        "customer selection."
     )
     main_photo = models.ForeignKey(
         'photo.Photo',

@@ -2496,9 +2496,6 @@
       margin-bottom: 0;
     }
   }
-  .-mt-1 {
-    margin-top: calc(var(--spacing) * -1);
-  }
   .-mt-2 {
     margin-top: calc(var(--spacing) * -2);
   }
@@ -2573,9 +2570,6 @@
         }
       }
     }
-  }
-  .mr-2 {
-    margin-right: calc(var(--spacing) * 2);
   }
   .mb-1 {
     margin-bottom: calc(var(--spacing) * 1);
@@ -3030,9 +3024,6 @@
   }
   .items-center {
     align-items: center;
-  }
-  .items-end {
-    align-items: flex-end;
   }
   .justify-between {
     justify-content: space-between;

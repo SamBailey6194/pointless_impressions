@@ -57,6 +57,14 @@
     },
     {
         "model": "profiles.Artist",
-        "fields": { "user": 7 }
+        "fields": { 
+            "user": 7, 
+            "bio": "Passionate artist specializing in digital illustrations and concept art.",
+            "portfolio_url": "https://artist7portfolio.com",
+            "social_links": {
+                "instagram": "https://instagram.com/artist7",
+                "x": "https://x.com/artist7"
+            }
+        }
     }
 ]
