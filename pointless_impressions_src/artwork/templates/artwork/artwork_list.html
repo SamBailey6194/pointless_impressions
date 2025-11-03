@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load static cloudinary tailwind_tags %}
+{% load artwork_filters %}
 
 {% block content %}
   <section class="py-16 section-alt w-full">
@@ -25,7 +26,7 @@
                     {% for artist in all_artists %}
                         <option value="{{ artist.user.username }}"
                           {% if request.GET.artist == artist.user.username %}selected{% endif %}>
-                            {{ artist.get_full_name }}
+                            {{ artist.user.username }}
                         </option>
                     {% endfor %}
                   </select>
@@ -112,40 +113,59 @@
       {% comment %} Artwork List Container {% endcomment %}
       <div class="bg-gray-300 dark:bg-gray-700 shadow-xl rounded-2xl">
         {% comment %} Sort and Filter controls {% endcomment %}
-        <div id="controls" class="p-4 pt-8 flex justify-center gap-2">
-          <button class="btn btn-outline sort-control" 
-                  data-type="sort" 
-                  data-sort-key="price" 
-                  data-sort-direction="asc" 
-                  id="sort-lowest-price">
+        <div id="controls" class="p-4 pt-8 flex justify-center gap-2 flex-wrap">
+          
+          {% comment %} Sort by Lowest Price {% endcomment %}
+          <a href="?{% url_replace sort='price' direction='asc' %}" 
+             class="btn sort-control {% if request.GET.sort == 'price' and request.GET.direction == 'asc' or not request.GET.sort and not request.GET.direction %}btn-primary{% else %}btn-outline{% endif %}"
+             data-type="sort"
+             data-sort-key="price"
+             data-sort-direction="asc"
+             id="sort-lowest-price">
             <i class="fa-solid fa-sort-amount-down"></i> Sort by Lowest Price
-          </button>
-          <button class="btn btn-outline sort-control" 
-                  data-type="sort" 
-                  data-sort-key="price" 
-                  data-sort-direction="desc" 
-                  id="sort-highest-price">
+          </a>
+          
+          {% comment %} Sort by Highest Price {% endcomment %}
+          <a href="?{% url_replace sort='price' direction='desc' %}" 
+             class="btn sort-control {% if request.GET.sort == 'price' and request.GET.direction == 'desc' %}btn-primary{% else %}btn-outline{% endif %}"
+             data-type="sort"
+             data-sort-key="price"
+             data-sort-direction="desc"
+             id="sort-highest-price">
             <i class="fa-solid fa-sort-amount-up"></i> Sort by Highest Price
-          </button>
-          <button class="btn btn-outline sort-control" 
-                  data-type="sort" 
-                  data-sort-key="name" 
-                  data-sort-direction="asc" 
-                  id="sort-name">
+          </a>
+          
+          {% comment %} Sort Alphabetically by Name {% endcomment %}
+          <a href="?{% url_replace sort='name' direction='asc' %}" 
+             class="btn sort-control {% if request.GET.sort == 'name' and request.GET.direction == 'asc' %}btn-primary{% else %}btn-outline{% endif %}"
+             data-type="sort"
+             data-sort-key="name"
+             data-sort-direction="asc"
+             id="sort-name">
             <i class="fa-solid fa-sort-alpha-asc"></i> Sort Alphabetically
-          </button>
-          <button class="btn btn-outline sort-control" 
-                  data-type="sort" 
-                  data-sort-key="artist" 
-                  data-sort-direction="asc" 
-                  id="sort-artist">
+          </a>
+          
+          {% comment %} Sort by Artist {% endcomment %}
+          <a href="?{% url_replace sort='artist' direction='asc' %}" 
+             class="btn sort-control {% if request.GET.sort == 'artist' and request.GET.direction == 'asc' %}btn-primary{% else %}btn-outline{% endif %}"
+             data-type="sort"
+             data-sort-key="artist"
+             data-sort-direction="asc"
+             id="sort-artist">
             <i class="fa-solid fa-sort-alpha-asc"></i> Sort by Artist
-          </button>
+          </a>
         </div>
-        <div id="artwork-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+        {% comment %} Pagination {% endcomment %}
+        {% if is_paginated %}
+          <div class="flex justify-center p-4">
+            {% include "includes/pagination.html" %}
+          </div>
+        {% endif %}
+        <div id="artwork-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-6">
           {% for artwork in artworks %}
             <div class="artwork-card card shadow-xl hover:shadow-2xl transition-shadow" data-sku="{{ artwork.sku }}">
-              {% with image_to_render=artwork.main_photo|default:placeholder_image %}
+              {% with image_to_render=artwork.main_photo %}
               <figure>
                 {% if image_to_render %}
                   {% comment %} An image exists for this artwork {% endcomment %}
@@ -157,21 +177,14 @@
                         alt="{{ image_to_render.alt_text_or_default }}" 
                         class="w-full h-64 object-cover">
                   {% endif %}
-                {% else %}
-                  {% comment %} No image or placeholder exists, use the favicon {% endcomment %}
-                  <div class="h-64 w-full flex items-center justify-center">
-                    <i class="fa-solid fa-image text-5xl text-base-content/50"></i>
-                  </div>
                 {% endif %}
               </figure>
               <div class="card-body">
                 <h2 class="artwork-name card-title">{{ artwork.name }}</h2>
-                {% if artwork.artist %}
-                  <p class="text-sm -mt-2 mb-2 text-base-content/70">
-                    By: <a href="{% url 'artwork:list' %}?artist={{ artwork.artist.user.username }}" class="link link-hover">{{ artwork.artist.user.username|title }}</a>
-                  </p>
-                {% endif %}
-                <p class="artwork-description text-base-content/70">{{ artwork.description|truncatewords:15 }}</p>
+                <p class="text-sm -mt-2 mb-2">
+                  <a href="{% url 'artwork:list' %}?artist={{ artwork.artist.user.username }}" class="link link-hover">{{ artwork.artist }}</a>
+                </p>
+                <p class="artwork-description">{{ artwork.description|truncatewords:15 }}</p>
                 <div class="divider my-2"></div>
                 <p class="artwork-price text-2xl font-bold text-primary">£{{ artwork.price }}</p>
                 
@@ -211,7 +224,7 @@
         </div>
         {% comment %} Pagination {% endcomment %}
         {% if is_paginated %}
-          <div class="flex justify-center mt-8">
+          <div class="flex justify-center p-4 pb-8">
             {% include "includes/pagination.html" %}
           </div>
         {% endif %}
@@ -221,10 +234,20 @@
 {% endblock %}
 
 {% block postloadjs %}
-{{  block.super }}
-  <script>
-    const ARTWORK_API_URL = "{% url 'artwork:api_artworks' %}";
-    const ARTWORK_DETAIL_BASE_PATH = "{% url 'artwork:detail' slug='placeholder' %}".replace('placeholder', '');
-  </script>
-  <script src="{% static 'js/artwork.js' %}" defer></script>
+{{ block.super }}
+{% comment %} Inject SSR data for JavaScript enhancement {% endcomment %}
+<script id="artworks-json-data" type="application/json">{{ artworks_json_data|safe }}</script>
+
+{% comment %} Define global constants for JavaScript {% endcomment %}
+<script>
+  window.ARTWORKS_JSON_DATA = JSON.parse(document.getElementById('artworks-json-data').textContent);
+  window.ARTWORK_API_URL = "{% url 'artwork:api_artworks' %}";
+  window.ARTWORK_LIST_URL = "{% url 'artwork:list' %}";
+  window.ARTWORK_DETAIL_BASE_PATH = "{% url 'artwork:detail' slug='placeholder' %}".replace('placeholder', '');
+  window.CLOUDINARY_CLOUD_NAME = "{{ settings.CLOUDINARY_CLOUD_NAME }}";
+  window.PLACEHOLDER_IMAGE_PUBLIC_ID = "{{ placeholder_image.asset_identifier|default:'placeholder_image' }}";
+</script>
+
+{% comment %} Load the artwork enhancement JavaScript {% endcomment %}
+<script src="{% static 'js/artwork.js' %}"></script>
 {% endblock postloadjs %}

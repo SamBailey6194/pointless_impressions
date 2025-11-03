@@ -65,6 +65,7 @@ show_help() {
     echo "  logs          Show logs from all services"
     echo "  shell         Access Django shell in the web container"
     echo "  bash          Access bash shell in the web container"
+    echo "  db            Access PostgreSQL database shell"
     echo "  migrate       Run Django migrations"
     echo "  makemigrations Run Django makemigrations"
     echo "  createsuperuser Create a Django superuser"
@@ -123,6 +124,21 @@ case "${1:-help}" in
     bash)
         print_status "Accessing bash shell..."
         docker compose -f docker-compose.dev.yml exec web bash
+        ;;
+    db)
+        DB_SERVICE_NAME="db_dev"
+        DB_USER="dev_user" # Using the user defined in your compose file
+        DB_NAME="dev_db" # Using the database defined in your compose file
+        print_status "Accessing PostgreSQL shell (psql) for service: ${DB_SERVICE_NAME}..."
+        
+        # Check if the 'db_dev' service container is running
+        if ! docker compose -f docker-compose.dev.yml ps -q ${DB_SERVICE_NAME} | grep -q .; then
+            print_error "The '${DB_SERVICE_NAME}' service is not running. Please run './dev.sh start' first."
+            exit 1
+        fi
+
+        # Run psql directly in the 'db_dev' container using the configured user
+        docker compose -f docker-compose.dev.yml exec ${DB_SERVICE_NAME} psql -U ${DB_USER} -d ${DB_NAME}
         ;;
     migrate)
         print_status "Running migrations..."

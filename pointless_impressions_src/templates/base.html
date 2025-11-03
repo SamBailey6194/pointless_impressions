@@ -82,7 +82,7 @@
 
   </head>
 
-  <body class="leading-normal tracking-normal">
+  <body class="leading-normal tracking-normal min-h-screen flex flex-col">
 
     {% comment %} Header Content Area {% endcomment %}
     <header class="fixed top-0 z-50 w-full">
@@ -92,7 +92,7 @@
     </header>
 
     {% comment %} Main Content Area {% endcomment %}
-    <main class="flex-1 pt-24 md:pt-28 lg:pt-32">
+    <main class="flex-grow pt-24 md:pt-28 lg:pt-32">
       {% comment %} Full Content Block for pages that need complete control {% endcomment %}
       {% block content %}
         
@@ -157,7 +157,6 @@
 
     {% comment %} Extra JavaScript Files {% endcomment %}
     {% block postloadjs %}
-    { block.super }
       <script>
         // Accessing the Django settings directly
         const IS_CLOUD_HOSTED = "{{ PRODUCTION }}" === "True";

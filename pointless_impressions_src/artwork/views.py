@@ -4,6 +4,7 @@ from django.conf import settings
 import json
 from django.http import JsonResponse
 from django.core.serializers.json import DjangoJSONEncoder
+from django.template.defaultfilters import truncatewords
 from .models import Artwork, ArtworkCategory, ArtworkFramingCondition
 from pointless_impressions_src.photo.models import Photo
 from pointless_impressions_src.profiles.models import Artist
@@ -12,12 +13,109 @@ from pointless_impressions_src.profiles.models import Artist
 # ----------------------------
 # Helper Functions
 # ---------------------------
+PLACEHOLDER_WORDS = 15
+
+
 def get_placeholder_image():
     """Returns a placeholder image data."""
     try:
-        return Photo.objects.get(asset_identifier='noimage_placeholder')
+        return Photo.objects.get(asset_identifier='placeholder_image')
     except Photo.DoesNotExist:
         return None
+
+
+def _serialize_artwork_data(artwork_queryset, placeholder_image):
+    """
+    Cleans and formats a queryset of Artwork objects into a list of
+    dictionaries with comprehensive details (suitable for API use).
+
+    Artwork objects must be prefetched with 'prefetched_conditions',
+    'main_photo', 'category', and 'artist__user'.
+
+    Args:
+        artwork_queryset (QuerySet): A queryset of Artwork objects.
+        placeholder_image (Photo or None): A Photo object for fallback.
+
+    Returns:
+        list: A list of dictionaries containing cleaned artwork data.
+    """
+    cleaned_data = []
+    for artwork in artwork_queryset:
+        # Image Data
+        image_url = None
+        image_public_id = None
+        image_alt_text = artwork.name
+        image_obj = artwork.main_photo or placeholder_image
+
+        if image_obj:
+            image_url_attr = getattr(image_obj, 'get_image_url', None)
+
+            if callable(image_url_attr):
+                image_url = image_url_attr()
+            else:
+                image_url = image_url_attr
+
+            image_public_id = getattr(image_obj, 'asset_identifier', None)
+
+            image_alt_text = getattr(
+                image_obj,
+                'alt_text_or_default',
+                artwork.name
+            )
+
+        # Artist Data
+        artist_data = None
+        if hasattr(artwork, 'artist') and artwork.artist:
+            user = artwork.artist.user
+            artist_data = {
+                'username': user.username,
+                'first_name': user.first_name,
+                'last_name': user.last_name,
+                'full_name': (
+                    f"{user.first_name} {user.last_name}".strip()
+                    ),
+            }
+
+        # Truncated Description
+        full_desc = artwork.description
+        truncated_desc = truncatewords(full_desc, PLACEHOLDER_WORDS)
+
+        # Framing Condition Data
+        conditions = [
+            {'name': cond.condition_name, 'slug': cond.slug}
+            for cond in getattr(artwork, 'prefetched_conditions', [])
+        ]
+
+        # Core Artwork Data
+        item = {
+            'id': artwork.id,
+            'name': artwork.name,
+            'artist': artist_data,
+            'full_description': full_desc,
+            'description': truncated_desc,
+            'price': float(artwork.price),
+            'category': artwork.category.name if artwork.category else None,
+            'selected_conditions': conditions,
+            'is_available': artwork.is_available,
+            'is_in_stock': artwork.is_in_stock,
+            'is_featured': artwork.is_featured,
+            'sku': artwork.sku,
+            'slug': artwork.slug,
+            'image_url': image_url,
+            'image_public_id': image_public_id,
+            'image_alt_text': image_alt_text,
+            'created_at': (
+                artwork.created_at.isoformat() if
+                getattr(artwork, 'created_at', None) else None
+                ),
+            'updated_at': (
+                artwork.updated_at.isoformat() if
+                getattr(artwork, 'updated_at', None) else None
+            ),
+            'quantity': artwork.quantity,
+        }
+        cleaned_data.append(item)
+    return cleaned_data
 
 
 # ---------------------------
@@ -71,7 +169,7 @@ class ArtworkListView(ListView):
                     'condition_name', 'id', 'slug'
                     ), to_attr='prefetched_conditions'
             )
-            ).order_by('id')
+        )
 
         # Artist filtering
         artist_username = self.request.GET.get('artist')
@@ -96,11 +194,24 @@ class ArtworkListView(ListView):
         if min_price and max_price:
             queryset = queryset.filter(
                 price__gte=min_price, price__lte=max_price
-                )
+            )
         elif min_price:
             queryset = queryset.filter(price__gte=min_price)
         elif max_price:
             queryset = queryset.filter(price__lte=max_price)
+
+        # Sorting
+        sort_key = self.request.GET.get('sort', 'price')
+        direction = self.request.GET.get('direction', 'asc')
+        sort_map = {
+            'price': 'price',
+            'name': 'name',
+            'artist': 'artist__user__username',
+        }
+        order_field = sort_map.get(sort_key, 'price')
+        if direction == 'desc':
+            order_field = '-' + order_field
+        queryset = queryset.order_by(order_field)
 
         return queryset
 
@@ -119,37 +230,29 @@ class ArtworkListView(ListView):
         # Prepare JSON data for artworks on the current page
         artworks_on_page = context['artworks']
         placeholder = context['placeholder_image']
+
+        raw_artwork_data = _serialize_artwork_data(
+            artworks_on_page, placeholder
+            )
+
         cleaned_artwork_data = []
-        for artwork in artworks_on_page:
-            # Safely get the image path
-            image_url = None
-            image_alt_text = artwork.name
-            image_obj = artwork.main_photo or placeholder
-
-            if image_obj:
-                image_url = image_obj.get_image_url
-                image_alt_text = image_obj.alt_text_or_default
-
-            # Get framing condition names
-            condition_names = [
-                cond.condition_name for cond in
-                artwork.prefetched_conditions
-            ]
-
+        for artwork in raw_artwork_data:
             cleaned_artwork_data.append({
-                'id': artwork.id,
-                'name': artwork.name,
-                'description': artwork.description,
-                'price': float(artwork.price),
-                'category': artwork.category.name,
-                'selected_conditions': condition_names,
-                'is_available': artwork.is_available,
-                'is_in_stock': artwork.is_in_stock,
-                'is_featured': artwork.is_featured,
-                'sku': artwork.sku,
-                'slug': artwork.slug,
-                'image_public_id': image_url,
-                'image_alt_text': image_alt_text
+                'id': artwork['id'],
+                'name': artwork['name'],
+                'description': artwork['description'],
+                'price': float(artwork['price']),
+                'category': artwork['category'],
+                'selected_conditions': [
+                    cond['name'] for cond in artwork['selected_conditions']
+                ],
+                'is_available': artwork['is_available'],
+                'is_in_stock': artwork['is_in_stock'],
+                'is_featured': artwork['is_featured'],
+                'sku': artwork['sku'],
+                'slug': artwork['slug'],
+                'image_public_id': artwork['image_public_id'],
+                'image_alt_text': artwork['image_alt_text'],
             })
         context['artworks_json_data'] = json.dumps(
             cleaned_artwork_data, cls=DjangoJSONEncoder
@@ -183,7 +286,7 @@ class ArtworkDetailView(DetailView):
 
     def get_queryset(self):
         return Artwork.objects.select_related(
-            'category', 'main_photo'
+            'category', 'main_photo', 'artist__user'
         ).prefetch_related(
             'photos',
             Prefetch(
@@ -216,7 +319,6 @@ class ArtworkAPIView(View):
     If `GET`, returns a JSON response with all available artworks.
 
     **Response**
-    A JSON array of artwork objects with fields:
     - ``id``
     - ``name``
     - ``artist``
@@ -224,7 +326,9 @@ class ArtworkAPIView(View):
     - ``price``
     - ``category``
     - ``selected_conditions``
-    - ``main_photo``
+    - ``image_url``
+    - ``image_public_id``
+    - ``image_alt_text``
     - ``is_available``
     - ``is_in_stock``
     - ``sku``
@@ -252,55 +356,30 @@ class ArtworkAPIView(View):
 
         placeholder = get_placeholder_image()
 
-        final_list = []
-        for artwork_data in artworks_queryset:
-            image_url = None
-            image_alt_text = artwork_data.name
-            image_obj = artwork_data.main_photo or placeholder
+        final_list = _serialize_artwork_data(
+            artworks_queryset, placeholder
+            )
 
-            if image_obj:
-                image_url = image_obj.get_image_url
-                image_alt_text = getattr(
-                    image_obj,
-                    'alt_text_or_default',
-                    artwork_data.name
-                    )
+        cleaned_api_data = []
+        for artwork in final_list:
+            cleaned_api_data.append({
+                'id': artwork['id'],
+                'name': artwork['name'],
+                'artist': artwork['artist'],
+                'description': artwork['description'],
+                'price': artwork['price'],
+                'category': artwork['category'],
+                'selected_conditions': artwork['selected_conditions'],
+                'is_available': artwork['is_available'],
+                'is_in_stock': artwork['is_in_stock'],
+                'sku': artwork['sku'],
+                'slug': artwork['slug'],
+                'image_url': artwork['image_url'],
+                'image_public_id': artwork['image_public_id'],
+                'image_alt_text': artwork['image_alt_text'],
+                'created_at': artwork['created_at'],
+                'updated_at': artwork['updated_at'],
+                'full_description': artwork['full_description'],
+            })
 
-            artist_data = {}
-            if artwork_data.artist:
-                user = artwork_data.artist.user
-                artist_data = {
-                    'username': user.username,
-                    'first_name': user.first_name,
-                    'last_name': user.last_name,
-                    'full_name': user.get_full_name(),
-                }
-
-            cleaned_artworks_item = {
-                'id': artwork_data.id,
-                'name': artwork_data.name,
-                'artist': artist_data,
-                'description': artwork_data.description,
-                'price': float(artwork_data.price),
-                'category': artwork_data.category.name,
-                'selected_conditions': [
-                    {'name': cond.condition_name, 'slug': cond.slug}
-                    for cond in artwork_data.prefetched_conditions
-                ],
-                'is_available': artwork_data.is_available,
-                'is_in_stock': artwork_data.is_in_stock,
-                'sku': artwork_data.sku,
-                'slug': artwork_data.slug,
-                'created_at': (
-                    artwork_data.created_at.isoformat() if
-                    artwork_data.created_at else None
-                    ),
-                'updated_at': (
-                    artwork_data.updated_at.isoformat() if
-                    artwork_data.updated_at else None
-                ),
-                'image_url': image_url,
-                'image_alt_text': image_alt_text,
-            }
-            final_list.append(cleaned_artworks_item)
-        return JsonResponse(final_list, safe=False)
+        return JsonResponse(cleaned_api_data, safe=False)

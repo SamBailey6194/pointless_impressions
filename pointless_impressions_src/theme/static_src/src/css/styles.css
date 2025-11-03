@@ -124,6 +124,11 @@
     color: var(--pointless-black) !important;
   }
 
+  .card {
+    background-color: var(--pointless-white) !important;
+    color: var(--pointless-black) !important;
+  }
+
   /* Dark Mode Overrides */
   @media (prefers-color-scheme: dark) {
     header, footer {
@@ -189,12 +194,12 @@
   }
 
   .btn:hover,
-  .btn-active-sort {
+  .btn-active {
     background-color: var(--pointless-red);
     border-color: var(--pointless-yellow);
   }
 
-  .btn-active-sort:hover {
+  .btn-active:hover {
     background-color: var(--pointless-yellow);
     border-color: var(--pointless-blue);
   }
@@ -445,7 +450,7 @@
   @media (prefers-color-scheme: dark) {
     .btn,
     .btn-circle,
-    .btn-active-sort:hover {
+    .btn-active:hover {
       background-color: var(--pointless-yellow);
       border-color: var(--pointless-blue);
       color: var(--pointless-black);
@@ -453,7 +458,7 @@
 
     .btn:hover,
     .btn-circle:hover,
-    .btn-active-sort {
+    .btn-active {
       background-color: var(--pointless-red);
       border-color: var(--pointless-yellow);
     }

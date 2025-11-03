@@ -30,19 +30,29 @@
       <div class="relative">
         <div class="flex overflow-x-auto gap-6 pb-4 snap-x snap-mandatory artwork-scrollbar">
           {% for artwork in featured_artworks %}
-            <div class="shrink-0 w-72 md:w-80 lg:w-96 snap-start">
-              <div class="rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-shadow duration-200 cursor-pointer card-adaptive">
-                {% if production and artwork.main_photo.image %}
-                  {% cloudinary artwork.main_photo.image height=256 crop='fit' format='auto' quality='auto' alt=artwork.main_photo.alt_text|default:artwork.name class="w-full h-64 object-cover bg-gray-200" %}
-                {% else %}
-                  <img src="{{ MEDIA_URL }}{{ artwork.main_photo.image }}" alt="{{ artwork.main_photo.alt_text|default:artwork.name }}" class="w-full h-64 object-cover bg-gray-200" />
-                {% endif %}
-                <div class="p-6">
-                  <h3 class="text-xl font-semibold mb-2 card-title">{{ artwork.name }}</h3>
-                  <p class="text-sm mb-3 opacity-70">By {{ artwork.category }}</p>
-                  <p class="text-lg mb-3 card-description">{{ artwork.description }}</p>
-                  <p class="text-lg font-bold text-[var(--pointless-blue)]">£{{ artwork.price }}</p>
-                </div>
+            <div class="shrink-0 w-72 md:w-80 lg:w-96 snap-start h-full">
+              <div class="rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-shadow duration-200 cursor-pointer card-adaptive h-full flex flex-col">
+                {% with image_to_render=artwork.main_photo %}
+                  <figure>
+                    {% if image_to_render %}
+                      {% comment %} An image exists for this artwork {% endcomment %}
+                      {% if production %}
+                        {% cloudinary image_to_render.image format="auto" quality="auto" width=400 height=300 crop="fill" class="w-full h-64 object-cover" alt=image_to_render.alt_text_or_default %}
+                      {% else %}
+                        {% comment %} LOCAL: Use the artwork's local image URL {% endcomment %}
+                        <img src="{{ image_to_render.get_image_url }}" 
+                            alt="{{ image_to_render.alt_text_or_default }}" 
+                            class="w-full h-64 object-cover">
+                      {% endif %}
+                    {% endif %}
+                  </figure>
+                  <div class="p-6 flex flex-col h-56">
+                    <h3 class="text-xl font-semibold mb-2 card-title">{{ artwork.name }}</h3>
+                    <p class="text-xs mb-3 opacity-70">By: {{ artwork.artist.user.username }} | Category: {{ artwork.category }}</p>
+                    <p class="text-sm mb-3 card-description flex-grow">{{ artwork.description }}</p>
+                    <p class="text-lg font-bold text-[var(--pointless-blue)]">£{{ artwork.price }}</p>
+                  </div>
+                {% endwith %}
               </div>
             </div>
           {% empty %}

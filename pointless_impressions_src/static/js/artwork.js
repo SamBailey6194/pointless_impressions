@@ -4,13 +4,11 @@
     const container = document.getElementById("artwork-list");
     if (!container) return;
     const isReady = typeof getCloudinaryUrl !== "undefined" && typeof ARTWORK_DETAIL_BASE_PATH !== "undefined";
-    const clearURL = "/artworks/";
-    container.innerHTML = "";
+    const clearURL = typeof ARTWORK_LIST_URL !== "undefined" ? ARTWORK_LIST_URL : "/artworks/";
+    let cardsHTML = "";
     if (artworks.length === 0) {
-      container.classList.remove("grid", "grid-cols-1", "md:grid-cols-2", "lg:grid-cols-3", "gap-6");
-      container.classList.add("flex", "justify-center", "items-center", "min-h-[400px]");
-      container.innerHTML = `
-            <div class="hero w-full">
+      cardsHTML = `
+            <div class="hero min-h-[400px] col-span-full">
                 <div class="hero-content text-center mx-auto">
                     <div class="max-w-md">
                         <i class="fa-solid fa-palette text-6xl text-base-content mb-4"></i>
@@ -23,27 +21,34 @@
                 </div>
             </div>`;
     } else {
-      container.classList.remove("flex", "justify-center", "items-center", "min-h-[400px]");
-      container.classList.add("grid", "grid-cols-1", "md:grid-cols-2", "lg:grid-cols-3", "gap-6");
       artworks.forEach((artwork) => {
-        const card = document.createElement("div");
-        card.className = "artwork-card card bg-base-100 shadow-xl hover:shadow-2xl transition-shadow";
-        card.setAttribute("data-sku", artwork.sku);
         let imageHTML = "";
         const publicId = artwork.image_public_id;
         const altText = artwork.image_alt_text || artwork.name;
-        if (publicId && isReady) {
+        if (publicId && isReady && typeof getCloudinaryUrl !== "undefined") {
           const transformations = "w_400,h_300,c_fill,f_auto,q_auto";
           const imageUrl = getCloudinaryUrl(publicId, transformations);
+          imageHTML = `<figure><img src="${imageUrl}" alt="${altText}" class="w-full h-64 object-cover"></figure>`;
+        } else if (artwork.image_url) {
+          imageHTML = `<figure><img src="${artwork.image_url}" alt="${altText}" class="w-full h-64 object-cover"></figure>`;
+        } else if (typeof PLACEHOLDER_IMAGE_PUBLIC_ID !== "undefined" && isReady && typeof getCloudinaryUrl !== "undefined") {
+          const transformations = "w_400,h_300,c_fill,f_auto,q_auto";
+          const imageUrl = getCloudinaryUrl(PLACEHOLDER_IMAGE_PUBLIC_ID, transformations);
           imageHTML = `<figure><img src="${imageUrl}" alt="${altText}" class="w-full h-64 object-cover"></figure>`;
         } else {
           imageHTML = `<figure><div class="bg-base-300 h-64 w-full flex items-center justify-center"><i class="fa-solid fa-image text-base-content/20 text-5xl"></i></div></figure>`;
         }
+        const artistUrl = typeof ARTWORK_LIST_URL !== "undefined" ? `${ARTWORK_LIST_URL}?artist=${artwork.artist.username}` : `/artworks/?artist=${artwork.artist.username}`;
+        const artistName = artwork.artist.username;
+        const artistLine = artwork.artist && artwork.artist.username ? `<p class="text-sm -mt-2 mb-2">
+                             <a href="${artistUrl}" class="link link-hover">${artistName}</a>
+                            </p>` : "";
         const detailUrl = isReady && artwork.slug ? ARTWORK_DETAIL_BASE_PATH + artwork.slug + "/" : "#";
         const bodyHTML = `
                 <div class="card-body">
                     <h2 class="artwork-name card-title">${artwork.name}</h2>
-                    <p class="artwork-description text-base-content/70">${artwork.description}</p>
+                    ${artistLine}
+                    <p class="artwork-description">${artwork.description}</p>
                     <div class="divider my-2"></div>
                     <p class="artwork-price text-2xl font-bold text-primary">\xA3${artwork.price.toFixed(2)}</p>
                     
@@ -59,16 +64,16 @@
                         `}
                     </div>
                 </div>`;
-        card.innerHTML = imageHTML + bodyHTML;
-        container.appendChild(card);
+        cardsHTML += `<div class="artwork-card card shadow-xl hover:shadow-2xl transition-shadow" data-sku="${artwork.sku}">${imageHTML}${bodyHTML}</div>`;
       });
     }
-  }
-  function filterAvailableArtworks(artworks) {
-    return artworks.filter((a) => a.is_available || a.is_in_stock);
+    container.innerHTML = cardsHTML;
   }
   function sortArtworksByPriceAsc(artworks) {
     return [...artworks].sort((a, b) => a.price - b.price);
+  }
+  function sortArtworksByPriceDesc(artworks) {
+    return [...artworks].sort((a, b) => b.price - a.price);
   }
   function sortArtworksByName(artworks) {
     return [...artworks].sort((a, b) => a.name.localeCompare(b.name));
@@ -83,109 +88,70 @@
   var masterArtworkList = [];
   var currentSortKey = "price";
   var currentSortDirection = "asc";
-  var isFilterActive = false;
-  function toggleLoadingState(isLoading) {
-    const container = document.getElementById("artwork-list");
-    if (!container) return;
-    if (isLoading) {
-      container.classList.add("opacity-50", "pointer-events-none");
-    } else {
-      container.classList.remove("opacity-50", "pointer-events-none");
-    }
-  }
-  function fetchArtworksFromAPI() {
-    if (typeof ARTWORK_API_URL === "undefined") {
-      console.error("ARTWORK_API_URL is missing.");
-      return Promise.resolve([]);
-    }
-    toggleLoadingState(true);
-    return fetch(ARTWORK_API_URL).then((response) => {
-      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-      return response.json();
-    }).then((data) => {
-      masterArtworkList = data;
-      toggleLoadingState(false);
-      return data;
-    }).catch((error) => {
-      console.error("Error loading artworks via API:", error);
-      toggleLoadingState(false);
-      document.getElementById("artwork-list").innerHTML = '<p class="text-center text-error p-8">Could not load dynamic artwork data.</p>';
-      return [];
-    });
-  }
+  var isEnhanced = false;
   function applyStateAndRender() {
-    let filteredList = [...masterArtworkList];
-    if (isFilterActive) {
-      filteredList = filterAvailableArtworks(filteredList);
-    }
-    let sortedList;
+    let sortedList = [...masterArtworkList];
     switch (currentSortKey) {
       case "price":
-        sortedList = sortArtworksByPriceAsc(filteredList);
+        sortedList = currentSortDirection === "desc" ? sortArtworksByPriceDesc(sortedList) : sortArtworksByPriceAsc(sortedList);
         break;
       case "name":
-        sortedList = sortArtworksByName(filteredList);
+        sortedList = sortArtworksByName(sortedList);
         break;
       case "artist":
-        sortedList = sortArtworksByArtist(filteredList);
+        sortedList = sortArtworksByArtist(sortedList);
         break;
       default:
-        sortedList = filteredList;
-    }
-    if (currentSortDirection === "desc") {
-      sortedList.reverse();
+        sortedList = sortArtworksByPriceAsc(sortedList);
     }
     renderArtworkList(sortedList);
   }
-  function handleControlClick(event) {
-    const button = event.target.closest(".sort-control");
-    if (!button) return;
-    const controlType = button.dataset.type;
-    if (controlType === "sort") {
-      const key = button.dataset.sortKey;
-      const direction = button.dataset.sortDirection;
-      updateSortStateAndStyles(key, direction, button);
-      applyStateAndRender();
-    }
-  }
-  function updateSortStateAndStyles(key, direction, activeButton) {
-    currentSortKey = key;
-    currentSortDirection = direction;
+  function updateSortButtonStates() {
     document.querySelectorAll('.sort-control[data-type="sort"]').forEach((btn) => {
-      btn.classList.remove("btn-active-sort");
-      btn.classList.add("btn-outline");
-    });
-    activeButton.classList.remove("btn-outline");
-    activeButton.classList.add("btn-active-sort");
-  }
-  function initArtworkListEnhancements() {
-    const hasServerFilters = window.location.search.length > 0;
-    if (hasServerFilters) {
-      return;
-    }
-    fetchArtworksFromAPI().then((artworks) => {
-      if (artworks.length > 0) {
-        const availableCheckbox2 = document.getElementById("available-only-checkbox");
-        if (availableCheckbox2 && availableCheckbox2.checked) {
-          isFilterActive = true;
-        }
-        const defaultSortButton = document.getElementById("sort-lowest-price");
-        if (defaultSortButton) {
-          updateSortStateAndStyles("price", "asc", defaultSortButton);
-          applyStateAndRender();
-        }
+      const key = btn.getAttribute("data-sort-key");
+      const direction = btn.getAttribute("data-sort-direction");
+      if (String(key) === String(currentSortKey) && String(direction) === String(currentSortDirection)) {
+        btn.classList.add("btn-active");
+      } else {
+        btn.classList.remove("btn-active");
       }
     });
+  }
+  function handleSortClick(event) {
+    const button = event.target.closest(".sort-control");
+    if (!button || button.dataset.type !== "sort") return;
+    if (!isEnhanced || masterArtworkList.length === 0) {
+      return;
+    }
+    event.preventDefault();
+    const key = button.dataset.sortKey;
+    const direction = button.dataset.sortDirection;
+    currentSortKey = key;
+    currentSortDirection = direction;
+    updateSortButtonStates();
+    applyStateAndRender();
+    const url = new URL(window.location);
+    url.searchParams.set("sort", key);
+    url.searchParams.set("direction", direction);
+    window.history.pushState({}, "", url);
+  }
+  function initializeSortState() {
+    const params = new URLSearchParams(window.location.search);
+    currentSortKey = params.get("sort") || "price";
+    currentSortDirection = params.get("direction") || "asc";
+    updateSortButtonStates();
+  }
+  function initArtworkListEnhancements() {
+    initializeSortState();
+    updateSortButtonStates();
+    if (typeof window.ARTWORKS_JSON_DATA !== "undefined" && window.ARTWORKS_JSON_DATA.length > 0) {
+      masterArtworkList = window.ARTWORKS_JSON_DATA;
+      isEnhanced = true;
+      applyStateAndRender();
+    }
     const controlsContainer = document.getElementById("controls");
     if (controlsContainer) {
-      controlsContainer.addEventListener("click", handleControlClick);
-    }
-    const availableCheckbox = document.getElementById("available-only-checkbox");
-    if (availableCheckbox) {
-      availableCheckbox.addEventListener("change", function(event) {
-        isFilterActive = event.target.checked;
-        applyStateAndRender();
-      });
+      controlsContainer.addEventListener("click", handleSortClick);
     }
   }
   document.addEventListener("DOMContentLoaded", initArtworkListEnhancements);

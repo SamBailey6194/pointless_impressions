@@ -40,6 +40,7 @@ class Artwork(models.Model):
     is_available = models.BooleanField(default=True)
     is_in_stock = models.BooleanField(default=True)
     is_featured = models.BooleanField(default=False)
+    quantity = models.PositiveIntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     slug = models.SlugField(max_length=255, unique=True, blank=True, null=True)
@@ -49,11 +50,15 @@ class Artwork(models.Model):
         return self.name
 
     def save(self, *args, **kwargs):
-        """Override save to generate SKU if not provided."""
+        """
+        Override save to generate SKU if not provided and set is_in_stock.
+        """
         if not self.sku:
             self.sku = self.generate_unique_sku()
         if not self.slug:
             self.slug = slugify(self.name)
+        # Set is_in_stock to True if quantity is not 0, else False
+        self.is_in_stock = self.quantity != 0
         super().save(*args, **kwargs)
 
     def generate_unique_sku(self):

@@ -15,6 +15,14 @@ class HomeView(TemplateView):
         context['section_3_class'] = 'py-16 section-alt w-full'
 
         # Add featured artworks to context
-        context['featured_artworks'] = Artwork.objects.filter(is_featured=True)
+        context['featured_artworks'] = Artwork.objects.filter(
+            is_featured=True
+            ).select_related(
+                'main_photo',
+                'artist__user',
+                'category'
+            ).prefetch_related(
+                'selected_conditions'
+            )[:10]
 
         return context

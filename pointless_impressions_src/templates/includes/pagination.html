@@ -23,7 +23,7 @@
         {% else %}
             {% if i == page_obj.number %}
                 {% comment %} Current, active page {% endcomment %}
-                <button class="join-item btn btn-active">{{ i }}</button>
+                <button class="join-item btn btn-ghost btn-active">{{ i }}</button>
             {% else %}
                 {% comment %} Other page links {% endcomment %}
                 <a href="?page={{ i }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}"

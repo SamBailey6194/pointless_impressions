@@ -312,6 +312,8 @@ Please note for the Jest and Cypress testing there was a need to create html fix
 - **Sort Functions**: Positioning of sort buttons were not centered and the message for no artworks found was not displaying correctly. Fixed the sort button positioning and message display by updating the artwork.js file and artwork.html template to have col-span-full to take up the space. While also applying JS and dataset attributes to ensure the correct sort button remains highlighted after sorting.
 - **GET for Filter**: GET request was not being used for the available only filter button in artwork.js. Therefore, the filter button was not working correctly. Fixed the issue by moving available only to a checkbox management system inside the filter form.
 - **Artwork CBV**: Fixed the Artwork CBV to properly filter artworks based on availability and sort order. Updated the get_queryset method to handle filtering and sorting logic correctly. While also ensuring the JSON response for AJAX requests is properly formatted.
+- **Sort Buttons Only Working on Artwork on the Page**: The sort buttons were only sorting the artworks that were currently displayed on the page rather than all artworks. Fixed this by updating the Django templates to use SSR and JavaScript to fetch and render sorted artworks from the server.
+- **Search Views had Wrong Names**: The search queries were not named after the correct models properly leading to type and attribute errors. Fixed this by renaming the queries to match the correct models and ensuring proper imports.
 
 ### Unfixed Bugs
 
@@ -786,3 +788,4 @@ Below are my credits for where I got inspiration for some of the code and conten
 - Writing TestCase tests for Django I used [Django Testing Documentation](https://docs.djangoproject.com/en/5.2/topics/testing/) and [Django Testing Tutorial by Pretty Printed](https://www.youtube.com/playlist?list=PLXmMXHVSvS-CjH8Yd4mJ6s8u0n1c2r3ZV)
 - Writing Jest inside JavaScript without affecting Django templating I used [Testing Django Templates with Jest by Simple is Better Than Complex](https://simpleisbetterthancomplex.com/tutorial/2020/03/30/testing-django-templates-with-jest.html)
 - For writing CBVs I followed [Bug Bytes - Django Class Based Views from Scratch!](https://www.youtube.com/watch?v=Z3Z8h6_2b0M) and used the official [Django Class Based Views Documentation](https://docs.djangoproject.com/en/5.2/topics/class-based-views/)
+- To help with sorting via SSR and AJAX via API I used [Django AJAX Tutorial by Pretty Printed](https://www.youtube.com/watch?v=2d7s3spWAzo) and [Django Sorting and Filtering with AJAX by JustDjango](https://www.youtube.com/watch?v=5hY6b6rX9mA)

@@ -3,6 +3,7 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.conf import settings
 from django.db.models import Q
 from django.http import JsonResponse
+from django.db.models import Prefetch
 from pointless_impressions_src.artwork.models import (
     Artwork, ArtworkCategory, ArtworkFramingCondition
     )
@@ -43,10 +44,10 @@ class SearchView(TemplateView):
     - ``q``: The primary query parameter (e.g., /search/?q=sunset).
 
     **Template:**
-    :template:`search/results.html`
+    :template:`search/search_list.html`
     """
-    template_name = 'search/results.html'
-    paginate_by = 10
+    template_name = 'search/search_list.html'
+    paginate_by = 12
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -58,16 +59,27 @@ class SearchView(TemplateView):
             # Get artwork results
             artwork_search_q = (
                 Q(name__icontains=query) |
-                Q(artist__name__icontains=query) |
+                Q(artist__user__username__icontains=query) |
+                Q(artist__user__first_name__icontains=query) |
+                Q(artist__user__last_name__icontains=query) |
                 Q(description__icontains=query) |
                 Q(category__name__icontains=query) |
-                Q(selected_condition__condition_name__icontains=query)
+                Q(selected_conditions__condition_name__icontains=query)
             )
             artwork_results = Artwork.objects.filter(
                 is_available=True
             ).filter(artwork_search_q).distinct().select_related(
-                'category', 'selected_condition', 'main_photo'
-            ).prefetch_related('photos')
+                'category',
+                'main_photo',
+                'artist',
+                'artist__user'
+            ).prefetch_related(
+                'photos',
+                Prefetch(
+                    'selected_conditions',
+                    queryset=ArtworkFramingCondition.objects.all()
+                )
+            )
 
             # Get Blog results
             # blog_search_q = (
@@ -85,11 +97,13 @@ class SearchView(TemplateView):
 
             # Get Artist results
             artist_search_q = (
-                Q(name__icontains=query) |
-                Q(biography__icontains=query)
+                Q(user__first_name__icontains=query) |
+                Q(user__last_name__icontains=query) |
+                Q(user__username__icontains=query) |
+                Q(bio__icontains=query)
             )
             artist_results = Artist.objects.filter(
-                is_active=True
+                user__is_active=True
             ).filter(artist_search_q).distinct().select_related(
                 'user',
                 'user__userprofile__profile_picture'
@@ -117,13 +131,11 @@ class SearchView(TemplateView):
             except EmptyPage:
                 page_obj = paginator.page(paginator.num_pages)
 
-        else:
-            paginator = Paginator([], self.paginate_by)
-            page_obj = paginator.page(1)
-
+        context['paginator'] = paginator
+        context['page_obj'] = page_obj
         context['results'] = page_obj
         context['search_query'] = query
-        context['is_paginated'] = page_obj.has_other_pages()
+        context['is_paginated'] = context['paginator'].num_pages >= 1
         context['production'] = not settings.DEBUG
         context['placeholder_image'] = get_placeholder_image()
         return context
