@@ -3,7 +3,7 @@
 /**
  * Renders a list of artwork cards into the designated container (#artwork-list).
  */
-function renderArtworkList(artworks) {
+export function renderArtworkList(artworks) {
     const container = document.getElementById('artwork-list');
     if (!container) return;
 
@@ -45,10 +45,14 @@ function renderArtworkList(artworks) {
                 imageHTML = `<figure><div class="bg-base-300 h-64 w-full flex items-center justify-center"><i class="fa-solid fa-image text-base-content/20 text-5xl"></i></div></figure>`;
             }
             
-            const artistUrl = typeof ARTWORK_LIST_URL !== 'undefined'
-                ? `${ARTWORK_LIST_URL}?artist=${artwork.artist.username}`
-                : `/artworks/?artist=${artwork.artist.username}`;
-            const artistName = artwork.artist.username;
+            // Handle artist info (may be undefined)
+            let artistUrl = '#';
+            let artistName = 'Unknown Artist';
+            if (artwork.artist && artwork.artist.username) {
+                const baseUrl = typeof ARTWORK_LIST_URL !== 'undefined' ? ARTWORK_LIST_URL : '/artworks/';
+                artistUrl = `${baseUrl}?artist=${artwork.artist.username}`;
+                artistName = artwork.artist.username;
+            }
             const artistLine = artwork.artist && artwork.artist.username
                          ? `<p class="text-sm -mt-2 mb-2">
                              <a href="${artistUrl}" class="link link-hover">${artistName}</a>
@@ -83,27 +87,27 @@ function renderArtworkList(artworks) {
 }
 
 /** Filters artworks to show only those marked as available or in stock. */
-function filterAvailableArtworks(artworks) {
+export function filterAvailableArtworks(artworks) {
     return artworks.filter(a => a.is_available || a.is_in_stock);
 }
 
 /** Sorts artworks by price in ascending order. */
-function sortArtworksByPriceAsc(artworks) {
+export function sortArtworksByPriceAsc(artworks) {
     return [...artworks].sort((a, b) => a.price - b.price); 
 }
 
 /** Sorts artworks by price in descending order. */
-function sortArtworksByPriceDesc(artworks) {
+export function sortArtworksByPriceDesc(artworks) {
     return [...artworks].sort((a, b) => b.price - a.price); 
 }
 
 /** Sorts artworks by name in ascending order. */
-function sortArtworksByName(artworks) {
+export function sortArtworksByName(artworks) {
     return [...artworks].sort((a, b) => a.name.localeCompare(b.name));
 }
 
 /** Sort artworks by artist in ascending order. */
-function sortArtworksByArtist(artworks) {
+export function sortArtworksByArtist(artworks) {
     return [...artworks].sort((a, b) => {
         const nameA = a.artist?.username || a.name;
         const nameB = b.artist?.username || b.name;

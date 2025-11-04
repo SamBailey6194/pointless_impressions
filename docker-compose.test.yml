@@ -1,0 +1,5 @@
+services:
+  web:
+    environment:
+      - ENV=test
+      - DJANGO_SETTINGS_MODULE=pointless_impressions_src.pointless_impressions.settings.test

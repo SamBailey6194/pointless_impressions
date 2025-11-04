@@ -1,4 +1,4 @@
-/** @type {import('jest').Config} */
+/** @type {import('@jest/types').Config.InitialOptions} */
 const config = {
   clearMocks: true,
   collectCoverage: true,

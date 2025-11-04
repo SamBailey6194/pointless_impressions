@@ -2,7 +2,7 @@
  * @jest-environment jsdom
  */
 
-import { renderArtworkList, filterAvailableArtworks, sortArtworksByPrice } from '../src/js/artwork.js';
+import { renderArtworkList, filterAvailableArtworks, sortArtworksByPriceAsc, sortArtworksByPriceDesc, sortArtworksByName, sortArtworksByArtist } from '../../../../js/artwork.js';
 
 describe('US001: Browse Pointillism Artwork (Frontend)', () => {
   let artworks;
@@ -16,7 +16,8 @@ describe('US001: Browse Pointillism Artwork (Frontend)', () => {
         price: 199.99,
         sku: 'SUNSET123',
         is_available: true,
-        is_in_stock: true
+        is_in_stock: true,
+        artist: { username: 'blake' }
       },
       {
         name: 'Starry Night',
@@ -24,7 +25,8 @@ describe('US001: Browse Pointillism Artwork (Frontend)', () => {
         price: 299.99,
         sku: 'STARRY123',
         is_available: false,
-        is_in_stock: false
+        is_in_stock: false,
+        artist: { username: 'chris' }
       }
     ];
 
@@ -52,8 +54,23 @@ describe('US001: Browse Pointillism Artwork (Frontend)', () => {
   });
 
   test('Sorting artworks by price ascending', () => {
-    const sorted = sortArtworksByPrice(artworks);
+    const sorted = sortArtworksByPriceAsc(artworks);
     expect(sorted[0].price).toBeLessThanOrEqual(sorted[1].price);
+  });
+
+  test('Sorting artworks by price descending', () => {
+    const sorted = sortArtworksByPriceDesc(artworks);
+    expect(sorted[0].price).toBeGreaterThanOrEqual(sorted[1].price);
+  });
+
+  test('Sorting artworks alphabetically', () => {
+    const sorted = sortArtworksByName(artworks);
+    expect(sorted[0].name.localeCompare(sorted[1].name)).toBeLessThanOrEqual(0);
+  });
+
+  test('Sorting artworks by artist', () => {
+    const sorted = sortArtworksByArtist(artworks);
+    expect(sorted[0].artist.username.localeCompare(sorted[1].artist.username)).toBeLessThanOrEqual(0);
   });
 
   test('Filtering available artworks', () => {

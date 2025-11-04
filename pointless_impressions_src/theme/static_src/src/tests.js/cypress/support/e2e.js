@@ -35,8 +35,29 @@ beforeEach(() => {
 
 // Run before all tests in a spec file
 before(() => {
-  // Setup that runs once before all tests
-  // Example: seed database, setup test data
+  // ⚠️  DEVELOPMENT ONLY: Setup test data for Cypress E2E tests
+  // This only works when using test.py settings with test database
+  
+  cy.request({
+    method: 'GET',
+    url: 'http://localhost:8000/artworks/api/setup-test-data/',
+    failOnStatusCode: false
+  }).then((response) => {
+    if (response.status === 200 || response.status === 201) {
+      cy.log('✅ Test data created successfully for E2E tests')
+    } else if (response.status === 403) {
+      cy.log(
+        '⚠️  Test data endpoint blocked - ensure using test.py settings'
+      )
+    } else {
+      cy.log(
+        '⚠️  Test data setup incomplete - status: ' + response.status
+      )
+    }
+  }, (error) => {
+    // API endpoint might not exist or not accessible
+    cy.log('Note: Test data endpoint not available')
+  })
 })
 
 // Run after each test
@@ -121,11 +142,6 @@ Cypress.Commands.add('waitForNetworkIdle', (timeout = 2000) => {
   })
 })
 
-// Wait for a specific number of milliseconds
-Cypress.Commands.add('wait', (ms) => {
-  return cy.wait(ms)
-})
-
 // Wait for element to be visible and interactable
 Cypress.Commands.add('waitForElement', (selector, timeout = 10000) => {
   return cy.get(selector, { timeout }).should('be.visible').and('not.be.disabled')
@@ -198,16 +214,6 @@ Cypress.Commands.add('visitAndWait', (url, timeout = 10000) => {
   cy.get('body', { timeout }).should('be.visible')
 })
 
-// Go back in browser history
-Cypress.Commands.add('goBack', () => {
-  cy.go('back')
-})
-
-// Reload the page
-Cypress.Commands.add('reload', () => {
-  cy.reload()
-})
-
 // **********************************************
 // Assertion Helpers
 // **********************************************
@@ -251,18 +257,6 @@ Cypress.Commands.add('selectByText', (selector, text) => {
 // **********************************************
 // Debug Helpers
 // **********************************************
-
-// Log and pause for debugging
-Cypress.Commands.add('debug', (message) => {
-  cy.log(`🐛 DEBUG: ${message}`)
-  cy.pause()
-})
-
-// Take a screenshot with a custom name
-Cypress.Commands.add('screenshot', (name) => {
-  const testName = Cypress.currentTest.title
-  cy.screenshot(`${testName}-${name}`)
-})
 
 // Log custom message to Cypress command log
 Cypress.Commands.add('logMessage', (message, type = 'info') => {

@@ -7,7 +7,8 @@ from pointless_impressions_src.photo.models import Photo
 
 
 # Create your tests here.
-class ArtworkModelTest(TestCase):
+class ArtworkListModelTest(TestCase):
+    """Tests for the Artwork model. For US001."""
     def setUp(self):
         self.framing_condition = ArtworkFramingCondition.objects.create(
             condition_name="framed",
@@ -26,12 +27,14 @@ class ArtworkModelTest(TestCase):
             price=199.99,
             sku="SUNSET1234",
             category=self.category,
-            selected_condition=self.framing_condition,
             is_available=True,
             is_in_stock=True,
             is_featured=False,
             slug="sunset",
+            quantity=10,
         )
+
+        self.artwork.selected_conditions.add(self.framing_condition)
 
         self.main_photo = Photo.objects.create(
             artwork=self.artwork,
@@ -53,7 +56,7 @@ class ArtworkModelTest(TestCase):
         self.assertEqual(self.artwork.sku, "SUNSET1234")
         self.assertEqual(self.artwork.category, self.category)
         self.assertEqual(
-            self.artwork.selected_condition, self.framing_condition
+            self.artwork.selected_conditions.first().condition_name, "framed"
             )
         self.assertEqual(self.artwork.main_photo, self.main_photo)
         self.assertTrue(self.artwork.is_available)
@@ -62,16 +65,11 @@ class ArtworkModelTest(TestCase):
         self.assertIsNotNone(self.artwork.created_at)
         self.assertIsNotNone(self.artwork.updated_at)
 
-    def test_artwork_selected_condition(self):
-        self.artwork.selected_condition = self.framing_condition
-        self.artwork.save()
-        self.assertEqual(
-            self.artwork.selected_condition.condition_name, "framed"
-        )
-        self.assertEqual(
-            self.artwork.selected_condition.condition_description,
-            "Artwork is framed with a wooden frame."
-        )
+    def test_artwork_selected_conditions(self):
+        condition_qs = self.artwork.selected_conditions.all()
+        self.assertEqual(condition_qs.count(), 1)
+        self.assertEqual(condition_qs.first(), self.framing_condition)
+        self.assertEqual(condition_qs.first().condition_name, "framed")
 
     def test_artwork_category(self):
         self.artwork.category = self.category
@@ -90,9 +88,14 @@ class ArtworkModelTest(TestCase):
 
     def test_artwork_stock(self):
         self.assertTrue(self.artwork.is_in_stock)
-        self.artwork.is_in_stock = False
+        self.assertEqual(self.artwork.quantity, 10)
+        self.artwork.quantity = 0
         self.artwork.save()
         self.assertFalse(self.artwork.is_in_stock)
+
+        # Replenish stock
+        self.artwork.quantity = 5
+        self.artwork.save()
 
     def test_artwork_featured(self):
         self.assertFalse(self.artwork.is_featured)
@@ -119,13 +122,14 @@ class ArtworkModelTest(TestCase):
                 price=149.99,
                 sku="SUNSET1234",
                 category=None,
-                selected_condition=None,
+                selected_conditions=None,
                 main_photo=None,
                 is_available=True,
                 is_in_stock=True,
                 is_featured=False,
                 created_at=timezone.now(),
                 updated_at=timezone.now(),
+                quantity=10,
             )
 
     def test_artwork_timestamps(self):
@@ -144,13 +148,13 @@ class ArtworkModelTest(TestCase):
             price=179.99,
             sku="OCEAN45678",
             category=None,
-            selected_condition=None,
             main_photo=None,
             is_available=True,
             is_in_stock=True,
             is_featured=True,
             created_at=timezone.now(),
             updated_at=timezone.now(),
+            quantity=5,
         )
         self.assertNotEqual(self.artwork.id, artwork2.id)
         self.assertEqual(Artwork.objects.count(), 2)
@@ -158,7 +162,7 @@ class ArtworkModelTest(TestCase):
         self.assertTrue(artwork2.is_featured)
         self.assertEqual(artwork2.sku, "OCEAN45678")
         self.assertIsNone(artwork2.category)
-        self.assertIsNone(artwork2.selected_condition)
+        self.assertEqual(artwork2.selected_conditions.count(), 0)
         self.assertIsNotNone(artwork2.created_at)
         self.assertIsNotNone(artwork2.updated_at)
 
@@ -170,11 +174,12 @@ class ArtworkModelTest(TestCase):
             price=10.00,
             sku="SLUGTEST1",
             category=self.category,
-            selected_condition=self.framing_condition,
             is_available=True,
             is_in_stock=True,
             is_featured=False,
+            quantity=5,
         )
+        artwork_no_slug.selected_conditions.add(self.framing_condition)
         self.assertEqual(artwork_no_slug.slug, "new-art-test-piece")
 
     def test_artwork_sku_auto_generation(self):
@@ -184,12 +189,13 @@ class ArtworkModelTest(TestCase):
             description="A test.",
             price=10.00,
             category=self.category,
-            selected_condition=self.framing_condition,
             is_available=True,
             is_in_stock=True,
             is_featured=False,
             slug="no-sku-art",
+            quantity=5,
         )
+        artwork_no_sku.selected_conditions.add(self.framing_condition)
         self.assertIsNotNone(artwork_no_sku.sku)
         self.assertTrue(artwork_no_sku.sku.startswith("SKU-"))
         self.assertGreater(len(artwork_no_sku.sku), 4)

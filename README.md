@@ -275,9 +275,9 @@ You can see the automatic testing table [here](docs/markdowns/AUTOMATICTESTING.m
 
 For TDD I used TestCase for Django and Jest for JavaScript
 
-For BDD I used Behave for Django and Cypress for JavaScript
+For BDD I used Behave for Python and Cypress for JavaScript.
 
-Please note for the Jest and Cypress testing there was a need to create html fixture files as Jest and Cypress don't always read the Django dynamic structure.
+Please note for the Jest testing there was a need to create html fixture files as Jest doesn't always read the Django dynamic structure.
 
 ### Fixed Bugs
 
@@ -314,6 +314,9 @@ Please note for the Jest and Cypress testing there was a need to create html fix
 - **Artwork CBV**: Fixed the Artwork CBV to properly filter artworks based on availability and sort order. Updated the get_queryset method to handle filtering and sorting logic correctly. While also ensuring the JSON response for AJAX requests is properly formatted.
 - **Sort Buttons Only Working on Artwork on the Page**: The sort buttons were only sorting the artworks that were currently displayed on the page rather than all artworks. Fixed this by updating the Django templates to use SSR and JavaScript to fetch and render sorted artworks from the server.
 - **Search Views had Wrong Names**: The search queries were not named after the correct models properly leading to type and attribute errors. Fixed this by renaming the queries to match the correct models and ensuring proper imports.
+- **Use Behave-Django instead of Django-Behave**: Django-Behave is no longer maintained and was causing issues with the latest Django versions. Therefore, I switched to Behave-Django which is actively maintained and works better with Django and created a `environment.py` and `settings/test.py` file for the testing environment as the actual database being populated was causing issues when running behave.
+- **Syntax issues with Behave-Django**: Behave tests were failing due to mismatches between feature file steps and step definitions. Fixed this by ensuring exact matches in wording and punctuation between feature files and step implementations. Behave-Django also can't use background features therefore each scenario feature had the database information added to it.
+- **Cypress test port on same port as dev**: Cypress was trying to run on the same port as the development server causing port conflicts. Along with that, Cypress was not receiving the data properly. Fixed this by creating a separate `docker-compose.test.yml` and adjusted the `dev.sh` entrypoint script to run the test server on port 8001. Updated Cypress configuration to point to the correct test server URL.
 
 ### Unfixed Bugs
 
@@ -784,7 +787,8 @@ Below are my credits for where I got inspiration for some of the code and conten
 - To help with SSR and API for fetching artwork, blog and profile information quickly and efficiently I used [Django REST Framework Documentation](https://www.django-rest-framework.org/) and [Building APIs with Django REST Framework by Pretty Printed](https://www.youtube.com/playlist?list=PLXmMXHVSvS-DdJHq3jE4wA3Y1l2R6pAGV)
 - Writing Jest tests for JavaScript I used [Jest Documentation](https://jestjs.io/docs/getting-started)
 - Writing Cypress tests for end to end testing I used [Cypress Documentation](https://docs.cypress.io/guides/overview/why-cypress)
-- Writing Behave tests for BDD in Django I used [Behave Documentation](https://behave.readthedocs.io/en/latest/) and [BDD with Behave and Django by Pretty Printed](https://www.youtube.com/watch?v=Z1v3gY6p6xA)
+- To set up Cypress using Docker and Django I used [End to End Testing with Cypress and Django in Docker by JustDjango](https://www.youtube.com/watch?v=YlRZ6J1bG1o)
+- Writing Behave tests using behave-django I used [Behave-Django Documentation](https://behave-django.readthedocs.io/en/latest/) and [BDD with Django and Behave by Pretty Printed](https://www.youtube.com/playlist?list=PLXmMXHVSvS-A8YxkG6Yk1KXJ8jJ1Jk9Zl)
 - Writing TestCase tests for Django I used [Django Testing Documentation](https://docs.djangoproject.com/en/5.2/topics/testing/) and [Django Testing Tutorial by Pretty Printed](https://www.youtube.com/playlist?list=PLXmMXHVSvS-CjH8Yd4mJ6s8u0n1c2r3ZV)
 - Writing Jest inside JavaScript without affecting Django templating I used [Testing Django Templates with Jest by Simple is Better Than Complex](https://simpleisbetterthancomplex.com/tutorial/2020/03/30/testing-django-templates-with-jest.html)
 - For writing CBVs I followed [Bug Bytes - Django Class Based Views from Scratch!](https://www.youtube.com/watch?v=Z3Z8h6_2b0M) and used the official [Django Class Based Views Documentation](https://docs.djangoproject.com/en/5.2/topics/class-based-views/)

@@ -27,7 +27,7 @@ DJANGO_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    "django_behave",
+    "behave_django",
 ]
 
 THIRD_PARTY_APPS = [

@@ -38,8 +38,13 @@
         } else {
           imageHTML = `<figure><div class="bg-base-300 h-64 w-full flex items-center justify-center"><i class="fa-solid fa-image text-base-content/20 text-5xl"></i></div></figure>`;
         }
-        const artistUrl = typeof ARTWORK_LIST_URL !== "undefined" ? `${ARTWORK_LIST_URL}?artist=${artwork.artist.username}` : `/artworks/?artist=${artwork.artist.username}`;
-        const artistName = artwork.artist.username;
+        let artistUrl = "#";
+        let artistName = "Unknown Artist";
+        if (artwork.artist && artwork.artist.username) {
+          const baseUrl = typeof ARTWORK_LIST_URL !== "undefined" ? ARTWORK_LIST_URL : "/artworks/";
+          artistUrl = `${baseUrl}?artist=${artwork.artist.username}`;
+          artistName = artwork.artist.username;
+        }
         const artistLine = artwork.artist && artwork.artist.username ? `<p class="text-sm -mt-2 mb-2">
                              <a href="${artistUrl}" class="link link-hover">${artistName}</a>
                             </p>` : "";
@@ -68,6 +73,9 @@
       });
     }
     container.innerHTML = cardsHTML;
+  }
+  function filterAvailableArtworks(artworks) {
+    return artworks.filter((a) => a.is_available || a.is_in_stock);
   }
   function sortArtworksByPriceAsc(artworks) {
     return [...artworks].sort((a, b) => a.price - b.price);

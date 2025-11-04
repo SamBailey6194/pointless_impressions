@@ -37,36 +37,44 @@
         console.warn("Autocomplete API URL is missing. Autocomplete feature disabled.");
         return;
       }
-      new autoComplete({
-        selector,
-        placeHolder: "Search products, categories...",
-        data: {
-          src: async (query) => {
-            try {
-              const response = await fetch(`${AUTOCOMPLETE_API_URL}?term=${query}`);
-              const data = await response.json();
-              return data;
-            } catch (error) {
-              console.error("Autocomplete fetch failed:", error);
-              return [];
+      if (typeof autoComplete === "undefined") {
+        console.warn("autoComplete library is not loaded. Search will work without autocomplete suggestions.");
+        return;
+      }
+      try {
+        new autoComplete({
+          selector,
+          placeHolder: "Search products, categories...",
+          data: {
+            src: async (query) => {
+              try {
+                const response = await fetch(`${AUTOCOMPLETE_API_URL}?term=${query}`);
+                const data = await response.json();
+                return data;
+              } catch (error) {
+                console.error("Autocomplete fetch failed:", error);
+                return [];
+              }
+            }
+          },
+          resultItem: {
+            highlight: true
+          },
+          threshold: 2,
+          events: {
+            input: {
+              selection: (event) => {
+                const inputElement = event.target;
+                const selectedValue = event.detail.selection.value;
+                inputElement.value = selectedValue;
+                performSearch(selectedValue, inputElement);
+              }
             }
           }
-        },
-        resultItem: {
-          highlight: true
-        },
-        threshold: 2,
-        events: {
-          input: {
-            selection: (event) => {
-              const inputElement = event.target;
-              const selectedValue = event.detail.selection.value;
-              inputElement.value = selectedValue;
-              performSearch(selectedValue, inputElement);
-            }
-          }
-        }
-      });
+        });
+      } catch (error) {
+        console.error("Failed to initialize autoComplete:", error);
+      }
     }
     const searchInputs = document.querySelectorAll('input[type="text"][name="q"]');
     searchInputs.forEach((input) => {

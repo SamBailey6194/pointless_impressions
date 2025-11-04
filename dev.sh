@@ -69,7 +69,11 @@ show_help() {
     echo "  migrate       Run Django migrations"
     echo "  makemigrations Run Django makemigrations"
     echo "  createsuperuser Create a Django superuser"
-    echo "  test          Run Django tests"
+    echo "  test          Run Django TestCase tests"
+    echo "  behave        Run Behave BDD tests"
+    echo "  cypress       Run Cypress E2E tests (with test database)"
+    echo "  cypress-open  Open Cypress UI (with test database)"
+    echo "  jest          Run Jest tests"
     echo "  collectstatic Collect static files"
     echo "  clean         Clean up containers, images, and volumes"
     echo "  status        Show status of all services"
@@ -79,6 +83,7 @@ show_help() {
     echo "  ./dev.sh start        # Start development environment"
     echo "  ./dev.sh logs web     # Show logs for web service only"
     echo "  ./dev.sh shell        # Access Django shell"
+    echo "  ./dev.sh cypress      # Run Cypress E2E tests"
 }
 
 # Main script logic
@@ -157,6 +162,55 @@ case "${1:-help}" in
     test)
         print_status "Running tests..."
         docker compose -f docker-compose.dev.yml exec web python /app/manage.py test
+        ;;
+    behave)
+        print_status "Running Behave tests with test settings..."
+        docker compose -f docker-compose.dev.yml exec web bash -c "export DJANGO_SETTINGS_MODULE=pointless_impressions_src.pointless_impressions.settings.test && python /app/manage.py behave"
+        ;;
+    cypress)
+        print_status "Running Cypress E2E tests with test settings..."
+        print_status "Stopping dev server..."
+        docker compose -f docker-compose.dev.yml stop web 2>/dev/null || true
+        # Clean up any orphaned containers from previous test runs
+        docker ps -a | grep "pointless_impressions-web-run" | awk '{print $1}' | xargs -r docker rm -f 2>/dev/null || true
+        sleep 1
+        print_status "Setting up test database..."
+        docker compose -f docker-compose.dev.yml run -T --rm web bash -c "export ENV=test && export DJANGO_SETTINGS_MODULE=pointless_impressions_src.pointless_impressions.settings.test && python /app/manage.py migrate --noinput"
+        print_status "Creating test data..."
+        docker compose -f docker-compose.dev.yml run -T --rm web bash -c "export ENV=test && export DJANGO_SETTINGS_MODULE=pointless_impressions_src.pointless_impressions.settings.test && python /app/manage.py create_test_artworks"
+        print_status "Starting test server..."
+        docker compose -f docker-compose.dev.yml run -d -p 8000:8000 web bash -c "export ENV=test && export DJANGO_SETTINGS_MODULE=pointless_impressions_src.pointless_impressions.settings.test && python /app/manage.py runserver 0.0.0.0:8000"
+        sleep 3
+        print_status "Running Cypress tests..."
+        NODE_ENV=development npx cypress run "${@:2}"
+        print_success "Cypress tests completed!"
+        print_status "Restarting dev server..."
+        docker ps | grep "pointless_impressions-web-run" | awk '{print $1}' | xargs -r docker kill 2>/dev/null || true
+        docker compose -f docker-compose.dev.yml up -d web
+        ;;
+    cypress-open)
+        print_status "Opening Cypress with test database..."
+        print_status "Stopping dev server..."
+        docker compose -f docker-compose.dev.yml stop web 2>/dev/null || true
+        # Clean up any orphaned containers from previous test runs
+        docker ps -a | grep "pointless_impressions-web-run" | awk '{print $1}' | xargs -r docker rm -f 2>/dev/null || true
+        sleep 1
+        print_status "Setting up test database..."
+        docker compose -f docker-compose.dev.yml run -T --rm web bash -c "export ENV=test && export DJANGO_SETTINGS_MODULE=pointless_impressions_src.pointless_impressions.settings.test && python /app/manage.py migrate --noinput"
+        print_status "Creating test data..."
+        docker compose -f docker-compose.dev.yml run -T --rm web bash -c "export ENV=test && export DJANGO_SETTINGS_MODULE=pointless_impressions_src.pointless_impressions.settings.test && python /app/manage.py create_test_artworks"
+        print_status "Starting test server..."
+        docker compose -f docker-compose.dev.yml run -d -p 8000:8000 web bash -c "export ENV=test && export DJANGO_SETTINGS_MODULE=pointless_impressions_src.pointless_impressions.settings.test && python /app/manage.py runserver 0.0.0.0:8000"
+        sleep 3
+        print_status "Opening Cypress UI..."
+        NODE_ENV=development npx cypress open
+        print_status "Restarting dev server..."
+        docker ps | grep "pointless_impressions-web-run" | awk '{print $1}' | xargs -r docker kill 2>/dev/null || true
+        docker compose -f docker-compose.dev.yml up -d web
+        ;;
+    jest)
+        print_status "Running Jest tests..."
+        docker compose -f docker-compose.dev.yml exec web bash -c "cd /app/pointless_impressions_src/theme/static_src && npm install && npm run test"
         ;;
     collectstatic)
         print_status "Collecting static files..."

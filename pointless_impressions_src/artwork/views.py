@@ -1,11 +1,17 @@
 from django.views.generic import ListView, DetailView, View
-from django.db.models import Prefetch
+from django.db.models import Prefetch, Avg, Count
 from django.conf import settings
 import json
-from django.http import JsonResponse
+from django.http import JsonResponse, Http404
 from django.core.serializers.json import DjangoJSONEncoder
+from django.utils.translation import gettext as _
 from django.template.defaultfilters import truncatewords
-from .models import Artwork, ArtworkCategory, ArtworkFramingCondition
+from django.views.decorators.http import require_http_methods
+from django.utils import timezone
+from django.contrib.auth import get_user_model
+from .models import (
+    Artwork, ArtworkCategory, ArtworkFramingCondition
+    )
 from pointless_impressions_src.photo.models import Photo
 from pointless_impressions_src.profiles.models import Artist
 
@@ -159,7 +165,7 @@ class ArtworkListView(ListView):
     paginate_by = 12
 
     def get_queryset(self):
-        queryset = Artwork.objects.filter(is_available=True).select_related(
+        queryset = Artwork.objects.all().select_related(
             'category', 'main_photo', 'artist__user'
         ).prefetch_related(
             'photos',
@@ -170,6 +176,12 @@ class ArtworkListView(ListView):
                     ), to_attr='prefetched_conditions'
             )
         )
+
+        # Only show available artworks
+        general_filter = self.request.GET.get('filter')
+        available_only = self.request.GET.get('available_only')
+        if general_filter == 'available' or available_only == 'on':
+            queryset = queryset.filter(is_available=True)
 
         # Artist filtering
         artist_username = self.request.GET.get('artist')
@@ -241,6 +253,7 @@ class ArtworkListView(ListView):
                 'id': artwork['id'],
                 'name': artwork['name'],
                 'description': artwork['description'],
+                'full_description': artwork['full_description'],
                 'price': float(artwork['price']),
                 'category': artwork['category'],
                 'selected_conditions': [
@@ -296,6 +309,25 @@ class ArtworkDetailView(DetailView):
                     ), to_attr='prefetched_conditions'
             )
         ).order_by('id')
+
+    def get_object(self, queryset=None):
+        queryset = self.get_queryset()
+
+        slug = self.kwargs.get(self.slug_url_kwarg)
+        if slug is not None:
+            queryset = queryset.filter(**{self.slug_url_kwarg: slug})
+
+        annotated_queryset = queryset.annotate(
+            average_rating=Avg('reviews__rating'),
+            review_count=Count('reviews')
+        )
+
+        try:
+            obj = annotated_queryset.get()
+        except queryset.model.DoesNotExist:
+            raise Http404(_("No %(verbose_name)s found matching the query") %
+                          {'verbose_name': queryset.model._meta.verbose_name})
+        return obj
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -383,3 +415,131 @@ class ArtworkAPIView(View):
             })
 
         return JsonResponse(cleaned_api_data, safe=False)
+
+
+# ----------------------------
+# Development/Test-Only Views
+# ----------------------------
+
+@require_http_methods(["GET"])
+def setup_test_data(request):
+    """
+    ⚠️  DEVELOPMENT ONLY - Test data creation endpoint.
+
+    API endpoint to create test data for Cypress E2E tests.
+    ONLY available when using test.py settings (SQLite test database).
+
+    This endpoint:
+    - Is protected by a test-mode database check
+    - Creates sample artworks (Sunset, Starry Night)
+    - Creates required artist and category records
+    - Returns 403 if not running with test settings
+
+    Args:
+        request: HTTP request object
+
+    Returns:
+        JSON response with created artworks or error message
+
+    Raises:
+        403 Forbidden: If not running with test settings
+    """
+    try:
+        # SECURITY: Only allow in test settings mode
+        db_name = settings.DATABASES.get('default', {}).get('NAME', '')
+        is_test_mode = 'test' in db_name.lower()
+
+        if not is_test_mode:
+            error_msg = (
+                'This endpoint only works with test.py settings '
+                '(test database)'
+            )
+            return JsonResponse({
+                'error': error_msg
+            }, status=403)
+
+        User = get_user_model()
+
+        # Check if test data already exists
+        if Artwork.objects.filter(name='Sunset').exists():
+            return JsonResponse({
+                'message': 'Test data already exists',
+                'artworks_created': False
+            })
+
+        # Create default artist
+        default_artist_user = User.objects.create(
+            username='test_artist',
+            email='test_artist@example.com',
+            phone='1234567890'
+        )
+
+        default_artist_profile = Artist.objects.create(
+            user=default_artist_user,
+            bio="Test artist bio",
+            portfolio_url="https://testartist.com"
+        )
+
+        # Create default category
+        default_category = ArtworkCategory.objects.create(
+            name="Pointillism",
+            friendly_name="Pointillism Art",
+            description="Beautiful pointillism artworks."
+        )
+
+        # Create default framing condition
+        default_framing_condition = ArtworkFramingCondition.objects.create(
+            condition_name="unframed",
+            condition_description="Artwork is unframed."
+        )
+
+        # Create test artworks
+        test_artworks = [
+            {
+                'name': 'Sunset',
+                'description': 'A beautiful sunset over the mountains.',
+                'price': 199.99,
+                'sku': 'SUNSET001',
+                'is_available': True,
+                'is_in_stock': True,
+                'quantity': 5,
+            },
+            {
+                'name': 'Starry Night',
+                'description': 'A night sky full of stars.',
+                'price': 249.99,
+                'sku': 'STARRY001',
+                'is_available': False,  # Sold out
+                'is_in_stock': False,
+                'quantity': 0,
+            }
+        ]
+
+        created_artworks = []
+        for artwork_data in test_artworks:
+            art = Artwork.objects.create(
+                name=artwork_data['name'],
+                artist=default_artist_profile,
+                category=default_category,
+                description=artwork_data['description'],
+                price=artwork_data['price'],
+                sku=artwork_data['sku'],
+                is_available=artwork_data['is_available'],
+                is_in_stock=artwork_data['is_in_stock'],
+                is_featured=False,
+                quantity=artwork_data['quantity'],
+                created_at=timezone.now(),
+                updated_at=timezone.now(),
+            )
+            art.selected_conditions.add(default_framing_condition)
+            created_artworks.append(art.name)
+
+        return JsonResponse({
+            'message': 'Test data created successfully',
+            'artworks_created': created_artworks
+        }, status=201)
+
+    except Exception as e:
+        return JsonResponse({
+            'error': str(e)
+        }, status=500)
