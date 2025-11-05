@@ -1,0 +1,146 @@
+{% extends "base.html" %}
+{% load static cloudinary tailwind_tags %}
+
+{% block content %}
+    <section class="py-16 section-alt w-full min-h-[calc(100vh-30rem)]">
+        <div class="max-w-7xl mx-auto px-4 pt-4 sm:px-6 sm:pt-6 lg:px-8 lg:pt-8">
+            <h1 class="text-4xl font-bold mb-8">Search Results for: <span class="font-semibold">{{ search_query }}</span></h1>
+
+            {% comment %} Display search results or a message if none found {% endcomment %}
+            <p class="mb-6">
+                {% if results.paginator.count > 0 %}
+                    Found {{ results.paginator.count }} item{{ results.paginator.count|pluralize }}.
+                {% else %}
+                    No results found
+                {% endif %}
+            </p>
+
+            {% if results %}
+            <div class="bg-gray-300 dark:bg-gray-700 shadow-xl rounded-2xl">
+                {% comment %} Pagination {% endcomment %}
+                {% if is_paginated %}
+                    <div class="flex justify-center p-4 pt-8">
+                        {% include "includes/pagination.html" %}
+                    </div>
+                {% endif %}
+                {% comment %} Display search results from Artwork, Blog and Artist {% endcomment %}
+                <div id="search-results-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-6 rounded-2xl">
+                    {% for result in results %}
+                        {% with item=result.object %}
+                        <div class="card shadow-xl hover:shadow-2xl transition-shadow">
+                            {% comment %} Display media for the result {% endcomment %}
+                            <figure>
+                                {% if result.model_name == 'artwork' %}
+                                    {% comment %} Handle Artwork Images {% endcomment %}
+                                    {% with image_to_render=item.main_photo|default:placeholder_image %}
+                                        {% if image_to_render %}
+                                            {% if production %}
+                                                {% cloudinary image_to_render.image format="auto" quality="auto" width=400 height=300 crop="fill" class="w-full h-64 object-cover" alt=image_to_render.alt_text_or_default %}
+                                            {% else %}
+                                                <img src="{{ image_to_render.image.url }}" alt="{{ image_to_render.alt_text_or_default }}" class="w-full h-64 object-cover">
+                                            {% endif %}
+                                        {% else %}
+                                            <div class="bg-base-300 h-64 w-full flex items-center justify-center">
+                                                <i class="fa-solid fa-image text-base-content/20 text-5xl"></i>
+                                            </div>
+                                        {% endif %}
+                                    {% endwith %}
+                                {% elif result.model_name == 'blog' %}
+                                    {% comment %} Handle Blog Images {% endcomment %}
+                                    {% with image_to_render=item.featured_image|default:placeholder_image %}
+                                        {% if image_to_render %}
+                                            {% if production %}
+                                                {% cloudinary image_to_render.image format="auto" quality="auto" width=400 height=300 crop="fill" class="w-full h-64 object-cover" alt=image_to_render.alt_text_or_default %}
+                                            {% else %}
+                                                <img src="{{ image_to_render.image.url }}" alt="{{ item.title }}" class="w-full h-64 object-cover">
+                                            {% endif %}
+                                        {% else %}
+                                            <div class="bg-base-300 h-64 w-full flex items-center justify-center">
+                                                <i class="fa-solid fa-blog text-base-content/20 text-5xl"></i>
+                                            </div>
+                                        {% endif %}
+                                    {% endwith %}
+
+                                {% elif result.model_name == 'artist' %}
+                                    {% comment %} Handle Artist Profile Images {% endcomment %}
+                                    {% with image_to_render=item.user.userprofile.profile_picture|default:placeholder_image %}
+                                        {% if image_to_render %}
+                                            {% if production %}
+                                                {% cloudinary image_to_render.image format="auto" quality="auto" width=400 height=300 crop="fill" class="w-full h-64 object-cover" alt=image_to_render.alt_text_or_default %}
+                                            {% else %}
+                                                <img src="{{ image_to_render.image.url }}" alt="{{ item.name }}" class="w-full h-64 object-cover">
+                                            {% endif %}
+                                        {% else %}
+                                            <div class="bg-base-300 h-64 w-full flex items-center justify-center">
+                                                <i class="fa-solid fa-user text-base-content/20 text-5xl"></i>
+                                            </div>
+                                        {% endif %}
+                                    {% endwith %}
+
+                                {% else %}
+                                    {% comment %} Fallback for other models {% endcomment %}
+                                    <div class="bg-base-300 h-64 w-full flex items-center justify-center">
+                                        <i class="fa-solid fa-image text-base-content/20 text-5xl"></i>
+                                    </div>
+                                {% endif %}
+                            </figure>
+
+                            <div class="card-body p-6">
+                                {% comment %} Artwork Result {% endcomment %}
+                                {% if result.model_name == 'artwork' %}
+                                    <h3 class="card-title text-xl font-semibold mb-2">{{ item.name }}</h3>
+                                    <span class="badge badge-lg badge-info">Artwork</span>
+                                    <p class="text-sm mb-1">By {{ item.category }}</p>
+                                    <p class="text-lg font-bold text-[var(--pointless-blue)]">£{{ item.price }}</p>
+
+                                    {% comment %} Slug if available or ID if not {% endcomment %}
+                                    <div class="card-actions justify-end mt-4">
+                                        <a href="{% url 'artwork:detail' slug=item.slug|default:item.id %}" class="inline-block px-8 py-3 rounded-xl btn btn-ghost transition-colors duration-200 cursor-pointer">View Details</a>
+                                    </div>
+                                {% elif result.model_name == 'artist' %}
+                                    {% comment %} Artist Result {% endcomment %}
+                                    <h3 class="card-title text-xl font-semibold mb-2">{{ item.name }}</h3>
+                                    <span class="badge badge-lg badge-info">Artist</span>
+                                    <p class="text-sm mb-1">{{ item.bio|truncatewords:15 }}</p>
+                                    <p class="text-lg font-bold text-[var(--pointless-blue)]">Joined {{ item.created_at|date:"F j, Y" }}</p>
+
+                                    {% comment %} Slug if available or ID if not {% endcomment %}
+                                    <div class="card-actions justify-end mt-4">
+                                        <a href="{% url 'artist:profile' username=item.user.username|default:item.id %}" class="inline-block px-8 py-3 rounded-xl btn btn-ghost transition-colors duration-200 cursor-pointer">View Profile</a>
+                                    </div>
+                                {% comment %} Blog Result {% endcomment %}
+                                {% elif result.model_name == 'blog' %}
+                                    <h3 class="card-title text-xl font-semibold mb-2">{{ item.title }}</h3>
+                                    <span class="badge badge-lg badge-info">Blog</span>
+                                    <p class="text-sm mb-1">{{ item.excerpt }}</p>
+                                    <p class="text-sm mb-1">By {{ item.author }}</p>
+                                    <p class="text-lg font-bold text-[var(--pointless-blue)]">{{ item.published_date|date:"F j, Y" }}</p>
+
+                                    {% comment %} Slug if available or ID if not {% endcomment %}
+                                    <div class="card-actions justify-end mt-4">
+                                        <a href="{% url 'blog:detail' slug=item.slug|default:item.id %}" class="inline-block px-8 py-3 rounded-xl btn btn-ghost transition-colors duration-200 cursor-pointer">Read More</a>
+                                    </div>
+                                {% comment %} Unknown Result {% endcomment %}
+                                {% else %}
+                                    <h3 class="card-title text-xl font-semibold mb-2">Other Results</h3>
+                                    <p class="text-sm">Other results shown below</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% endwith %}
+                    {% empty %}
+                        <p class="text-center w-full">No results found.</p>
+                    {% endfor %}
+                </div>
+
+                {% comment %} Pagination Controls {% endcomment %}
+                {% if is_paginated %}
+                    <div class="flex justify-center p-4 pb-8">
+                        {% include "includes/pagination.html" %}
+                    </div>
+                {% endif %}
+            </div>
+            {% endif %}
+        </div>
+    </section>
+{% endblock %}

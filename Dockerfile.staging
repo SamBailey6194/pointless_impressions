@@ -1,37 +1,35 @@
-# ---------- Stage 1: Build JS and CSS ----------
-FROM node:24-bookworm-slim AS node_builder
-WORKDIR /app
+# ---------- Stage 1: Build JS, CSS, and Collect Static ----------
+# This stage installs both Python and Node.js to build everything
+FROM python:3.13-slim-bookworm AS builder
 
-# Copy Node package files and install dependencies (including dev dependencies for build)
-COPY pointless_impressions_src/theme/static_src/package*.json ./
-RUN npm ci
-
-# Copy theme source files and build assets
-COPY pointless_impressions_src/theme/ ./theme/
-WORKDIR /app/theme/static_src
-RUN npm run build && \
-    echo "Build completed, checking output:" && \
-    ls -la ../../ && \
-    find /app -name "*.css" -o -name "*.js" | head -10
-
-# ---------- Stage 2: Python + Django ----------
-FROM python:3.13-slim-bookworm
-
+# Set env vars for build stage
 ENV PYTHONDONTWRITEBYTECODE=1 \
-    PYTHONUNBUFFERED=1
+    PYTHONUNBUFFERED=1 \
+    DEBIAN_FRONTEND=noninteractive \
+    NODE_VERSION=24.2.0 \
+    NPM_VERSION=11.3.0 \
+    # Set Django settings for collectstatic
+    DJANGO_SETTINGS_MODULE=pointless_impressions_src.pointless_impressions.settings.staging \
+    # Tell Django it's in production mode
+    DEBUG=False
 
 WORKDIR /app
 
+# Install all system dependencies
 RUN apt-get update && apt-get install -y \
     curl \
-    netcat-openbsd \
     gcc \
     libpq-dev \
-    nodejs \
-    npm \
+    xz-utils \
     && rm -rf /var/lib/apt/lists/*
 
-# UV for faster pip
+# Install Node.js
+RUN curl -fsSL https://nodejs.org/dist/v${NODE_VERSION}/node-v${NODE_VERSION}-linux-x64.tar.xz -o node.tar.xz && \
+    tar -xJf node.tar.xz -C /usr/local --strip-components=1 && \
+    rm node.tar.xz && \
+    npm install -g npm@${NPM_VERSION}
+
+# Install UV (for Python)
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
 
 # Install Python dependencies
@@ -39,24 +37,67 @@ COPY requirements.txt .
 RUN uv pip install --upgrade pip --system && \
     uv pip install -r requirements.txt --system
 
-# Copy Django project
+# Install Node dependencies
+COPY package.json package-lock.json* ./
+
+# Use 'npm ci' for production/staging to ensure exact versions
+RUN npm ci
+
+# Copy ALL source code
 COPY pointless_impressions_src/ ./pointless_impressions_src/
 COPY manage.py .
 
-# Copy built static files from Node stage
-COPY --from=node_builder /app/static/ ./pointless_impressions_src/theme/static/
+# This runs 'npm run build' (which runs Tailwind)
+# AND 'python manage.py collectstatic' (which collects admin static)
+# The output will be in /app/staticfiles (defined in your settings)
+RUN npm run build && \
+    python manage.py collectstatic --noinput
 
-# Ensure all files are owned by the app user before switching
-RUN useradd -m appuser && \
-    chown -R appuser:appuser /app
+# ---------- Stage 2: Final Production/Staging Image ----------
+# This stage ONLY installs Python. It is small and secure.
+FROM python:3.13-slim-bookworm
 
-# Make entrypoint executable before switching user
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    # Gunicorn will be run by the 'appuser'
+    USER=appuser \
+    HOME=/home/appuser
+
+WORKDIR /app
+
+# Install only necessary runtime dependencies (no Node.js)
+RUN apt-get update && apt-get install -y \
+    libpq-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# UV (for installing Gunicorn)
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
+
+# Install Python dependencies (including Gunicorn)
+COPY requirements.txt .
+RUN uv pip install --upgrade pip --system && \
+    uv pip install -r requirements.txt --system
+
+# Copy Django project (small layer)
+COPY pointless_impressions_src/ ./pointless_impressions_src/
+COPY manage.py .
+
+# Copy the fully collected staticfiles from the builder stage
+# This one line is the magic of multi-stage builds.
+COPY --from=builder /app/staticfiles/ ./staticfiles/
+
+# Create non-root user and give it ownership
+RUN useradd -m $USER && \
+    chown -R $USER:$USER /app
+
+# Make entrypoint executable
 RUN chmod +x ./pointless_impressions_src/staging-entrypoint.sh
 
 # Switch to non-root user
-USER appuser
+USER $USER
 
 EXPOSE 8000
 HEALTHCHECK CMD curl -f http://localhost:8000/health/ || exit 1
 
+# Run the entrypoint
 CMD ["/app/pointless_impressions_src/staging-entrypoint.sh"]
