@@ -23,7 +23,12 @@ from .views import health_check
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('pointless_impressions_src.home.urls')),
+    path('artworks/', include(
+        'pointless_impressions_src.artwork.urls', namespace='artwork'),
+        ),
     path('health/', health_check, name='health'),
+    path('photos/', include('pointless_impressions_src.photo.urls')),
+    path('search/', include('pointless_impressions_src.search.urls')),
 ]
 
 if settings.DEBUG:

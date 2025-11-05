@@ -1,0 +1,1490 @@
+[
+    {
+        "pk": 1,
+        "model": "artwork.Artwork",
+        "fields": {
+            "name": "City Icons 01",
+            "description": "The iconic Lloyds of London towers above the viewer. 'City Icons 01' ",
+            "artist": 1,
+            "price": "150.00",
+            "category": 2,
+            "selected_conditions": [
+                1
+            ],
+            "main_photo": 4,
+            "is_available": true,
+            "is_in_stock": true,
+            "is_featured": true,
+            "quantity": 16,
+            "created_at": "2024-01-01T00:00:00Z",
+            "updated_at": "2024-01-01T00:00:00Z",
+            "slug": "city-icons-01",
+            "sku": "SKU-PD9N6NOJEA"
+        }
+    },
+    {
+        "pk": 2,
+        "model": "artwork.Artwork",
+        "fields": {
+            "name": "City Icons 02",
+            "description": "The iconic Lloyds of London towers above the viewer. 'City Icons 02' ",
+            "artist": 1,
+            "price": "150.00",
+            "category": 2,
+            "selected_conditions": [
+                1
+            ],
+            "main_photo": 6,
+            "is_available": true,
+            "is_in_stock": true,
+            "is_featured": false,
+            "quantity": 10,
+            "created_at": "2024-01-01T00:00:00Z",
+            "updated_at": "2024-01-01T00:00:00Z",
+            "slug": "city-icons-02",
+            "sku": "SKU-U8PT2U8C61"
+        }
+    },
+    {
+        "pk": 3,
+        "model": "artwork.Artwork",
+        "fields": {
+            "name": "City Icons 03",
+            "description": "The iconic Lloyds of London towers above the viewer. 'City Icons 03' ",
+            "artist": 1,
+            "price": "150.00",
+            "category": 2,
+            "selected_conditions": [
+                1
+            ],
+            "main_photo": 8,
+            "is_available": true,
+            "is_in_stock": true,
+            "is_featured": true,
+            "quantity": 2,
+            "created_at": "2024-01-01T00:00:00Z",
+            "updated_at": "2024-01-01T00:00:00Z",
+            "slug": "city-icons-03",
+            "sku": "SKU-RQH3ZR2J5I"
+        }
+    },
+    {
+        "pk": 4,
+        "model": "artwork.Artwork",
+        "fields": {
+            "name": "City Icons 04",
+            "description": "The iconic Lloyds of London towers above the viewer. 04' ",
+            "artist": 1,
+            "price": "150.00",
+            "category": 2,
+            "selected_conditions": [
+                1
+            ],
+            "main_photo": 10,
+            "is_available": true,
+            "is_in_stock": true,
+            "is_featured": false,
+            "quantity": 9,
+            "created_at": "2024-01-01T00:00:00Z",
+            "updated_at": "2024-01-01T00:00:00Z",
+            "slug": "city-icons-04",
+            "sku": "SKU-F24481SNVQ"
+        }
+    },
+    {
+        "pk": 5,
+        "model": "artwork.Artwork",
+        "fields": {
+            "name": "City Icons 05",
+            "description": "The iconic Lloyds of London towers above the viewer. 'City Icons 05' ",
+            "artist": 1,
+            "price": "150.00",
+            "category": 2,
+            "selected_conditions": [
+                1
+            ],
+            "main_photo": 12,
+            "is_available": true,
+            "is_in_stock": true,
+            "is_featured": false,
+            "quantity": 15,
+            "created_at": "2024-01-01T00:00:00Z",
+            "updated_at": "2024-01-01T00:00:00Z",
+            "slug": "city-icons-05",
+            "sku": "SKU-TN40HKLV16"
+        }
+    },
+    {
+        "pk": 6,
+        "model": "artwork.Artwork",
+        "fields": {
+            "name": "City Modernity",
+            "description": "The classic skyline of modern London across the river Thames. 'City Modernity' ",
+            "artist": 1,
+            "price": "450.00",
+            "category": 2,
+            "selected_conditions": [
+                1
+            ],
+            "main_photo": 14,
+            "is_available": true,
+            "is_in_stock": true,
+            "is_featured": true,
+            "quantity": 8,
+            "created_at": "2024-01-01T00:00:00Z",
+            "updated_at": "2024-01-01T00:00:00Z",
+            "slug": "city-modernity",
+            "sku": "SKU-TY6ZCPM22B"
+        }
+    },
+    {
+        "pk": 7,
+        "model": "artwork.Artwork",
+        "fields": {
+            "name": "City Saints 01",
+            "description": "Across the pedestrian millennium bridge and toward St. Pauls. 'City Saints 01' ",
+            "artist": 1,
+            "price": "350.00",
+            "category": 2,
+            "selected_conditions": [
+                1
+            ],
+            "main_photo": 16,
+            "is_available": true,
+            "is_in_stock": true,
+            "is_featured": false,
+            "quantity": 8,
+            "created_at": "2024-01-01T00:00:00Z",
+            "updated_at": "2024-01-01T00:00:00Z",
+            "slug": "city-saints-01",
+            "sku": "SKU-56BT65JN9E"
+        }
+    },
+    {
+        "pk": 8,
+        "model": "artwork.Artwork",
+        "fields": {
+            "name": "City Saints 02",
+            "description": "Across the pedestrian millennium bridge and toward St. Pauls at night. 'City Saints 02' ",
+            "artist": 1,
+            "price": "350.00",
+            "category": 2,
+            "selected_conditions": [
+                1
+            ],
+            "main_photo": 18,
+            "is_available": true,
+            "is_in_stock": true,
+            "is_featured": false,
+            "quantity": 5,
+            "created_at": "2024-01-01T00:00:00Z",
+            "updated_at": "2024-01-01T00:00:00Z",
+            "slug": "city-saints-02",
+            "sku": "SKU-T8ANXH4BLF"
+        }
+    },
+    {
+        "pk": 9,
+        "model": "artwork.Artwork",
+        "fields": {
+            "name": "City The Buzz",
+            "description": "The city that never sleeps - Santiago Chile. 'City The Buzz' ",
+            "artist": 1,
+            "price": "150.00",
+            "category": 2,
+            "selected_conditions": [
+                1
+            ],
+            "main_photo": 20,
+            "is_available": true,
+            "is_in_stock": true,
+            "is_featured": false,
+            "quantity": 11,
+            "created_at": "2024-01-01T00:00:00Z",
+            "updated_at": "2024-01-01T00:00:00Z",
+            "slug": "city-the-buzz",
+            "sku": "SKU-JUKWPZ4B6Y"
+        }
+    },
+    {
+        "pk": 10,
+        "model": "artwork.Artwork",
+        "fields": {
+            "name": "Digital Abstract",
+            "description": "Digitally created artwork in the abstract form.  'Digital Abstract' ",
+            "artist": 1,
+            "price": "200.00",
+            "category": 4,
+            "selected_conditions": [
+                2
+            ],
+            "main_photo": 22,
+            "is_available": true,
+            "is_in_stock": true,
+            "is_featured": true,
+            "quantity": 20,
+            "created_at": "2024-01-01T00:00:00Z",
+            "updated_at": "2024-01-01T00:00:00Z",
+            "slug": "digital-abstract",
+            "sku": "SKU-NYRFMFCV8K"
+        }
+    },
+    {
+        "pk": 11,
+        "model": "artwork.Artwork",
+        "fields": {
+            "name": "Digital Dotty",
+            "description": "Digitally created artwork of many bold dots. 'Digital Dotty' ",
+            "artist": 1,
+            "price": "200.00",
+            "category": 4,
+            "selected_conditions": [
+                2
+            ],
+            "main_photo": 24,
+            "is_available": true,
+            "is_in_stock": true,
+            "is_featured": false,
+            "created_at": "2024-01-01T00:00:00Z",
+            "updated_at": "2024-01-01T00:00:00Z",
+            "slug": "digital-dotty",
+            "sku": "SKU-IBKV2CAMQ3",
+            "quantity": 11
+        }
+    },
+    {
+        "pk": 12,
+        "model": "artwork.Artwork",
+        "fields": {
+            "name": "Digital Mixing It",
+            "description": "Digitally created artwork in a cocktail form. 'Digital Mixing It' ",
+            "artist": 1,
+            "price": "200.00",
+            "category": 4,
+            "selected_conditions": [
+                2
+            ],
+            "main_photo": 26,
+            "is_available": true,
+            "is_in_stock": true,
+            "is_featured": false,
+            "created_at": "2024-01-01T00:00:00Z",
+            "updated_at": "2024-01-01T00:00:00Z",
+            "slug": "digital-mixing-it",
+            "sku": "SKU-EUVNFG0S40",
+            "quantity": 3
+        }
+    },
+    {
+        "pk": 13,
+        "model": "artwork.Artwork",
+        "fields": {
+            "name": "Digital Semis",
+            "description": "Digitally created artwork in the abstract semi-colons. 'Digital Semis' ",
+            "artist": 1,
+            "price": "200.00",
+            "category": 4,
+            "selected_conditions": [
+                2
+            ],
+            "main_photo": 28,
+            "is_available": true,
+            "is_in_stock": true,
+            "is_featured": false,
+            "created_at": "2024-01-01T00:00:00Z",
+            "updated_at": "2024-01-01T00:00:00Z",
+            "slug": "digital-semis",
+            "sku": "SKU-RLC84Q5ZFM",
+            "quantity": 15
+        }
+    },
+    {
+        "pk": 14,
+        "model": "artwork.Artwork",
+        "fields": {
+            "name": "Digital Trucking",
+            "description": "Digitally created artwork in the abstract form of some trucks. 'Digital Trucking' ",
+            "artist": 1,
+            "price": "200.00",
+            "category": 4,
+            "selected_conditions": [
+                2
+            ],
+            "main_photo": 30,
+            "is_available": true,
+            "is_in_stock": true,
+            "is_featured": false,
+            "created_at": "2024-01-01T00:00:00Z",
+            "updated_at": "2024-01-01T00:00:00Z",
+            "slug": "digital-trucking",
+            "sku": "SKU-C8W1NSWHK6",
+            "quantity": 3
+        }
+    },
+    {
+        "pk": 15,
+        "model": "artwork.Artwork",
+        "fields": {
+            "name": "Digital Turrets",
+            "description": "Digitally created artwork in the abstract form of some turrets. 'Digital Turrets' ",
+            "artist": 1,
+            "price": "200.00",
+            "category": 4,
+            "selected_conditions": [
+                2
+            ],
+            "main_photo": 32,
+            "is_available": true,
+            "is_in_stock": true,
+            "is_featured": false,
+            "created_at": "2024-01-01T00:00:00Z",
+            "updated_at": "2024-01-01T00:00:00Z",
+            "slug": "digital-turrets",
+            "sku": "SKU-IQKDJD8B2X",
+            "quantity": 4
+        }
+    },
+    {
+        "pk": 16,
+        "model": "artwork.Artwork",
+        "fields": {
+            "name": "Gardens Bending Grass 01",
+            "description": "The beauty of Kew Gardens and grasses blowing in the gentle breeze. 'Gardens Bending Grass 01' ",
+            "artist": 1,
+            "price": "350.00",
+            "category": 2,
+            "selected_conditions": [
+                1
+            ],
+            "main_photo": 34,
+            "is_available": true,
+            "is_in_stock": true,
+            "is_featured": true,
+            "created_at": "2024-01-01T00:00:00Z",
+            "updated_at": "2024-01-01T00:00:00Z",
+            "slug": "gardens-bending-grass-01",
+            "sku": "SKU-F2H82WWBRL",
+            "quantity": 12
+        }
+    },
+    {
+        "pk": 17,
+        "model": "artwork.Artwork",
+        "fields": {
+            "name": "Gardens Bending Grass 02",
+            "description": "The beauty of Kew Gardens and grasses blowing in the gentle breeze. 'Gardens Bending Grass 02' ",
+            "artist": 1,
+            "price": "350.00",
+            "category": 2,
+            "selected_conditions": [
+                1
+            ],
+            "main_photo": 36,
+            "is_available": true,
+            "is_in_stock": true,
+            "is_featured": false,
+            "created_at": "2024-01-01T00:00:00Z",
+            "updated_at": "2024-01-01T00:00:00Z",
+            "slug": "gardens-bending-grass-02",
+            "sku": "SKU-T2E0J5DW02",
+            "quantity": 13
+        }
+    },
+    {
+        "pk": 18,
+        "model": "artwork.Artwork",
+        "fields": {
+            "name": "Gardens The Hive",
+            "description": "A combination of nature and art captured in the hive sculpture at Kew. 'Gardens The Hive' ",
+            "artist": 1,
+            "price": "350.00",
+            "category": 2,
+            "selected_conditions": [
+                1
+            ],
+            "main_photo": 38,
+            "is_available": true,
+            "is_in_stock": true,
+            "is_featured": false,
+            "created_at": "2024-01-01T00:00:00Z",
+            "updated_at": "2024-01-01T00:00:00Z",
+            "slug": "gardens-the-hive",
+            "sku": "SKU-03DJZZAZSZ",
+            "quantity": 8
+        }
+    },
+    {
+        "pk": 19,
+        "model": "artwork.Artwork",
+        "fields": {
+            "name": "Gardens The Sunrise",
+            "description": "Kew Gardens in the sunrise. 'Gardens The Sunrise' ",
+            "artist": 1,
+            "price": "250.00",
+            "category": 2,
+            "selected_conditions": [
+                1
+            ],
+            "main_photo": 40,
+            "is_available": true,
+            "is_in_stock": true,
+            "is_featured": false,
+            "created_at": "2024-01-01T00:00:00Z",
+            "updated_at": "2024-01-01T00:00:00Z",
+            "slug": "gardens-the-sunrise",
+            "sku": "SKU-B5S43VORXX",
+            "quantity": 17
+        }
+    },
+    {
+        "pk": 20,
+        "model": "artwork.Artwork",
+        "fields": {
+            "name": "Landscape Foreign Shores Chile",
+            "description": "The lake district of Chile. 'Landscape Foreign Shores Chile' ",
+            "artist": 1,
+            "price": "100.00",
+            "category": 2,
+            "selected_conditions": [
+                1
+            ],
+            "main_photo": 42,
+            "is_available": true,
+            "is_in_stock": true,
+            "is_featured": false,
+            "created_at": "2024-01-01T00:00:00Z",
+            "updated_at": "2024-01-01T00:00:00Z",
+            "slug": "landscape-foreign-shores-chile",
+            "sku": "SKU-ATJOAAZFVP",
+            "quantity": 15
+        }
+    },
+    {
+        "pk": 21,
+        "model": "artwork.Artwork",
+        "fields": {
+            "name": "London Shard Of Glass",
+            "description": "Modern London. 'London Shard Of Glass' ",
+            "artist": 1,
+            "price": "350.00",
+            "category": 2,
+            "selected_conditions": [
+                1
+            ],
+            "main_photo": 44,
+            "is_available": true,
+            "is_in_stock": true,
+            "is_featured": true,
+            "created_at": "2024-01-01T00:00:00Z",
+            "updated_at": "2024-01-01T00:00:00Z",
+            "slug": "london-shard-of-glass",
+            "sku": "SKU-L6F5Y4SH5I",
+            "quantity": 6
+        }
+    },
+    {
+        "pk": 22,
+        "model": "artwork.Artwork",
+        "fields": {
+            "name": "Painting Autumn Reflections",
+            "description": "Reflections of autumn in an impressionist style. 'Painting Autumn Reflections' ",
+            "artist": 1,
+            "price": "200.00",
+            "category": 1,
+            "selected_conditions": [
+                1
+            ],
+            "main_photo": 46,
+            "is_available": true,
+            "is_in_stock": true,
+            "is_featured": false,
+            "created_at": "2024-01-01T00:00:00Z",
+            "updated_at": "2024-01-01T00:00:00Z",
+            "slug": "painting-autumn-reflections",
+            "sku": "SKU-OOEI069OWP",
+            "quantity": 2
+        }
+    },
+    {
+        "pk": 23,
+        "model": "artwork.Artwork",
+        "fields": {
+            "name": "Painting Scottish Hills",
+            "description": "An impressionist painting of the hills of Scotland dedicated to the coronation of King Charles III. 'Painting Scottish Hills' ",
+            "artist": 1,
+            "price": "100.00",
+            "category": 1,
+            "selected_conditions": [
+                1
+            ],
+            "main_photo": 48,
+            "is_available": true,
+            "is_in_stock": true,
+            "is_featured": false,
+            "created_at": "2024-01-01T00:00:00Z",
+            "updated_at": "2024-01-01T00:00:00Z",
+            "slug": "painting-scottish-hills",
+            "sku": "SKU-NQ1DAHXE0L",
+            "quantity": 10
+        }
+    },
+    {
+        "pk": 24,
+        "model": "artwork.Artwork",
+        "fields": {
+            "name": "Painting The Bear",
+            "description": "A stylised watercolour of a bear. 'Painting The Bear' ",
+            "artist": 1,
+            "price": "350.00",
+            "category": 1,
+            "selected_conditions": [
+                1,
+                3
+            ],
+            "main_photo": 50,
+            "is_available": true,
+            "is_in_stock": true,
+            "is_featured": true,
+            "created_at": "2024-01-01T00:00:00Z",
+            "updated_at": "2024-01-01T00:00:00Z",
+            "slug": "painting-the-bear",
+            "sku": "SKU-Z66D86X3GL",
+            "quantity": 16
+        }
+    },
+    {
+        "pk": 25,
+        "model": "artwork.Artwork",
+        "fields": {
+            "name": "Painting The Elephant",
+            "description": "A stylised watercolour of an elephant. 'Painting The Elephant' ",
+            "artist": 1,
+            "price": "350.00",
+            "category": 1,
+            "selected_conditions": [
+                1,
+                3
+            ],
+            "main_photo": 52,
+            "is_available": true,
+            "is_in_stock": true,
+            "is_featured": false,
+            "created_at": "2024-01-01T00:00:00Z",
+            "updated_at": "2024-01-01T00:00:00Z",
+            "slug": "painting-the-elephant",
+            "sku": "SKU-Z47ZWLC3N6",
+            "quantity": 12
+        }
+    },
+    {
+        "pk": 26,
+        "model": "artwork.Artwork",
+        "fields": {
+            "name": "Painting The Giraffe",
+            "description": "A stylised watercolour of a giraffe. 'Painting The Giraffe' ",
+            "artist": 1,
+            "price": "350.00",
+            "category": 1,
+            "selected_conditions": [
+                1,
+                3
+            ],
+            "main_photo": 54,
+            "is_available": true,
+            "is_in_stock": true,
+            "is_featured": false,
+            "created_at": "2024-01-01T00:00:00Z",
+            "updated_at": "2024-01-01T00:00:00Z",
+            "slug": "painting-the-giraffe",
+            "sku": "SKU-5XHVXLLTVD",
+            "quantity": 2
+        }
+    },
+    {
+        "pk": 27,
+        "model": "artwork.Artwork",
+        "fields": {
+            "name": "Painting The Lion",
+            "description": "A stylised watercolour of the King of the jungle. 'Painting The Lion' ",
+            "artist": 1,
+            "price": "350.00",
+            "category": 1,
+            "selected_conditions": [
+                1,
+                3
+            ],
+            "main_photo": 56,
+            "is_available": true,
+            "is_in_stock": true,
+            "is_featured": false,
+            "created_at": "2024-01-01T00:00:00Z",
+            "updated_at": "2024-01-01T00:00:00Z",
+            "slug": "painting-the-lion",
+            "sku": "SKU-T777KNGRCZ",
+            "quantity": 5
+        }
+    },
+    {
+        "pk": 28,
+        "model": "artwork.Artwork",
+        "fields": {
+            "name": "Painting The Rabbit",
+            "description": "A stylised watercolour of a rabbit. 'Painting The Rabbit' ",
+            "artist": 1,
+            "price": "350.00",
+            "category": 2,
+            "selected_conditions": [
+                1,
+                3
+            ],
+            "main_photo": 58,
+            "is_available": true,
+            "is_in_stock": true,
+            "is_featured": true,
+            "created_at": "2024-01-01T00:00:00Z",
+            "updated_at": "2024-01-01T00:00:00Z",
+            "slug": "painting-the-rabbit",
+            "sku": "SKU-YN1RS1HJGO",
+            "quantity": 1
+        }
+    },
+    {
+        "pk": 29,
+        "model": "artwork.Artwork",
+        "fields": {
+            "name": "Painting The Rhino",
+            "description": "A stylised watercolour of a rhino. 'Painting The Rhino' ",
+            "artist": 1,
+            "price": "350.00",
+            "category": 2,
+            "selected_conditions": [
+                1,
+                3
+            ],
+            "main_photo": 60,
+            "is_available": true,
+            "is_in_stock": true,
+            "is_featured": false,
+            "created_at": "2024-01-01T00:00:00Z",
+            "updated_at": "2024-01-01T00:00:00Z",
+            "slug": "painting-the-rhino",
+            "sku": "SKU-U0DADAOJJZ",
+            "quantity": 18
+        }
+    },
+    {
+        "pk": 30,
+        "model": "artwork.Artwork",
+        "fields": {
+            "name": "Pointillism Always A Child 01",
+            "description": "Having fun in the rain. 'Pointillism Always A Child 01' ",
+            "artist": 1,
+            "price": "250.00",
+            "category": 3,
+            "selected_conditions": [
+                1,
+                3
+            ],
+            "main_photo": 62,
+            "is_available": true,
+            "is_in_stock": true,
+            "is_featured": false,
+            "created_at": "2024-01-01T00:00:00Z",
+            "updated_at": "2024-01-01T00:00:00Z",
+            "slug": "pointillism-always-a-child-01",
+            "sku": "SKU-HFFC7PLF9U",
+            "quantity": 18
+        }
+    },
+    {
+        "pk": 31,
+        "model": "artwork.Artwork",
+        "fields": {
+            "name": "Pointillism Always A Child 02",
+            "description": "Having fun in the rain. 'Pointillism Always A Child 02' ",
+            "artist": 1,
+            "price": "250.00",
+            "category": 3,
+            "selected_conditions": [
+                1,
+                3
+            ],
+            "main_photo": 64,
+            "is_available": true,
+            "is_in_stock": true,
+            "is_featured": false,
+            "created_at": "2024-01-01T00:00:00Z",
+            "updated_at": "2024-01-01T00:00:00Z",
+            "slug": "pointillism-always-a-child-02",
+            "sku": "SKU-CGFF4BUZTW",
+            "quantity": 2
+        }
+    },
+    {
+        "pk": 32,
+        "model": "artwork.Artwork",
+        "fields": {
+            "name": "Pointillism Always A Child 03",
+            "description": "Having fun in the rain. 'Pointillism Always A Child 03' ",
+            "artist": 1,
+            "price": "250.00",
+            "category": 3,
+            "selected_conditions": [
+                1,
+                3
+            ],
+            "main_photo": 66,
+            "is_available": true,
+            "is_in_stock": true,
+            "is_featured": false,
+            "created_at": "2024-01-01T00:00:00Z",
+            "updated_at": "2024-01-01T00:00:00Z",
+            "slug": "pointillism-always-a-child-03",
+            "sku": "SKU-5ERMKK7VNU",
+            "quantity": 18
+        }
+    },
+    {
+        "pk": 33,
+        "model": "artwork.Artwork",
+        "fields": {
+            "name": "Pointillism Always A Child 04",
+            "description": "Having fun in the rain. 'Pointillism Always A Child 04' ",
+            "artist": 1,
+            "price": "250.00",
+            "category": 3,
+            "selected_conditions": [
+                1,
+                3
+            ],
+            "main_photo": 68,
+            "is_available": true,
+            "is_in_stock": true,
+            "is_featured": true,
+            "created_at": "2024-01-01T00:00:00Z",
+            "updated_at": "2024-01-01T00:00:00Z",
+            "slug": "pointillism-always-a-child-04",
+            "sku": "SKU-696L7B6XK7",
+            "quantity": 15
+        }
+    },
+    {
+        "pk": 34,
+        "model": "artwork.Artwork",
+        "fields": {
+            "name": "Pointillism Always A Child 05",
+            "description": "Having fun in the rain. 'Pointillism Always A Child 05' ",
+            "artist": 1,
+            "price": "250.00",
+            "category": 3,
+            "selected_conditions": [
+                1,
+                3
+            ],
+            "main_photo": 70,
+            "is_available": true,
+            "is_in_stock": true,
+            "is_featured": false,
+            "created_at": "2024-01-01T00:00:00Z",
+            "updated_at": "2024-01-01T00:00:00Z",
+            "slug": "pointillism-always-a-child-05",
+            "sku": "SKU-EY8QER78EN",
+            "quantity": 6
+        }
+    },
+    {
+        "pk": 35,
+        "model": "artwork.Artwork",
+        "fields": {
+            "name": "Pointillism An Icon",
+            "description": "A picture of Mick Jagger in his youth. 'Pointillism An Icon' ",
+            "artist": 1,
+            "price": "250.00",
+            "category": 3,
+            "selected_conditions": [
+                1,
+                3
+            ],
+            "main_photo": 72,
+            "is_available": true,
+            "is_in_stock": true,
+            "is_featured": false,
+            "created_at": "2024-01-01T00:00:00Z",
+            "updated_at": "2024-01-01T00:00:00Z",
+            "slug": "pointillism-an-icon",
+            "sku": "SKU-9RRHB4NVR5",
+            "quantity": 2
+        }
+    },
+    {
+        "pk": 36,
+        "model": "artwork.Artwork",
+        "fields": {
+            "name": "Pointillism The Beauty Of Genesis 01",
+            "description": "A representation of the snake in the garden of Eden. 'Pointillism The Beauty Of Genesis 01' ",
+            "artist": 1,
+            "price": "250.00",
+            "category": 3,
+            "selected_conditions": [
+                1,
+                3
+            ],
+            "main_photo": 74,
+            "is_available": true,
+            "is_in_stock": true,
+            "is_featured": false,
+            "created_at": "2024-01-01T00:00:00Z",
+            "updated_at": "2024-01-01T00:00:00Z",
+            "slug": "pointillism-the-beauty-of-genesis-01",
+            "sku": "SKU-IHATPXXQE3",
+            "quantity": 11
+        }
+    },
+    {
+        "pk": 37,
+        "model": "artwork.Artwork",
+        "fields": {
+            "name": "Pointillism The Beauty Of Genesis 02",
+            "description": "A representation of the snake in the garden of Eden. 'Pointillism The Beauty Of Genesis 02' ",
+            "artist": 1,
+            "price": "250.00",
+            "category": 3,
+            "selected_conditions": [
+                1,
+                3
+            ],
+            "main_photo": 76,
+            "is_available": true,
+            "is_in_stock": true,
+            "is_featured": false,
+            "created_at": "2024-01-01T00:00:00Z",
+            "updated_at": "2024-01-01T00:00:00Z",
+            "slug": "pointillism-the-beauty-of-genesis-02",
+            "sku": "SKU-2X8SR31UBY",
+            "quantity": 6
+        }
+    },
+    {
+        "pk": 38,
+        "model": "artwork.Artwork",
+        "fields": {
+            "name": "Pointillism The Dog 01",
+            "description": "A representation of a cute pup. 'Pointillism The Dog 01' ",
+            "artist": 1,
+            "price": "250.00",
+            "category": 3,
+            "selected_conditions": [
+                1,
+                3
+            ],
+            "main_photo": 78,
+            "is_available": true,
+            "is_in_stock": true,
+            "is_featured": false,
+            "created_at": "2024-01-01T00:00:00Z",
+            "updated_at": "2024-01-01T00:00:00Z",
+            "slug": "pointillism-the-dog-01",
+            "sku": "SKU-FND2B9470A",
+            "quantity": 1
+        }
+    },
+    {
+        "pk": 39,
+        "model": "artwork.Artwork",
+        "fields": {
+            "name": "Pointillism The Dog 02",
+            "description": "A representation of a cute pup. 'Pointillism The Dog 02' ",
+            "artist": 1,
+            "price": "100.00",
+            "category": 3,
+            "selected_conditions": [
+                1,
+                3
+            ],
+            "main_photo": 80,
+            "is_available": true,
+            "is_in_stock": true,
+            "is_featured": false,
+            "created_at": "2024-01-01T00:00:00Z",
+            "updated_at": "2024-01-01T00:00:00Z",
+            "slug": "pointillism-the-dog-02",
+            "sku": "SKU-XHPZ05N7NQ",
+            "quantity": 15
+        }
+    },
+    {
+        "pk": 40,
+        "model": "artwork.Artwork",
+        "fields": {
+            "name": "Resurrection Engulfed In The Flames",
+            "description": "Fine art photography. 'Resurrection Engulfed In The Flames' ",
+            "artist": 1,
+            "price": "1400.00",
+            "category": 2,
+            "selected_conditions": [
+                1
+            ],
+            "main_photo": 82,
+            "is_available": true,
+            "is_in_stock": true,
+            "is_featured": true,
+            "created_at": "2024-01-01T00:00:00Z",
+            "updated_at": "2024-01-01T00:00:00Z",
+            "slug": "resurrection-engulfed-in-the-flames",
+            "sku": "SKU-HB5I5GGOFY",
+            "quantity": 16
+        }
+    },
+    {
+        "pk": 41,
+        "model": "artwork.Artwork",
+        "fields": {
+            "name": "Resurrection Surrender To The Flames",
+            "description": "Fine art photography. 'Resurrection Surrender To The Flames' ",
+            "artist": 1,
+            "price": "1400.00",
+            "category": 2,
+            "selected_conditions": [
+                1
+            ],
+            "main_photo": 84,
+            "is_available": true,
+            "is_in_stock": true,
+            "is_featured": false,
+            "created_at": "2024-01-01T00:00:00Z",
+            "updated_at": "2024-01-01T00:00:00Z",
+            "slug": "resurrection-surrender-to-the-flames",
+            "sku": "SKU-MTJTPU58G2",
+            "quantity": 1
+        }
+    },
+    {
+        "pk": 42,
+        "model": "artwork.Artwork",
+        "fields": {
+            "name": "Resurrection The Fire Of Purity",
+            "description": "Fine art photography. 'Resurrection The Fire Of Purity' ",
+            "artist": 1,
+            "price": "1400.00",
+            "category": 2,
+            "selected_conditions": [
+                1
+            ],
+            "main_photo": 86,
+            "is_available": true,
+            "is_in_stock": true,
+            "is_featured": false,
+            "created_at": "2024-01-01T00:00:00Z",
+            "updated_at": "2024-01-01T00:00:00Z",
+            "slug": "resurrection-the-fire-of-purity",
+            "sku": "SKU-B5MJFILASV",
+            "quantity": 5
+        }
+    },
+    {
+        "pk": 43,
+        "model": "artwork.Artwork",
+        "fields": {
+            "name": "Seascape Mists Of Time",
+            "description": "The sea on a long exposure. 'Seascape Mists Of Time' ",
+            "artist": 1,
+            "price": "500.00",
+            "category": 2,
+            "selected_conditions": [
+                1
+            ],
+            "main_photo": 88,
+            "is_available": true,
+            "is_in_stock": true,
+            "is_featured": false,
+            "created_at": "2024-01-01T00:00:00Z",
+            "updated_at": "2024-01-01T00:00:00Z",
+            "slug": "seascape-mists-of-time",
+            "sku": "SKU-XEJN3NNSA6",
+            "quantity": 10
+        }
+    },
+    {
+        "pk": 44,
+        "model": "artwork.Artwork",
+        "fields": {
+            "name": "Seascape Sentry Duty",
+            "description": "The ancient groynes in a harbour. 'Seascape Sentry Duty' ",
+            "artist": 1,
+            "price": "350.00",
+            "category": 2,
+            "selected_conditions": [
+                1
+            ],
+            "main_photo": 90,
+            "is_available": true,
+            "is_in_stock": true,
+            "is_featured": false,
+            "created_at": "2024-01-01T00:00:00Z",
+            "updated_at": "2024-01-01T00:00:00Z",
+            "slug": "seascape-sentry-duty",
+            "sku": "SKU-AEC4ZMROLI",
+            "quantity": 9
+        }
+    },
+    {
+        "pk": 45,
+        "model": "artwork.Artwork",
+        "fields": {
+            "name": "Seascape The Beginning",
+            "description": "The estuary meets the tide of the sea. \u2018The Beginning' ",
+            "artist": 1,
+            "price": "200.00",
+            "category": 2,
+            "selected_conditions": [
+                1
+            ],
+            "main_photo": 92,
+            "is_available": true,
+            "is_in_stock": true,
+            "is_featured": false,
+            "created_at": "2024-01-01T00:00:00Z",
+            "updated_at": "2024-01-01T00:00:00Z",
+            "slug": "seascape-the-beginning",
+            "sku": "SKU-GXR6EQT6BJ",
+            "quantity": 4
+        }
+    },
+    {
+        "pk": 46,
+        "model": "artwork.Artwork",
+        "fields": {
+            "name": "Seascape The Landmark",
+            "description": "The famous Spinnaker tower of Portsmouth. 'Seascape The Landmark' ",
+            "artist": 1,
+            "price": "400.00",
+            "category": 2,
+            "selected_conditions": [
+                1
+            ],
+            "main_photo": 94,
+            "is_available": true,
+            "is_in_stock": true,
+            "is_featured": false,
+            "created_at": "2024-01-01T00:00:00Z",
+            "updated_at": "2024-01-01T00:00:00Z",
+            "slug": "seascape-the-landmark",
+            "sku": "SKU-6E4C59ZMYT",
+            "quantity": 16
+        }
+    },
+    {
+        "pk": 47,
+        "model": "artwork.Artwork",
+        "fields": {
+            "name": "Seascape Tides Out",
+            "description": "The sea at low tide. 'Seascape Tides Out' ",
+            "artist": 1,
+            "price": "100.00",
+            "category": 2,
+            "selected_conditions": [
+                1
+            ],
+            "main_photo": 96,
+            "is_available": true,
+            "is_in_stock": false,
+            "is_featured": false,
+            "created_at": "2024-01-01T00:00:00Z",
+            "updated_at": "2024-01-01T00:00:00Z",
+            "slug": "seascape-tides-out",
+            "sku": "SKU-TAFXX9CTKB",
+            "quantity": 0
+        }
+    },
+    {
+        "pk": 48,
+        "model": "artwork.Artwork",
+        "fields": {
+            "name": "Statue Absence",
+            "description": "The angel of the north. 'Statue Absence' ",
+            "artist": 1,
+            "price": "400.00",
+            "category": 2,
+            "selected_conditions": [
+                1
+            ],
+            "main_photo": 98,
+            "is_available": true,
+            "is_in_stock": true,
+            "is_featured": false,
+            "created_at": "2024-01-01T00:00:00Z",
+            "updated_at": "2024-01-01T00:00:00Z",
+            "slug": "statue-absence",
+            "sku": "SKU-L7TTP33RJ2",
+            "quantity": 11
+        }
+    },
+    {
+        "pk": 49,
+        "model": "artwork.Artwork",
+        "fields": {
+            "name": "Statue Angel Descends 01",
+            "description": "The angel of the north. 'Statue Angel Descends 01' ",
+            "artist": 1,
+            "price": "400.00",
+            "category": 2,
+            "selected_conditions": [
+                1
+            ],
+            "main_photo": 100,
+            "is_available": true,
+            "is_in_stock": true,
+            "is_featured": false,
+            "created_at": "2024-01-01T00:00:00Z",
+            "updated_at": "2024-01-01T00:00:00Z",
+            "slug": "statue-angel-descends-01",
+            "sku": "SKU-E2IDPU6WBM",
+            "quantity": 10
+        }
+    },
+    {
+        "pk": 50,
+        "model": "artwork.Artwork",
+        "fields": {
+            "name": "Statue Angel Descends 02",
+            "description": "The angel of the north. 'Statue Angel Descends 02' ",
+            "artist": 1,
+            "price": "400.00",
+            "category": 2,
+            "selected_conditions": [
+                1
+            ],
+            "main_photo": 102,
+            "is_available": true,
+            "is_in_stock": true,
+            "is_featured": false,
+            "created_at": "2024-01-01T00:00:00Z",
+            "updated_at": "2024-01-01T00:00:00Z",
+            "slug": "statue-angel-descends-02",
+            "sku": "SKU-M9AC2IEHSA",
+            "quantity": 10
+        }
+    },
+    {
+        "pk": 51,
+        "model": "artwork.Artwork",
+        "fields": {
+            "name": "Statue Angel Descends 03",
+            "description": "The angel of the north. 'Statue Angel Descends 03' ",
+            "artist": 1,
+            "price": "400.00",
+            "category": 2,
+            "selected_conditions": [
+                1
+            ],
+            "main_photo": 104,
+            "is_available": true,
+            "is_in_stock": true,
+            "is_featured": false,
+            "created_at": "2024-01-01T00:00:00Z",
+            "updated_at": "2024-01-01T00:00:00Z",
+            "slug": "statue-angel-descends-03",
+            "sku": "SKU-ZUCPTXU4PZ",
+            "quantity": 17
+        }
+    },
+    {
+        "pk": 52,
+        "model": "artwork.Artwork",
+        "fields": {
+            "name": "Statue Angel Descends 04",
+            "description": "The angel of the north. 'Statue Angel Descends 04' ",
+            "artist": 1,
+            "price": "400.00",
+            "category": 2,
+            "selected_conditions": [
+                1
+            ],
+            "main_photo": 106,
+            "is_available": true,
+            "is_in_stock": true,
+            "is_featured": false,
+            "created_at": "2024-01-01T00:00:00Z",
+            "updated_at": "2024-01-01T00:00:00Z",
+            "slug": "statue-angel-descends-04",
+            "sku": "SKU-OZ9CIB6QTG",
+            "quantity": 10
+        }
+    },
+    {
+        "pk": 53,
+        "model": "artwork.Artwork",
+        "fields": {
+            "name": "Statue Angel Descends 05",
+            "description": "The angel of the north. 'Statue Angel Descends 05' ",
+            "artist": 1,
+            "price": "400.00",
+            "category": 2,
+            "selected_conditions": [
+                1
+            ],
+            "main_photo": 108,
+            "is_available": true,
+            "is_in_stock": true,
+            "is_featured": false,
+            "created_at": "2024-01-01T00:00:00Z",
+            "updated_at": "2024-01-01T00:00:00Z",
+            "slug": "statue-angel-descends-05",
+            "sku": "SKU-V2NRYWUK07",
+            "quantity": 18
+        }
+    },
+    {
+        "pk": 54,
+        "model": "artwork.Artwork",
+        "fields": {
+            "name": "Statue Angel Descends 06",
+            "description": "The angel of the north.'Statue Angel Descends 06' ",
+            "artist": 1,
+            "price": "400.00",
+            "category": 2,
+            "selected_conditions": [
+                1
+            ],
+            "main_photo": 110,
+            "is_available": true,
+            "is_in_stock": true,
+            "is_featured": false,
+            "created_at": "2024-01-01T00:00:00Z",
+            "updated_at": "2024-01-01T00:00:00Z",
+            "slug": "statue-angel-descends-06",
+            "sku": "SKU-304JTE2FG2",
+            "quantity": 17
+        }
+    },
+    {
+        "pk": 55,
+        "model": "artwork.Artwork",
+        "fields": {
+            "name": "Statue Angel Descends 07",
+            "description": "The angel of the north. 'Statue Angel Descends 07' ",
+            "artist": 1,
+            "price": "400.00",
+            "category": 2,
+            "selected_conditions": [
+                1
+            ],
+            "main_photo": 112,
+            "is_available": true,
+            "is_in_stock": true,
+            "is_featured": false,
+            "created_at": "2024-01-01T00:00:00Z",
+            "updated_at": "2024-01-01T00:00:00Z",
+            "slug": "statue-angel-descends-07",
+            "sku": "SKU-J03WDR4I4F",
+            "quantity": 5
+        }
+    },
+    {
+        "pk": 56,
+        "model": "artwork.Artwork",
+        "fields": {
+            "name": "Statue Angel Descends 08",
+            "description": "The angel of the north. 'Statue Angel Descends 08' ",
+            "artist": 1,
+            "price": "400.00",
+            "category": 2,
+            "selected_conditions": [
+                1
+            ],
+            "main_photo": 114,
+            "is_available": true,
+            "is_in_stock": true,
+            "is_featured": false,
+            "created_at": "2024-01-01T00:00:00Z",
+            "updated_at": "2024-01-01T00:00:00Z",
+            "slug": "statue-angel-descends-08",
+            "sku": "SKU-G605NVVUT9",
+            "quantity": 19
+        }
+    },
+    {
+        "pk": 57,
+        "model": "artwork.Artwork",
+        "fields": {
+            "name": "Statue Angel Descends 09",
+            "description": "The angel of the north. 'Statue Angel Descends 09' ",
+            "artist": 1,
+            "price": "400.00",
+            "category": 2,
+            "selected_conditions": [
+                1
+            ],
+            "main_photo": 116,
+            "is_available": true,
+            "is_in_stock": true,
+            "is_featured": false,
+            "created_at": "2024-01-01T00:00:00Z",
+            "updated_at": "2024-01-01T00:00:00Z",
+            "slug": "statue-angel-descends-09",
+            "sku": "SKU-OM5V3WUKZ9",
+            "quantity": 16
+        }
+    },
+    {
+        "pk": 58,
+        "model": "artwork.Artwork",
+        "fields": {
+            "name": "Statue Angel Descends 10",
+            "description": "The angel of the north. 'Statue Angel Descends 10' ",
+            "artist": 1,
+            "price": "400.00",
+            "category": 2,
+            "selected_conditions": [
+                1
+            ],
+            "main_photo": 118,
+            "is_available": true,
+            "is_in_stock": true,
+            "is_featured": false,
+            "created_at": "2024-01-01T00:00:00Z",
+            "updated_at": "2024-01-01T00:00:00Z",
+            "slug": "statue-angel-descends-10",
+            "sku": "SKU-DQFXNGZAAN",
+            "quantity": 12
+        }
+    },
+    {
+        "pk": 59,
+        "model": "artwork.Artwork",
+        "fields": {
+            "name": "Statue Angel Descends 11",
+            "description": "The angel of the north. 'Statue Angel Descends 11' ",
+            "artist": 1,
+            "price": "400.00",
+            "category": 2,
+            "selected_conditions": [
+                1
+            ],
+            "main_photo": 120,
+            "is_available": true,
+            "is_in_stock": true,
+            "is_featured": false,
+            "created_at": "2024-01-01T00:00:00Z",
+            "updated_at": "2024-01-01T00:00:00Z",
+            "slug": "statue-angel-descends-11",
+            "sku": "SKU-ZGDVRCOZQV",
+            "quantity": 16
+        }
+    },
+    {
+        "pk": 60,
+        "model": "artwork.Artwork",
+        "fields": {
+            "name": "Statue Ascending",
+            "description": "The angel of the north. 'Statue Ascending' ",
+            "artist": 1,
+            "price": "400.00",
+            "category": 2,
+            "selected_conditions": [
+                1
+            ],
+            "main_photo": 122,
+            "is_available": true,
+            "is_in_stock": true,
+            "is_featured": false,
+            "created_at": "2024-01-01T00:00:00Z",
+            "updated_at": "2024-01-01T00:00:00Z",
+            "slug": "statue-ascending",
+            "sku": "SKU-JXWEVL8J5G",
+            "quantity": 5
+        }
+    },
+    {
+        "pk": 61,
+        "model": "artwork.Artwork",
+        "fields": {
+            "name": "Statue Drops Of Memories",
+            "description": "The wire soldiers. 'Statue Drops Of Memories' ",
+            "artist": 1,
+            "price": "350.00",
+            "category": 2,
+            "selected_conditions": [
+                1
+            ],
+            "main_photo": 124,
+            "is_available": true,
+            "is_in_stock": true,
+            "is_featured": false,
+            "created_at": "2024-01-01T00:00:00Z",
+            "updated_at": "2024-01-01T00:00:00Z",
+            "slug": "statue-drops-of-memories",
+            "sku": "SKU-G2NH4SX98N",
+            "quantity": 12
+        }
+    },
+    {
+        "pk": 62,
+        "model": "artwork.Artwork",
+        "fields": {
+            "name": "Statue Silent Weapons",
+            "description": "The wire soldiers. 'Statue Silent Weapons' ",
+            "artist": 1,
+            "price": "350.00",
+            "category": 2,
+            "selected_conditions": [
+                1
+            ],
+            "main_photo": 126,
+            "is_available": true,
+            "is_in_stock": true,
+            "is_featured": false,
+            "created_at": "2024-01-01T00:00:00Z",
+            "updated_at": "2024-01-01T00:00:00Z",
+            "slug": "statue-silent-weapons",
+            "sku": "SKU-WWGELXRFSH",
+            "quantity": 3
+        }
+    },
+    {
+        "pk": 63,
+        "model": "artwork.Artwork",
+        "fields": {
+            "name": "Statue The Crossing",
+            "description": "The wire soldiers. 'Statue The Crossing' ",
+            "artist": 1,
+            "price": "350.00",
+            "category": 2,
+            "selected_conditions": [
+                1
+            ],
+            "main_photo": 128,
+            "is_available": true,
+            "is_in_stock": true,
+            "is_featured": false,
+            "created_at": "2024-01-01T00:00:00Z",
+            "updated_at": "2024-01-01T00:00:00Z",
+            "slug": "statue-the-crossing",
+            "sku": "SKU-XQHO5K9XPB",
+            "quantity": 2
+        }
+    },
+    {
+        "pk": 64,
+        "model": "artwork.Artwork",
+        "fields": {
+            "name": "Statue The Remains",
+            "description": "The wire soldiers. 'Statue The Remains'.",
+            "artist": 1,
+            "price": "400.00",
+            "category": 2,
+            "selected_conditions": [
+                1
+            ],
+            "main_photo": 130,
+            "is_available": true,
+            "is_in_stock": true,
+            "is_featured": false,
+            "created_at": "2024-01-01T00:00:00Z",
+            "updated_at": "2024-01-01T00:00:00Z",
+            "slug": "statue-the-remains",
+            "sku": "SKU-V1XX5U7K67",
+            "quantity": 6
+        }
+    }
+]
