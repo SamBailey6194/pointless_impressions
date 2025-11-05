@@ -371,9 +371,31 @@ class ArtworkDetailView(DetailView):
         artwork = self.get_object()
         context['prefetched_conditions'] = artwork.prefetched_conditions
         photos = artwork.photos.all()
+
         if artwork.main_photo:
             photos = photos.exclude(pk=artwork.main_photo.pk)
-        context['photos'] = photos
+        context['photos'] = photos[:5]
+
+        if artwork.artist:
+            similar_artists = Artwork.objects.filter(
+                artist=artwork.artist
+            ).exclude(
+                pk=artwork.pk
+            ).select_related(
+                'main_photo', 'artist__user'
+            )[:10]
+            context['similar_artists'] = similar_artists
+
+        if artwork.category:
+            similar_artworks = Artwork.objects.filter(
+                category=artwork.category
+            ).exclude(
+                pk=artwork.pk
+            ).select_related(
+                'main_photo', 'artist__user'
+            )[:10]
+            context['similar_artworks'] = similar_artworks
+
         return context
 
 
