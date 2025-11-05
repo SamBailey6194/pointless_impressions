@@ -19,7 +19,7 @@ from pointless_impressions_src.profiles.models import Artist
 def get_placeholder_image():
     """Returns a placeholder image data."""
     try:
-        return Photo.objects.get(asset_identifier='noimage_placeholder')
+        return Photo.objects.get(asset_identifier='placeholder_image')
     except Photo.DoesNotExist:
         return None
 
@@ -189,12 +189,24 @@ class SearchAutocompleteView(View):
         artist_matches = Artist.objects.filter(
             user__is_active=True,
             user__username__icontains=term
-        ).values_list('name', flat=True)
+        ).values_list('user__username', flat=True)
+
+        artist_first_name_matches = Artist.objects.filter(
+            user__is_active=True,
+            user__first_name__icontains=term
+        ).values_list('user__first_name', flat=True)
+
+        artist_last_name_matches = Artist.objects.filter(
+            user__is_active=True,
+            user__last_name__icontains=term
+        ).values_list('user__last_name', flat=True)
 
         combined_results = set(artwork_matches)
         combined_results.update(category_matches)
         combined_results.update(condition_matches)
         combined_results.update(artist_matches)
+        combined_results.update(artist_first_name_matches)
+        combined_results.update(artist_last_name_matches)
 
         final_list = sorted(list(combined_results))[:10]
 

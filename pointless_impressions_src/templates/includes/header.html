@@ -41,12 +41,12 @@
                 </a>
               </li>
               <li>
-                <div class="dropdown dropdown-hover dropdown-right">
+                <div class="dropdown dropdown-click">
                     <label tabindex="0" class="rounded-lg flex items-center gap-2">
                         <i class="fa-solid fa-palette"></i>Artwork Categories
                         <i class="fa-solid fa-circle-chevron-down"></i>
                     </label>
-                    <ul tabindex="0" class="menu menu-sm dropdown-content z-10 p-2 shadow-lg rounded-box w-52">
+                    <ul tabindex="0" class="menu menu-sm dropdown-content z-10 p-2 shadow-lg rounded-box w-52 ml-32">
                         {% for category in artwork_categories %}
                             <li>
                                 <a href="{% url 'artwork:list' %}?category={{ category.slug }}" class="hover:bg-[var(--pointless-yellow)]">
@@ -58,12 +58,12 @@
                 </div>
               </li>
               <li>
-                <div class="dropdown dropdown-hover dropdown-right">
+                <div class="dropdown dropdown-click">
                     <label tabindex="0" class="rounded-lg flex items-center gap-2">
                         <i class="fa-solid fa-crop-simple"></i>Framing Options
                         <i class="fa-solid fa-circle-chevron-down"></i>
                     </label>
-                    <ul tabindex="0" class="menu menu-sm dropdown-content shadow-lg rounded-box w-52">
+                    <ul tabindex="0" class="menu menu-sm dropdown-content z-10 p-2 shadow-lg rounded-box w-52 ml-28">
                         {% for framing in framing_options %}
                             <li>
                                 <a href="{% url 'artwork:list' %}?selected_condition={{ framing.slug }}" class="hover:bg-[var(--pointless-yellow)]">
@@ -75,12 +75,12 @@
                 </div>  
               </li>
               <li>
-                <div class="dropdown dropdown-hover dropdown-right">
+                <div class="dropdown dropdown-click">
                   <label tabindex="0" class="rounded-lg flex items-center gap-2">
                       <i class="fa-solid fa-brush"></i>Artists
                       <i class="fa-solid fa-circle-chevron-down"></i>
                   </label>
-                  <ul tabindex="0" class="menu menu-sm dropdown-content z-10 p-2 shadow-lg rounded-box w-52">
+                  <ul tabindex="0" class="menu menu-sm dropdown-content z-10 p-2 shadow-lg rounded-box w-52 ml-14">
                       {% for artist in artists %}
                           <li>
                               <a href="{% url 'artwork:list' %}?artist={{ artist.user.username }}" class="hover:bg-[var(--pointless-yellow)]">
@@ -341,9 +341,9 @@
   <div class="hidden md:block py-3">
     <div class="max-w-6xl mx-auto px-4">
       <div class="max-w-md mx-auto">
-        <div class="flex w-full">
+        <div class="flex w-full relative">
           <form method="get" action="{% url 'search:search_results' %}" class="flex w-full">
-            <input type="text" name="q" id="global-search-input" placeholder="Search products, artists..." class="custom-input flex-1 rounded-r-none" />
+            <input type="text" name="q" id="desktop-search-input" placeholder="Search products, artists..." autocomplete="off" class="custom-input flex-1 rounded-r-none" />
             <button type="submit" class="btn rounded-l-none">
               <i class="fa-solid fa-magnifying-glass"></i>
             </button>
@@ -356,9 +356,9 @@
   {% comment %} Mobile Search Bar (toggleable) {% endcomment %}
   <div id="mobile-search-bar" class="hidden md:hidden pb-4 w-full">
     <div class="w-full px-2">
-      <div class="flex w-full">
+      <div class="flex w-full relative">
         <form method="get" action="{% url 'search:search_results' %}" class="flex w-full">
-          <input type="text" name="q" id="global-search-input" placeholder="Search products, artists..." class="custom-input w-full rounded-r-none" />
+          <input type="text" name="q" id="mobile-search-input" placeholder="Search products, artists..." autocomplete="off" class="custom-input w-full rounded-r-none" />
           <button type="submit" class="btn rounded-l-none">
             <i class="fa-solid fa-magnifying-glass"></i>
           </button>

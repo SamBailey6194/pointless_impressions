@@ -32,7 +32,7 @@
         }
       }
     }
-    function initAutoComplete(selector) {
+    function initAutoComplete(inputElement) {
       if (!AUTOCOMPLETE_API_URL) {
         console.warn("Autocomplete API URL is missing. Autocomplete feature disabled.");
         return;
@@ -42,8 +42,12 @@
         return;
       }
       try {
+        const inputId = inputElement.id || `search-input-${Math.random().toString(36).substr(2, 9)}`;
+        if (!inputElement.id) {
+          inputElement.id = inputId;
+        }
         new autoComplete({
-          selector,
+          selector: `#${inputId}`,
           placeHolder: "Search products, categories...",
           data: {
             src: async (query) => {
@@ -64,10 +68,10 @@
           events: {
             input: {
               selection: (event) => {
-                const inputElement = event.target;
+                const inputElement2 = event.target;
                 const selectedValue = event.detail.selection.value;
-                inputElement.value = selectedValue;
-                performSearch(selectedValue, inputElement);
+                inputElement2.value = selectedValue;
+                performSearch(selectedValue, inputElement2);
               }
             }
           }

@@ -70,13 +70,17 @@
     {% endblock %}
 
     <title>{% block title %}{% if product %}{{ product.name|striptags }} | Pointless Impressions{% elif post %}{{ post.title|striptags }} | Pointless Impressions{% elif category %}{{ category.name|striptags }} | Pointless Impressions{% elif page_slug == 'about' %}About Us | Pointless Impressions{% else %}Pointless Impressions – Unique Pointillism Art{% endif %}{% endblock %}</title>
-
+    
     {% tailwind_preload_css %}
+    
     {% tailwind_css %}
 
     {% block corejs %}
       <script src="https://kit.fontawesome.com/b28d0f6314.js" crossorigin="anonymous"></script>
+      <script src="https://cdn.jsdelivr.net/npm/@tarekraafat/autocomplete.js@10.2.9/dist/autoComplete.min.js"></script>
     {% endblock %}
+
+    {% block extracss %}{% endblock %}
 
     {% block extra_head %}{% endblock %}
 

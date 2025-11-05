@@ -51,7 +51,7 @@ def _serialize_artwork_data(artwork_queryset, placeholder_image):
         image_url = None
         image_public_id = None
         image_alt_text = artwork.name
-        
+
         # Use artwork's main_photo, NOT placeholder as fallback
         image_obj = artwork.main_photo
 
