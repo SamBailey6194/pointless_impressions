@@ -1,6 +1,7 @@
 /**
  * Artwork Detail Page - Main Script
- * Handles displaying artwork details, images, and cart functionality
+ * Handles displaying artwork details, images, carousel navigation,
+ * cart functionality, and review submission
  */
 
 /**
@@ -126,6 +127,9 @@ export function initArtworkDetail() {
       nextSlide();
     }
   });
+
+  // Initialize review functionality
+  initializeReviewFunctionality();
 }
 
 /**
@@ -215,6 +219,119 @@ function updateThumbnails() {
 window.goToSlide = goToSlide;
 window.nextSlide = nextSlide;
 window.previousSlide = previousSlide;
+
+/**
+ * Review Submission Handling
+ */
+
+/**
+ * Submit review form via fetch API
+ */
+async function submitReview() {
+  const form = document.getElementById('review_form');
+  const modal = document.getElementById('review_modal');
+  const formData = new FormData(form);
+
+  try {
+    const response = await fetch(form.action, {
+      method: 'POST',
+      body: formData,
+      headers: {
+        'X-Requested-With': 'XMLHttpRequest',
+      }
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+      // Success
+      showNotification(data.message, 'success');
+      form.reset();
+      modal.close();
+
+      // Refresh reviews section after 1 second
+      setTimeout(() => {
+        window.location.reload();
+      }, 1000);
+    } else {
+      // Error
+      showNotification(data.error || 'An error occurred', 'error');
+
+      if (data.errors) {
+        console.error('Form errors:', data.errors);
+      }
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    showNotification('Failed to submit review. Please try again.', 'error');
+  }
+}
+
+/**
+ * Show notification toast
+ * @param {string} message - Message to display
+ * @param {string} type - Notification type (success, error, info)
+ */
+function showNotification(message, type = 'info') {
+  const toast = document.createElement('div');
+  const alertClass = type === 'success' ? 'alert-success' : 'alert-error';
+
+  toast.className = `alert ${alertClass} fixed bottom-4 right-4 shadow-lg max-w-md z-50`;
+  toast.innerHTML = `
+    <div>
+      <svg class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${type === 'success' ? 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z' : 'M12 8v4m0 4v.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z'}"></path>
+      </svg>
+      <span>${message}</span>
+    </div>
+  `;
+
+  document.body.appendChild(toast);
+
+  // Remove after 5 seconds
+  setTimeout(() => {
+    toast.remove();
+  }, 5000);
+}
+
+/**
+ * Handle View Reviews button scroll
+ */
+function handleViewReviewsScroll() {
+  const viewReviewsBtn = document.querySelector('[data-scroll-to-reviews]');
+  if (viewReviewsBtn) {
+    viewReviewsBtn.addEventListener('click', function() {
+      const reviewsSection = document.getElementById('reviews_section');
+      if (reviewsSection) {
+        reviewsSection.scrollIntoView({ behavior: 'smooth' });
+      }
+    });
+  }
+}
+
+/**
+ * Initialize review form submission
+ */
+function initializeReviewForm() {
+  const reviewForm = document.getElementById('review_form');
+
+  if (reviewForm) {
+    reviewForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+      submitReview();
+    });
+  }
+}
+
+// Initialize review functionality on page load
+function initializeReviewFunctionality() {
+  initializeReviewForm();
+  handleViewReviewsScroll();
+}
+
+// Make review functions globally accessible
+window.submitReview = submitReview;
+window.showNotification = showNotification;
 
 // Initialize on page load
 if (document.readyState === 'loading') {

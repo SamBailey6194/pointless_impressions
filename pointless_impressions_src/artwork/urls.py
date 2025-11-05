@@ -13,4 +13,9 @@ urlpatterns = [
         views.setup_test_data,
         name='setup_test_data'
     ),
+    path(
+        'reviews/submit/',
+        views.SubmitArtworkReviewView.as_view(),
+        name='submit-review'
+    ),
 ]

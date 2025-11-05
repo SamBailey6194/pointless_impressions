@@ -27,7 +27,6 @@ DJANGO_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    "behave_django",
 ]
 
 THIRD_PARTY_APPS = [
@@ -38,6 +37,11 @@ THIRD_PARTY_APPS = [
     # Storage backends
     "cloudinary",
     "storages",
+    # Testing tools
+    "behave_django",
+    # Form rendering
+    "crispy_forms",
+    "crispy_tailwind",
 ]
 
 LOCAL_APPS = [

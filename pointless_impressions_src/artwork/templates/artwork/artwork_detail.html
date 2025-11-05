@@ -128,6 +128,54 @@
                 <span class="badge badge-outline">{{ condition.condition_friendly_name }}</span>
                 {% endfor %}
               </div>
+              <div class="divider my-1"></div>
+              <div class="flex justify-between items-center">
+                <span class="font-semibold">Rating:</span>
+                <div class="flex items-center gap-2">
+                  {% if artwork.average_rating %}
+                    <div class="rating rating-sm gap-1">
+                      {% for i in "12345" %}
+                        {% if forloop.counter <= artwork.average_rating %}
+                          <span class="mask mask-star-2 bg-orange-400"></span>
+                        {% else %}
+                          <span class="mask mask-star-2 bg-gray-300"></span>
+                        {% endif %}
+                      {% endfor %}
+                    </div>
+                    <span class="badge badge-outline">{{ artwork.average_rating|floatformat:1 }} stars</span>
+                  {% else %}
+                    <span class="badge badge-outline">No ratings yet</span>
+                  {% endif %}
+                  {% if artwork.review_count %}
+                    <span class="badge badge-outline">({{ artwork.review_count }} review{{ artwork.review_count|pluralize }})</span>
+                  {% endif %}
+                </div>
+              </div>
+              <div class="divider my-1"></div>
+              <div class="flex gap-2 justify-between">
+                {% if user.is_authenticated %}
+                  <button class="btn btn-outline btn-sm flex-1" onclick="document.getElementById('review_modal').showModal()">
+                    <i class="fa-solid fa-pen-to-square"></i> Write Review
+                  </button>
+                {% else %}
+                  <a href="" class="btn btn-outline btn-lg flex-1">
+                    <i class="fa-solid fa-pen-to-square"></i> Login to Review
+                  </a>
+                {% endif %}
+                {% if artwork.review_count > 0 %}
+                  <button class="btn btn-outline btn-lg flex-1" data-scroll-to-reviews onclick="document.getElementById('reviews_section').scrollIntoView({behavior: 'smooth'})">
+                    <i class="fa-solid fa-eye"></i> View Reviews
+                  </button>
+                {% else %}
+                  <div class="alert alert-warning w-1/2">
+                    <i class="fa-solid fa-exclamation-triangle text-xl text-gray-700"></i>
+                    <div class="text-gray-700">
+                      <h3 class="font-bold">No Reviews yet</h3>
+                      <div class="text-xs">This artwork has not been reviewed yet</div>
+                    </div>
+                  </div>
+                {% endif %}
+              </div>
             </div>
           </div>
         </div>
@@ -206,8 +254,10 @@
             <i class="fa-solid fa-brush"></i> View More {{ artwork.artist.user.username }}
           </a>
         </div>
+      {% comment %} Yellow line under the search bar {% endcomment %}
+      <div class="border border-[var(--pointless-yellow)]"></div>
     </div>
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="max-w-7xl mx-auto my-8 px-4 sm:px-6 lg:px-8">
         <h2 class="text-3xl font-bold mb-12 text-center">Other {{ artwork.category.name }} Artwork</h2>
         
         {% comment %} Horizontal Scrolling Container {% endcomment %}
@@ -264,27 +314,70 @@
 
   {% comment %} Section 3 - Reviews {% endcomment %}
   {% block section_3 %}
-  <section class="section-alt py-16 w-full">
+  <section class="section-alt py-16 w-full" id="reviews_section">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex items-center justify-between mb-8">
         <h2 class="text-3xl font-bold">
-          <i class="fa-solid fa-star"></i> Reviews
+          <i class="fa-solid fa-star"></i> Reviews ({{ reviews.count }})
         </h2>
-        {% if artwork.is_in_stock %}
+        {% if user.is_authenticated %}
           <button class="btn btn-primary" onclick="document.getElementById('review_modal').showModal()">
             <i class="fa-solid fa-pen-to-square"></i> Write a Review
           </button>
+        {% else %}
+          <a href="" class="btn btn-primary">
+            <i class="fa-solid fa-pen-to-square"></i> Login to Review
+          </a>
         {% endif %}
       </div>
 
       {% comment %} Reviews List {% endcomment %}
       <div class="space-y-4">
-        <div class="alert alert-info">
-          <i class="fa-solid fa-circle-info text-xl"></i>
-          <div>
-            <p>No reviews yet. Be the first to review this artwork!</p>
+        {% if reviews %}
+          {% for review in reviews %}
+            <div class="card bg-base-200">
+              <div class="card-body">
+                {% comment %} Review Header {% endcomment %}
+                <div class="flex items-start justify-between">
+                  <div>
+                    <h3 class="font-semibold text-lg">{{ review.review_title }}</h3>
+                    <p class="text-sm opacity-70">
+                      By <span class="font-mono">{{ review.reviewer.username }}</span> 
+                      on {{ review.created_at|date:"M d, Y" }}
+                    </p>
+                  </div>
+                  {% comment %} Edit button - only show if user is the reviewer {% endcomment %}
+                  {% if user == review.reviewer %}
+                    <button class="btn btn-ghost btn-sm">
+                      <i class="fa-solid fa-edit"></i> Edit
+                    </button>
+                  {% endif %}
+                </div>
+
+                {% comment %} Rating Stars {% endcomment %}
+                <div class="rating rating-sm gap-1 my-2">
+                  {% for i in "12345" %}
+                    {% if forloop.counter <= review.rating %}
+                      <span class="mask mask-star-2 bg-orange-400"></span>
+                    {% else %}
+                      <span class="mask mask-star-2 bg-gray-300"></span>
+                    {% endif %}
+                  {% endfor %}
+                </div>
+
+                {% comment %} Review Text {% endcomment %}
+                <p class="mt-3">{{ review.review_text }}</p>
+              </div>
+            </div>
+          {% endfor %}
+        {% else %}
+          <div class="alert alert-info">
+            <i class="fa-solid fa-circle-info text-xl"></i>
+            <div>
+              <p>No reviews yet. Be the first to review this artwork!</p>
+            </div>
           </div>
-        </div>
+        {% endif %}
       </div>
     </div>
   </section>
