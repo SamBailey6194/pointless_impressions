@@ -204,7 +204,6 @@ document.addEventListener("DOMContentLoaded", () => {
     button.addEventListener('click', (e) => {
       if (button.textContent.includes('View Cart')) {
         e.preventDefault();
-        console.log('Navigate to cart page');
         // TODO: Implement cart navigation
         // window.location.href = '/cart/';
       }

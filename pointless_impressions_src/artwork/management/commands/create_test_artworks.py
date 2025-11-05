@@ -14,6 +14,7 @@ from pointless_impressions_src.artwork.models import (
     ArtworkFramingCondition
 )
 from pointless_impressions_src.profiles.models import Artist
+from pointless_impressions_src.photo.models import Photo
 
 
 class Command(BaseCommand):
@@ -120,10 +121,26 @@ class Command(BaseCommand):
                     updated_at=timezone.now(),
                 )
                 art.selected_conditions.add(default_framing_condition)
+                
+                # Create a Photo object for this artwork
+                photo = Photo.objects.create(
+                    artwork=art,
+                    photo_type='artwork',
+                    title=f"{art.name} Image",
+                    description=f"Image for {art.name} artwork",
+                    image=f"artwork/{art.name.lower().replace(' ', '_')}.png",
+                    alt_text=f"{art.name} artwork",
+                    uploaded_by=default_artist_user
+                )
+                
+                # Set the photo as the main photo for the artwork
+                art.main_photo = photo
+                art.save()
+                
                 created_count += 1
                 self.stdout.write(
                     self.style.SUCCESS(
-                        f'  ✅ Created: {art.name} (£{art.price})'
+                        f'  ✅ Created: {art.name} (£{art.price}) with photo'
                     )
                 )
 

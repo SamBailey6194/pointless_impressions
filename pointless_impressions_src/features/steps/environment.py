@@ -3,7 +3,6 @@ Behave environment configuration for Django test database.
 This ensures Django ORM operations are properly committed to the test database.
 """
 from django.test import Client
-from django.db import connection
 
 
 def before_scenario(context, scenario):

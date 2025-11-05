@@ -162,7 +162,6 @@
       button.addEventListener("click", (e) => {
         if (button.textContent.includes("View Cart")) {
           e.preventDefault();
-          console.log("Navigate to cart page");
         }
       });
     });

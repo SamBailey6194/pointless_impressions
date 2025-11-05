@@ -1087,13 +1087,13 @@
             ],
             "main_photo": 96,
             "is_available": true,
-            "is_in_stock": true,
+            "is_in_stock": false,
             "is_featured": false,
             "created_at": "2024-01-01T00:00:00Z",
             "updated_at": "2024-01-01T00:00:00Z",
             "slug": "seascape-tides-out",
             "sku": "SKU-TAFXX9CTKB",
-            "quantity": 16
+            "quantity": 0
         }
     },
     {

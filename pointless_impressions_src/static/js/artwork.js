@@ -24,19 +24,16 @@
       artworks.forEach((artwork) => {
         let imageHTML = "";
         const publicId = artwork.image_public_id;
+        const imageUrl = artwork.image_url;
         const altText = artwork.image_alt_text || artwork.name;
-        if (publicId && isReady && typeof getCloudinaryUrl !== "undefined") {
+        if (imageUrl && imageUrl.trim() && imageUrl !== "/media/") {
+          imageHTML = `<figure class="w-full"><img src="${imageUrl}" alt="${altText}" class="w-full h-64 object-cover" loading="lazy"></figure>`;
+        } else if (publicId && isReady && typeof getCloudinaryUrl !== "undefined") {
           const transformations = "w_400,h_300,c_fill,f_auto,q_auto";
-          const imageUrl = getCloudinaryUrl(publicId, transformations);
-          imageHTML = `<figure><img src="${imageUrl}" alt="${altText}" class="w-full h-64 object-cover"></figure>`;
-        } else if (artwork.image_url) {
-          imageHTML = `<figure><img src="${artwork.image_url}" alt="${altText}" class="w-full h-64 object-cover"></figure>`;
-        } else if (typeof PLACEHOLDER_IMAGE_PUBLIC_ID !== "undefined" && isReady && typeof getCloudinaryUrl !== "undefined") {
-          const transformations = "w_400,h_300,c_fill,f_auto,q_auto";
-          const imageUrl = getCloudinaryUrl(PLACEHOLDER_IMAGE_PUBLIC_ID, transformations);
-          imageHTML = `<figure><img src="${imageUrl}" alt="${altText}" class="w-full h-64 object-cover"></figure>`;
+          const cloudinaryUrl = getCloudinaryUrl(publicId, transformations);
+          imageHTML = `<figure class="w-full"><img src="${cloudinaryUrl}" alt="${altText}" class="w-full h-64 object-cover" loading="lazy"></figure>`;
         } else {
-          imageHTML = `<figure><div class="bg-base-300 h-64 w-full flex items-center justify-center"><i class="fa-solid fa-image text-base-content/20 text-5xl"></i></div></figure>`;
+          imageHTML = `<figure class="w-full"><img src="/media/site_assets/noimage.png" alt="Placeholder" class="w-full h-64 object-cover"></figure>`;
         }
         let artistUrl = "#";
         let artistName = "Unknown Artist";
@@ -155,7 +152,11 @@
     if (typeof window.ARTWORKS_JSON_DATA !== "undefined" && window.ARTWORKS_JSON_DATA.length > 0) {
       masterArtworkList = window.ARTWORKS_JSON_DATA;
       isEnhanced = true;
-      applyStateAndRender();
+      const params = new URLSearchParams(window.location.search);
+      const hasActiveSorting = params.has("sort") || params.has("direction");
+      if (hasActiveSorting) {
+        applyStateAndRender();
+      }
     }
     const controlsContainer = document.getElementById("controls");
     if (controlsContainer) {

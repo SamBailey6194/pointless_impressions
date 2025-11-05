@@ -20,9 +20,6 @@ DATABASES = {
     }
 }
 
-print("Loaded settings file:", __file__)
-print("Test DB name:", DATABASES['default']['NAME'])
-
 # Optional: Speed up password hashing for tests
 PASSWORD_HASHERS = [
     'django.contrib.auth.hashers.MD5PasswordHasher',

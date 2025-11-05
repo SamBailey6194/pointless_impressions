@@ -9,10 +9,18 @@ This document outlines the manual tests to be carried out for each feature. Use 
 - [Manual Testing Guide](#manual-testing-guide)
   - [Table of Contents](#table-of-contents)
   - [Example](#example)
+    - [Section](#section)
+      - [Area](#area)
   - [Backend Testing](#backend-testing)
     - [US001: Browse Available Artworks - In Artwork App](#us001-browse-available-artworks---in-artwork-app)
+      - [Test the Artwork Model and Database Queries](#test-the-artwork-model-and-database-queries)
   - [Frontend Testing](#frontend-testing)
     - [US001: Browse Available Artworks - In Artwork App](#us001-browse-available-artworks---in-artwork-app-1)
+      - [Test the Artwork Listing Page](#test-the-artwork-listing-page)
+      - [Test Artwork Detail Page](#test-artwork-detail-page)
+      - [Test Pagination (if applicable)](#test-pagination-if-applicable)
+      - [Test Responsive Design](#test-responsive-design)
+      - [Test Error Handling](#test-error-handling)
 
 ---
 
@@ -34,15 +42,17 @@ This document outlines the manual tests to be carried out for each feature. Use 
 
 #### Test the Artwork Model and Database Queries
 
+Use `./dev.sh shell` to access the Django shell for executing the queries 2 to 10.
+
 | Step | Action | Expected Outcome | Pass / Fail |
 | :--- | :--- | :--- | :--- |
 | 1 | Start dev server with `./dev.sh start` | Server starts at http://localhost:8000 without errors | Pass |
 | 2 | Query artwork model for all items (no filters): `Artwork.objects.all().count()` | Returns all artwork records from database (e.g., if 2 artworks exist, returns 2) | Pass |
 | 3 | Query artworks for available only: `Artwork.objects.filter(is_available=True).count()` | Returns only records marked as available (e.g., returns 1 if "Sunset" is available) | Pass |
-| 4 | Query artworks filtered by category: `Artwork.objects.filter(category__name="Nature")` | Returns only artworks linked to the selected category (e.g., returns "Sunset" for Nature) | Pass |
-| 5 | Query artworks filtered by price range: `Artwork.objects.filter(price__gte=150, price__lte=200)` | Returns only artworks whose price falls within specified range (e.g., returns "Sunset" for 150-200) | Pass |
-| 6 | Query artworks filtered by framing condition: `Artwork.objects.filter(selected_conditions__condition_name="unframed")` | Returns only artworks linked to the selected framing condition | Pass |
-| 7 | Retrieve artwork details by slug: `Artwork.objects.get(slug="sunset")` | Returns the correct single Artwork object with matching name, description, price, and artist | Pass |
+| 4 | Query artworks filtered by category: `Artwork.objects.filter(category__name="paintings")` | Returns only artworks linked to the selected category (e.g., returns "Autumn Reflections" for Paintings) | Pass |
+| 5 | Query artworks filtered by price range: `Artwork.objects.filter(price__gte=150, price__lte=200)` | Returns only artworks whose price falls within specified range (e.g., returns "City The Buzz" for 150-200) | Pass |
+| 6 | Query artworks filtered by framing condition: `Artwork.objects.filter(selected_conditions__condition_name="original framed")` | Returns only artworks linked to the selected framing condition | Pass |
+| 7 | Retrieve artwork details by slug: `artwork = Artwork.objects.get(slug="city-icons-01")` then `print(artwork.name, artwork.description, artwork.price, artwork.artist)` | Returns the correct single Artwork object with matching name, description, price, and artist | Pass |
 | 8 | Attempt to retrieve non-existent artwork by slug: `Artwork.objects.get(slug="nonexistent")` | Raises `Artwork.DoesNotExist` exception (proper error handling) | Pass |
 | 9 | Check artwork relationships: verify `artwork.artist` exists | Artwork has valid Artist foreign key relationship | Pass |
 | 10 | Check artwork photos: verify `artwork.main_photo` exists | Artwork has valid Photo relationship for main image | Pass |
@@ -58,9 +68,9 @@ This document outlines the manual tests to be carried out for each feature. Use 
 | Step | Action | Expected Outcome | Pass / Fail |
 | :--- | :--- | :--- | :--- |
 | 1 | Navigate to http://localhost:8000/artworks/ | Page loads successfully with artwork list and all elements visible (filters, sorting, pagination) | Pass |
-| 2 | Verify page title and heading | Page displays "Browse Pointillism Artwork" or similar heading | Pass |
-| 3 | Verify available artworks display | "Sunset" artwork card is visible with image, title, artist, price, and availability status | Pass |
-| 4 | Verify sold-out artwork display | "Starry Night" artwork card is visible and clearly marked as "Sold Out" | Pass |
+| 2 | Verify page title and heading | Page displays "Browse Artworks" or similar heading | Pass |
+| 3 | Verify available artworks display | "Pointillism The Dog 02" artwork card is visible with image, title, artist, price, and availability status | Pass |
+| 4 | Verify sold-out artwork display | "Seascape Tides Out" artwork card is visible and clearly marked as "Sold Out" | Pass |
 | 5 | Verify artwork card elements | Each artwork card shows: thumbnail image, title, artist name, price in GBP (e.g., £199.99), availability badge | Pass |
 | 6 | Apply category filter (select "Pointillism") | Only artworks in "Pointillism" category display; other categories filter out | Pass |
 | 7 | Apply price range filter (Min 150, Max 200) | Only artworks with price between £150-£200 display (e.g., "Sunset" shows) | Pass |
@@ -114,4 +124,3 @@ This document outlines the manual tests to be carried out for each feature. Use 
 | 3 | Refresh page during cart operation | Page reloads gracefully without errors | Pass |
 | 4 | Check browser console for errors | No JavaScript errors or warnings in browser developer tools console | Pass |
 | 5 | Verify images load correctly | No broken image icons, all artwork images display properly | Pass |
-

@@ -51,23 +51,57 @@ def _serialize_artwork_data(artwork_queryset, placeholder_image):
         image_url = None
         image_public_id = None
         image_alt_text = artwork.name
-        image_obj = artwork.main_photo or placeholder_image
+        
+        # Use artwork's main_photo, NOT placeholder as fallback
+        image_obj = artwork.main_photo
 
         if image_obj:
+            # Get image URL - for local dev with ImageField or Cloudinary
             image_url_attr = getattr(image_obj, 'get_image_url', None)
 
             if callable(image_url_attr):
-                image_url = image_url_attr()
-            else:
-                image_url = image_url_attr
+                url_result = image_url_attr()
+                # Only set if not empty string
+                if url_result and url_result.strip():
+                    image_url = url_result
 
+            # Fallback: Try to get URL from image field directly
+            if not image_url and hasattr(image_obj, 'image'):
+                img_field = getattr(image_obj, 'image', None)
+                if img_field:
+                    try:
+                        # Try to get URL from image field directly
+                        image_url = img_field.url
+                    except (AttributeError, ValueError):
+                        pass
+
+            # Get Cloudinary public ID for site assets
             image_public_id = getattr(image_obj, 'asset_identifier', None)
 
-            image_alt_text = getattr(
-                image_obj,
-                'alt_text_or_default',
-                artwork.name
-            )
+            # Get alt text - this is a property, so just access it directly
+            try:
+                image_alt_text = image_obj.alt_text_or_default
+            except AttributeError:
+                image_alt_text = artwork.name
+        else:
+            # Only use placeholder if artwork has no main_photo
+            placeholder_image_obj = placeholder_image
+            if placeholder_image_obj:
+                image_url_attr = getattr(
+                    placeholder_image_obj,
+                    'get_image_url',
+                    None
+                )
+                if callable(image_url_attr):
+                    url_result = image_url_attr()
+                    if url_result and url_result.strip():
+                        image_url = url_result
+
+                image_public_id = getattr(
+                    placeholder_image_obj,
+                    'asset_identifier',
+                    None
+                )
 
         # Artist Data
         artist_data = None
@@ -264,6 +298,7 @@ class ArtworkListView(ListView):
                 'is_featured': artwork['is_featured'],
                 'sku': artwork['sku'],
                 'slug': artwork['slug'],
+                'image_url': artwork['image_url'],
                 'image_public_id': artwork['image_public_id'],
                 'image_alt_text': artwork['image_alt_text'],
             })
@@ -424,7 +459,7 @@ class ArtworkAPIView(View):
 @require_http_methods(["GET"])
 def setup_test_data(request):
     """
-    ⚠️  DEVELOPMENT ONLY - Test data creation endpoint.
+    DEVELOPMENT ONLY - Test data creation endpoint.
 
     API endpoint to create test data for Cypress E2E tests.
     ONLY available when using test.py settings (SQLite test database).

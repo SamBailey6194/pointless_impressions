@@ -3,8 +3,6 @@ from django.urls import reverse
 from django.utils import timezone
 from django.contrib.auth import get_user_model
 from bs4 import BeautifulSoup
-import json
-import re
 
 
 # --------------------------
@@ -42,7 +40,6 @@ def _parse_artworks_html(response):
             "is_in_stock": sold_out_tag is None,
         })
 
-    print(f"[DEBUG] Parsed {len(artworks)} artworks from HTML: {[a['name'] for a in artworks]}")
     return artworks
 
 
@@ -54,23 +51,12 @@ def step_create_artworks(context):
     """
     Populate the test database with artworks from the Gherkin table.
     """
-    # Write to a file to confirm this is being executed
-    with open('/tmp/behave_step_executed.txt', 'w') as f:
-        f.write('Given step was executed\n')
-    
-    print("\n!!! GIVEN STEP STARTED !!!")
     from pointless_impressions_src.artwork.models import (
         Artwork, ArtworkCategory, ArtworkFramingCondition
     )
     from pointless_impressions_src.profiles.models import Artist
-    from django.db import connection
-    
-    # Debug: Check which database we're using
-    print(f"[DEBUG] Step DB: {connection.settings_dict['NAME']}")
 
     User = get_user_model()
-
-    print("\n=== DEBUG: Creating test data ===")
 
     default_artist_user = User.objects.create(
         username='default_artist',
@@ -114,12 +100,6 @@ def step_create_artworks(context):
             updated_at=timezone.now(),
         )
         art.selected_conditions.add(default_framing_condition)
-        print(f"DEBUG: Created artwork: {art.name} (available={art.is_available}, in_stock={art.is_in_stock})")
-
-    total_artworks = Artwork.objects.count()
-    print(f"DEBUG: Total artworks in database: {total_artworks}")
-    for artwork in Artwork.objects.all():
-        print(f"DEBUG:   - {artwork.name}: available={artwork.is_available}, in_stock={artwork.is_in_stock}")
 
 
 # --------------------------
@@ -130,7 +110,6 @@ def step_impl(context):
     """
     Simulate visiting the artwork list page.
     """
-    print("\n=== DEBUG: Visiting artwork listing page ===")
     url = reverse('artwork:list')
     # behave_django provides context.test which is a TransactionTestCase
     if hasattr(context, 'test') and hasattr(context.test, 'client'):
@@ -139,32 +118,27 @@ def step_impl(context):
         # Fallback: create a client
         from django.test import Client
         context.response = Client().get(url)
-    print(f"DEBUG: GET {url} => {context.response.status_code}")
-    print(context.response.content.decode('utf-8')[:1000])
 
 
 @when('I visit the artwork listing page sorted by "{sort_key}"')
 def step_impl(context, sort_key):
-    print(f"\n=== DEBUG: Visiting artwork listing page sorted by {sort_key} ===")
     url = reverse('artwork:list') + f'?sort={sort_key}&direction=asc'
     if hasattr(context, 'test') and hasattr(context.test, 'client'):
         context.response = context.test.client.get(url)
     else:
         from django.test import Client
         context.response = Client().get(url)
-    print(f"DEBUG: GET {url} => {context.response.status_code}")
 
 
 @when('I visit the artwork listing page with filter "{filter_key}"')
 def step_impl(context, filter_key):
-    print(f"\n=== DEBUG: Visiting artwork listing page with filter {filter_key} ===")
     url = reverse('artwork:list') + f'?filter={filter_key}'
     if hasattr(context, 'test') and hasattr(context.test, 'client'):
         context.response = context.test.client.get(url)
     else:
         from django.test import Client
         context.response = Client().get(url)
-    print(f"DEBUG: GET {url} => {context.response.status_code}")
+
 
 
 # --------------------------
@@ -175,9 +149,10 @@ def step_impl(context, text):
     """
     Check if a given text appears in any artwork name or description.
     """
-    print(f"\n=== DEBUG: Checking for text: '{text}' ===")
     artworks = _parse_artworks_html(context.response)
-    found = any(text in a["name"] or text in a["description"] for a in artworks)
+    found = any(
+        text in a["name"] or text in a["description"] for a in artworks
+    )
     assert found, f"Expected '{text}' not found in artworks."
 
 
@@ -186,10 +161,12 @@ def step_impl(context, amount):
     """
     Verify that the expected price appears.
     """
-    print(f"\n=== DEBUG: Checking for price £{amount} ===")
     expected_price = float(amount.replace(',', ''))
     artworks = _parse_artworks_html(context.response)
-    found = any(abs(a["price"] - expected_price) < 0.01 for a in artworks if a["price"] is not None)
+    found = any(
+        abs(a["price"] - expected_price) < 0.01
+        for a in artworks if a["price"] is not None
+    )
     assert found, f"Expected price £{amount} not found in artworks."
 
 
@@ -198,15 +175,18 @@ def step_impl(context, title, status):
     """
     Check if an artwork is correctly marked Sold Out or available.
     """
-    print(f"\n=== DEBUG: Checking artwork '{title}' status: {status} ===")
     artworks = _parse_artworks_html(context.response)
     artwork = next((a for a in artworks if a["name"] == title), None)
     assert artwork, f"Artwork '{title}' not found."
 
     if status.lower() == "sold out":
-        assert not artwork["is_in_stock"], f"Artwork '{title}' should be sold out but is in stock."
+        assert not artwork["is_in_stock"], (
+            f"Artwork '{title}' should be sold out but is in stock."
+        )
     elif status.lower() == "available":
-        assert artwork["is_in_stock"], f"Artwork '{title}' should be available but is sold out."
+        assert artwork["is_in_stock"], (
+            f"Artwork '{title}' should be available but is sold out."
+        )
     else:
         raise AssertionError(f"Unknown status '{status}'")
 
@@ -216,11 +196,11 @@ def step_impl(context):
     """
     Ensure the artworks appear sorted by ascending price.
     """
-    print("\n=== DEBUG: Checking ascending price order ===")
     artworks = _parse_artworks_html(context.response)
     prices = [a["price"] for a in artworks if a["price"] is not None]
-    print(f"DEBUG: Prices found: {prices}")
-    assert prices == sorted(prices), f"Artworks not sorted by ascending price: {prices}"
+    assert prices == sorted(prices), (
+        f"Artworks not sorted by ascending price: {prices}"
+    )
 
 
 @then(u'I should not see "{text}"')
@@ -228,7 +208,6 @@ def step_impl(context, text):
     """
     Ensure a given text (usually artwork name) does not appear.
     """
-    print(f"\n=== DEBUG: Checking that '{text}' is NOT present ===")
     artworks = _parse_artworks_html(context.response)
     found = any(text in a["name"] for a in artworks)
     assert not found, f"Unexpected artwork '{text}' found in list."
