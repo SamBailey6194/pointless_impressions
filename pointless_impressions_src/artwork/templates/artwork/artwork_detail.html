@@ -2,7 +2,7 @@
 {% load static cloudinary tailwind_tags %}
 
 {% block content %}
-<section class="py-16 w-full">
+<section class="section-alt py-16 w-full">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     {% comment %} Breadcrumbs {% endcomment %}
     <div class="breadcrumbs text-sm mb-6">
@@ -14,22 +14,50 @@
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-      {% comment %} Image Section {% endcomment %}
-      <div>
-         {% with image_to_render=artwork.main_photo %}
-          <figure>
-            {% if image_to_render %}
-              {% comment %} An image exists for this artwork {% endcomment %}
-              {% if production %}
-                {% cloudinary image_to_render.image format="auto" quality="auto" width=400 height=300 crop="fill" class="w-full h-64 object-cover" alt=image_to_render.alt_text_or_default %}
-              {% else %}
-                {% comment %} LOCAL: Use the artwork's local image URL {% endcomment %}
-                <img src="{{ image_to_render.get_image_url }}" 
-                    alt="{{ image_to_render.alt_text_or_default }}" 
-                    class="w-full h-64 object-cover">
-              {% endif %}
+      {% comment %} Image Section with Carousel {% endcomment %}
+      <div class="relative">
+        <div class="carousel carousel-center rounded-lg overflow-hidden relative h-96">
+            {% for photo in artwork.photos.all %}
+              <div class="carousel-item w-full h-full justify-center" id="slide-{{ forloop.counter0 }}">
+                <figure class="w-full h-full">
+                  {% if production %}
+                    {% cloudinary photo.image format="auto" quality="auto" width=400 class="w-full h-full object-cover" alt=photo.alt_text_or_default %}
+                  {% else %}
+                    <img src="{{ photo.get_image_url }}" 
+                        alt="{{ photo.alt_text_or_default }}" 
+                        class="w-full h-full object-cover">
+                  {% endif %}
+                </figure>
+              </div>
+            {% endfor %}
+        </div>
+
+        {% comment %} Navigation Arrows (outside carousel) {% endcomment %}
+        <div class="absolute left-2 right-2 top-1/4 flex transform justify-between z-10 pointer-events-none">
+          <button class="btn btn-circle btn-sm border-0 pointer-events-auto" onclick="previousSlide()">
+            ❮
+          </button>
+          <button class="btn btn-circle btn-sm border-0 pointer-events-auto" onclick="nextSlide()">
+            ❯
+          </button>
+        </div>
+
+        
+        
+        {% comment %} Thumbnail Navigation {% endcomment %}
+        <div class="flex gap-2 mt-4 overflow-x-auto pb-2" id="thumbnail-container">
+          {% for photo in artwork.photos.all %}
+            {% if production %}
+              <button class="thumbnail-btn w-16 h-16 rounded border-2 border-gray-300 shrink-0 overflow-hidden hover:border-primary" data-slide="{{ forloop.counter0 }}">
+                {% cloudinary photo.image format="auto" quality="auto" class="w-full h-full object-cover" alt=photo.alt_text_or_default %}
+              </button>
+            {% else %}
+              <button class="thumbnail-btn w-16 h-16 rounded border-2 border-gray-300 shrink-0 overflow-hidden hover:border-primary" data-slide="{{ forloop.counter0 }}">
+                <img src="{{ photo.get_image_url }}" alt="{{ photo.alt_text_or_default }}" class="w-full h-full object-cover">
+              </button>
             {% endif %}
-          </figure>
+          {% endfor %}
+        </div>
       </div>
 
       {% comment %} Details Section {% endcomment %}
@@ -57,15 +85,15 @@
           </div>
         {% endif %}
         
-        <div class="card bg-base-200">
+        <div class="card">
           <div class="card-body">
-            <div class="flex items-baseline gap-2">
+            <div class="flex gap-2">
               <span class="text-5xl font-bold text-primary">£{{ artwork.price }}</span>
             </div>
           </div>
         </div>
         
-        <div class="card bg-base-200">
+        <div class="card">
           <div class="card-body">
             <h2 class="card-title">
               <i class="fa-solid fa-info-circle"></i> Description
@@ -76,7 +104,7 @@
           </div>
         </div>
         
-        <div class="card bg-base-200">
+        <div class="card">
           <div class="card-body">
             <h2 class="card-title">
               <i class="fa-solid fa-list-ul"></i> Details
@@ -94,24 +122,26 @@
               <div class="divider my-1"></div>
               <div class="flex justify-between">
                 <span class="font-semibold">Conditions:</span>
-                <span class="badge badge-success">{{ artwork.selected_conditions.first.condition_name }}</span>
+                {% for condition in prefetched_conditions %}
+                <span class="badge badge-outline">{{ condition.condition_friendly_name }}</span>
+                {% endfor %}
               </div>
             </div>
           </div>
         </div>
         
-        <div class="space-y-3">
+        <div class="space-y-3 md:space-y-0 md:flex md:items-center md:gap-4">
           {% if artwork.is_in_stock %}
-            <button class="btn btn-primary btn-lg w-full">
-              <i class="fa-solid fa-cart-plus text-xl"></i> Add to Cart
+            <button class="btn btn-primary btn-lg md:flex-1">
+              <i class="fa-solid fa-cart-plus"></i> Add to Cart
             </button>
           {% else %}
-            <button class="btn btn-disabled btn-lg w-full" disabled>
-              <i class="fa-solid fa-ban text-xl"></i> Out of Stock
+            <button class="btn btn-disabled btn-lg md:flex-1" disabled>
+              <i class="fa-solid fa-ban"></i> Out of Stock
             </button>
           {% endif %}
-          
-          <a href="{% url 'artwork:list' %}" class="btn btn-outline btn-lg w-full">
+
+          <a href="{% url 'artwork:list' %}" class="btn btn-outline btn-lg md:flex-1">
             <i class="fa-solid fa-arrow-left"></i> Back to Browse
           </a>
         </div>
@@ -119,7 +149,7 @@
     </div>
   </div>
 </section>
-{% endblock content %}
+{% endblock %}
 
 {% block postloadjs %}
 <script src="{% static 'js/artwork_detail.js' %}" defer></script>

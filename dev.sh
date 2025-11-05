@@ -112,6 +112,7 @@ case "${1:-help}" in
         ;;
     restart)
         print_status "Restarting development environment..."
+        docker compose -f docker-compose.dev.yml kill
         docker compose -f docker-compose.dev.yml down
         docker compose -f docker-compose.dev.yml up --build -d
         print_success "Development environment restarted!"
@@ -250,8 +251,11 @@ case "${1:-help}" in
         ;;
 
     loadfixtures)
+        print_status "Flushing existing data..."
+        docker compose -f docker-compose.dev.yml exec web python /app/manage.py flush --noinput
         print_status "Loading initial data fixtures into the database..."
         docker compose -f docker-compose.dev.yml exec web python /app/manage.py loaddata photo.json artwork.json artwork_categories.json artwork_framing_options.json profiles.json account_group.json account.json
+        print_success "Fixtures loaded successfully!"
         ;;
     status)
         print_status "Development environment status:"

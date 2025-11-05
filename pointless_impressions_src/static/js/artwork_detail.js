@@ -62,6 +62,24 @@
         }
       });
     }
+    const thumbnailContainer = document.getElementById("thumbnail-container");
+    if (thumbnailContainer) {
+      const thumbnails = thumbnailContainer.querySelectorAll(".thumbnail-btn");
+      thumbnails.forEach((thumb) => {
+        thumb.addEventListener("click", (e) => {
+          e.preventDefault();
+          const slideNum = parseInt(thumb.dataset.slide);
+          goToSlide(slideNum);
+        });
+      });
+    }
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "ArrowLeft") {
+        previousSlide();
+      } else if (e.key === "ArrowRight") {
+        nextSlide();
+      }
+    });
   }
   function showConfirmationMessage(message) {
     const confirmationDiv = document.getElementById("confirmation-message");
@@ -73,6 +91,48 @@
       }, 3e3);
     }
   }
+  var currentSlide = 0;
+  function goToSlide(n) {
+    const slides = document.querySelectorAll(".carousel-item");
+    const totalSlides = slides.length;
+    currentSlide = n;
+    if (currentSlide >= totalSlides) {
+      currentSlide = 0;
+    }
+    if (currentSlide < 0) {
+      currentSlide = totalSlides - 1;
+    }
+    const slideElement = document.getElementById(`slide-${currentSlide}`);
+    if (slideElement) {
+      slideElement.scrollIntoView({
+        behavior: "smooth",
+        block: "nearest",
+        inline: "nearest"
+      });
+    }
+    updateThumbnails();
+  }
+  function nextSlide() {
+    goToSlide(currentSlide + 1);
+  }
+  function previousSlide() {
+    goToSlide(currentSlide - 1);
+  }
+  function updateThumbnails() {
+    const thumbnails = document.querySelectorAll(".thumbnail-btn");
+    thumbnails.forEach((thumb, index) => {
+      if (index === currentSlide) {
+        thumb.classList.add("border-primary");
+        thumb.classList.remove("border-gray-300");
+      } else {
+        thumb.classList.remove("border-primary");
+        thumb.classList.add("border-gray-300");
+      }
+    });
+  }
+  window.goToSlide = goToSlide;
+  window.nextSlide = nextSlide;
+  window.previousSlide = previousSlide;
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", initArtworkDetail);
   } else {

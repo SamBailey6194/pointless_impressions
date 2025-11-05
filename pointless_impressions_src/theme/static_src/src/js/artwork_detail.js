@@ -104,6 +104,28 @@ export function initArtworkDetail() {
       }
     });
   }
+
+  // Initialize carousel thumbnail listeners
+  const thumbnailContainer = document.getElementById('thumbnail-container');
+  if (thumbnailContainer) {
+    const thumbnails = thumbnailContainer.querySelectorAll('.thumbnail-btn');
+    thumbnails.forEach((thumb) => {
+      thumb.addEventListener('click', (e) => {
+        e.preventDefault();
+        const slideNum = parseInt(thumb.dataset.slide);
+        goToSlide(slideNum);
+      });
+    });
+  }
+
+  // Add keyboard navigation
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowLeft') {
+      previousSlide();
+    } else if (e.key === 'ArrowRight') {
+      nextSlide();
+    }
+  });
 }
 
 /**
@@ -122,6 +144,77 @@ export function showConfirmationMessage(message) {
     }, 3000);
   }
 }
+
+/**
+ * Carousel Navigation Functions
+ */
+let currentSlide = 0;
+
+/**
+ * Go to a specific slide in the carousel
+ * @param {number} n - The slide number
+ */
+export function goToSlide(n) {
+  const slides = document.querySelectorAll('.carousel-item');
+  const totalSlides = slides.length;
+
+  currentSlide = n;
+
+  // Loop around carousel
+  if (currentSlide >= totalSlides) {
+    currentSlide = 0;
+  }
+  if (currentSlide < 0) {
+    currentSlide = totalSlides - 1;
+  }
+
+  // Scroll to the slide
+  const slideElement = document.getElementById(`slide-${currentSlide}`);
+  if (slideElement) {
+    slideElement.scrollIntoView({
+      behavior: 'smooth',
+      block: 'nearest',
+      inline: 'nearest',
+    });
+  }
+
+  updateThumbnails();
+}
+
+/**
+ * Go to next slide
+ */
+export function nextSlide() {
+  goToSlide(currentSlide + 1);
+}
+
+/**
+ * Go to previous slide
+ */
+export function previousSlide() {
+  goToSlide(currentSlide - 1);
+}
+
+/**
+ * Update thumbnail border styles to highlight current slide
+ */
+function updateThumbnails() {
+  const thumbnails = document.querySelectorAll('.thumbnail-btn');
+  thumbnails.forEach((thumb, index) => {
+    if (index === currentSlide) {
+      thumb.classList.add('border-primary');
+      thumb.classList.remove('border-gray-300');
+    } else {
+      thumb.classList.remove('border-primary');
+      thumb.classList.add('border-gray-300');
+    }
+  });
+}
+
+// Make carousel functions globally accessible for onclick handlers
+window.goToSlide = goToSlide;
+window.nextSlide = nextSlide;
+window.previousSlide = previousSlide;
 
 // Initialize on page load
 if (document.readyState === 'loading') {

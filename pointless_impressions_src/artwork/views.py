@@ -369,6 +369,7 @@ class ArtworkDetailView(DetailView):
         context['production'] = not settings.DEBUG
         context['placeholder_image'] = get_placeholder_image()
         artwork = self.get_object()
+        context['prefetched_conditions'] = artwork.prefetched_conditions
         photos = artwork.photos.all()
         if artwork.main_photo:
             photos = photos.exclude(pk=artwork.main_photo.pk)
