@@ -1,0 +1,194 @@
+<!-- Artwork Detail Page Fixture - Mirrors artwork_detail.html Django template -->
+<section class="py-16 w-full" id="artwork-detail">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- Breadcrumbs -->
+        <div class="breadcrumbs text-sm mb-6">
+            <ul>
+                <li><a href="/"><i class="fa-solid fa-home"></i> Home</a></li>
+                <li><a href="/artwork/"><i class="fa-solid fa-palette"></i> Artworks</a></li>
+                <li>Mountain Peak</li>
+            </ul>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <!-- Image Section -->
+            <div>
+                <figure class="rounded-box overflow-hidden shadow-2xl">
+                    <img 
+                        id="artwork-image" 
+                        src="test_mountain.jpg" 
+                        alt="Mountain Peak" 
+                        class="w-full"
+                    />
+                </figure>
+            </div>
+
+            <!-- Details Section -->
+            <div class="space-y-6">
+                <!-- Title and Category -->
+                <div>
+                    <h1 id="artwork-title" class="text-4xl font-bold mb-2">Mountain Peak</h1>
+                    <div class="badge badge-primary badge-lg">Landscape</div>
+                </div>
+
+                <!-- Stock Status Alert -->
+                <div id="availability-status" class="alert alert-info">
+                    <i class="fa-solid fa-info-circle text-xl"></i>
+                    <div>
+                        <h3 class="font-bold">Available</h3>
+                        <div class="text-xs">This artwork is in stock</div>
+                    </div>
+                </div>
+
+                <!-- Price Card -->
+                <div class="card bg-base-200">
+                    <div class="card-body">
+                        <div class="flex items-baseline gap-2">
+                            <span id="artwork-price" class="text-5xl font-bold text-primary">£249.99</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Description Card -->
+                <div class="card bg-base-200">
+                    <div class="card-body">
+                        <h2 class="card-title">
+                            <i class="fa-solid fa-info-circle"></i> Description
+                        </h2>
+                        <div class="prose max-w-none">
+                            <p id="artwork-description">A serene mountain landscape in pointillist style.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Details Card (SKU, Category, Condition) -->
+                <div class="card bg-base-200">
+                    <div class="card-body">
+                        <h2 class="card-title">
+                            <i class="fa-solid fa-list-ul"></i> Details
+                        </h2>
+                        <div class="space-y-2">
+                            <div class="flex justify-between">
+                                <span class="font-semibold">SKU:</span>
+                                <span class="font-mono">MOUNTAIN001</span>
+                            </div>
+                            <div class="divider my-1"></div>
+                            <div class="flex justify-between">
+                                <span class="font-semibold">Category:</span>
+                                <span class="badge badge-outline">Landscape</span>
+                            </div>
+                            <div class="divider my-1"></div>
+                            <div class="flex justify-between">
+                                <span class="font-semibold">Condition:</span>
+                                <span class="badge badge-success">Framed</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Framing Options -->
+                <div id="framing-options" class="card bg-base-200">
+                    <div class="card-body">
+                        <h2 class="card-title">Framing Options</h2>
+                        <label class="label cursor-pointer gap-4">
+                            <input type="radio" name="framing" value="framed" class="radio" checked />
+                            <span class="label-text">Framed</span>
+                        </label>
+                        <label class="label cursor-pointer gap-4">
+                            <input type="radio" name="framing" value="unframed" class="radio" />
+                            <span class="label-text">Unframed</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Add to Cart Button -->
+                <div class="space-y-3">
+                    <button 
+                        id="add-to-cart-btn" 
+                        class="btn btn-primary btn-lg w-full"
+                        data-artwork-id="mountain-peak"
+                        data-price="249.99"
+                    >
+                        <i class="fa-solid fa-cart-plus text-xl"></i> Add to Cart
+                    </button>
+                    <a href="/artwork/" class="btn btn-outline btn-lg w-full">
+                        <i class="fa-solid fa-arrow-left"></i> Back to Browse
+                    </a>
+                </div>
+
+                <!-- Confirmation Message -->
+                <div id="confirmation-message" class="alert alert-success" style="display: none;"></div>
+            </div>
+        </div>
+
+        <!-- Artist Information Section -->
+        <div class="mt-12 card bg-base-200">
+            <div class="card-body">
+                <h2 class="card-title mb-4">
+                    <i class="fa-solid fa-user"></i> About the Artist
+                </h2>
+                <div id="artist-info" class="flex items-center gap-4">
+                    <div class="avatar placeholder">
+                        <div class="bg-primary text-primary-content rounded-full w-16">
+                            <span class="text-2xl">M</span>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-lg">
+                            <a href="/profile/michael" class="link link-primary">Michael</a>
+                        </h3>
+                        <p class="text-sm opacity-75">A talented pointillist artist</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Related Artworks Section -->
+        <div id="related-artworks" class="mt-12">
+            <h2 class="text-2xl font-bold mb-6">Related Artworks</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div class="card bg-base-100 shadow-xl">
+                    <figure>
+                        <img src="related1.jpg" alt="Valley View" />
+                    </figure>
+                    <div class="card-body">
+                        <h3 class="card-title">Valley View</h3>
+                        <p class="text-primary font-bold">£199.99</p>
+                    </div>
+                </div>
+                <div class="card bg-base-100 shadow-xl">
+                    <figure>
+                        <img src="related2.jpg" alt="Lake Reflection" />
+                    </figure>
+                    <div class="card-body">
+                        <h3 class="card-title">Lake Reflection</h3>
+                        <p class="text-primary font-bold">£229.99</p>
+                    </div>
+                </div>
+                <div class="card bg-base-100 shadow-xl">
+                    <figure>
+                        <img src="related3.jpg" alt="Forest Path" />
+                    </figure>
+                    <div class="card-body">
+                        <h3 class="card-title">Forest Path</h3>
+                        <p class="text-primary font-bold">£189.99</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Reviews Section (Placeholder for US002) -->
+        <div id="reviews-section" class="mt-12">
+            <h2 class="text-2xl font-bold mb-6">Reviews</h2>
+            <div id="reviews-container" class="space-y-4">
+                <!-- Reviews will be added here during implementation -->
+            </div>
+            <div id="reviews-form" class="mt-8 card bg-base-200">
+                <div class="card-body">
+                    <h3 class="card-title">Leave a Review</h3>
+                    <!-- Review form will be added here -->
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

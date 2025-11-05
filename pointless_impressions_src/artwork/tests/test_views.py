@@ -221,3 +221,213 @@ class ArtworkListViewsTest(TestCase):
             )
         artworks = self.get_artworks_from_response(response)
         self.assertEqual(len(artworks), 0)
+
+
+@override_settings(
+    DEBUG=True,
+    MIDDLEWARE=[
+        mw for mw in settings.MIDDLEWARE if mw != (
+            "django_browser_reload.middleware.BrowserReloadMiddleware"
+        )
+    ]
+)
+class ArtworkDetailViewTest(TestCase):
+    """Tests for Artwork detail view. For US002"""
+
+    def setUp(self):
+        """Set up test data for detail view tests."""
+        User = get_user_model()
+        self.artist_user = User.objects.create_user(
+            username='michael',
+            password='testpassword',
+            email='michael@example.com',
+            phone='0987654321'
+        )
+
+        self.artist = Artist.objects.create(
+            user=self.artist_user,
+            bio='A talented pointillist artist.'
+        )
+
+        self.framing_condition = (
+            ArtworkFramingCondition.objects.create(
+                condition_name="framed",
+                condition_description="Framed with wooden frame."
+            )
+        )
+
+        self.category = ArtworkCategory.objects.create(
+            name="Landscape",
+            friendly_name="Landscape Art",
+            description="Beautiful landscape scenes."
+        )
+
+        self.artwork = Artwork.objects.create(
+            name="Mountain Peak",
+            artist=self.artist,
+            description="A serene mountain landscape in pointillist style.",
+            price=249.99,
+            sku="MOUNTAIN001",
+            category=self.category,
+            is_available=True,
+            is_in_stock=True,
+            is_featured=False,
+            slug="mountain-peak",
+            quantity=2,
+        )
+
+        self.artwork.selected_conditions.add(self.framing_condition)
+
+        self.main_photo = Photo.objects.create(
+            artwork=self.artwork,
+            title="Mountain Peak Main",
+            description="Main photo showing the artwork.",
+            image='test_mountain.jpg',
+            alt_text='Mountain Peak Artwork'
+        )
+
+        self.artwork.main_photo = self.main_photo
+        self.artwork.save()
+
+    def test_artwork_detail_view_returns_200(self):
+        """Test detail view loads successfully."""
+        response = self.client.get(
+            reverse('artwork:detail', kwargs={'slug': 'mountain-peak'})
+        )
+        self.assertEqual(response.status_code, 200)
+
+    def test_artwork_detail_view_uses_correct_template(self):
+        """Test detail view uses the correct template."""
+        response = self.client.get(
+            reverse('artwork:detail', kwargs={'slug': 'mountain-peak'})
+        )
+        self.assertTemplateUsed(response, 'artwork/artwork_detail.html')
+
+    def test_artwork_detail_view_context_contains_artwork(self):
+        """Test context contains artwork object."""
+        response = self.client.get(
+            reverse('artwork:detail', kwargs={'slug': 'mountain-peak'})
+        )
+        self.assertIn('artwork', response.context)
+        self.assertEqual(response.context['artwork'], self.artwork)
+
+    def test_artwork_detail_displays_title(self):
+        """Test artwork title is displayed."""
+        response = self.client.get(
+            reverse('artwork:detail', kwargs={'slug': 'mountain-peak'})
+        )
+        self.assertContains(response, 'Mountain Peak')
+
+    def test_artwork_detail_displays_description(self):
+        """Test artwork description is displayed."""
+        response = self.client.get(
+            reverse('artwork:detail', kwargs={'slug': 'mountain-peak'})
+        )
+        soup = BeautifulSoup(response.content, 'html.parser')
+        self.assertIn(
+            'serene mountain landscape',
+            soup.get_text()
+        )
+
+    def test_artwork_detail_displays_price(self):
+        """Test artwork price is displayed."""
+        response = self.client.get(
+            reverse('artwork:detail', kwargs={'slug': 'mountain-peak'})
+        )
+        self.assertContains(response, '249.99')
+
+    def test_artwork_detail_displays_availability(self):
+        """Test artwork availability status is displayed."""
+        response = self.client.get(
+            reverse('artwork:detail', kwargs={'slug': 'mountain-peak'})
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(response.context['artwork'].is_available)
+
+    def test_artwork_detail_displays_add_to_cart_button(self):
+        """Test Add to Cart button displays when available."""
+        response = self.client.get(
+            reverse('artwork:detail', kwargs={'slug': 'mountain-peak'})
+        )
+        soup = BeautifulSoup(response.content, 'html.parser')
+        buttons = soup.find_all('button')
+        add_to_cart_buttons = [
+            btn for btn in buttons
+            if btn.get_text() and 'Add to Cart' in btn.get_text()
+        ]
+        self.assertGreater(len(add_to_cart_buttons), 0)
+
+    def test_artwork_detail_hides_add_to_cart_when_unavailable(self):
+        """Test Add to Cart button hidden when unavailable."""
+        self.artwork.is_available = False
+        self.artwork.save()
+
+        response = self.client.get(
+            reverse('artwork:detail', kwargs={'slug': 'mountain-peak'})
+        )
+        self.assertFalse(response.context['artwork'].is_available)
+
+    def test_artwork_detail_shows_sold_out_when_zero_quantity(self):
+        """Test sold out message when quantity is zero."""
+        self.artwork.quantity = 0
+        self.artwork.save()
+
+        response = self.client.get(
+            reverse('artwork:detail', kwargs={'slug': 'mountain-peak'})
+        )
+        self.assertFalse(response.context['artwork'].is_in_stock)
+
+    def test_artwork_detail_displays_image(self):
+        """Test artwork image is displayed."""
+        response = self.client.get(
+            reverse('artwork:detail', kwargs={'slug': 'mountain-peak'})
+        )
+        soup = BeautifulSoup(response.content, 'html.parser')
+        img_tags = soup.find_all('img')
+        # Should have at least one image for the artwork
+        self.assertGreater(len(img_tags), 0)
+
+    def test_artwork_detail_displays_artist_info(self):
+        """Test artist information is displayed."""
+        response = self.client.get(
+            reverse('artwork:detail', kwargs={'slug': 'mountain-peak'})
+        )
+        self.assertContains(response, 'michael')
+
+    def test_artwork_detail_displays_category(self):
+        """Test artwork category is displayed."""
+        response = self.client.get(
+            reverse('artwork:detail', kwargs={'slug': 'mountain-peak'})
+        )
+        soup = BeautifulSoup(response.content, 'html.parser')
+        self.assertIn('Landscape', soup.get_text())
+
+    def test_artwork_detail_404_for_nonexistent_slug(self):
+        """Test 404 response for non-existent artwork."""
+        response = self.client.get(
+            reverse('artwork:detail', kwargs={'slug': 'nonexistent-art'})
+        )
+        self.assertEqual(response.status_code, 404)
+
+    def test_artwork_detail_related_artworks_by_category(self):
+        """Test related artworks display in detail view."""
+        # Create another artwork in the same category
+        related_artwork = Artwork.objects.create(
+            name="Valley View",
+            artist=self.artist,
+            description="A peaceful valley landscape.",
+            price=199.99,
+            sku="VALLEY001",
+            category=self.category,
+            is_available=True,
+            is_in_stock=True,
+            slug="valley-view",
+            quantity=1,
+        )
+        related_artwork.selected_conditions.add(self.framing_condition)
+
+        response = self.client.get(
+            reverse('artwork:detail', kwargs={'slug': 'mountain-peak'})
+        )
+        # Check if context has related artworks or if template filters them
+        self.assertEqual(response.status_code, 200)

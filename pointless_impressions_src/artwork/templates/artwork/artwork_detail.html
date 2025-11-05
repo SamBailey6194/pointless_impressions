@@ -16,15 +16,20 @@
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
       {% comment %} Image Section {% endcomment %}
       <div>
-        <figure class="rounded-box overflow-hidden shadow-2xl">
-          {% if artwork.image %}
-            {% cloudinary artwork.image.public_id format="jpg" width=800 height=600 crop="fill" class="w-full" %}
-          {% else %}
-            <div class="bg-base-300 w-full aspect-[4/3] flex items-center justify-center">
-              <i class="fa-solid fa-image text-base-content/20 text-8xl"></i>
-            </div>
-          {% endif %}
-        </figure>
+         {% with image_to_render=artwork.main_photo %}
+          <figure>
+            {% if image_to_render %}
+              {% comment %} An image exists for this artwork {% endcomment %}
+              {% if production %}
+                {% cloudinary image_to_render.image format="auto" quality="auto" width=400 height=300 crop="fill" class="w-full h-64 object-cover" alt=image_to_render.alt_text_or_default %}
+              {% else %}
+                {% comment %} LOCAL: Use the artwork's local image URL {% endcomment %}
+                <img src="{{ image_to_render.get_image_url }}" 
+                    alt="{{ image_to_render.alt_text_or_default }}" 
+                    class="w-full h-64 object-cover">
+              {% endif %}
+            {% endif %}
+          </figure>
       </div>
 
       {% comment %} Details Section {% endcomment %}
@@ -40,6 +45,14 @@
             <div>
               <h3 class="font-bold">Out of Stock</h3>
               <div class="text-xs">This artwork is currently unavailable</div>
+            </div>
+          </div>
+        {% else %}
+          <div class="alert alert-success">
+            <i class="fa-solid fa-check-circle text-xl"></i>
+            <div>
+              <h3 class="font-bold">Available</h3>
+              <div class="text-xs">This artwork is in stock</div>
             </div>
           </div>
         {% endif %}
@@ -70,8 +83,8 @@
             </h2>
             <div class="space-y-2">
               <div class="flex justify-between">
-                <span class="font-semibold">SKU:</span>
-                <span class="font-mono">{{ artwork.sku }}</span>
+                <span class="font-semibold">Artist:</span>
+                <span class="font-mono">{{ artwork.artist.user.username }}</span>
               </div>
               <div class="divider my-1"></div>
               <div class="flex justify-between">
@@ -80,8 +93,8 @@
               </div>
               <div class="divider my-1"></div>
               <div class="flex justify-between">
-                <span class="font-semibold">Condition:</span>
-                <span class="badge badge-success">{{ artwork.selected_condition.condition_name }}</span>
+                <span class="font-semibold">Conditions:</span>
+                <span class="badge badge-success">{{ artwork.selected_conditions.first.condition_name }}</span>
               </div>
             </div>
           </div>
@@ -109,5 +122,5 @@
 {% endblock content %}
 
 {% block postloadjs %}
-<script src="{% static 'js/artwork.js' %}" defer></script>
+<script src="{% static 'js/artwork_detail.js' %}" defer></script>
 {% endblock postloadjs %}

@@ -194,7 +194,7 @@ case "${1:-help}" in
         print_status "Creating test data..."
         docker compose -f docker-compose.dev.yml run -T --rm web bash -c "export ENV=test && export DJANGO_SETTINGS_MODULE=pointless_impressions_src.pointless_impressions.settings.test && python /app/manage.py create_test_artworks"
         print_status "Starting test server..."
-        docker compose -f docker-compose.dev.yml run -d -p 8000:8000 web bash -c "export ENV=test && export DJANGO_SETTINGS_MODULE=pointless_impressions_src.pointless_impressions.settings.test && python /app/manage.py runserver 0.0.0.0:8000"
+        docker compose -f docker-compose.dev.yml run -d -p 8001:8000 web bash -c "export ENV=test && export DJANGO_SETTINGS_MODULE=pointless_impressions_src.pointless_impressions.settings.test && python /app/manage.py runserver 0.0.0.0:8000"
         sleep 3
         print_status "Running Cypress tests..."
         NODE_ENV=development npx cypress run "${@:2}"
@@ -216,7 +216,7 @@ case "${1:-help}" in
         print_status "Creating test data..."
         docker compose -f docker-compose.dev.yml run -T --rm web bash -c "export ENV=test && export DJANGO_SETTINGS_MODULE=pointless_impressions_src.pointless_impressions.settings.test && python /app/manage.py create_test_artworks"
         print_status "Starting test server..."
-        docker compose -f docker-compose.dev.yml run -d -p 8000:8000 web bash -c "export ENV=test && export DJANGO_SETTINGS_MODULE=pointless_impressions_src.pointless_impressions.settings.test && python /app/manage.py runserver 0.0.0.0:8000"
+        docker compose -f docker-compose.dev.yml run -d -p 8001:8000 web bash -c "export ENV=test && export DJANGO_SETTINGS_MODULE=pointless_impressions_src.pointless_impressions.settings.test && python /app/manage.py runserver 0.0.0.0:8000"
         sleep 3
         print_status "Opening Cypress UI..."
         NODE_ENV=development npx cypress open
@@ -252,11 +252,12 @@ case "${1:-help}" in
     loadfixtures)
         print_status "Loading initial data fixtures into the database..."
         docker compose -f docker-compose.dev.yml exec web python /app/manage.py loaddata photo.json artwork.json artwork_categories.json artwork_framing_options.json profiles.json account_group.json account.json
+        ;;
     status)
         print_status "Development environment status:"
         docker compose -f docker-compose.dev.yml ps
         ;;
-    help|--help|-h)
+    help--help|-h)
         show_help
         ;;
     *)
