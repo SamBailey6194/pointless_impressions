@@ -163,6 +163,42 @@
       controlsContainer.addEventListener("click", handleSortClick);
     }
   }
-  document.addEventListener("DOMContentLoaded", initArtworkListEnhancements);
+  function initPriceFilterValidation() {
+    const minPriceInput = document.getElementById("min_price");
+    const maxPriceInput = document.getElementById("max_price");
+    const applyButton = document.getElementById("apply-filters");
+    const form = applyButton?.closest("form");
+    if (!minPriceInput || !maxPriceInput || !applyButton || !form) return;
+    function validatePrices() {
+      const minPrice = parseFloat(minPriceInput.value) || 0;
+      const maxPrice = parseFloat(maxPriceInput.value) || 0;
+      if (minPriceInput.value && maxPriceInput.value && minPrice > maxPrice) {
+        applyButton.disabled = true;
+        applyButton.title = "Min price cannot be greater than max price";
+        applyButton.classList.add("btn-disabled");
+      } else {
+        applyButton.disabled = false;
+        applyButton.title = "";
+        applyButton.classList.remove("btn-disabled");
+      }
+    }
+    minPriceInput.addEventListener("change", validatePrices);
+    minPriceInput.addEventListener("input", validatePrices);
+    maxPriceInput.addEventListener("change", validatePrices);
+    maxPriceInput.addEventListener("input", validatePrices);
+    form.addEventListener("submit", function(e) {
+      const minPrice = parseFloat(minPriceInput.value) || 0;
+      const maxPrice = parseFloat(maxPriceInput.value) || 0;
+      if (minPriceInput.value && maxPriceInput.value && minPrice > maxPrice) {
+        e.preventDefault();
+        alert("Min price cannot be greater than max price");
+      }
+    });
+    validatePrices();
+  }
+  document.addEventListener("DOMContentLoaded", function() {
+    initArtworkListEnhancements();
+    initPriceFilterValidation();
+  });
 })();
 //# sourceMappingURL=artwork.js.map

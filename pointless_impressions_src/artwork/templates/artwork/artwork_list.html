@@ -71,16 +71,28 @@
                   <label class="label">
                     <span class="label-text">Min Price (£)</span>
                   </label>
-                  <input type="number" name="min_price" placeholder="0" 
-                        value="{{ request.GET.min_price }}" class="input input-bordered w-full">
+                  <input type="number" 
+                         id="min_price"
+                         name="min_price" 
+                         placeholder="0" 
+                         min="0"
+                         step="10"
+                         value="{{ request.GET.min_price }}" 
+                         class="input input-bordered w-full">
                 </div>
                 
                 <div class="form-control w-full md:w-1/2 max-w-xs">
                   <label class="label">
                     <span class="label-text">Max Price (£)</span>
                   </label>
-                  <input type="number" name="max_price" placeholder="1000" 
-                        value="{{ request.GET.max_price }}" class="input input-bordered w-full">
+                  <input type="number" 
+                         id="max_price"
+                         name="max_price" 
+                         placeholder="1000+" 
+                         min="0"
+                         step="10"
+                         value="{{ request.GET.max_price }}" 
+                         class="input input-bordered w-full">
                 </div>
               
                 {% comment %} Availability Filter {% endcomment %}
