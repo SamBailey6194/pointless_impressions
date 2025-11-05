@@ -27,6 +27,7 @@
     "cypress:run": "cross-env NODE_ENV=development cypress run",
     "cypress:open": "cross-env NODE_ENV=development cypress open",
     "cypress:home": "cross-env NODE_ENV=development cypress run --spec 'pointless_impressions_src/theme/static_src/cypress/e2e/home/**/*'",
+    "cypress:artwork": "cross-env NODE_ENV=development cypress run --spec 'pointless_impressions_src/theme/static_src/cypress/e2e/artwork/**/*'",
     "test:all": "npm run test && npm run cypress:run",
     "heroku-postbuild": "npm run build"
   },

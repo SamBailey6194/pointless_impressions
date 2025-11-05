@@ -52,6 +52,17 @@
                     <p class="text-sm mb-3 card-description flex-grow">{{ artwork.description }}</p>
                     <p class="text-lg font-bold text-[var(--pointless-blue)]">£{{ artwork.price }}</p>
                   </div>
+                  <div class="card-actions justify-between items-center m-4">
+                    <a href="{% url 'artwork:list' %}?category={{ artwork.category.slug }}" class="btn btn-ghost btn-sm">
+                      <i class="fa-solid fa-palette"></i> View More {{ artwork.category.name }} 
+                    </a>
+                    <a href="{% url 'artwork:list' %}?artist={{ artwork.artist.user.username }}" class="btn btn-ghost btn-sm">
+                      <i class="fa-solid fa-brush"></i> View More By {{ artwork.artist.user.username }} 
+                    </a>
+                    <a href="{% url 'artwork:detail' artwork.slug %}" class="btn btn-ghost btn-sm">
+                      <i class="fa-solid fa-eye"></i> Details
+                    </a>
+                  </div>
                 {% endwith %}
               </div>
             </div>

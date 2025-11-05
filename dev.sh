@@ -69,21 +69,27 @@ show_help() {
     echo "  migrate       Run Django migrations"
     echo "  makemigrations Run Django makemigrations"
     echo "  createsuperuser Create a Django superuser"
-    echo "  test          Run Django TestCase tests"
-    echo "  behave        Run Behave BDD tests"
+    echo "  test          Run all Django TestCase tests"
+    echo "  test [app]    Run Django TestCase tests (optionally specify app name)"
+    echo "  behave        Run all Behave tests"
+    echo "  cypress:reset Reset Cypress test database ready for tests"
     echo "  cypress       Run Cypress E2E tests (with test database)"
     echo "  cypress-open  Open Cypress UI (with test database)"
     echo "  jest          Run Jest tests"
     echo "  collectstatic Collect static files"
     echo "  clean         Clean up containers, images, and volumes"
+    echo "  loadfixtures  Load initial data fixtures into the database"
     echo "  status        Show status of all services"
     echo "  help          Show this help message"
     echo ""
     echo "Examples:"
-    echo "  ./dev.sh start        # Start development environment"
-    echo "  ./dev.sh logs web     # Show logs for web service only"
-    echo "  ./dev.sh shell        # Access Django shell"
-    echo "  ./dev.sh cypress      # Run Cypress E2E tests"
+    echo "  ./dev.sh start            # Start development environment"
+    echo "  ./dev.sh logs web         # Show logs for web service only"
+    echo "  ./dev.sh shell            # Access Django shell"
+    echo "  ./dev.sh cypress          # Run Cypress E2E tests"
+    echo "  ./dev.sh test             # Run all Django tests"
+    echo "  ./dev.sh test artwork     # Run tests for artwork app only"
+    echo "  ./dev.sh behave           # Run all Behave tests"
 }
 
 # Main script logic
@@ -160,18 +166,27 @@ case "${1:-help}" in
         docker compose -f docker-compose.dev.yml exec web python /app/manage.py createsuperuser
         ;;
     test)
-        print_status "Running tests..."
-        docker compose -f docker-compose.dev.yml exec web python /app/manage.py test
+        if [ -n "$2" ]; then
+            print_status "Running tests for $2 app..."
+            docker compose -f docker-compose.dev.yml exec web python /app/manage.py test "$2"
+        else
+            print_status "Running all tests..."
+            docker compose -f docker-compose.dev.yml exec web python /app/manage.py test
+        fi
         ;;
     behave)
-        print_status "Running Behave tests with test settings..."
+        print_status "Running all Behave tests with test settings..."
         docker compose -f docker-compose.dev.yml exec web bash -c "export DJANGO_SETTINGS_MODULE=pointless_impressions_src.pointless_impressions.settings.test && python /app/manage.py behave"
+        ;;
+    cypress:reset)
+        print_status "Resetting Cypress test database..."
+        docker compose -f docker-compose.dev.yml exec web bash -c "export ENV=test && export DJANGO_SETTINGS_MODULE=pointless_impressions_src.pointless_impressions.settings.test && python /app/manage.py flush --noinput && python /app/manage.py migrate --noinput && python /app/manage.py create_test_artworks"
+        print_success "Cypress test database reset completed!"
         ;;
     cypress)
         print_status "Running Cypress E2E tests with test settings..."
         print_status "Stopping dev server..."
         docker compose -f docker-compose.dev.yml stop web 2>/dev/null || true
-        # Clean up any orphaned containers from previous test runs
         docker ps -a | grep "pointless_impressions-web-run" | awk '{print $1}' | xargs -r docker rm -f 2>/dev/null || true
         sleep 1
         print_status "Setting up test database..."
@@ -185,14 +200,15 @@ case "${1:-help}" in
         NODE_ENV=development npx cypress run "${@:2}"
         print_success "Cypress tests completed!"
         print_status "Restarting dev server..."
-        docker ps | grep "pointless_impressions-web-run" | awk '{print $1}' | xargs -r docker kill 2>/dev/null || true
-        docker compose -f docker-compose.dev.yml up -d web
+        ./dev.sh restart
+        print_status "Loading fixtures back to dev database..."
+        ./dev.sh loadfixtures
+        print_success "Cypress tests completed!"
         ;;
     cypress-open)
         print_status "Opening Cypress with test database..."
         print_status "Stopping dev server..."
         docker compose -f docker-compose.dev.yml stop web 2>/dev/null || true
-        # Clean up any orphaned containers from previous test runs
         docker ps -a | grep "pointless_impressions-web-run" | awk '{print $1}' | xargs -r docker rm -f 2>/dev/null || true
         sleep 1
         print_status "Setting up test database..."
@@ -207,6 +223,10 @@ case "${1:-help}" in
         print_status "Restarting dev server..."
         docker ps | grep "pointless_impressions-web-run" | awk '{print $1}' | xargs -r docker kill 2>/dev/null || true
         docker compose -f docker-compose.dev.yml up -d web
+        print_status "Loading Photo and Artwork fixtures back to dev database..."
+        docker compose -f docker-compose.dev.yml exec web python /app/manage.py loaddata photo.json artwork.json
+        print_status "Added Photo and Artwork fixtures back to dev database."
+        print_success "Cypress UI completed!"
         ;;
     jest)
         print_status "Running Jest tests..."
@@ -228,6 +248,10 @@ case "${1:-help}" in
             print_status "Clean operation cancelled."
         fi
         ;;
+
+    loadfixtures)
+        print_status "Loading initial data fixtures into the database..."
+        docker compose -f docker-compose.dev.yml exec web python /app/manage.py loaddata photo.json artwork.json artwork_categories.json artwork_framing_options.json profiles.json account_group.json account.json
     status)
         print_status "Development environment status:"
         docker compose -f docker-compose.dev.yml ps

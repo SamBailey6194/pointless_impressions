@@ -3,7 +3,7 @@
         "pk": 1,
         "model": "artwork.ArtworkCategory",
         "fields": {
-            "name": "paintings",
+            "name": "Paintings",
             "friendly_name": "Paintings",
             "description": "Images that use water based medium of acrylic and watercolours.",
             "slug": "paintings"

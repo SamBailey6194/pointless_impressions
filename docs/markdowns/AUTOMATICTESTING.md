@@ -10,42 +10,314 @@ Please copy the example to the relevant part for your tests.
 
 - [Automated Tests](#automated-tests)
   - [Table of Contents](#table-of-contents)
-  - [Example](#example)
-    - [Type of Testing (TDD or BDD)](#type-of-testing-tdd-or-bdd)
-      - [App-Name](#app-name)
-        - [What is it testing](#what-is-it-testing)
-  - [Python Tests](#python-tests)
-    - [TDD Testing via TestCase](#tdd-testing-via-testcase)
-      - [US001: Browse Available Artworks - In Artwork App](#us001-browse-available-artworks---in-artwork-app)
-        - [Artwork Model Tests](#artwork-model-tests)
-      - [Artwork Views Tests](#artwork-views-tests)
-  - [BDD Testing via Behave](#bdd-testing-via-behave)
-    - [US001: Browse Available Artworks - In Artwork App](#us001-browse-available-artworks---in-artwork-app-1)
-      - [Artwork Browsing Features](#artwork-browsing-features)
-        - [Viewing Available Artwork](#viewing-available-artwork)
-        - [Sold Out Artworks Are Clearly Marked](#sold-out-artworks-are-clearly-marked)
-        - [Sort Artworks by Price](#sort-artworks-by-price)
-        - [Filter Artworks by Availability](#filter-artworks-by-availability)
-        - [View Artwork Details](#view-artwork-details)
-        - [Add Artwork to Cart](#add-artwork-to-cart)
-        - [Attempt to Add Sold Out Artwork to Cart](#attempt-to-add-sold-out-artwork-to-cart)
-  - [JavaScript Tests](#javascript-tests)
-    - [TDD Testing via Jest](#tdd-testing-via-jest)
-      - [US001: Browse Available Artworks - In Artwork App](#us001-browse-available-artworks---in-artwork-app-2)
-        - [Artwork Listing Component Tests](#artwork-listing-component-tests)
-    - [BDD Testing via Cypress](#bdd-testing-via-cypress)
-      - [US001: Browse Available Artworks - In Artwork App](#us001-browse-available-artworks---in-artwork-app-3)
-        - [Artwork Browsing Features](#artwork-browsing-features-1)
+  - [Writing the Tests](#writing-the-tests)
+    - [Django Tests (Backend)](#django-tests-backend)
+    - [Behave (BDD) Tests](#behave-bdd-tests)
+    - [Frontend Tests (Jest \& Cypress)](#frontend-tests-jest--cypress)
+      - [Jest (Unit Tests)](#jest-unit-tests)
+      - [Cypress (End-to-End Tests)](#cypress-end-to-end-tests)
+  - [Running The Tests](#running-the-tests)
+    - [Commands](#commands)
+    - [Optional Commands](#optional-commands)
+  - [Documenting The Automated Tests](#documenting-the-automated-tests)
+    - [Example](#example)
+      - [Type of Testing (TDD or BDD)](#type-of-testing-tdd-or-bdd)
+        - [App-Name](#app-name)
+          - [What is it testing](#what-is-it-testing)
+    - [Python Tests](#python-tests)
+      - [TDD Testing via TestCase](#tdd-testing-via-testcase)
+        - [US001: Browse Available Artworks - In Artwork App](#us001-browse-available-artworks---in-artwork-app)
+          - [Artwork Model Tests](#artwork-model-tests)
+        - [Artwork Views Tests](#artwork-views-tests)
+    - [BDD Testing via Behave](#bdd-testing-via-behave)
+      - [US001: Browse Available Artworks - In Artwork App](#us001-browse-available-artworks---in-artwork-app-1)
+        - [Artwork Browsing Features](#artwork-browsing-features)
+          - [Viewing Available Artwork](#viewing-available-artwork)
+          - [Sold Out Artworks Are Clearly Marked](#sold-out-artworks-are-clearly-marked)
+          - [Sort Artworks by Price](#sort-artworks-by-price)
+          - [Filter Artworks by Availability](#filter-artworks-by-availability)
+          - [View Artwork Details](#view-artwork-details)
+          - [Add Artwork to Cart](#add-artwork-to-cart)
+          - [Attempt to Add Sold Out Artwork to Cart](#attempt-to-add-sold-out-artwork-to-cart)
+    - [JavaScript Tests](#javascript-tests)
+      - [TDD Testing via Jest](#tdd-testing-via-jest)
+        - [US001: Browse Available Artworks - In Artwork App](#us001-browse-available-artworks---in-artwork-app-2)
+          - [Artwork Listing Component Tests](#artwork-listing-component-tests)
+      - [BDD Testing via Cypress](#bdd-testing-via-cypress)
+        - [US001: Browse Available Artworks - In Artwork App](#us001-browse-available-artworks---in-artwork-app-3)
+          - [Artwork Browsing Features](#artwork-browsing-features-1)
 
 ---
 
-## Example
+## Writing the Tests
 
-### Type of Testing (TDD or BDD)
+---
 
-#### App-Name
+When writing tests for **Pointless Impressions**, it’s important to keep test frameworks organised by type and location to maintain clarity and consistency.
 
-##### What is it testing
+### Django Tests (Backend)
+
+**Location:** Each app should have its own a `tests/tests.py` folder.  
+Example: pointless_impressions_src/home/tests/tests.py
+
+**Structure:**  
+- Use `django.test.TestCase` for model, view, and form tests.  
+- Keep tests small and focused (one assertion per behavior).  
+- Name test methods descriptively:  
+  
+  ```python
+  class HomeModelTest(TestCase):
+      def test_home_str_method_returns_title(self):
+          home = Home.objects.create(title="Sunset")
+          self.assertEqual(str(home), "Sunset")
+  ```
+
+**Best Practices:**  
+- Use `setUpTestData()` for creating objects once per class if multiple tests share them.  
+- Mock external calls where needed (e.g., APIs, email sending).
+
+### Behave (BDD) Tests
+
+**Location:** All tests should be located in the `features/` folder in `pointless_impressions_src/`.  
+Example: pointless_impressions_src/features/
+
+- **Structure:**  
+- `.feature` files describe behavior in **Given/When/Then** format.  
+- Step definitions go in `steps/` within the same `features/` folder.
+
+- **Naming:** Feature file names should be descriptive, e.g., `browse_home.feature`.
+
+**Example:**
+```gherkin
+Feature: Browse available Home
+  As a customer
+  I want to see the homepage display current artwork for sale
+  So that I can decide what to purchase
+
+  Scenario: Viewing artwork list
+    Given the following artwork exists:
+      | title       | price |
+      | Sunset      | 100   |
+      | Mountains   | 200   |
+    When I visit the homepage I want to see a section for latest artwork
+    Then I should see "Sunset" and "Mountains"
+```
+
+### Frontend Tests (Jest & Cypress)
+
+#### Jest (Unit Tests)
+
+- **Location** all frontend tests live in `pointless_impressions_src/theme/static_src/src/tests.js/jest/app_name/*.test.js`
+- Test JavaScript functions, components, or utilities
+- **File Naming:** Use `NAME.test.js` suffix, e.g., `artwork.test.js`
+- **HTML Fixture:**
+  - Store mock HTML pages or snippets in `pointless_impressions_src/theme/static_src/src/tests.js/jest/app_name/fixtures/*.html`
+  - Load fixtures in Jest tests
+
+**Example**
+
+```javascript
+import { formatPrice } from '../utils/format';
+
+test('formats price correctly', () => {
+  expect(formatPrice(100)).toBe('£100.00');
+});
+```
+
+#### Cypress (End-to-End Tests)
+
+- **Location** all frontend tests live in `pointless_impressions_src/theme/static_src/src/tests.js/cypress/e2e/app_name/*.cy.js`
+- Test full user flows in the browser
+- **File Naming:** Use `NAME.cy.js` suffix, e.g., `browse_artwork.cy.js`
+    
+    ```javascript
+    cy.fixture('artwork_list.html').then((html) => {
+        document.body.innerHTML = html;
+        cy.get('.artwork-title').should('contain', 'Sunset');
+    });
+    ```
+
+---
+
+## Running The Tests
+
+---
+
+To run the tests please use:
+
+### Commands
+
+In the `dev.sh` script there are easy commands to run each type of test.
+
+1. For Django TestCase
+
+  ```bash
+  ./dev.sh test
+  ```
+
+2. For Django Behave
+
+  ```bash
+  ./dev.sh behave
+  ```
+
+3. For JavaScript Jest
+
+  ```bash
+  ./dev.sh jest
+  ```
+
+4. For JavaScript Cypress
+
+  ```bash
+  ./dev.sh cypress
+  ```
+
+  or to open the Cypress UI and see tests running visually:
+
+  ```bash
+  ./dev.sh cypress-open
+  ```
+
+  **Important** Cypress tests will reset the development database. After running Cypress tests, the `Photo` and `Artwork` fixtures will be reloaded automatically to restore the data.
+
+### Optional Commands
+
+Running specific tests can be done following the below:
+
+1. To run app specific Django TestCase:
+
+  ```bash
+  ./dev.sh test app_name
+  
+  # Example:
+  ./dev.sh test artwork
+  ```
+
+2. To run specific Behave feature tests:
+
+  For Behave tests, you need to be in the Docker container shell first:
+
+  ```bash
+  ./dev.sh bash
+  ```
+
+  Then run the specific feature file (all feature files are located in `pointless_impressions_src/features/`):
+
+  ```bash
+  behave feature_file.feature
+
+  # Example:
+  behave artwork_browse.feature
+  ```
+
+  Behave will automatically locate and use the corresponding step definitions in the `steps/` folder.
+
+3. To run app specific Jest tests:
+
+  In the `package.json`, ensure you have the following script defined:
+
+  ```json
+  "scripts": {
+    "test:app_name": "jest --config=jest.config.js pointless_impressions_src/theme/static_src/src/tests.js/jest/app_name/__tests__/"
+  }
+  ```
+
+  As an example, for the `artwork` app, you would add:
+
+  ```json
+  "scripts": {
+    "test:artwork": "jest --config=jest.config.js pointless_impressions_src/theme/static_src/src/tests.js/jest/artwork/__tests__/"
+  }
+  ```
+
+  Then access the Docker container shell:
+
+  ```bash
+  ./dev.sh bash
+  ```
+
+  Then run the app specific Jest tests by executing:
+
+  ```bash
+  npm run test:app_name
+  ```
+
+  So for artwork app tests, you would run:
+
+  ```bash
+  npm run test:artwork
+  ```
+
+4. To run app specific Cypress tests:
+
+  In the `package.json`, ensure you have the following script defined:
+
+  ```json
+  "scripts": {
+    "cypress:app_name": "cross-env NODE_ENV=development cypress run --spec 'pointless_impressions_src/theme/static_src/cypress/e2e/app_name/**/*'"
+  }
+  ```
+
+  As an example, for the `artwork` app, you would add:
+
+  ```json
+  "scripts": {
+    "cypress:artwork": "cross-env NODE_ENV=development cypress run --spec 'pointless_impressions_src/theme/static_src/cypress/e2e/artwork/**/*'"
+  }
+  ```
+
+  You will need to clear the Dev DB and load the Test Port and Fixtures again before running Cypress tests to ensure a clean state:
+
+  ```bash
+  ./dev.sh cypress:reset
+  ```
+
+  Then access the Docker container shell by running in a terminal not already in the container:
+
+  ```bash
+  ./dev.sh bash
+  ```
+
+  Then run the app specific Cypress tests by executing:
+
+  ```bash
+  npm run cypress:app_name
+  ```
+
+  So for artwork app tests, you would run:
+
+  ```bash
+  npm run cypress:artwork
+  ```
+
+  Make sure you then start the dev server again by running in a terminal not already in the container:
+
+  ```bash
+  ./dev.sh start
+  ```
+
+  And load the fixtures again if needed by running in a terminal not already in the container:
+
+  ```bash
+  ./dev.sh loadfixtures
+  ```
+
+  This will restore the development database to the with the required data.
+
+---
+
+## Documenting The Automated Tests
+
+---
+
+### Example
+
+#### Type of Testing (TDD or BDD)
+
+##### App-Name
+
+###### What is it testing
 
 | Step | Action          | Outcome                 | Pass / Fail                |
 | ---- | --------------- | ----------------------- | -------------------------- |
@@ -53,13 +325,13 @@ Please copy the example to the relevant part for your tests.
 
 ---
 
-## Python Tests
+### Python Tests
 
-### TDD Testing via TestCase
+#### TDD Testing via TestCase
 
-#### US001: Browse Available Artworks - In Artwork App
+##### US001: Browse Available Artworks - In Artwork App
 
-##### Artwork Model Tests
+###### Artwork Model Tests
 
 | Step | Action | Outcome | Pass / Fail |
 | :--- | :--- | :--- | :--- |
@@ -83,7 +355,7 @@ Please copy the example to the relevant part for your tests.
 | 18 | Remove all photos and access alt text | Verifies the deepest fallback logic: defaults to Artwork name when no related photo exists. | Pass |
 | 19 | Create a second, independent Artwork | Confirms integrity when creating a new, distinct artwork instance. | Pass |
 
-#### Artwork Views Tests
+##### Artwork Views Tests
 
 | Step | Action | Outcome | Pass / Fail |
 | :--- | :--- | :--- | :--- |
@@ -97,13 +369,13 @@ Please copy the example to the relevant part for your tests.
 
 ---
 
-## BDD Testing via Behave
+### BDD Testing via Behave
 
-### US001: Browse Available Artworks - In Artwork App
+#### US001: Browse Available Artworks - In Artwork App
 
-#### Artwork Browsing Features
+##### Artwork Browsing Features
 
-##### Viewing Available Artwork
+###### Viewing Available Artwork
 
 | Step | Action | Outcome | Pass / Fail |
 | ---- | ------ | ------- | ----------- |
@@ -111,27 +383,27 @@ Please copy the example to the relevant part for your tests.
 | 2 | See artwork description | "A beautiful sunset over the mountains." | Pass |
 | 3 | See artwork price | "£199.99" | Pass |
 
-##### Sold Out Artworks Are Clearly Marked
+###### Sold Out Artworks Are Clearly Marked
 
 | Step | Action | Outcome | Pass / Fail |
 | ---- | ------ | ------- | ----------- |
 | 1 | Visit the artwork listing page | See "Starry Night" | Pass |
 | 2 | Check sold out badge | "Sold Out" next to "Starry Night" | Pass |
 
-##### Sort Artworks by Price
+###### Sort Artworks by Price
 
 | Step | Action | Outcome | Pass / Fail |
 | ---- | ------ | ------- | ----------- |
 | 1 | Visit the artwork listing page sorted by "price" | Artworks displayed in ascending price order | Pass |
 
-##### Filter Artworks by Availability
+###### Filter Artworks by Availability
 
 | Step | Action | Outcome | Pass / Fail |
 | ---- | ------ | ------- | ----------- |
 | 1 | Visit the artwork listing page with filter "available" | See "Sunset" | Pass |
 | 2 | Check filtered out items | Do not see "Starry Night" | Pass |
 
-##### View Artwork Details
+###### View Artwork Details
 
 | Step | Action | Outcome | Pass / Fail |
 | ---- | ------ | ------- | ----------- |
@@ -142,7 +414,7 @@ Please copy the example to the relevant part for your tests.
 | 5 | Check artwork price | See "£199.99" | Pass |
 | 6 | Check "Add to Cart" button | Button visible | Pass |
 
-##### Add Artwork to Cart
+###### Add Artwork to Cart
 
 | Step | Action | Outcome | Pass / Fail |
 | ---- | ------ | ------- | ----------- |
@@ -150,7 +422,7 @@ Please copy the example to the relevant part for your tests.
 | 2 | Click "Add to Cart" button | "Sunset" added to shopping cart | Pass |
 | 3 | Check confirmation message | "Sunset has been added to your cart." | Pass |
 
-##### Attempt to Add Sold Out Artwork to Cart
+###### Attempt to Add Sold Out Artwork to Cart
 
 | Step | Action | Outcome | Pass / Fail |
 | ---- | ------ | ------- | ----------- |
@@ -160,13 +432,13 @@ Please copy the example to the relevant part for your tests.
 
 ---
 
-## JavaScript Tests
+### JavaScript Tests
 
-### TDD Testing via Jest
+#### TDD Testing via Jest
 
-#### US001: Browse Available Artworks - In Artwork App
+##### US001: Browse Available Artworks - In Artwork App
 
-##### Artwork Listing Component Tests
+###### Artwork Listing Component Tests
 
 | Step | Action | Outcome | Pass / Fail |
 | ---- | ------ | ------- | ----------- |
@@ -179,11 +451,11 @@ Please copy the example to the relevant part for your tests.
 | 7 | Filter available artworks | Only available artworks are returned (`Sunset`) | Pass |
 | 8 | Click on artwork | Artwork detail shows name, description, price, and `Add to Cart` button | Pass |
 
-### BDD Testing via Cypress
+#### BDD Testing via Cypress
 
-#### US001: Browse Available Artworks - In Artwork App
+##### US001: Browse Available Artworks - In Artwork App
 
-##### Artwork Browsing Features
+###### Artwork Browsing Features
 
 | Step | Action | Outcome | Pass / Fail |
 | ---- | ------ | ------- | ----------- |

@@ -54,6 +54,8 @@ class SearchView(TemplateView):
         query = self.request.GET.get('q')
 
         combined_list = []
+        paginator = None
+        page_obj = None
 
         if query:
             # Get artwork results
@@ -135,7 +137,9 @@ class SearchView(TemplateView):
         context['page_obj'] = page_obj
         context['results'] = page_obj
         context['search_query'] = query
-        context['is_paginated'] = context['paginator'].num_pages >= 1
+        context['is_paginated'] = (
+            paginator.num_pages >= 1 if paginator else False
+        )
         context['production'] = not settings.DEBUG
         context['placeholder_image'] = get_placeholder_image()
         return context

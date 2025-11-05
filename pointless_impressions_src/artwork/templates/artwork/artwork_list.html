@@ -16,26 +16,12 @@
               
               <div class="flex flex-col md:flex-row gap-4 justify-center items-center">
 
-                {% comment %} Artist Filter {% endcomment %}
-                <div class="form-control w-full md:w-1/3 max-w-xs">
-                  <label class="label">
-                    <span class="label-text">Artist</span>
-                  </label>
-                  <select name="artist" class="select select-bordered w-full">
-                    <option value="">All Artists</option>
-                    {% for artist in all_artists %}
-                        <option value="{{ artist.user.username }}"
-                          {% if request.GET.artist == artist.user.username %}selected{% endif %}>
-                            {{ artist.user.username }}
-                        </option>
-                    {% endfor %}
-                  </select>
-                </div>
-
                 {% comment %} Artwork Category Filter {% endcomment %}
                 <div class="form-control w-full md:w-1/3 max-w-xs">
                   <label class="label">
-                    <span class="label-text">Artwork Category</span>
+                    <span class="label-text">
+                      <i class="fa-solid fa-palette"></i> Artwork Category
+                    </span>
                   </label>
                   <select name="category" class="select select-bordered w-full">
                     <option value="">All Categories</option>
@@ -51,7 +37,9 @@
                 {% comment %} Framing Condition Filter {% endcomment %}
                 <div class="form-control w-full md:w-1/3 max-w-xs">
                   <label class="label">
-                    <span class="label-text">Framing Condition</span>
+                    <span class="label-text">
+                      <i class="fa-solid fa-crop-simple"></i> Framing Condition
+                    </span>
                   </label>
                   <select name="selected_conditions" class="select select-bordered w-full">
                     <option value="">All Conditions</option>
@@ -59,6 +47,24 @@
                         <option value="{{ framing.slug }}"
                           {% if request.GET.selected_conditions == framing.slug %}selected{% endif %}>
                             {{ framing.condition_friendly_name|default:framing.condition_name }}
+                        </option>
+                    {% endfor %}
+                  </select>
+                </div>
+
+                {% comment %} Artist Filter {% endcomment %}
+                <div class="form-control w-full md:w-1/3 max-w-xs">
+                  <label class="label">
+                    <span class="label-text">
+                      <i class="fa-solid fa-brush"></i>Artist
+                    </span>
+                  </label>
+                  <select name="artist" class="select select-bordered w-full">
+                    <option value="">All Artists</option>
+                    {% for artist in all_artists %}
+                        <option value="{{ artist.user.username }}"
+                          {% if request.GET.artist == artist.user.username %}selected{% endif %}>
+                            {{ artist.user.username }}
                         </option>
                     {% endfor %}
                   </select>
