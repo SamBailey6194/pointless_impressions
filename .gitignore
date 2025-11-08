@@ -19,6 +19,7 @@ env/
 *.mo
 db.sqlite3
 /staticfiles/
+/pointless_impressions_src/media/  # Media files stored in Cloudinary
 
 # -----------------------------
 # Environment / secrets
