@@ -12,6 +12,8 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -46,7 +48,6 @@ jobs:
           DATABASE_URL: ${{ secrets.STAGING_DB_URL }}
         run: |
           heroku run python manage.py loaddata account_group.json -a ${{ secrets.HEROKU_STAGING_APP_NAME }}
-          heroku run python manage.py loaddata account.json -a ${{ secrets.HEROKU_STAGING_APP_NAME }}
           heroku run python manage.py loaddata account.json -a ${{ secrets.HEROKU_STAGING_APP_NAME }}
           heroku run python manage.py loaddata artwork_categories.json -a ${{ secrets.HEROKU_STAGING_APP_NAME }}
           heroku run python manage.py loaddata artwork_framing_options.json -a ${{ secrets.HEROKU_STAGING_APP_NAME }}
