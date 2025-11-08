@@ -21,31 +21,31 @@
         }
     },
     {
-        "model": "account.CustomUser_groups",
+        "model": "account.customuser",
+        "pk": 1,
         "fields": {
-            "customuser_id": 1,
-            "group_id": 1
+            "groups": [1]
         }
     },
     {
-        "model": "account.CustomUser_groups",
+        "model": "account.customuser",
+        "pk": 2,
         "fields": {
-            "customuser_id": 2,
-            "group_id": 2
+            "groups": [2]
         }
     },
     {
-        "model": "account.CustomUser_groups",
+        "model": "account.customuser",
+        "pk": 3,
         "fields": {
-            "customuser_id": 3,
-            "group_id": 3
+            "groups": [3]
         }
     },
     {
-        "model": "account.CustomUser_groups",
+        "model": "account.customuser",
+        "pk": 5,
         "fields": {
-            "customuser_id": 5,
-            "group_id": 1
+            "groups": [1]
         }
     }
 ]
