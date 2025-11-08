@@ -1,6 +1,6 @@
 from django.core.management.base import BaseCommand
 from django.conf import settings
-from photo.models import Photo
+from pointless_impressions_src.photo.models import Photo
 import cloudinary
 import cloudinary.uploader
 
