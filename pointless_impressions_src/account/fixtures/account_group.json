@@ -19,33 +19,5 @@
         "fields": {
             "name": "Employee"
         }
-    },
-    {
-        "model": "account.customuser",
-        "pk": 1,
-        "fields": {
-            "groups": [1]
-        }
-    },
-    {
-        "model": "account.customuser",
-        "pk": 2,
-        "fields": {
-            "groups": [2]
-        }
-    },
-    {
-        "model": "account.customuser",
-        "pk": 3,
-        "fields": {
-            "groups": [3]
-        }
-    },
-    {
-        "model": "account.customuser",
-        "pk": 5,
-        "fields": {
-            "groups": [1]
-        }
     }
 ]
