@@ -15,10 +15,12 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 
 WORKDIR /app
 
-# Install all system dependencies
+# Install all system dependencies FIRST (before any pip installs)
 RUN apt-get update && apt-get install -y \
     curl \
     gcc \
+    g++ \
+    make \
     libpq-dev \
     xz-utils \
     && rm -rf /var/lib/apt/lists/*
