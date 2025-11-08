@@ -47,9 +47,8 @@ RUN npm ci
 COPY pointless_impressions_src/ ./pointless_impressions_src/
 COPY manage.py .
 
-# Build and Collect ALL static assets
-RUN npm run build && \
-    python manage.py collectstatic --noinput
+# Build CSS/JS only (collectstatic will run in entrypoint)
+RUN npm run build
 
 # ---------- Stage 2: Final Production Image ----------
 # This stage ONLY installs Python. It is small and secure.
@@ -80,11 +79,7 @@ RUN uv pip install --upgrade pip --system && \
 COPY pointless_impressions_src/ ./pointless_impressions_src/
 COPY manage.py .
 
-# 5. Copy the fully collected staticfiles from the builder stage
-# This one line is the magic of multi-stage builds.
-COPY --from=builder /app/staticfiles/ ./staticfiles/
-
-# 6. Create non-root user and give it ownership
+# 5. Create non-root user and give it ownership
 RUN useradd -m $USER && \
     chown -R $USER:$USER /app
 
