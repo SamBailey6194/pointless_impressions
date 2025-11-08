@@ -31,6 +31,10 @@ Please copy the example to the relevant part for your tests.
         - [Artwork Views Tests](#artwork-views-tests)
         - [US002: View Artwork Details - In Artwork App](#us002-view-artwork-details---in-artwork-app)
           - [Artwork Detail View Tests](#artwork-detail-view-tests)
+        - [US008: Admin Upload and Manage Artwork - In Artwork App](#us008-admin-upload-and-manage-artwork---in-artwork-app)
+          - [Artwork Admin CRUD Tests](#artwork-admin-crud-tests)
+          - [Artwork Admin Permissions Tests](#artwork-admin-permissions-tests)
+          - [Artwork Validation Tests](#artwork-validation-tests)
     - [BDD Testing via Behave](#bdd-testing-via-behave)
       - [US001: Browse Available Artworks - In Artwork App](#us001-browse-available-artworks---in-artwork-app-1)
         - [Artwork Browsing Features](#artwork-browsing-features)
@@ -417,6 +421,60 @@ Running specific tests can be done following the below:
 | 16 | Load detail page for artwork with reviews | Review count annotation is calculated correctly | Pass |
 | 17 | Load detail page for artwork | Review form is available in context | Pass |
 | 18 | Load detail page for artwork | All reviews ordered by newest first are in context | Pass |
+
+---
+
+##### US008: Admin Upload and Manage Artwork - In Artwork App
+
+###### Artwork Admin CRUD Tests
+
+| Step | Action | Outcome | Pass / Fail |
+| :--- | :--- | :--- | :--- |
+| 1 | Create artwork with all required fields | Artwork created with name, artist, description, price, category; SKU and slug auto-generated | Pass |
+| 2 | Create multiple artworks | Each artwork receives unique auto-generated SKU starting with "SKU-" | Pass |
+| 3 | Create artwork and verify slug generation | Artwork name "The Starry Night" generates slug "the-starry-night" | Pass |
+| 4 | Create artwork with framing conditions | Artwork created and framing conditions successfully added via ManyToMany relation | Pass |
+| 5 | Read artwork by ID | Admin can retrieve artwork by primary key with all fields intact | Pass |
+| 6 | Read artwork by slug | Admin can retrieve artwork using slug field for direct access | Pass |
+| 7 | Update artwork name | Admin can change artwork name and save; updated name persists | Pass |
+| 8 | Update artwork price | Admin can change artwork price; updated price persists | Pass |
+| 9 | Update artwork description | Admin can change artwork description; updated description persists | Pass |
+| 10 | Update artwork category | Admin can reassign artwork to different category; change persists | Pass |
+| 11 | Update artwork artist | Admin can reassign artwork to different artist; change persists | Pass |
+| 12 | Delete artwork | Admin can delete artwork; artwork no longer exists in database | Pass |
+| 13 | Mark artwork as sold out | Admin can set `is_available=False`; status persists | Pass |
+| 14 | Mark artwork as available | Admin can set `is_available=True` on unavailable artwork; status persists | Pass |
+| 15 | Mark artwork out of stock | Admin can set `quantity=0`; `is_in_stock` automatically becomes False | Pass |
+| 16 | Update artwork quantity | Admin can increase quantity; `is_in_stock` automatically becomes True | Pass |
+| 17 | Mark artwork as featured | Admin can set `is_featured=True`; status persists | Pass |
+| 18 | CRUD sequence: Create-Read-Update-Delete | Artwork progresses through full lifecycle correctly | Pass |
+
+###### Artwork Admin Permissions Tests
+
+| Step | Action | Outcome | Pass / Fail |
+| :--- | :--- | :--- | :--- |
+| 1 | Check add_artwork permission exists | Permission `add_artwork` created for Artwork model | Pass |
+| 2 | Check change_artwork permission exists | Permission `change_artwork` created for Artwork model | Pass |
+| 3 | Check delete_artwork permission exists | Permission `delete_artwork` created for Artwork model | Pass |
+| 4 | Check view_artwork permission exists | Permission `view_artwork` created for Artwork model | Pass |
+| 5 | Superuser has all artwork permissions | Superuser can execute add, change, delete, view operations | Pass |
+| 6 | Staff user can be assigned artwork permissions | Staff user without permissions; after granting `add_artwork`, user has permission | Pass |
+| 7 | Regular user lacks artwork permissions | Regular (non-staff) user lacks all artwork admin permissions by default | Pass |
+
+###### Artwork Validation Tests
+
+| Step | Action | Outcome | Pass / Fail |
+| :--- | :--- | :--- | :--- |
+| 1 | Create artwork with duplicate name | IntegrityError raised; unique constraint on `name` enforced | Pass |
+| 2 | Create artwork with duplicate SKU | IntegrityError raised; unique constraint on `sku` enforced | Pass |
+| 3 | Create artwork without description | Artwork created with empty description (TextField allows empty strings) | Pass |
+| 4 | Create artwork without price | IntegrityError raised; database NOT NULL constraint on `price` enforced | Pass |
+| 5 | Create artwork with decimal price | Artwork saves with precise decimal format (e.g., 99.99) | Pass |
+| 6 | Create artwork with two-decimal price | Price retrieved as string maintains precision (e.g., "199.99") | Pass |
+| 7 | Create artwork with default quantity | New artwork has quantity=0 by default | Pass |
+| 8 | Create artwork with default availability | New artwork has is_available=True by default | Pass |
+| 9 | Create artwork with default featured status | New artwork has is_featured=False by default | Pass |
+| 10 | Attempt duplicate slug assignment | IntegrityError raised; unique constraint on `slug` enforced | Pass |
 
 ---
 
