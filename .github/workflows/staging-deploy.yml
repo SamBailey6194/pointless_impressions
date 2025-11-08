@@ -25,6 +25,8 @@ jobs:
       run: echo $HEROKU_API_KEY | docker login --username=_ --password-stdin registry.heroku.com
 
     - name: Build and Push Docker Image to Heroku
+      env: 
+        HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
       run: |
         docker build -f Dockerfile.staging -t registry.heroku.com/${{ secrets.HEROKU_STAGING_APP_NAME }}/web:latest .
         docker push registry.heroku.com/${{ secrets.HEROKU_STAGING_APP_NAME }}/web:latest
@@ -35,3 +37,9 @@ jobs:
       run: |
         heroku stack:set container -a ${{ secrets.HEROKU_STAGING_APP_NAME }}
         heroku container:release web -a ${{ secrets.HEROKU_STAGING_APP_NAME }}
+
+    - name: Collect Static Files
+      env: 
+        HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
+      run: |
+        heroku run python manage.py collectstatic --noinput -a ${{ secrets.HEROKU_STAGING_APP_NAME }}

@@ -56,12 +56,6 @@ python /app/manage.py migrate --noinput || {
 echo "Creating cache tables if needed..."
 python /app/manage.py createcachetable
 
-# Collect static files (for admin, CSS, JS)
-echo "Collecting static files..."
-python /app/manage.py collectstatic --noinput || {
-    echo "Warning: Static file collection failed. Continuing anyway..."
-}
-
 # Load initial data fixtures (always load to get latest data)
 echo "Loading initial data fixtures..."
 python /app/manage.py shell -c "
