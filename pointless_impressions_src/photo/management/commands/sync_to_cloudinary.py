@@ -18,12 +18,8 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         recreate = options.get('recreate', False)
 
-        # Configure Cloudinary
-        cloudinary.config(
-            cloud_name=settings.CLOUDINARY_CLOUD_NAME,
-            api_key=settings.CLOUDINARY_API_KEY,
-            api_secret=settings.CLOUDINARY_API_SECRET,
-        )
+        # Cloudinary is already configured in settings
+        # (cloudinary.config() is called in staging.py/production.py)
 
         photos = Photo.objects.all()
         self.stdout.write(f"Processing {photos.count()} photos...")
@@ -54,7 +50,8 @@ class Command(BaseCommand):
                     )
                     photo.image = result['secure_url']
                     photo.save()
-                    self.stdout.write(self.style.SUCCESS(f"  ✓ {photo.title}"))
+                    success_msg = f"  ✓ {photo.title}"
+                    self.stdout.write(self.style.SUCCESS(success_msg))
                     synced += 1
                 else:
                     self.stdout.write(f"  ⊘ {photo.title} - no local file")
