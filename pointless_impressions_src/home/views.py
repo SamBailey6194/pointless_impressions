@@ -1,4 +1,5 @@
 from django.views.generic import TemplateView
+from pointless_impressions_src.artwork.models import Artwork
 
 
 # Create your views here.
@@ -12,4 +13,16 @@ class HomeView(TemplateView):
         context['section_1_class'] = 'py-20 section-blue w-full'
         context['section_2_class'] = 'py-16 section-alt w-full'
         context['section_3_class'] = 'py-16 section-alt w-full'
+
+        # Add featured artworks to context
+        context['featured_artworks'] = Artwork.objects.filter(
+            is_featured=True
+            ).select_related(
+                'main_photo',
+                'artist__user',
+                'category'
+            ).prefetch_related(
+                'selected_conditions'
+            )[:10]
+
         return context

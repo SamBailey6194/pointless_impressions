@@ -16,9 +16,6 @@ BASE_DIR = Path(__file__).resolve().parent.parent.parent
 ENV_PATH = BASE_DIR
 load_dotenv(os.path.join(ENV_PATH, ".env"))
 
-# Environment flag - should be overridden in environment-specific settings
-ENVIRONMENT = os.getenv("DJANGO_ENVIRONMENT", "development")
-
 # Application definition
 DJANGO_APPS = [
     "django.contrib.admin",
@@ -37,12 +34,23 @@ THIRD_PARTY_APPS = [
     # Storage backends
     "cloudinary",
     "storages",
+    # Testing tools
+    "behave_django",
+    # Form rendering
+    "crispy_forms",
+    "crispy_tailwind",
 ]
 
 LOCAL_APPS = [
     "pointless_impressions_src.pointless_impressions",
     "pointless_impressions_src.home",
     "pointless_impressions_src.theme",
+    "pointless_impressions_src.artwork",
+    "pointless_impressions_src.photo",
+    "pointless_impressions_src.account",
+    "pointless_impressions_src.search",
+    "pointless_impressions_src.profiles",
+    "pointless_impressions_src.dashboard",
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -78,7 +86,7 @@ CACHES = {
 ROOT_URLCONF = "pointless_impressions_src.pointless_impressions.urls"
 
 # Tailwind CSS
-TAILWIND_APP_NAME = "theme"
+TAILWIND_APP_NAME = "pointless_impressions_src.theme"
 TAILWIND_CSS_PATH = "css/styles.css"
 
 # Session configuration
@@ -102,14 +110,17 @@ TEMPLATES = [
                 "django.template.context_processors.tz",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
-                "pointless_impressions.context_processors.environment",
-                "pointless_impressions.context_processors.static_version",
+                "pointless_impressions_src.pointless_impressions.context_processors.global_context",
             ],
         },
     },
 ]
 
+# WSGI application
 WSGI_APPLICATION = "pointless_impressions_src.pointless_impressions.wsgi.application"
+
+# Custom user model
+AUTH_USER_MODEL = "account.CustomUser"
 
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [

@@ -1,0 +1,27 @@
+name: Production Deploy
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy_production:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4
+
+    - name: Install Heroku CLI
+      run: curl https://cli-assets.heroku.com/install.sh | sh
+
+    - name: Procfile Setup for Production
+      run: cp Procfile.production Procfile
+
+    - name: Login to Heroku Container Registry
+      run: echo ${{ secrets.HEROKU_API_KEY }} | docker login --username=_ --password-stdin registry.heroku.com
+
+    - name: Build, Push and Release to Heroku (Production App)
+      run: |
+        heroku container:push web --dockerfile Dockerfile.production -a ${{ secrets.HEROKU_PRODUCTION_APP_NAME }}
+        heroku container:release web -a ${{ secrets.HEROKU_PRODUCTION_APP_NAME }}

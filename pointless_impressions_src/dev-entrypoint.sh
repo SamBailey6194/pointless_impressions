@@ -1,5 +1,6 @@
 #!/bin/bash
 set -e
+
 echo "Starting development container..."
 
 # Change to project root directory
@@ -14,7 +15,7 @@ fi
 # Wait for database to be ready
 echo "Waiting for database at ${DEV_DB_HOST:-db_dev}:${DEV_DB_PORT:-5432}..."
 while ! nc -z ${DEV_DB_HOST:-db_dev} ${DEV_DB_PORT:-5432}; do
-  sleep 1
+    sleep 1
 done
 echo "Database is ready!"
 
@@ -22,32 +23,55 @@ echo "Database is ready!"
 echo "Applying database migrations..."
 python /app/manage.py migrate
 
-# Create superuser if it doesn't exist (for development convenience)
-echo "Checking for superuser..."
+# Load initial data fixtures if database is empty
+echo "Checking if database is populated..."
 python /app/manage.py shell -c "
 from django.contrib.auth import get_user_model
-User = get_user_model()
-if not User.objects.filter(is_superuser=True).exists():
-    User.objects.create_superuser('admin', 'admin@example.com', 'admin123')
-    print('Superuser created: admin/admin123')
-else:
-    print('Superuser already exists')
-" 2>/dev/null || echo "Note: Superuser creation skipped"
+from django.core.management import call_command
+import os
 
-# Install Tailwind dependencies
-NODE_DIR=/app/pointless_impressions_src/theme/static_src
-echo "Installing Tailwind and Node dependencies..."
-if [ -f "$NODE_DIR/package.json" ]; then
-    cd $NODE_DIR
-    npm install
+User = get_user_model()
+
+if User.objects.filter(username='superuser').exists():
+    print('Database already populated. Skipping fixture loading.')
+else:
+    print('Database is empty. Loading fixtures...')
+    try:
+        call_command('loaddata', 'account.json')
+        print('Loaded account.json')
+        call_command('loaddata', 'account_group.json')
+        print('Loaded account_group.json')
+        call_command('loaddata', 'profiles.json')
+        print('Loaded profiles.json')
+        call_command('loaddata', 'artwork_categories.json')
+        print('Loaded artwork_categories.json')
+        call_command('loaddata', 'artwork_framing_options.json')
+        print('Loaded artwork_framing_options.json')
+        call_command('loaddata', 'photo.json')
+        print('Loaded photo.json')
+        call_command('loaddata', 'artwork.json')
+        print('Loaded artwork.json')
+        print('All fixtures loaded successfully.')
+    except Exception as e:
+        print(f'Error loading fixtures: {e}')
+        print('Please check your fixture files and paths.')
+        os._exit(1) # Exit with an error code
+"
+
+
+# Install Node dependencies at project root
+echo "Installing Node dependencies at project root..."
+if [ -f /app/package.json ]; then
     cd /app
+    npm install
 else
-    echo "Warning: package.json not found in $NODE_DIR"
+    echo "Warning: package.json not found in /app"
 fi
 
-# Install Tailwind CSS
-echo "Installing Tailwind CSS..."
-python /app/manage.py tailwind install
+# Build Tailwind CSS and JavaScript assets
+echo "Building Tailwind CSS and JavaScript..."
+cd /app
+npm run build || echo "Warning: Tailwind and JS build failed (check package.json)"
 
 # Function to handle graceful shutdown
 cleanup() {
@@ -55,17 +79,16 @@ cleanup() {
     kill $(jobs -p) 2>/dev/null || true
     exit 0
 }
+
 trap cleanup SIGTERM SIGINT
 
-# Change to Django project directory for Tailwind commands
-cd /app/pointless_impressions_src
+# Start Tailwind and JavaScript watcher in background (from project root)
+echo "Starting Tailwind and JavaScript in watch mode..."
+cd /app
+npm run start &
+WATCH_PID=$!
 
-# Start Tailwind watcher in background
-echo "Starting Tailwind in watch mode..."
-python /app/manage.py tailwind start &
-TAILWIND_PID=$!
-
-# Wait a moment for Tailwind to start
+# Wait a moment for watchers to start
 sleep 2
 
 # Start Django development server

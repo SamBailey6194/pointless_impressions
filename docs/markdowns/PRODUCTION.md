@@ -1,40 +1,36 @@
 # Production Environment Guide
 
-This document explains how to work with the production environment for the Pointless Impressions project.
+This document explains how to work with the **production environment** for the Pointless Impressions project. 
 
-Production is the live environment used by clients and end-users. All production deployments should be approved by the lead developer. It all comes from `main` branch.
+Production is the live environment where the application is accessible to end users. All production work should branch off `main` and be approved by the lead developer.
 
 ---
 
 ## Table of Contents
-
+    
 - [Production Environment Guide](#production-environment-guide)
   - [Table of Contents](#table-of-contents)
   - [Purpose](#purpose)
-  - [Project Structure](#project-structure)
+  - [Docker Files](#docker-files)
   - [Prerequisites](#prerequisites)
-  - [Environment Setup](#environment-setup)
-    - [Environment Variables](#environment-variables)
-  - [Docker Setup](#docker-setup)
-  - [Deploying the Production App](#deploying-the-production-app)
+  - [Variables for Heroku Config Vars and .env.staging](#variables-for-heroku-config-vars-and-envstaging)
+  - [Heroku Setup](#heroku-setup)
+  - [Github Actions Deployment](#github-actions-deployment)
 
 ---
 
 ## Purpose
 
-Production is the live environment used to:
+Production is the live environment for customers to access the application. It is used to:
 
-- Serve the public-facing application
-- Ensure all features are stable and performant
-- Integrate with real payment, email, and cloud services
-- Serve static files and media via AWS S3 / Cloudinary
-- Maintain logs and monitor uptime
+- Serve the live web application to end users
+- Handle real user data and transactions
+- Ensure high availability and performance
+- Monitor for issues and maintain security
 
 ---
 
-## Project Structure
-
-Production uses the same project structure as development and staging. Relevant Docker files:
+## Docker Files
 
 - `docker-compose.production.yml`
 - `Dockerfile.production`
@@ -47,311 +43,245 @@ Production uses the same project structure as development and staging. Relevant 
 
 - [Docker](https://www.docker.com/get-started)
 - [Docker Compose](https://docs.docker.com/compose/install/)
-- Git
+- [Git](https://git-scm.com/downloads)
 - [Heroku CLI](https://devcenter.heroku.com/articles/heroku-cli)
+- [AWS account with S3 and IAM access](https://aws.amazon.com/)
+- [Cloudinary account](https://cloudinary.com/users/register)
+- [Ethereal Email account](https://ethereal.email/)
 
 ---
 
-## Environment Setup
+## Variables for Heroku Config Vars and .env.staging
 
-1. Ensure you create a local venv to be able to manage the requirements.txt and install the requirements.txt into your venv.
+1. In the Dev Docker container we can generate the Secret Key by running
 
-    ```bash
-    python -m venv .venv
-    source .venv/bin/activate  # Linux/Mac
-    .venv\Scripts\activate     # Windows
-    pip install -r requirements.txt
+  ```bash
+  ./dev.sh bash
+  python -c "from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())"
+  ```
+
+  If python doesn't work, use python3:
+
+  ```bash
+  ./dev.sh bash
+  python3 -c "from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())"
+  ```
+
+  You should get a long string in your terminal. You can then copy it and paste it into the `.env.production` and this is your production secret key for **Pointless Impressions**. Which will also need to go into the Heroku Config Vars.
+
+2. **Set up Cloudinary for Production Media Storage**
+
+    1. Log into your [Cloudinary Dashboard](https://cloudinary.com/console)
+
+    2. Create a new folder for production environment:
+       - Navigate to Media Library
+       - Click "Create Folder" 
+       - Name it `pointless-impressions`
+       - Note down your Cloud Name, API Key, and API Secret from the dashboard
+
+3. **Set up Email Provider for Production**
+
+    1. I chose to use Google's SMTP service for sending emails in production. Follow these steps to set it up:
+
+    2. Go to your [Google Account Security Settings](https://myaccount.google.com/security)
+      1. Under "Signing in to Google," enable 2-Step Verification
+      2. After enabling 2-Step Verification, go to "App Passwords"
+      3. Create an app password for "Mail" on "Other (Custom name)" and name it "Django App"
+      4. Note down the generated app password for SMTP use
+      5. Use the following SMTP settings in your production environment:
+       - Host: 
+       - Port: 
+       - Username: your full Gmail address
+       - Password: the generated app password
+       - Use TLS: 
+
+4. **Set up AWS S3 Bucket and IAM for Production**
+
+    1. **Create S3 Bucket:**
+       - Log into AWS Console
+       - Navigate to S3 service
+       - Click "Create bucket"
+       - Bucket name: `pointless-impressions-static`
+       - Region: Choose closest to your users (e.g., eu-west-2 for UK)
+       - Uncheck "Block all public access" for media files
+       - Enable versioning (optional but recommended)
+       - Click "Create bucket"
+
+    2. **Configure Bucket Policy:**
+       - Go to bucket → Permissions → Bucket Policy
+       - Add policy for public read access to static files:
+       ```json
+       {
+         "Version": "2012-10-17",
+         "Statement": [
+           {
+             "Sid": "PublicReadGetObject",
+             "Effect": "Allow",
+             "Principal": "*",
+             "Action": "s3:GetObject",
+             "Resource": "arn"
+           }
+         ]
+       }
+       ```
+
+    3. **Configure CORS:**
+       - Go to bucket → Permissions → Cross-origin resource sharing (CORS)
+       - Add CORS configuration:
+       ```json
+       [
+         {
+           "AllowedHeaders": ["*"],
+           "AllowedMethods": ["GET", "POST", "PUT", "DELETE"],
+           "AllowedOrigins": ["*"],
+           "ExposeHeaders": ["ETag"],
+           "MaxAgeSeconds": 3000
+         }
+       ]
+       ```
+
+    4. **Create IAM Policy:**
+       - Navigate to IAM → Policies
+       - Click "Create policy"
+       - Select "JSON" tab and add the following policy (replace `your-bucket-name`):
+       ```json
+       {
+         "Version": "2012-10-17",
+         "Statement": [
+           {
+             "Effect": "Allow",
+             "Action": [
+               "s3:PutObject",
+               "s3:GetObject",
+               "s3:DeleteObject",
+               "s3:ListBucket"
+             ],
+             "Resource": [
+               "arn",
+               "arn/*"
+             ]
+           }
+         ]
+       }
+       ```
+       - Click "Next: Tags" → "Next: Review"
+       - Name: Global Name
+       - Description (optional): Describe whether it is for staging or production
+       - Click "Create policy"
+
+    5. **Create IAM User Groups:**
+
+       **Service Group (for applications):**
+       - Navigate to IAM → User groups
+       - Click "Create group"
+       - Group name: global name
+       - Description: Describe whether it is for staging or production
+       - Attach the policy: policy name
+       - Click "Create group"
+
+    6. **Create IAM User:**
+       - Navigate to IAM → Users
+       - Click "Create user"
+       - Username: Global Name
+       - Select "Programmatic access"
+       - Click "Next"
+
+    7. **Add User to Service Group:**
+       - On the permissions page, select "Add user to group"
+       - Select User Groups Global Name you created earlier
+       - Click "Next" → "Create user"
+       - **Important:** Download the Access Key ID and Secret Access Key
+       - Store these securely - they won't be shown again
+
+5. **Create a DB**
+   - Create a new database using Code Institutes DB Maker
+   - Note the Database URL and name it PRODUCTION_DB_URL in the `/env.production`
+
+**Important** Note all of these in the `.env.production` as we will need them for the Heroku Config Vars.
+
+**Important** All the relevant data for production will be loaded in from the fixtures during deployment via the `production-entrypoint.sh` including a superuser, artwork, photos and more.
+
+## Heroku Setup
+
+1. **Create Heroku Staging App:**
+   - Log into [Heroku Dashboard](https://dashboard.heroku.com/)
+   - Click "New" → "Create new app"
+   - App name: `pointless-impressions` (or similar)
+   - Region: Choose closest to your users (e.g., Europe)
+   - Click "Create app"
+
+2. **Set Up Heroku Config Vars:**
+   - Go to the "Settings" tab of your new app
+   - Click "Reveal Config Vars"
+   - Add the following config vars (replace placeholders with actual values):
+
+     ```plaintext
+    ALLOWED_HOSTS=
+    DEBUG=FALSE
+    DJANGO_SECRET_KEY= 
+    DEBUG=False 
+    ALLOWED_HOSTS= 
+    DJANGO_SETTINGS_MODULE= 
+    DJANGO_ENVIRONMENT=production
+    ENV=production
+    PRODUCTION_DB_URL= 
+    EMAIL_BACKEND= 
+    EMAIL_HOST= 
+    EMAIL_PORT= 
+    EMAIL_USE_TLS= 
+    EMAIL_HOST_USER= 
+    EMAIL_HOST_PASSWORD= 
+    DEFAULT_FROM_EMAIL= 
+    CLOUDINARY_CLOUD_NAME= 
+    CLOUDINARY_API_KEY= 
+    CLOUDINARY_API_SECRET= 
+    CLOUDINARY_UPLOAD_PREFIX=pointless-impressions
+    AWS_STORAGE_BUCKET_NAME= 
+    AWS_S3_REGION_NAME= 
+    AWS_ACCESS_KEY_ID= 
+    AWS_SECRET_ACCESS_KEY= 
+    STRIPE_PUBLIC_KEY= 
+    STRIPE_SECRET_KEY= 
+    STRIPE_WH_SECRET= 
     ```
 
-    If python or pip don't work ensure you can run this as:
+## Github Actions Deployment
 
-    ```bash
-    python3 -m venv .venv
-    source .venv/bin/activate  # Linux/Mac
-    .venv\Scripts\activate     # Windows
-    pip3 install -r requirements.txt
-    ```
+1. Create a `.github/workflows/deploy-production.yml` file in your repository with the following content:
 
-2. Copy the production environment template:
+  ```yaml
+  name: Production Deploy
 
-```bash
-cp .env.production.example .env.production
-```
+  on:
+    push:
+      branches:
+        - main
 
-3. Update the .env.production with the credentials, secret key and database settings
+  jobs:
+    deploy_production:
+      runs-on: ubuntu-latest
+      steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
 
-    ### Example
-    DJANGO_SECRET_KEY="production_secret_key"
-    PROD_DB_HOST=your_production_db_host
-    PROD_DB_PORT=5432
-    PROD_DB_NAME=prod_db
-    PROD_DB_USER=prod_user
-    PROD_DB_PASS=prod_pass
-    CACHE_URL=redis://redis_production:6379/0
-    EMAIL_BACKEND=django.core.mail.backends.smtp.EmailBackend
-    EMAIL_HOST=your_email_provider
-    EMAIL_PORT=587
-    EMAIL_USE_TLS=True
-    DEFAULT_FROM_EMAIL=production@example.com
+      - name: Install Heroku CLI
+        run: curl https://cli-assets.heroku.com/install.sh | sh
 
+      - name: Procfile Setup for Production
+        run: cp Procfile.production Procfile
 
-    On Heroku for production you will need to put these in as config vars, along with AWS S3, Cloudinary and .env.production variables.
+      - name: Login to Heroku Container Registry
+        run: echo ${{ secrets.HEROKU_API_KEY }} | docker login --username=_ --password-stdin registry.heroku.com
 
-    For emails on Heroku look to use Gmail, to do this follow the video [SMTP Setup](https://www.youtube.com/watch?v=ZfEK3WP73eY), you don't need to use SMTP Test tool. The video just shows you how to get the password for the config vars.
+      - name: Build, Push and Release to Heroku (Production App)
+        run: |
+          heroku container:push web --dockerfile Dockerfile.production -a ${{ secrets.HEROKU_PRODUCTION_APP_NAME }}
+          heroku container:release web -a ${{ secrets.HEROKU_PRODUCTION_APP_NAME }}
+  ```
 
-4. For the Heroku production we will need to have a postgres created from Code Institutes Database maker and we will need to create a superuser for the production Django Web App as well. We will do this later.
+2. Set the following secrets in your GitHub repository settings:
 
-5. We will also need to generate a secret key for the production
+   - `HEROKU_API_KEY`: Your Heroku API key (found in Heroku account settings)
+   - `HEROKU_PRODUCTION_APP_NAME`: The name of your Heroku production app
 
-    In the venv in VS Code you can enter:
-
-    ```bash
-    source .venv/bin/activate  # Linux/Mac
-    .venv\Scripts\activate     # Windows
-    python -c "from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())"
-    ```
-
-    If python doesn't work ensure you can run this as:
-
-    ```bash
-    source .venv/bin/activate  # Linux/Mac
-    .venv\Scripts\activate     # Windows
-    python3 -c "from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())"
-    ```
-
-    You should get a long string in your terminal. You can then copy it and paste it into the .env.production and this is your production secret key for **Pointless Impressions**. Which will also need to go into the Heroku Config Vars.
-
-### Environment Variables
-
-| Variable           | Purpose                          | Example                                                 |
-| ------------------ | -------------------------------- | ------------------------------------------------------- |
-| DJANGO_SECRET_KEY  | Django secret key for production | "production_secret_key"                                 |
-| PROD_DB_HOST       | Database host                    | your_production_db_host                                 |
-| PROD_DB_PORT       | Database port                    | 5432                                                    |
-| PROD_DB_NAME       | Database name                    | prod_db                                                 |
-| PROD_DB_USER       | Database username                | prod_user                                               |
-| PROD_DB_PASS       | Database password                | prod_pass                                               |
-| CACHE_URL          | Redis cache URL                  | redis://redis_production:6379/0                         |
-| EMAIL_BACKEND      | Email backend                    | django.core.mail.backends.smtp.EmailBackend             |
-| EMAIL_HOST         | Email server host                | smtp.yourprovider.com                                   |
-| EMAIL_PORT         | Email server port                | 587                                                     |
-| EMAIL_USE_TLS      | Enable TLS for email             | True                                                    |
-| DEFAULT_FROM_EMAIL | Default sender email             | [production@example.com](mailto:production@example.com) |
-
-
----
-
-## Docker Setup
-
-For development you only need to worry about the Dockerfile.production, docker-compose.production.yml and production-entrypoint.sh
-
-Ensure AWS S3, Cloudinary, PostgreSQL, and Stripe are reachable from the production container.
-
-### Using the Production Helper Script
-
-A helper script `production.sh` is provided to simplify production environment management with built-in safety warnings:
-
-```bash
-# Make the script executable (one time setup)
-chmod +x production.sh
-
-# Start production services (with confirmation prompt)
-./production.sh start
-
-# Stop production services
-./production.sh stop
-
-# Build production images
-./production.sh build
-
-# Rebuild and restart everything (with confirmation prompt)
-./production.sh rebuild
-
-# View logs (all services or specific service)
-./production.sh logs
-./production.sh logs web_prod
-
-# Open shell in Django container (with production warning)
-./production.sh shell
-
-# Run Django migrations (with confirmation prompt)
-./production.sh migrate
-
-# Run Django tests
-./production.sh test
-
-# Create database backup
-./production.sh backup
-
-# Check service health
-./production.sh health
-
-# Clean up containers and volumes (requires typing "DELETE" to confirm)
-./production.sh clean
-
-# Show service status
-./production.sh status
-
-# Show service URLs
-./production.sh urls
-
-# Show help
-./production.sh help
-```
-
-**⚠️ IMPORTANT:** The production script includes safety prompts and warnings since this affects live users. Always double-check before confirming destructive operations.
-
----
-
-## Deploying the Production App
-
-**Important**: Never change or upgrade dependencies or packages, leave this to the lead dev. If there are any warnings at install please contact the lead dev.
-
-1. Ensure env.production is set up and has the relevant variables
-
-2. In the venv ensure you run `pip freeze > requirements.txt` or `pip3 freeze > requirements.txt` this will ensure the requirements.txt is up to date.
-
-
-3. Ensure your Dockerfile.production and production-entrypoint.sh are correctly configured.
-
-4. Build and start production the containers
-
-    **Option A: Using the helper script (recommended)**
-    ```bash
-    ./production.sh start
-    ```
-    *Note: This will prompt for confirmation since it's production*
-
-    **Option B: Using docker-compose directly**
-    ```bash
-    docker compose -f docker-compose.production.yml up --build -d
-    ```
-
-5. Verify they are running
-
-    **Option A: Using the helper script**
-    ```bash
-    ./production.sh status
-    ```
-
-    **Option B: Check health of all services**
-    ```bash
-    ./production.sh health
-    ```
-
-    **Option C: Using docker directly**
-    ```bash
-    docker ps
-    ```
-
-6. Create a superuser for the Django Admin by:
-
-    **Option A: Using the helper script (recommended)**
-    ```bash
-    ./production.sh shell
-    # Then inside the container:
-    python manage.py createsuperuser
-    ```
-    *Note: This will show a production warning before opening the shell*
-
-    **Option B: Direct docker-compose command**
-    ```bash
-    docker-compose -f docker-compose.production.yml exec web_prod python manage.py createsuperuser
-    ```
-
-    **Option C: Using local venv (if you prefer)**
-    1. Ensure you are in your venv
-
-        ```bash
-        source .venv/bin/activate  # Linux/Mac
-        .venv\Scripts\activate     # Windows
-        ```
-
-    2. Typing:
-
-        ```bash
-        python manage.py createsuperuser
-        ```
-
-        If python doesn't work ensure you can run this as:
-
-        ```bash
-        python3 manage.py createsuperuser
-        ```
-
-    3. Enter the username, email, and password when prompted
-
-7. Ensure you have Heroku CLI installed, you can check by typing.
-
-    ```bash
-    heroku --version
-    ```
-
-    You should have Heroku return what version you have
-
-    If you do not have a version appear then install Heroku CLI from [here](https://devcenter.heroku.com/articles/heroku-cli)
-
-8. Log into Heroku and Heroku Container Registry
-
-    ```bash
-    heroku login
-    heroku container:login
-    ```
-
-9. Create your app in Heroku
-
-    ```bash
-    heroku create pointless-impressions
-    ```
-
-10. Push the docker image to Heroku
-
-    ```bash
-    heroku container:push web --app pointless-impressions --context-dir .
-    ```
-
-11.  Create the config vars in Heroku CLI
-
-    ```bash
-    heroku config:set \
-    ALLOWED_HOSTS= \
-    DJANGO_SECRET_KEY= \
-    DJANGO_DEBUG=False \
-    DJANGO_ALLOWED_HOSTS= \
-    DJANGO_SETTINGS_MODULE= \
-    PRODUCTION_DB_NAME= \
-    PRODUCTION_DB_USER= \
-    PRODUCTION_DB_PASSWORD= \
-    PRODUCTION_DB_HOST= \
-    PRODUCTION_DB_PORT= \
-    EMAIL_BACKEND= \
-    EMAIL_HOST= \
-    EMAIL_PORT= \
-    EMAIL_USE_TLS= \
-    EMAIL_HOST_USER= \
-    EMAIL_HOST_PASSWORD= \
-    DEFAULT_FROM_EMAIL= \
-    CLOUDINARY_CLOUD_NAME= \
-    CLOUDINARY_API_KEY= \
-    CLOUDINARY_API_SECRET= \
-    AWS_STORAGE_BUCKET_NAME= \
-    AWS_S3_REGION_NAME= \
-    AWS_ACCESS_KEY_ID= \
-    AWS_SECRET_ACCESS_KEY= \
-    STRIPE_PUBLIC_KEY= \
-    STRIPE_SECRET_KEY= \
-    STRIPE_WH_SECRET= \
-    --app pointless-impressions
-    ```
-
-12. Release the container
-
-    ```bash
-    heroku container:release web --app pointless-impressions
-    ```
-
-13. Access the app
-
-    ```bash
-    heroku open --app pointless-impressions
-    ```
+3. Create a PR to merge changes into the `main` branch. Upon merging, the GitHub Actions workflow will automatically deploy the changes to the production environment on Heroku.

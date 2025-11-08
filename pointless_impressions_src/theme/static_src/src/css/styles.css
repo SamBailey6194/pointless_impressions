@@ -111,7 +111,7 @@
     padding: 0.5rem;
     border-radius: 0.25rem;
     box-shadow: none !important;
-    transition: border-color 0.2s ease, box-shadow 0.2s ease;                                                                               
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
   }
 
   .custom-input:focus {
@@ -121,6 +121,11 @@
   }
 
   .custom-input::placeholder {
+    color: var(--pointless-black) !important;
+  }
+
+  .card {
+    background-color: var(--pointless-white) !important;
     color: var(--pointless-black) !important;
   }
 
@@ -188,9 +193,15 @@
     font-family: var(--font-Poppins);
   }
 
-  .btn:hover {
+  .btn:hover,
+  .btn-active {
     background-color: var(--pointless-red);
     border-color: var(--pointless-yellow);
+  }
+
+  .btn-active:hover {
+    background-color: var(--pointless-yellow);
+    border-color: var(--pointless-blue);
   }
 
   .btn-circle {
@@ -438,14 +449,16 @@
   /* Dark Mode Overrides */
   @media (prefers-color-scheme: dark) {
     .btn,
-    .btn-circle {
+    .btn-circle,
+    .btn-active:hover {
       background-color: var(--pointless-yellow);
       border-color: var(--pointless-blue);
       color: var(--pointless-black);
     }
 
     .btn:hover,
-    .btn-circle:hover {
+    .btn-circle:hover,
+    .btn-active {
       background-color: var(--pointless-red);
       border-color: var(--pointless-yellow);
     }
@@ -497,6 +510,178 @@
 }
 
 @layer components {
+  /* AutoComplete.js Styling - Custom design */
+  .autoComplete_wrapper {
+    display: inline-block;
+    position: relative;
+    width: 100%;
+  }
+
+  .autoComplete_wrapper > input {
+    height: 2.5rem;
+    width: 100%;
+    margin: 0;
+    padding: 0.5rem 1rem;
+    box-sizing: border-box;
+    font-size: 1rem;
+    text-overflow: ellipsis;
+    color: var(--pointless-black);
+    outline: none;
+    border-radius: 0.25rem 0 0 0.25rem;
+    border: 1px solid var(--pointless-blue);
+    background-color: var(--pointless-white);
+    transition: all 0.3s ease;
+  }
+
+  .autoComplete_wrapper > input::placeholder {
+    color: var(--pointless-black);
+    opacity: 0.6;
+    transition: all 0.3s ease;
+  }
+
+  .autoComplete_wrapper > input:hover::placeholder {
+    opacity: 0.8;
+    transition: all 0.3s ease;
+  }
+
+  .autoComplete_wrapper > input:focus::placeholder {
+    opacity: 0.5;
+  }
+
+  .autoComplete_wrapper > input::selection {
+    background-color: var(--pointless-yellow);
+    color: var(--pointless-blue);
+  }
+
+  .autoComplete_wrapper > input:hover {
+    color: var(--pointless-black);
+    transition: all 0.3s ease;
+  }
+
+  .autoComplete_wrapper > input:focus {
+    color: var(--pointless-black);
+    border: 1px solid var(--pointless-blue);
+    box-shadow: 0 0 0 3px rgba(5, 81, 135, 0.2);
+  }
+
+  .autoComplete_wrapper > ul {
+    position: absolute;
+    max-height: 20rem;
+    overflow-y: auto;
+    box-sizing: border-box;
+    left: 0;
+    right: 0;
+    top: 100%;
+    margin: 0;
+    padding: 0;
+    z-index: 50;
+    list-style: none;
+    border-radius: 0;
+    background-color: var(--pointless-white);
+    border: 1px solid var(--pointless-blue);
+    border-top: none;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    outline: none;
+    transition: opacity 0.15s ease-in-out;
+  }
+
+  .autoComplete_wrapper > ul[hidden],
+  .autoComplete_wrapper > ul:empty {
+    display: block;
+    opacity: 0;
+    transform: scale(0);
+  }
+
+  .autoComplete_wrapper > ul > li {
+    margin: 0;
+    padding: 0.75rem 1rem;
+    text-align: left;
+    font-size: 1rem;
+    color: var(--pointless-black);
+    border-radius: 0;
+    background-color: var(--pointless-white);
+    border-bottom: 1px solid #e5e7eb;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    transition: all 0.2s ease;
+  }
+
+  .autoComplete_wrapper > ul > li:last-child {
+    border-bottom: none;
+  }
+
+  .autoComplete_wrapper > ul > li mark {
+    background-color: var(--pointless-yellow);
+    color: var(--pointless-blue);
+    font-weight: 600;
+    padding: 0.1rem 0.2rem;
+    border-radius: 0.15rem;
+  }
+
+  .autoComplete_wrapper > ul > li:hover {
+    cursor: pointer;
+    background-color: var(--pointless-yellow);
+    color: var(--pointless-blue);
+  }
+
+  .autoComplete_wrapper > ul > li[aria-selected="true"] {
+    background-color: var(--pointless-yellow);
+    color: var(--pointless-blue);
+    font-weight: 500;
+  }
+
+  /* Dark Mode Support */
+  @media (prefers-color-scheme: dark) {
+    .autoComplete_wrapper > input {
+      background-color: var(--pointless-black);
+      color: var(--pointless-white);
+      border-color: var(--pointless-blue);
+    }
+
+    .autoComplete_wrapper > input::placeholder {
+      color: var(--pointless-white);
+      opacity: 0.6;
+    }
+
+    .autoComplete_wrapper > ul {
+      background-color: var(--pointless-black);
+      border-color: var(--pointless-blue);
+    }
+
+    .autoComplete_wrapper > ul > li {
+      background-color: var(--pointless-black);
+      color: var(--pointless-white);
+      border-bottom-color: #374151;
+    }
+
+    .autoComplete_wrapper > ul > li:hover,
+    .autoComplete_wrapper > ul > li[aria-selected="true"] {
+      background-color: var(--pointless-yellow);
+      color: var(--pointless-black);
+    }
+
+    .autoComplete_wrapper > ul > li mark {
+      background-color: #fcd34d;
+      color: var(--pointless-black);
+    }
+  }
+
+  /* Mobile Responsive */
+  @media (max-width: 767px) {
+    .autoComplete_wrapper > input {
+      height: 2.25rem;
+      padding: 0.4rem 0.75rem;
+      font-size: 0.95rem;
+    }
+
+    .autoComplete_wrapper > ul > li {
+      padding: 0.5rem 0.75rem;
+      font-size: 0.95rem;
+    }
+  }
+
+
   /* Yellow Scrollbar Styling - Thick and Always Visible */
   .artwork-scrollbar::-webkit-scrollbar {
     height: 14px; /* Thicker scrollbar */

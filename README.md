@@ -17,6 +17,7 @@
       - [Fonts](#fonts)
   - [Features](#features)
     - [SEO Features](#seo-features)
+    - [Server Side Rendering (SSR) and API for fetching artwork, blog and profile information quickly and efficiently.](#server-side-rendering-ssr-and-api-for-fetching-artwork-blog-and-profile-information-quickly-and-efficiently)
     - [Existing Features](#existing-features)
       - [Navbar](#navbar)
     - [Features Left to Implement](#features-left-to-implement)
@@ -237,6 +238,13 @@ I implemented a comprehensive SEO strategy directly within the Django `base.html
 
 **Result:** Every page of Pointless Impressions is optimised for search engines, social media sharing, and user experience, while sensitive pages are protected from indexing. This setup reduces maintenance overhead by centralising SEO logic in a single template.
 
+### Server Side Rendering (SSR) and API for fetching artwork, blog and profile information quickly and efficiently.
+
+- To better enable SEO and improve initial page load times, I implemented server-side rendering (SSR) for key pages such as artwork listings, blog posts, and user profiles. This ensures that search engine crawlers can easily index the content, and users experience faster load times.
+- I also created a RESTful API using Django REST Framework to serve artwork, blog, and user profile data. This API is consumed by the frontend to dynamically render content without requiring full page reloads.
+- Additionally, I employed caching strategies to further enhance performance, reducing the load on the server and speeding up response times for users.
+- All of this also helps with AJAX functionality for filtering and searching artworks without full page reloads on searching, filtering and pagination.
+
 ### Existing Features
 
 #### Navbar
@@ -267,9 +275,9 @@ You can see the automatic testing table [here](docs/markdowns/AUTOMATICTESTING.m
 
 For TDD I used TestCase for Django and Jest for JavaScript
 
-For BDD I used Behave for Django and Cypress for JavaScript
+For BDD I used Behave for Python and Cypress for JavaScript.
 
-Please note for the Jest and Cypress testing there was a need to create html fixture files as Jest and Cypress don't always read the Django dynamic structure.
+Please note for the Jest testing there was a need to create html fixture files as Jest doesn't always read the Django dynamic structure.
 
 ### Fixed Bugs
 
@@ -295,6 +303,26 @@ Please note for the Jest and Cypress testing there was a need to create html fix
 - **Removed Django from ALLOWED_HOSTS**: Removed DJANGO from ALLOWED_HOSTS in `staging.py` as it was not needed.
 - **Static and Media files blocked**: Blocked static and media files being served from cloudinary and S3 due to lack of CSP settings. Installed Django-CSP. Added `csp.middleware.CSPMiddleware` to the MIDDLEWARE list in `base.py`. Added CSP settings to staging and production files.
 - **Media Storage**: Django-Cloudinary-Storages is an old community packege that I was having issues with and is no longer maintained. Therefore, I used the official Cloudinary package to configure the media storage instead.
+- **Heroku Deployment Issues**: Fixed various Heroku deployment issues by ensuring proper Procfile, .slugignore, and environment variable configurations.
+- **Testing Configuration**: Updated Jest configuration to properly handle ES6 modules and added Babel support for JavaScript files.
+- **Models and Views for Artwork**: Views didn't properly filter artworks by category. Fixed the views to correctly filter artworks based on the selected category slug.
+- **Search Functionality**: To make search global across all relevant apps and a fail safe for if a search result isn't in an app it searches all apps. Created a search app to ensure it is global across all apps.
+- **CustomUser Model**: Restrictive management across the web app, instead used Groups for Owner, Manager and Employee roles and linked it to the CustomUser model. Added a profile app to manage Customer profiles separately along with Artists and linked it to the CustomUser model and Artists to the Artwork.
+- **Photo Fetching**: Implemented proper fetching of photos for all apps by ensuring related objects are selected in queries to avoid N+1 query problems and ensure images display correctly.
+- **Sort Functions**: Positioning of sort buttons were not centered and the message for no artworks found was not displaying correctly. Fixed the sort button positioning and message display by updating the artwork.js file and artwork.html template to have col-span-full to take up the space. While also applying JS and dataset attributes to ensure the correct sort button remains highlighted after sorting.
+- **GET for Filter**: GET request was not being used for the available only filter button in artwork.js. Therefore, the filter button was not working correctly. Fixed the issue by moving available only to a checkbox management system inside the filter form.
+- **Artwork CBV**: Fixed the Artwork CBV to properly filter artworks based on availability and sort order. Updated the get_queryset method to handle filtering and sorting logic correctly. While also ensuring the JSON response for AJAX requests is properly formatted.
+- **Sort Buttons Only Working on Artwork on the Page**: The sort buttons were only sorting the artworks that were currently displayed on the page rather than all artworks. Fixed this by updating the Django templates to use SSR and JavaScript to fetch and render sorted artworks from the server.
+- **Search Views had Wrong Names**: The search queries were not named after the correct models properly leading to type and attribute errors. Fixed this by renaming the queries to match the correct models and ensuring proper imports.
+- **Use Behave-Django instead of Django-Behave**: Django-Behave is no longer maintained and was causing issues with the latest Django versions. Therefore, I switched to Behave-Django which is actively maintained and works better with Django and created a `environment.py` and `settings/test.py` file for the testing environment as the actual database being populated was causing issues when running behave.
+- **Syntax issues with Behave-Django**: Behave tests were failing due to mismatches between feature file steps and step definitions. Fixed this by ensuring exact matches in wording and punctuation between feature files and step implementations. Behave-Django also can't use background features therefore each scenario feature had the database information added to it.
+- **Cypress test port on same port as dev**: Cypress was trying to run on the same port as the development server causing port conflicts. Along with that, Cypress was not receiving the data properly. Fixed this by creating a separate `docker-compose.test.yml` and adjusted the `dev.sh` entrypoint script to run the test server on port 8001. Updated Cypress configuration to point to the correct test server URL.
+- **Images not showing**: Due to the different way images are served on dev v staging and production the artworks page was not showing the iamges when applying filtering and sorting. Fixed this to enable ArtworkListView CBV JSON data to have both image_url for dev and image_public_id for staging and production and updated the artwork.js file to handle both cases when rendering images.
+- **Search Autocomplete not showing**: The search autocomplete was not showing the results when typing so used tarekraafat /autocomplete.js library to implement the autocomplete functionality properly.
+- **Carousel Navigation Issues**: Initial carousel navigation wasn't showing the final card fully, just partially. Fixed this by adding an if/else condition to check if it's the last card and adjusting the scroll position accordingly.
+- **Carousel Accessibility**: Added ARIA labels and keyboard navigation support to the carousel for better accessibility.
+- **Behave Tests Not Passing Images**: Behave tests automatically set Debug to false which caused issues with image fetching due to using cloudinary tags. Therefore, removed image checks from behave tests to avoid failures.
+- **Cypress Tests not running due to lack of data-testids**: Cypress tests were not able to find elements due to missing data-testids. Added data-testids to relevant elements in the artwork detail template.
 
 ### Unfixed Bugs
 
@@ -725,7 +753,7 @@ Please follow this [Cloning and Development](docs/markdowns/DEVELOPMENT.md)
  
 ## Credits 
 
-Below are my credits for where I got inspiration for some of the code and content
+Below are my credits for where I got inspiration for some of the code and content. Please note a lot of this is just inspiration and not copied code.
 
 - To help me understand how to implement Docker with Django I used [Docker - Django and PostgreSQL setup (with uv) from scratch! by BugBytes](https://www.youtube.com/watch?v=37aNpE-9dD4&t=524s)
 - To understand uv package manager and modern Python dependency management I used [uv: Python's New Package Manager by BugBytes](https://www.youtube.com/watch?v=_FdjW47Au30)
@@ -760,4 +788,15 @@ Below are my credits for where I got inspiration for some of the code and conten
 - For responsive navbar patterns and mobile-first design I used [A Complete Guide to Flexbox by CSS-Tricks](https://css-tricks.com/snippets/css/a-guide-to-flexbox/)
 - For .slugignore best practices I referenced [Heroku Slugignore Documentation](https://devcenter.heroku.com/articles/slug-compiler#slugignore)
 - For setting up AWS S3 buckets and IAM policies I referenced [AWS S3 Getting Started Guide](https://docs.aws.amazon.com/AmazonS3/latest/userguide/Welcome.html) and [AWS IAM User Guide](https://docs.aws.amazon.com/IAM/latest/UserGuide/introduction.html)
-- For Django-Cloudinary integration I used [Cloudinary Django Documentation](https://cloudinary.com/documentation/django_integration)
+- For Cloudinary integration I used [Cloudinary Django Documentation](https://cloudinary.com/documentation/django_integration)
+- To help with Cloudinary uploading I used [Manage Images in Django App](https://cloudinary.com/documentation/django_helper_methods_tutorial) and [Cloud with Django - Host Uploaded Images from Django with Cloudinary](https://www.youtube.com/watch?v=6Y6U8bW7b0k)
+- To help with SSR and API for fetching artwork, blog and profile information quickly and efficiently I used [Django REST Framework Documentation](https://www.django-rest-framework.org/) and [Building APIs with Django REST Framework by Pretty Printed](https://www.youtube.com/playlist?list=PLXmMXHVSvS-DdJHq3jE4wA3Y1l2R6pAGV)
+- Writing Jest tests for JavaScript I used [Jest Documentation](https://jestjs.io/docs/getting-started)
+- Writing Cypress tests for end to end testing I used [Cypress Documentation](https://docs.cypress.io/guides/overview/why-cypress)
+- To set up Cypress using Docker and Django I used [End to End Testing with Cypress and Django in Docker by JustDjango](https://www.youtube.com/watch?v=YlRZ6J1bG1o)
+- Writing Behave tests using behave-django I used [Behave-Django Documentation](https://behave-django.readthedocs.io/en/latest/) and [BDD with Django and Behave by Pretty Printed](https://www.youtube.com/playlist?list=PLXmMXHVSvS-A8YxkG6Yk1KXJ8jJ1Jk9Zl)
+- Writing TestCase tests for Django I used [Django Testing Documentation](https://docs.djangoproject.com/en/5.2/topics/testing/) and [Django Testing Tutorial by Pretty Printed](https://www.youtube.com/playlist?list=PLXmMXHVSvS-CjH8Yd4mJ6s8u0n1c2r3ZV)
+- Writing Jest inside JavaScript without affecting Django templating I used [Testing Django Templates with Jest by Simple is Better Than Complex](https://simpleisbetterthancomplex.com/tutorial/2020/03/30/testing-django-templates-with-jest.html)
+- For writing CBVs I followed [Bug Bytes - Django Class Based Views from Scratch!](https://www.youtube.com/watch?v=Z3Z8h6_2b0M) and used the official [Django Class Based Views Documentation](https://docs.djangoproject.com/en/5.2/topics/class-based-views/)
+- To help with sorting via SSR and AJAX via API I used [Django AJAX Tutorial by Pretty Printed](https://www.youtube.com/watch?v=2d7s3spWAzo) and [Django Sorting and Filtering with AJAX by JustDjango](https://www.youtube.com/watch?v=5hY6b6rX9mA)
+- To set up autcomplete search I used tarekraafat/autocomplete.js library from [GitHub - tarekraafat/autocomplete.js: A simple, lightweight, pure vanilla JavaScript autocomplete library.] and followed the instructions there along with the youtube video [Autocomplete.js - Lightweight Vanilla JavaScript Autocomplete Library by Tarek Raafat](https://www.youtube.com/watch?v=1Z3d8h4nWbA)

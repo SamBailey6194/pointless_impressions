@@ -3,51 +3,43 @@ set -e
 
 echo "Starting production container..."
 
-# Change to the project directory
-cd /app/pointless_impressions_src
+# This uses the DATABASE_URL from the environment (e.g., Heroku Config Vars)
+echo "Waiting for database..."
+python /app/manage.py shell -c "
+import os
+import sys
+import time
+from django.db import connections
+from django.db.utils import OperationalError
 
-# Load environment variables from the app root
-if [ -f "/app/.env.production" ]; then
-    echo "Loading environment variables from /app/.env.production"
-    export $(grep -v '^#' /app/.env.production | xargs)
-fi
+db_conn = None
+db_url = os.environ.get('PRODUCTION_DB_URL')
 
-# Set Django settings module
-export DJANGO_SETTINGS_MODULE="${DJANGO_SETTINGS_MODULE:-pointless_impressions_src.pointless_impressions.settings.production}"
+if not db_url:
+    print('FATAL: PRODUCTION_DB_URL not set. Exiting.')
+    sys.exit(1)
 
-# Wait for services (database and cache)
-echo "Waiting for services to be ready..."
+retries = 30
+while retries > 0:
+    try:
+        db_conn = connections['default']
+        db_conn.cursor()
+        print('Database is ready!')
+        break
+    except OperationalError:
+        print('Database unavailable, waiting 1 second...')
+        time.sleep(1)
+    retries -= 1
 
-# Handle both DATABASE_URL (course database) and manual database config
-if [ -n "$DATABASE_URL" ]; then
-    echo "Using course DATABASE_URL for database connection"
-    # Extract host and port from DATABASE_URL for connection test
-    DB_HOST=$(echo $DATABASE_URL | sed 's/.*@//' | sed 's/:.*//')
-    DB_PORT=$(echo $DATABASE_URL | sed 's/.*://' | sed 's/\/.*//')
-    echo "Testing connection to $DB_HOST:$DB_PORT..."
-else
-    echo "Using manual database configuration"
-    DB_HOST="${PROD_DB_HOST:-db_prod}"
-    DB_PORT="${PROD_DB_PORT:-5432}"
-    echo "Testing connection to $DB_HOST:$DB_PORT..."
-fi
-
-# Wait for database with timeout
-timeout=60
-while ! nc -z $DB_HOST $DB_PORT; do
-    timeout=$((timeout - 1))
-    if [ $timeout -le 0 ]; then
-        echo "Error: Database connection timeout"
-        exit 1
-    fi
-    sleep 1
-done
-echo "Database connection successful."
+if db_conn is None:
+    print('FATAL: Could not connect to database. Exiting.')
+    sys.exit(1)
+"
 
 # Check if we can connect to the database
 echo "Testing database connection..."
 python /app/manage.py check --database default || {
-    echo "Error: Cannot connect to database. Please check your DATABASE_URL or production database settings."
+    echo "Error: Cannot connect to database. Please check your PRODUCTION_DB_URL or production database settings."
     exit 1
 }
 
@@ -58,22 +50,44 @@ python /app/manage.py migrate --noinput || {
     exit 1
 }
 
-# Collect static files
-echo "Collecting static files..."
-python /app/manage.py collectstatic --noinput --clear || {
-    echo "Warning: Static file collection failed, continuing..."
-}
-
 # Create cache table if needed (for database cache backend)
 echo "Creating cache tables if needed..."
-python /app/manage.py createcachetable 2>/dev/null || echo "Cache tables already exist or not needed."
+python /app/manage.py createcachetable
 
-# Show deployment info
-echo "Production deployment information:"
-echo "- Django settings module: ${DJANGO_SETTINGS_MODULE}"
-echo "- Debug mode: ${DJANGO_DEBUG:-False}"
-echo "- Allowed hosts: ${DJANGO_ALLOWED_HOSTS:-not set}"
-echo "- Database: $(echo $DATABASE_URL | sed 's/.*@//' | sed 's/\?.*//' || echo 'Local production database')"
+# Load initial data fixtures if database is empty
+echo "Checking if database is populated..."
+python /app/manage.py shell -c "
+from django.contrib.auth import get_user_model
+from django.core.management import call_command
+import os
+
+User = get_user_model()
+
+if User.objects.filter(username='superuser').exists():
+    print('Database already populated. Skipping fixture loading.')
+else:
+    print('Database is empty. Loading fixtures...')
+    try:
+        call_command('loaddata', 'account.json')
+        print('Loaded account.json')
+        call_command('loaddata', 'account_group.json')
+        print('Loaded account_group.json')
+        call_command('loaddata', 'profiles.json')
+        print('Loaded profiles.json')
+        call_command('loaddata', 'artwork_categories.json')
+        print('Loaded artwork_categories.json')
+        call_command('loaddata', 'artwork_framing_conditions.json')
+        print('Loaded artwork_framing_conditions.json')
+        call_command('loaddata', 'photo.json')
+        print('Loaded photo.json')
+        call_command('loaddata', 'artwork.json')
+        print('Loaded artwork.json')
+        print('All fixtures loaded successfully.')
+    except Exception as e:
+        print(f'Error loading fixtures: {e}')
+        print('Please check your fixture files and paths.')
+        os._exit(1) # Exit with an error code
+"
 
 # Start Gunicorn with production settings
 echo "Starting Gunicorn production server..."

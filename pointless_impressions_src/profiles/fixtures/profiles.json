@@ -1,0 +1,70 @@
+[
+    {
+        "model": "profiles.UserProfile",
+        "fields": { "user": 1 }
+    },
+    {
+        "model": "profiles.Customer",
+        "fields": { "user": 1 }
+    },
+    {
+        "model": "profiles.UserProfile",
+        "fields": { "user": 2 }
+    },
+    {
+        "model": "profiles.Customer",
+        "fields": { "user": 2 }
+    },
+    {
+        "model": "profiles.UserProfile",
+        "fields": { "user": 3 }
+    },
+    {
+        "model": "profiles.Customer",
+        "fields": { "user": 3 }
+    },
+    {
+        "model": "profiles.UserProfile",
+        "fields": { "user": 4 }
+    },
+    {
+        "model": "profiles.Customer",
+        "fields": { "user": 4 }
+    },
+    {
+        "model": "profiles.UserProfile",
+        "fields": { "user": 5 }
+    },
+    {
+        "model": "profiles.Customer",
+        "fields": { "user": 5 }
+    },
+    {
+        "model": "profiles.UserProfile",
+        "fields": { "user": 6 }
+    },
+    {
+        "model": "profiles.Customer",
+        "fields": { "user": 6 }
+    },
+    {
+        "model": "profiles.UserProfile",
+        "fields": { "user": 7 }
+    },
+    {
+        "model": "profiles.Customer",
+        "fields": { "user": 7 }
+    },
+    {
+        "model": "profiles.Artist",
+        "fields": { 
+            "user": 7, 
+            "bio": "Passionate artist specializing in digital illustrations and concept art.",
+            "portfolio_url": "https://artist7portfolio.com",
+            "social_links": {
+                "instagram": "https://instagram.com/artist7",
+                "x": "https://x.com/artist7"
+            }
+        }
+    }
+]

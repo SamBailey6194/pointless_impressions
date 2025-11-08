@@ -3,34 +3,39 @@ set -e
 
 echo "Starting staging container..."
 
-# Change to Django project directory for proper imports
-cd /app/pointless_impressions_src
+# This is a more robust way to wait for the external database
+# It uses the STAGING_DB_URL from the environment.
+echo "Waiting for database..."
+python /app/manage.py shell -c "
+import os
+import sys
+import time
+from django.db import connections
+from django.db.utils import OperationalError
 
-# Load environment variables
-if [ -f "/app/.env.staging" ]; then
-    echo "Loading environment variables from .env.staging..."
-    export $(grep -v '^#' /app/.env.staging | xargs)
-fi
+db_conn = None
+db_url = os.environ.get('STAGING_DB_URL')
 
-# Set default database connection variables for staging
-DB_HOST=${STAGING_DB_HOST:-${STAGING_DB_URL:-db_staging}}
-DB_PORT=${STAGING_DB_PORT:-5432}
+if not db_url:
+    print('STAGING_DB_URL not set. Exiting.')
+    sys.exit(1)
 
-# Wait for database (supports both manual config and STAGING_DB_URL)
-if [ -n "$STAGING_DB_URL" ]; then
-    echo "Using STAGING_DB_URL for database connection..."
-    # Extract host from STAGING_DB_URL if needed for health check
-    DB_HOST=$(echo $STAGING_DB_URL | sed -n 's/.*@\([^:]*\):.*/\1/p')
-    echo "Waiting for database at $DB_HOST..."
-    # Simple wait for STAGING_DB_URL connection
-    sleep 5
-else
-    echo "Waiting for database at $DB_HOST:$DB_PORT..."
-    while ! nc -z $DB_HOST $DB_PORT; do
-        sleep 1
-    done
-fi
-echo "Database connection ready."
+retries = 30
+while retries > 0:
+    try:
+        db_conn = connections['default']
+        db_conn.cursor()
+        print('Database is ready!')
+        break
+    except OperationalError:
+        print('Database unavailable, waiting 1 second...')
+        time.sleep(1)
+    retries -= 1
+
+if db_conn is None:
+    print('Could not connect to database. Exiting.')
+    sys.exit(1)
+"
 
 # Check if we can connect to the database
 echo "Testing database connection..."
@@ -38,6 +43,7 @@ python /app/manage.py check --database default || {
     echo "Error: Cannot connect to database. Please check your STAGING_DB_URL or staging database settings."
     exit 1
 }
+echo "Database connection ready."
 
 # Run database migrations
 echo "Running Django migrations..."
@@ -46,28 +52,40 @@ python /app/manage.py migrate --noinput || {
     exit 1
 }
 
-# Collect static files
-echo "Collecting static files..."
-python /app/manage.py collectstatic --noinput --clear || {
-    echo "Warning: Static file collection failed, continuing..."
-}
-
 # Create cache table if needed (for database cache backend)
 echo "Creating cache tables if needed..."
-python /app/manage.py createcachetable 2>/dev/null || echo "Cache tables already exist or not needed."
+python /app/manage.py createcachetable
 
-# Show deployment info
-echo "Staging deployment information:"
-echo "- Django settings module: ${DJANGO_SETTINGS_MODULE:-pointless_impressions_src.pointless_impressions.settings.staging}"
-echo "- Debug mode: ${DJANGO_DEBUG:-False}"
-echo "- Allowed hosts: ${DJANGO_ALLOWED_HOSTS:-not set}"
-echo "- Database: $(echo $STAGING_DB_URL | sed 's/.*@//' | sed 's/\?.*//' || echo 'Local staging database')"
+# Load initial data fixtures if database is empty
+echo "Checking if database is populated..."
+python /app/manage.py shell -c "
+from django.contrib.auth import get_user_model
+from django.core.management import call_command
+
+User = get_user_model()
+
+if User.objects.filter(pk=5, username='superuser').exists():
+    print('Database is already populated. Skipping fixtures.')
+else:
+    print('Database is empty. Loading initial data fixtures...')
+    try:
+        call_command('loaddata', 'account.json')
+        call_command('loaddata', 'account_group.json')
+        call_command('loaddata', 'profiles.json')
+        call_command('loaddata', 'artwork_categories.json')
+        call_command('loaddata', 'artwork_framing_conditions.json')
+        call_command('loaddata', 'photo.json')
+        call_command('loaddata', 'artwork.json')
+        print('All fixtures loaded successfully.')
+    except Exception as e:
+        print(f'Error loading fixtures: {e}')
+        # Exit with error if fixtures are required but fail
+        exit(1)
+"
 
 # Start Gunicorn with improved settings for staging
 echo "Starting Gunicorn staging server..."
-export PYTHONPATH="/app/pointless_impressions_src:$PYTHONPATH"
-export DJANGO_SETTINGS_MODULE="pointless_impressions_src.pointless_impressions.settings.staging"
-exec gunicorn pointless_impressions.wsgi:application \
+exec gunicorn pointless_impressions_src.pointless_impressions.wsgi:application \
     --bind 0.0.0.0:8000 \
     --workers 1 \
     --max-requests 1000 \

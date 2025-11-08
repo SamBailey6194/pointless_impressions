@@ -13,22 +13,24 @@
       {% comment %} SEO Meta Tags {% endcomment %}
 
       {% comment %} Dynamic Meta Description based on page type {% endcomment %}
-      <meta name="description" content="{% if product %}{{ product.description|striptags|truncatechars:155 }}{% elif post %}{{ post.meta_description|striptags|truncatechars:155 }}{% elif category %}{{ category.description|striptags|truncatechars:155 }}{% elif page_slug == 'about' %}Learn about Pointless Impressions, our mission, values, and the artists we support.{% else %}Discover and buy unique Pointillism art online at Pointless Impressions. Explore curated pieces, artist stories, and art education.{% endif %}" />
+      <meta name="description" content="{% if product %}{{ artwork.description|striptags|truncatechars:155 }}{% elif post %}{{ post.meta_description|striptags|truncatechars:155 }}{% elif page_slug == 'about' %}Learn about Pointless Impressions, our mission, values, and the artists we support.{% else %}Discover and buy unique Pointillism art online at Pointless Impressions. Explore curated pieces, artist stories, and art education.{% endif %}" />
 
       {% comment %} Open Graph Tags {% endcomment %}
-      <meta property="og:title" content="{% block og_title %}{% if product %}{{ product.name|truncatechars:200|striptags }} | Pointless Impressions{% elif post %}{{ post.title|striptags }} | Pointless Impressions{% elif category %}{{ category.name|truncatechars:200|striptags }} | Pointless Impressions{% elif page_slug == 'about' %}About Us | Pointless Impressions{% else %}Pointless Impressions – Unique Pointillism Art{% endif %}{% endblock %}" />
-      <meta property="og:description" content="{% if product %}{{ product.description|striptags|truncatechars:155 }}{% elif post %}{{ post.meta_description|striptags|truncatechars:155 }}{% elif category %}{{ category.description|striptags|truncatechars:155 }}{% elif page_slug == 'about' %}Learn about Pointless Impressions, our mission, values, and the artists we support.{% else %}Discover and buy unique Pointillism art online at Pointless Impressions. Explore curated pieces, artist stories, and art education.{% endif %}" />
+      <meta property="og:title" content="{% block og_title %}{% if artwork %}{{ artwork.name|truncatechars:200|striptags }} | Pointless Impressions{% elif post %}{{ post.title|striptags }} | Pointless Impressions{% elif page_slug == 'about' %}About Us | Pointless Impressions{% else %}Pointless Impressions – Unique Pointillism Art{% endif %}{% endblock %}" />
+      <meta property="og:description" content="{% if artwork %}{{ artwork.description|striptags|truncatechars:155 }}{% elif post %}{{ post.meta_description|striptags|truncatechars:155 }}{% elif page_slug == 'about' %}Learn about Pointless Impressions, our mission, values, and the artists we support.{% else %}Discover and buy unique Pointillism art online at Pointless Impressions. Explore curated pieces, artist stories, and art education.{% endif %}" />
       <meta property="og:type" content="website" />
       <meta property="og:site_name" content="Pointless Impressions" />
 
       {% comment %} Open Graph Image Block: Dev uses local files, Prod uses Cloudinary {% endcomment %}
-      {% if product.image %}
-          <meta property="og:image" content="{% cloudinary_url product.image width=1200 height=630 crop='fill' format='auto' quality='auto' %}">
+      {% comment %}
+      {% if artwork.image %}
+          <meta property="og:image" content="{% cloudinary_url artwork.image width=1200 height=630 crop='fill' format='auto' quality='auto' %}">
       {% elif post.featured_image %}
           <meta property="og:image" content="{% cloudinary_url post.featured_image width=1200 height=630 crop='fill' format='auto' quality='auto' %}">
-      {% else %}
-          <meta property="og:image" content="{% cloudinary_url 'qzdky29kboidek5sm5qs' width=1200 height=630 crop='fill' format='auto' quality='auto' %}">
+      {% elif site_logo %}
+          <meta property="og:image" content="{% cloudinary_url site_logo.image width=1200 height=630 crop='fill' format='auto' quality='auto' %}">
       {% endif %}
+      {% endcomment %}
 
       {% comment %} Robots Meta Tags {% endcomment %}
       {% if page_slug == "login" or page_slug == "signup" or page_slug == "checkout" or page_slug == "account" or page_slug == "admin" %}
@@ -43,11 +45,24 @@
       <link rel="canonical" href="{{ request.build_absolute_uri }}" />
       
       {% comment %} Favicon {% endcomment %}
-      {% if production %}
-        {% cloudinary_url 'qzdky29kboidek5sm5qs' width=32 height=32 crop='fit' format='png' quality='auto' as favicon_url %}
-        <link rel="icon" type="image/png" href="{{ favicon_url }}" />
+      {% if production and site_logo %}
+          {# Modern browsers with auto format (AVIF/WebP/PNG fallback) #}
+          {% cloudinary_url site_logo_white_bg.image width=32 height=32 crop='fit' format='auto' quality='auto' as favicon_32 %}
+          <link rel="icon" type="image/png" sizes="32x32" href="{{ favicon_32 }}">
+          
+          {% cloudinary_url site_logo_white_bg.image width=16 height=16 crop='fit' format='auto' quality='auto' as favicon_16 %}
+          <link rel="icon" type="image/png" sizes="16x16" href="{{ favicon_16 }}">
+          
+          {# Apple Touch Icon #}
+          {% cloudinary_url site_logo_white_bg.image width=180 height=180 crop='fit' format='auto' quality='auto' as apple_touch %}
+          <link rel="apple-touch-icon" href="{{ apple_touch }}">
+          
+          {# Android Chrome #}
+          {% cloudinary_url site_logo_white_bg.image width=192 height=192 crop='fit' format='auto' quality='auto' as android_192 %}
+          <link rel="icon" type="image/png" sizes="192x192" href="{{ android_192 }}">
       {% else %}
-        <link rel="icon" type="image/png" href="{{ MEDIA_URL }}logo_white_01.png" />
+          {# Fallback for dev #}
+          <link rel="icon" type="image/png" href="{{ MEDIA_URL }}site_assets/pointless_impressions_logo_white_bg.png">
       {% endif %}
     {% endblock %}
 
@@ -55,19 +70,25 @@
     {% endblock %}
 
     <title>{% block title %}{% if product %}{{ product.name|striptags }} | Pointless Impressions{% elif post %}{{ post.title|striptags }} | Pointless Impressions{% elif category %}{{ category.name|striptags }} | Pointless Impressions{% elif page_slug == 'about' %}About Us | Pointless Impressions{% else %}Pointless Impressions – Unique Pointillism Art{% endif %}{% endblock %}</title>
-
+    
     {% tailwind_preload_css %}
+    
     {% tailwind_css %}
 
     {% block corejs %}
       <script src="https://kit.fontawesome.com/b28d0f6314.js" crossorigin="anonymous"></script>
+      <script src="https://cdn.jsdelivr.net/npm/@tarekraafat/autocomplete.js@10.2.9/dist/autoComplete.min.js"></script>
+      <script src="{% static 'js/general.js' %}" defer></script>
+      <script src="{% static 'js/header_footer.js' %}" defer></script>
     {% endblock %}
+
+    {% block extracss %}{% endblock %}
 
     {% block extra_head %}{% endblock %}
 
   </head>
 
-  <body class="leading-normal tracking-normal">
+  <body class="leading-normal tracking-normal min-h-screen flex flex-col">
 
     {% comment %} Header Content Area {% endcomment %}
     <header class="fixed top-0 z-50 w-full">
@@ -77,7 +98,7 @@
     </header>
 
     {% comment %} Main Content Area {% endcomment %}
-    <main class="flex-1 pt-24 md:pt-28 lg:pt-32">
+    <main class="flex-grow pt-24 md:pt-28 lg:pt-32">
       {% comment %} Full Content Block for pages that need complete control {% endcomment %}
       {% block content %}
         
@@ -119,6 +140,7 @@
 
     {% comment %} Modals and Overlays {% endcomment %}
     {% block modals %}
+      {% include 'includes/review_modal.html' %}
     {% endblock %}
 
     {% comment %} Extra Modals and Overlays {% endcomment %}
@@ -142,7 +164,31 @@
 
     {% comment %} Extra JavaScript Files {% endcomment %}
     {% block postloadjs %}
-      <script src="{% static 'js/header_footer.js' %}" defer></script>
+      <script>
+        // Accessing the Django settings directly
+        const IS_CLOUD_HOSTED = "{{ PRODUCTION }}" === "True";
+        const CLOUD_NAME = "{{ settings.CLOUDINARY_CLOUD_NAME|default:'' }}";
+        
+        // Set the base URL dynamically
+        const MEDIA_BASE_URL = IS_CLOUD_HOSTED 
+          ? `https://res.cloudinary.com/${CLOUD_NAME}/image/upload/`
+          : "{{ settings.MEDIA_URL }}";
+
+        // Global helper function (uses the base environment variables)
+        function getCloudinaryUrl(publicId, transformations) {
+            if (!IS_CLOUD_HOSTED || !publicId) {
+                // Fallback for local dev/missing ID
+                return `${MEDIA_BASE_URL}${publicId || 'placeholder.png'}`; 
+            }
+            
+            const tx = transformations || 'w_400,h_300,c_fill';
+            return `${MEDIA_BASE_URL}${tx},f_auto,q_auto/${publicId}`; 
+        }
+
+        // Define the Autocomplete URL
+        window.GLOBAL_URLS = window.GLOBAL_URLS || {}; 
+        window.GLOBAL_URLS.AUTOCOMPLETE_API = "{% url 'search:search_autocomplete' %}";
+      </script>
     {% endblock %}
   </body>
 
