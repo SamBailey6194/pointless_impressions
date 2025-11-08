@@ -35,6 +35,9 @@ Please copy the example to the relevant part for your tests.
           - [Artwork Admin CRUD Tests](#artwork-admin-crud-tests)
           - [Artwork Admin Permissions Tests](#artwork-admin-permissions-tests)
           - [Artwork Validation Tests](#artwork-validation-tests)
+          - [Artwork Form Tests](#artwork-form-tests)
+        - [Photo Form Tests](#photo-form-tests)
+          - [Photo Form Field Conditioning Tests](#photo-form-field-conditioning-tests)
     - [BDD Testing via Behave](#bdd-testing-via-behave)
       - [US001: Browse Available Artworks - In Artwork App](#us001-browse-available-artworks---in-artwork-app-1)
         - [Artwork Browsing Features](#artwork-browsing-features)
@@ -475,6 +478,51 @@ Running specific tests can be done following the below:
 | 8 | Create artwork with default availability | New artwork has is_available=True by default | Pass |
 | 9 | Create artwork with default featured status | New artwork has is_featured=False by default | Pass |
 | 10 | Attempt duplicate slug assignment | IntegrityError raised; unique constraint on `slug` enforced | Pass |
+
+###### Artwork Form Tests
+
+| Step | Action | Outcome | Pass / Fail |
+| :--- | :--- | :--- | :--- |
+| 1 | Submit ArtworkForm with all required fields | Form validates successfully and artwork can be created | Pass |
+| 2 | Submit ArtworkForm without name field | Form validation fails with error in `name` field | Pass |
+| 3 | Submit ArtworkForm without price field | Form validation fails with error in `price` field | Pass |
+| 4 | Submit ArtworkForm without description field | Form validation fails with error in `description` field | Pass |
+| 5 | Submit ArtworkForm with non-numeric price | Form validation fails with error in `price` field | Pass |
+| 6 | Submit ArtworkForm with negative price | Form validation fails; negative prices rejected | Pass |
+| 7 | Save valid ArtworkForm | New artwork object created with all form data | Pass |
+| 8 | Submit ArtworkSubmissionForm with limited fields | Form validates with name, description, price, category only | Pass |
+| 9 | Check ArtworkSubmissionForm excludes admin fields | Form does not include `is_featured`, `sku`, `is_available` fields | Pass |
+| 10 | Save ArtworkSubmissionForm with artist parameter | Artwork saves with artist set from parameter; is_available defaults to False | Pass |
+| 11 | Submit ArtworkApprovalForm with valid data | Form validates successfully with is_available field | Pass |
+| 12 | Check ArtworkApprovalForm field count | Form contains exactly 1 field: `is_available` | Pass |
+| 13 | Save ArtworkApprovalForm with instance | Artwork instance updated with approval status | Pass |
+| 14 | Submit ArtworkForm with framing conditions | Form validates and saves with ManyToMany framing conditions attached | Pass |
+| 15 | Submit ArtworkForm with decimal price | Form preserves decimal precision (e.g., 99.99) when saved | Pass |
+
+---
+
+### Photo Form Tests (DRY Approach)
+
+#### Photo Form Field Conditioning Tests
+
+Photo forms use a DRY (Don't Repeat Yourself) approach with conditional field inclusion based on `photo_type` parameter. A single `PhotoForm` base class handles artwork, profile, and site asset photos.
+
+| Step | Action | Outcome | Pass / Fail |
+| :--- | :--- | :--- | :--- |
+| 1 | Submit PhotoForm with photo_type='artwork' and valid artwork image | Form validates successfully with artwork, title, description, image, alt_text fields | Pass |
+| 2 | Submit PhotoForm with photo_type='profile' and valid profile image | Form validates successfully with title, description, image, alt_text fields (no artwork/asset fields) | Pass |
+| 3 | Submit PhotoForm with photo_type='site_asset' and valid asset image | Form validates successfully with asset_identifier, title, description, image, alt_text fields | Pass |
+| 4 | Submit PhotoForm artwork type without artwork field | Form validation fails with error in `artwork` field | Pass |
+| 5 | Submit PhotoForm site_asset type without asset_identifier | Form validation fails with error in `asset_identifier` field | Pass |
+| 6 | Initialize PhotoForm with photo_type='artwork' | Form field 'asset_identifier' is excluded from form.fields | Pass |
+| 7 | Initialize PhotoForm with photo_type='site_asset' | Form field 'artwork' is excluded from form.fields | Pass |
+| 8 | Initialize PhotoForm with photo_type='profile' | Form fields 'artwork' and 'asset_identifier' are both excluded from form.fields | Pass |
+| 9 | Submit PhotoForm without title field | Form validation fails with error in `title` field | Pass |
+| 10 | Submit PhotoForm without description field | Form validation fails with error in `description` field | Pass |
+| 11 | Submit PhotoForm with title less than 3 characters | Form validation fails; title must be minimum 3 characters | Pass |
+| 12 | Submit PhotoForm with description less than 5 characters | Form validation fails; description must be minimum 5 characters | Pass |
+| 13 | Submit PhotoForm with alt_text exceeding 255 characters | Form validation fails; alt_text must be 255 characters or less | Pass |
+| 14 | Save valid PhotoForm with user parameter | Photo object saved with uploaded_by field set to provided user | Pass |
 
 ---
 
