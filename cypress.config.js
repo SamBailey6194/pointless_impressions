@@ -7,7 +7,7 @@ if (process.env.NODE_ENV !== "development") {
 
 export default defineConfig({
   e2e: {
-    baseUrl: "http://localhost:8000",
+    baseUrl: "http://localhost:8001",
     // Now relative to project root
     specPattern: "pointless_impressions_src/theme/static_src/src/tests.js/cypress/e2e/**/*.cy.js",
     supportFile: "pointless_impressions_src/theme/static_src/src/tests.js/cypress/support/e2e.js",

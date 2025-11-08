@@ -159,8 +159,11 @@ class ArtworkReview(models.Model):
         on_delete=models.CASCADE,
         related_name='reviews_written'
     )
-    review_text = models.TextField(blank=False)
-    rating = models.PositiveIntegerField(blank=False)
+    review_title = models.CharField(
+        max_length=255, blank=False, default='Review'
+    )
+    review_text = models.TextField(blank=False, default='')
+    rating = models.PositiveIntegerField(blank=False, default=5)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:

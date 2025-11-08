@@ -2,7 +2,7 @@
  * @jest-environment jsdom
  */
 
-import { renderArtworkList, filterAvailableArtworks, sortArtworksByPriceAsc, sortArtworksByPriceDesc, sortArtworksByName, sortArtworksByArtist } from '../../../../js/artwork.js';
+import { renderArtworkList, filterAvailableArtworks, sortArtworksByPriceAsc, sortArtworksByPriceDesc, sortArtworksByName, sortArtworksByArtist } from '../../../../js/artwork_list.js';
 
 describe('US001: Browse Pointillism Artwork (Frontend)', () => {
   let artworks;

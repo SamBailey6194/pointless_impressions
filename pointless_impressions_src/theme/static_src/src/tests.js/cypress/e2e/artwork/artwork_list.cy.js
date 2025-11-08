@@ -4,7 +4,7 @@ describe('US001: Browse Pointillism Artwork', () => {
 
   beforeEach(() => {
     // Use your global helper to visit and wait for page
-    cy.visitAndWait('http://localhost:8000/artworks/')
+    cy.visitAndWait('http://localhost:8001/artworks/')
   });
 
   it('displays available artwork', () => {

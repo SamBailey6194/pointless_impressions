@@ -14,11 +14,13 @@ click==8.3.0
 cloudinary==1.44.1
 colorama==0.4.6
 cookiecutter==2.6.0
+crispy-tailwind==1.0.3
 cucumber-expressions==18.0.1
 cucumber-tag-expressions==8.0.0
 dj-database-url==3.0.1
 Django==5.2.7
 django-browser-reload==1.21.0
+django-crispy-forms==2.4
 django-csp==4.0
 django-redis==6.0.0
 django-storages==1.14.6

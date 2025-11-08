@@ -8,10 +8,14 @@ urlpatterns = [
     path('', views.ArtworkListView.as_view(), name='list'),
     path('<slug:slug>/', views.ArtworkDetailView.as_view(), name='detail'),
     path('api/artworks/', views.ArtworkAPIView.as_view(), name='api_artworks'),
-    # ⚠️  DEVELOPMENT ONLY - Test data setup endpoint
     path(
         'api/setup-test-data/',
         views.setup_test_data,
         name='setup_test_data'
+    ),
+    path(
+        'reviews/submit/',
+        views.SubmitArtworkReviewView.as_view(),
+        name='submit-review'
     ),
 ]
