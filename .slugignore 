@@ -32,3 +32,13 @@ redis.conf
 # Generated / local CSS (will be hashed in build)
 # -----------------------------
 **/static/css/styles.css
+
+# -----------------------------
+# Media files - stored in Cloudinary, not needed in production
+# -----------------------------
+pointless_impressions_src/media/
+
+# -----------------------------
+# Coverage reports
+# -----------------------------
+coverage/
