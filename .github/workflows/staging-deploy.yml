@@ -21,7 +21,11 @@ jobs:
     - name: Login to Heroku Container Registry
       run: echo ${{ secrets.HEROKU_API_KEY }} | docker login --username=_ --password-stdin registry.heroku.com
 
-    - name: Build, Push and Release to Heroku (Staging App)
+    - name: Build and Push Docker Image to Heroku
       run: |
-        heroku container:push web --dockerfile Dockerfile.staging -a ${{ secrets.HEROKU_STAGING_APP_NAME }}
+        docker build -f Dockerfile.staging -t registry.heroku.com/${{ secrets.HEROKU_STAGING_APP_NAME }}/web:latest .
+        docker push registry.heroku.com/${{ secrets.HEROKU_STAGING_APP_NAME }}/web:latest
+
+    - name: Release to Heroku
+      run: |
         heroku container:release web -a ${{ secrets.HEROKU_STAGING_APP_NAME }}
