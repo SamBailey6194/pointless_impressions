@@ -31,6 +31,13 @@ Please copy the example to the relevant part for your tests.
         - [Artwork Views Tests](#artwork-views-tests)
         - [US002: View Artwork Details - In Artwork App](#us002-view-artwork-details---in-artwork-app)
           - [Artwork Detail View Tests](#artwork-detail-view-tests)
+        - [US008: Admin Upload and Manage Artwork - In Artwork App](#us008-admin-upload-and-manage-artwork---in-artwork-app)
+          - [Artwork Admin CRUD Tests](#artwork-admin-crud-tests)
+          - [Artwork Admin Permissions Tests](#artwork-admin-permissions-tests)
+          - [Artwork Validation Tests](#artwork-validation-tests)
+          - [Artwork Form Tests](#artwork-form-tests)
+        - [Photo Form Tests](#photo-form-tests)
+          - [Photo Form Field Conditioning Tests](#photo-form-field-conditioning-tests)
     - [BDD Testing via Behave](#bdd-testing-via-behave)
       - [US001: Browse Available Artworks - In Artwork App](#us001-browse-available-artworks---in-artwork-app-1)
         - [Artwork Browsing Features](#artwork-browsing-features)
@@ -417,6 +424,105 @@ Running specific tests can be done following the below:
 | 16 | Load detail page for artwork with reviews | Review count annotation is calculated correctly | Pass |
 | 17 | Load detail page for artwork | Review form is available in context | Pass |
 | 18 | Load detail page for artwork | All reviews ordered by newest first are in context | Pass |
+
+---
+
+##### US008: Admin Upload and Manage Artwork - In Artwork App
+
+###### Artwork Admin CRUD Tests
+
+| Step | Action | Outcome | Pass / Fail |
+| :--- | :--- | :--- | :--- |
+| 1 | Create artwork with all required fields | Artwork created with name, artist, description, price, category; SKU and slug auto-generated | Pass |
+| 2 | Create multiple artworks | Each artwork receives unique auto-generated SKU starting with "SKU-" | Pass |
+| 3 | Create artwork and verify slug generation | Artwork name "The Starry Night" generates slug "the-starry-night" | Pass |
+| 4 | Create artwork with framing conditions | Artwork created and framing conditions successfully added via ManyToMany relation | Pass |
+| 5 | Read artwork by ID | Admin can retrieve artwork by primary key with all fields intact | Pass |
+| 6 | Read artwork by slug | Admin can retrieve artwork using slug field for direct access | Pass |
+| 7 | Update artwork name | Admin can change artwork name and save; updated name persists | Pass |
+| 8 | Update artwork price | Admin can change artwork price; updated price persists | Pass |
+| 9 | Update artwork description | Admin can change artwork description; updated description persists | Pass |
+| 10 | Update artwork category | Admin can reassign artwork to different category; change persists | Pass |
+| 11 | Update artwork artist | Admin can reassign artwork to different artist; change persists | Pass |
+| 12 | Delete artwork | Admin can delete artwork; artwork no longer exists in database | Pass |
+| 13 | Mark artwork as sold out | Admin can set `is_available=False`; status persists | Pass |
+| 14 | Mark artwork as available | Admin can set `is_available=True` on unavailable artwork; status persists | Pass |
+| 15 | Mark artwork out of stock | Admin can set `quantity=0`; `is_in_stock` automatically becomes False | Pass |
+| 16 | Update artwork quantity | Admin can increase quantity; `is_in_stock` automatically becomes True | Pass |
+| 17 | Mark artwork as featured | Admin can set `is_featured=True`; status persists | Pass |
+| 18 | CRUD sequence: Create-Read-Update-Delete | Artwork progresses through full lifecycle correctly | Pass |
+
+###### Artwork Admin Permissions Tests
+
+| Step | Action | Outcome | Pass / Fail |
+| :--- | :--- | :--- | :--- |
+| 1 | Check add_artwork permission exists | Permission `add_artwork` created for Artwork model | Pass |
+| 2 | Check change_artwork permission exists | Permission `change_artwork` created for Artwork model | Pass |
+| 3 | Check delete_artwork permission exists | Permission `delete_artwork` created for Artwork model | Pass |
+| 4 | Check view_artwork permission exists | Permission `view_artwork` created for Artwork model | Pass |
+| 5 | Superuser has all artwork permissions | Superuser can execute add, change, delete, view operations | Pass |
+| 6 | Staff user can be assigned artwork permissions | Staff user without permissions; after granting `add_artwork`, user has permission | Pass |
+| 7 | Regular user lacks artwork permissions | Regular (non-staff) user lacks all artwork admin permissions by default | Pass |
+
+###### Artwork Validation Tests
+
+| Step | Action | Outcome | Pass / Fail |
+| :--- | :--- | :--- | :--- |
+| 1 | Create artwork with duplicate name | IntegrityError raised; unique constraint on `name` enforced | Pass |
+| 2 | Create artwork with duplicate SKU | IntegrityError raised; unique constraint on `sku` enforced | Pass |
+| 3 | Create artwork without description | Artwork created with empty description (TextField allows empty strings) | Pass |
+| 4 | Create artwork without price | IntegrityError raised; database NOT NULL constraint on `price` enforced | Pass |
+| 5 | Create artwork with decimal price | Artwork saves with precise decimal format (e.g., 99.99) | Pass |
+| 6 | Create artwork with two-decimal price | Price retrieved as string maintains precision (e.g., "199.99") | Pass |
+| 7 | Create artwork with default quantity | New artwork has quantity=0 by default | Pass |
+| 8 | Create artwork with default availability | New artwork has is_available=True by default | Pass |
+| 9 | Create artwork with default featured status | New artwork has is_featured=False by default | Pass |
+| 10 | Attempt duplicate slug assignment | IntegrityError raised; unique constraint on `slug` enforced | Pass |
+
+###### Artwork Form Tests
+
+| Step | Action | Outcome | Pass / Fail |
+| :--- | :--- | :--- | :--- |
+| 1 | Submit ArtworkForm with all required fields | Form validates successfully and artwork can be created | Pass |
+| 2 | Submit ArtworkForm without name field | Form validation fails with error in `name` field | Pass |
+| 3 | Submit ArtworkForm without price field | Form validation fails with error in `price` field | Pass |
+| 4 | Submit ArtworkForm without description field | Form validation fails with error in `description` field | Pass |
+| 5 | Submit ArtworkForm with non-numeric price | Form validation fails with error in `price` field | Pass |
+| 6 | Submit ArtworkForm with negative price | Form validation fails; negative prices rejected | Pass |
+| 7 | Save valid ArtworkForm | New artwork object created with all form data | Pass |
+| 8 | Submit ArtworkSubmissionForm with limited fields | Form validates with name, description, price, category only | Pass |
+| 9 | Check ArtworkSubmissionForm excludes admin fields | Form does not include `is_featured`, `sku`, `is_available` fields | Pass |
+| 10 | Save ArtworkSubmissionForm with artist parameter | Artwork saves with artist set from parameter; is_available defaults to False | Pass |
+| 11 | Submit ArtworkApprovalForm with valid data | Form validates successfully with is_available field | Pass |
+| 12 | Check ArtworkApprovalForm field count | Form contains exactly 1 field: `is_available` | Pass |
+| 13 | Save ArtworkApprovalForm with instance | Artwork instance updated with approval status | Pass |
+| 14 | Submit ArtworkForm with framing conditions | Form validates and saves with ManyToMany framing conditions attached | Pass |
+| 15 | Submit ArtworkForm with decimal price | Form preserves decimal precision (e.g., 99.99) when saved | Pass |
+
+---
+
+### Photo Form Tests (DRY Approach)
+
+#### Photo Form Field Conditioning Tests
+
+Photo forms use a DRY (Don't Repeat Yourself) approach with conditional field inclusion based on `photo_type` parameter. A single `PhotoForm` base class handles artwork, profile, and site asset photos.
+
+| Step | Action | Outcome | Pass / Fail |
+| :--- | :--- | :--- | :--- |
+| 1 | Submit PhotoForm with photo_type='artwork' and valid artwork image | Form validates successfully with artwork, title, description, image, alt_text fields | Pass |
+| 2 | Submit PhotoForm with photo_type='profile' and valid profile image | Form validates successfully with title, description, image, alt_text fields (no artwork/asset fields) | Pass |
+| 3 | Submit PhotoForm with photo_type='site_asset' and valid asset image | Form validates successfully with asset_identifier, title, description, image, alt_text fields | Pass |
+| 4 | Submit PhotoForm artwork type without artwork field | Form validation fails with error in `artwork` field | Pass |
+| 5 | Submit PhotoForm site_asset type without asset_identifier | Form validation fails with error in `asset_identifier` field | Pass |
+| 6 | Initialize PhotoForm with photo_type='artwork' | Form field 'asset_identifier' is excluded from form.fields | Pass |
+| 7 | Initialize PhotoForm with photo_type='site_asset' | Form field 'artwork' is excluded from form.fields | Pass |
+| 8 | Initialize PhotoForm with photo_type='profile' | Form fields 'artwork' and 'asset_identifier' are both excluded from form.fields | Pass |
+| 9 | Submit PhotoForm without title field | Form validation fails with error in `title` field | Pass |
+| 10 | Submit PhotoForm without description field | Form validation fails with error in `description` field | Pass |
+| 11 | Submit PhotoForm with title less than 3 characters | Form validation fails; title must be minimum 3 characters | Pass |
+| 12 | Submit PhotoForm with description less than 5 characters | Form validation fails; description must be minimum 5 characters | Pass |
+| 13 | Submit PhotoForm with alt_text exceeding 255 characters | Form validation fails; alt_text must be 255 characters or less | Pass |
+| 14 | Save valid PhotoForm with user parameter | Photo object saved with uploaded_by field set to provided user | Pass |
 
 ---
 
