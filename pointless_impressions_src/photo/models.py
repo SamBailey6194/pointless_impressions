@@ -2,7 +2,6 @@ from django.db import models
 from django.core.exceptions import ValidationError
 from django.conf import settings
 from cloudinary.models import CloudinaryField
-from .storage import OverwriteStorage
 
 
 # Create your models here.
@@ -65,19 +64,12 @@ class Photo(models.Model):
     title = models.CharField(max_length=255, blank=False)
     description = models.TextField(blank=False)
 
-    if settings.DEBUG:
-        # Dev: use local file storage
-        image = models.ImageField(
-            upload_to=artwork_image_path,
-            storage=OverwriteStorage()
-            )
-    else:
-        # Staging/Prod: use Cloudinary
-        image = CloudinaryField(
-            'image',
-            blank=False,
-            null=False
-        )
+    # Use Cloudinary for all environments (staging/prod required)
+    image = CloudinaryField(
+        'image',
+        blank=False,
+        null=False
+    )
 
     alt_text = models.CharField(max_length=255, blank=True)
     uploaded_at = models.DateTimeField(auto_now_add=True)
