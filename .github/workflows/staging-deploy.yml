@@ -30,12 +30,8 @@ jobs:
           heroku_app_name: ${{ secrets.HEROKU_STAGING_APP_NAME }}
           heroku_email: ${{ secrets.HEROKU_EMAIL }}
           usedocker: false
-
-      - name: Run Django Migrations
-        env:
-          DATABASE_URL: ${{ secrets.STAGING_DB_URL }}
-        run: |
-          heroku run python manage.py migrate -a ${{ secrets.HEROKU_STAGING_APP_NAME }}
+          run_migrations: true
+          run_collectstatic: true
 
       - name: Load Fixtures
         env:
@@ -49,9 +45,3 @@ jobs:
           heroku run python manage.py loaddata artwork.json -a ${{ secrets.HEROKU_STAGING_APP_NAME }}
           heroku run python manage.py loaddata photo.json -a ${{ secrets.HEROKU_STAGING_APP_NAME }}
           heroku run python manage.py loaddata profiles.json -a ${{ secrets.HEROKU_STAGING_APP_NAME }}
-
-      - name: Collect Static Files
-        env:
-          DATABASE_URL: ${{ secrets.STAGING_DB_URL }}
-        run: |
-          heroku run python manage.py collectstatic --noinput -a ${{ secrets.HEROKU_STAGING_APP_NAME }}
