@@ -16,6 +16,11 @@ This document outlines the manual tests to be carried out for each feature. Use 
       - [Test the Artwork Model and Database Queries](#test-the-artwork-model-and-database-queries)
     - [US002: View Artwork Details - In Artwork App](#us002-view-artwork-details---in-artwork-app)
       - [Test the Artwork Model and Detail Retrieval](#test-the-artwork-model-and-detail-retrieval)
+    - [US008: Admin Upload and Manage Artwork - In Artwork App](#us008-admin-upload-and-manage-artwork---in-artwork-app)
+      - [Test Artwork Admin CRUD Operations](#test-artwork-admin-crud-operations)
+      - [Test Artwork Form Submissions](#test-artwork-form-submissions)
+    - [Photo Form Tests](#photo-form-tests)
+      - [Test Photo Form DRY Approach](#test-photo-form-dry-approach)
   - [Frontend Testing](#frontend-testing)
     - [US001: Browse Available Artworks - In Artwork App](#us001-browse-available-artworks---in-artwork-app-1)
       - [Test the Artwork Listing Page](#test-the-artwork-listing-page)
@@ -93,6 +98,77 @@ Use `./dev.sh shell` to access the Django shell for executing the queries 2 to 1
 | 9 | Check category relationship: `print(artwork.category.name)` | Returns "Photography" for "City Icons 01"; verifies ForeignKey relationship is intact | Pass |
 | 10 | Check framing conditions: `print(list(artwork.selected_conditions.all()))` | Returns list of FramingCondition objects associated with artwork | Pass |
 | 11 | Attempt to retrieve non-existent artwork: `Artwork.objects.get(slug="fake-artwork")` | Raises `Artwork.DoesNotExist` exception (proper error handling) | Pass |
+
+---
+
+### US008: Admin Upload and Manage Artwork - In Artwork App
+
+#### Test Artwork Admin CRUD Operations
+
+Use `./dev.sh shell` to access the Django shell for executing these tests.
+
+| Step | Action | Expected Outcome | Pass / Fail |
+| :--- | :--- | :--- | :--- |
+| 1 | Access Django admin at http://localhost:8000/admin/ | Admin login page displays | Pass |
+| 2 | Log in with superuser credentials (username: admin) | Admin dashboard loads successfully | Pass |
+| 3 | Navigate to Artwork section in admin | Artwork list displays all existing artworks with columns: Name, Artist, Price, Category, Available, Stock, Featured | Pass |
+| 4 | Click "Add Artwork" button | Artwork creation form loads with fields: name, artist, description, price, category, framing conditions, main_photo, quantity, is_available, is_featured | Pass |
+| 5 | Fill all required fields and click "Save" | New artwork is created; admin displays success message and returns to artwork list showing new artwork | Pass |
+| 6 | Verify auto-generated SKU | New artwork has auto-generated SKU starting with "SKU-" (e.g., "SKU-12345") | Pass |
+| 7 | Verify auto-generated slug | New artwork slug is generated from name and URL-safe (e.g., "test-artwork" from "Test Artwork") | Pass |
+| 8 | Click on existing artwork to edit | Artwork edit form loads with all current values populated | Pass |
+| 9 | Modify artwork fields (name, price, category) and click "Save" | Artwork updates; success message displays; changes persist in artwork list | Pass |
+| 10 | Use admin action "Mark as available" | Select artwork and execute action; artwork is_available flag sets to True; list refreshes showing updated status | Pass |
+| 11 | Use admin action "Mark as sold out" | Select artwork and execute action; artwork is_available flag sets to False; list refreshes showing updated status | Pass |
+| 12 | Use admin action "Mark as featured" | Select artwork and execute action; artwork is_featured flag sets to True; list refreshes showing updated status | Pass |
+| 13 | Filter artwork list by category | Click category filter; list displays only artworks matching selected category | Pass |
+| 14 | Filter artwork list by availability | Click availability filter; list displays only available or unavailable artworks as selected | Pass |
+| 15 | Search artwork by name or SKU | Use search box; list filters to show only matching artworks | Pass |
+| 16 | Delete artwork | Click delete button or action; confirmation prompt appears; after confirming, artwork is removed from list and database | Pass |
+
+#### Test Artwork Form Submissions
+
+Use `./dev.sh shell` to test form validation in Django shell.
+
+| Step | Action | Expected Outcome | Pass / Fail |
+| :--- | :--- | :--- | :--- |
+| 1 | Submit ArtworkForm with all required fields | Form validates without errors; artwork saves to database | Pass |
+| 2 | Submit ArtworkForm without name field | Form shows validation error on name field (e.g., "This field is required") | Pass |
+| 3 | Submit ArtworkForm without price field | Form shows validation error on price field (e.g., "This field is required") | Pass |
+| 4 | Submit ArtworkForm without description field | Form shows validation error on description field | Pass |
+| 5 | Submit ArtworkForm with non-numeric price (e.g., "abc") | Form shows validation error: "Price must be a valid decimal number" | Pass |
+| 6 | Submit ArtworkForm with negative price (e.g., -50.00) | Form shows validation error: "Price must be greater than 0" | Pass |
+| 7 | Submit ArtworkForm with decimal price (e.g., 99.99) | Form accepts decimal format; saves with proper decimal precision | Pass |
+| 8 | Submit ArtworkSubmissionForm (artist workflow) | Form validates with limited fields: name, description, price, category (no is_featured, sku, is_available) | Pass |
+| 9 | Submit ArtworkSubmissionForm without artist pre-selection | Form saves with artist set from parameter; is_available defaults to False (pending approval) | Pass |
+| 10 | Submit ArtworkApprovalForm (admin approval) | Form validates with only is_available field; admin can approve artwork for sale | Pass |
+| 11 | Save ArtworkForm with framing conditions | Form accepts multiple framing conditions; saves ManyToMany relationships correctly | Pass |
+| 12 | Retrieve saved artwork and verify precision | Artwork price stored and retrieved as Decimal with 2 decimal places (e.g., "99.99") | Pass |
+
+---
+
+### Photo Form Tests
+
+#### Test Photo Form DRY Approach
+
+Use `./dev.sh shell` to test photo form behavior with conditional fields.
+
+| Step | Action | Expected Outcome | Pass / Fail |
+| :--- | :--- | :--- | :--- |
+| 1 | Initialize PhotoForm with photo_type='artwork' | Form includes fields: photo_type, title, description, image, alt_text, artwork; excludes asset_identifier | Pass |
+| 2 | Initialize PhotoForm with photo_type='profile' | Form includes base fields: photo_type, title, description, image, alt_text; excludes artwork and asset_identifier | Pass |
+| 3 | Initialize PhotoForm with photo_type='site_asset' | Form includes fields: photo_type, title, description, image, alt_text, asset_identifier; excludes artwork | Pass |
+| 4 | Submit PhotoForm artwork type with all fields including valid artwork | Form validates successfully; photo saves with artwork relationship | Pass |
+| 5 | Submit PhotoForm artwork type without artwork field | Form validation fails with error: "Artwork must be selected for artwork photos" | Pass |
+| 6 | Submit PhotoForm site_asset type with asset_identifier | Form validates successfully; photo saves with asset_identifier | Pass |
+| 7 | Submit PhotoForm site_asset type without asset_identifier | Form validation fails with error: "Asset identifier is required for site assets" | Pass |
+| 8 | Submit PhotoForm without title field | Form validation fails; title is required | Pass |
+| 9 | Submit PhotoForm without description field | Form validation fails; description is required | Pass |
+| 10 | Submit PhotoForm with title less than 3 characters (e.g., "ab") | Form validation fails: "Title must be at least 3 characters long" | Pass |
+| 11 | Submit PhotoForm with description less than 5 characters (e.g., "test") | Form validation fails: "Description must be at least 5 characters long" | Pass |
+| 12 | Submit PhotoForm with alt_text exceeding 255 characters | Form validation fails: "Alt text must be 255 characters or less" | Pass |
+| 13 | Save valid PhotoForm with user parameter | Photo saves with uploaded_by field set to provided user; user relationship persists | Pass |
+| 14 | Verify field exclusion logic at form level | Accessing form.fields['artwork'] raises KeyError for profile/site_asset types; no field pollution | Pass |
 
 ---
 
