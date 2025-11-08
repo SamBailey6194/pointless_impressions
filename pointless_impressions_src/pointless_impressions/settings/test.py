@@ -5,6 +5,7 @@ from .base import *
 
 SECRET_KEY = "test-secret-key"
 
+ENVIRONMENT = "development"
 ALLOWED_HOSTS = ['*']
 DEBUG = True
 PRODUCTION = False
@@ -46,3 +47,8 @@ LOGGING = {
         },
     },
 }
+
+# Force DEBUG and PRODUCTION for test environment
+# This ensures image handling uses local ImageField, not Cloudinary
+DEBUG = True
+PRODUCTION = False

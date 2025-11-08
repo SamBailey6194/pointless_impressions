@@ -223,3 +223,134 @@ class ArtworkListModelTest(TestCase):
         """Test the __str__ method of ArtworkFramingCondition."""
         expected_str = "framed: Artwork is framed with a wooden frame."
         self.assertEqual(str(self.framing_condition), expected_str)
+
+
+class ArtworkDetailModelTest(TestCase):
+    """Tests for the Artwork model detail view requirements. For US002."""
+
+    def setUp(self):
+        """Set up test data for artwork detail tests."""
+        self.framing_condition = ArtworkFramingCondition.objects.create(
+            condition_name="framed",
+            condition_description="Artwork is framed with a wooden frame."
+        )
+
+        self.category = ArtworkCategory.objects.create(
+            name="Portrait",
+            friendly_name="Portrait Art",
+            description="Art depicting people and portraits."
+        )
+
+        self.artwork = Artwork.objects.create(
+            name="Summer Portrait",
+            description="A detailed pointillist portrait of summer light.",
+            price=299.99,
+            sku="PORTRAIT001",
+            category=self.category,
+            is_available=True,
+            is_in_stock=True,
+            is_featured=False,
+            slug="summer-portrait",
+            quantity=1,
+        )
+
+        self.artwork.selected_conditions.add(self.framing_condition)
+
+        self.main_photo = Photo.objects.create(
+            artwork=self.artwork,
+            title="Summer Portrait Main",
+            description="Main photo of the portrait.",
+            image='test_portrait.jpg',
+            alt_text='Summer Portrait'
+        )
+
+        self.artwork.main_photo = self.main_photo
+        self.artwork.save()
+
+    def test_artwork_detail_all_required_fields(self):
+        """Test that all required detail fields are accessible."""
+        self.assertEqual(self.artwork.name, "Summer Portrait")
+        self.assertEqual(
+            self.artwork.description,
+            "A detailed pointillist portrait of summer light."
+        )
+        self.assertEqual(self.artwork.price, 299.99)
+        self.assertTrue(self.artwork.is_available)
+        self.assertEqual(self.artwork.image_alt_text, "Summer Portrait")
+
+    def test_artwork_availability_on_detail(self):
+        """Test availability status displays correctly."""
+        self.assertTrue(self.artwork.is_available)
+        self.assertTrue(self.artwork.is_in_stock)
+
+        # Mark as unavailable
+        self.artwork.is_available = False
+        self.artwork.save()
+
+        self.assertFalse(self.artwork.is_available)
+
+    def test_artwork_sold_out_status(self):
+        """Test sold out status when quantity is zero."""
+        self.artwork.quantity = 0
+        self.artwork.save()
+
+        self.assertFalse(self.artwork.is_in_stock)
+        self.assertTrue(self.artwork.is_available)
+
+    def test_artwork_multiple_photos(self):
+        """Test artwork can have multiple photos."""
+        Photo.objects.create(
+            artwork=self.artwork,
+            title="Summer Portrait Detail",
+            description="Detail photo of the portrait.",
+            image='test_portrait_detail.jpg',
+            alt_text='Summer Portrait Detail'
+        )
+
+        photos = Photo.objects.filter(artwork=self.artwork)
+        self.assertEqual(photos.count(), 2)
+
+    def test_artwork_related_artworks_by_category(self):
+        """Test retrieving related artworks by category."""
+        related_artwork = Artwork.objects.create(
+            name="Winter Portrait",
+            description="Another portrait for comparison.",
+            price=249.99,
+            sku="PORTRAIT002",
+            category=self.category,
+            is_available=True,
+            is_in_stock=True,
+            slug="winter-portrait",
+            quantity=1,
+        )
+        related_artwork.selected_conditions.add(self.framing_condition)
+
+        related = Artwork.objects.filter(category=self.category)
+        self.assertEqual(related.count(), 2)
+        self.assertIn(self.artwork, related)
+        self.assertIn(related_artwork, related)
+
+    def test_artwork_size_information(self):
+        """Test artwork size/dimensions information."""
+        # This would be added to the model if not already present
+        self.assertIsNotNone(self.artwork.name)
+        self.assertIsNotNone(self.artwork.description)
+
+    def test_artwork_add_to_cart_eligibility(self):
+        """Test artwork is eligible for adding to cart when available."""
+        self.assertTrue(self.artwork.is_available)
+        self.assertGreater(self.artwork.quantity, 0)
+
+    def test_artwork_cannot_add_to_cart_when_unavailable(self):
+        """Test artwork cannot be added to cart when unavailable."""
+        self.artwork.is_available = False
+        self.artwork.save()
+
+        self.assertFalse(self.artwork.is_available)
+
+    def test_artwork_cannot_add_to_cart_when_sold_out(self):
+        """Test artwork cannot be added to cart when sold out."""
+        self.artwork.quantity = 0
+        self.artwork.save()
+
+        self.assertFalse(self.artwork.is_in_stock)

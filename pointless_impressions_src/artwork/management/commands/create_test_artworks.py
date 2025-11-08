@@ -1,7 +1,7 @@
 """
 Django management command to create test artworks for E2E testing.
 
-⚠️  DEVELOPMENT ONLY - This command creates test data in the test database.
+DEVELOPMENT ONLY - This command creates test data in the test database.
 Only use with test.py settings (SQLite test database).
 """
 
@@ -19,15 +19,13 @@ from pointless_impressions_src.photo.models import Photo
 
 class Command(BaseCommand):
     help = (
-        '⚠️  DEVELOPMENT ONLY: Create test artworks for E2E testing. '
+        'DEVELOPMENT ONLY: Create test artworks for E2E testing. '
         'Only works with test.py settings.'
     )
 
     def handle(self, *args, **options):
         """Create test data for Cypress E2E tests."""
         from django.conf import settings
-
-        # SECURITY: Only allow in test mode
         db_name = settings.DATABASES.get('default', {}).get('NAME', '')
         is_test_mode = 'test' in db_name.lower()
 
@@ -121,7 +119,7 @@ class Command(BaseCommand):
                     updated_at=timezone.now(),
                 )
                 art.selected_conditions.add(default_framing_condition)
-                
+
                 # Create a Photo object for this artwork
                 photo = Photo.objects.create(
                     artwork=art,
@@ -132,11 +130,10 @@ class Command(BaseCommand):
                     alt_text=f"{art.name} artwork",
                     uploaded_by=default_artist_user
                 )
-                
+
                 # Set the photo as the main photo for the artwork
                 art.main_photo = photo
                 art.save()
-                
                 created_count += 1
                 self.stdout.write(
                     self.style.SUCCESS(

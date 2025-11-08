@@ -16,9 +16,6 @@ BASE_DIR = Path(__file__).resolve().parent.parent.parent
 ENV_PATH = BASE_DIR
 load_dotenv(os.path.join(ENV_PATH, ".env"))
 
-# Environment flag - should be overridden in environment-specific settings
-ENVIRONMENT = os.getenv("DJANGO_ENVIRONMENT", "development")
-
 # Application definition
 DJANGO_APPS = [
     "django.contrib.admin",
@@ -27,7 +24,6 @@ DJANGO_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    "behave_django",
 ]
 
 THIRD_PARTY_APPS = [
@@ -38,6 +34,11 @@ THIRD_PARTY_APPS = [
     # Storage backends
     "cloudinary",
     "storages",
+    # Testing tools
+    "behave_django",
+    # Form rendering
+    "crispy_forms",
+    "crispy_tailwind",
 ]
 
 LOCAL_APPS = [

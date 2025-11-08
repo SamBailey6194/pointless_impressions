@@ -9,11 +9,14 @@ from django.template.defaultfilters import truncatewords
 from django.views.decorators.http import require_http_methods
 from django.utils import timezone
 from django.contrib.auth import get_user_model
+from django.utils.decorators import method_decorator
 from .models import (
-    Artwork, ArtworkCategory, ArtworkFramingCondition
+    Artwork, ArtworkCategory, ArtworkFramingCondition, ArtworkReview
     )
+from .forms import ArtworkReviewForm
 from pointless_impressions_src.photo.models import Photo
 from pointless_impressions_src.profiles.models import Artist
+from pointless_impressions_src.profiles.mixins import CustomerRequiredMixin
 
 
 # ----------------------------
@@ -366,13 +369,47 @@ class ArtworkDetailView(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['production'] = not settings.DEBUG
-        context['placeholder_image'] = get_placeholder_image()
         artwork = self.get_object()
-        photos = artwork.photos.all()
-        if artwork.main_photo:
-            photos = photos.exclude(pk=artwork.main_photo.pk)
-        context['photos'] = photos
+        placeholder = get_placeholder_image()
+
+        serialized_data_list = _serialize_artwork_data(
+            [artwork], placeholder
+            )
+
+        artwork_data = serialized_data_list[0]
+
+        context['artwork_data'] = artwork_data
+
+        all_photos = artwork.photos.all()
+        context['carousel_photos'] = all_photos
+
+        context['prefetched_conditions'] = artwork.prefetched_conditions
+        context['reviews'] = artwork.reviews.all().order_by('-created_at')
+
+        if artwork.artist:
+            similar_artists = Artwork.objects.filter(
+                artist=artwork.artist
+            ).exclude(
+                pk=artwork.pk
+            ).select_related(
+                'main_photo', 'artist__user'
+            )[:10]
+            context['similar_artists'] = similar_artists
+
+        if artwork.category:
+            similar_artworks = Artwork.objects.filter(
+                category=artwork.category
+            ).exclude(
+                pk=artwork.pk
+            ).select_related(
+                'main_photo', 'artist__user'
+            )[:10]
+            context['similar_artworks'] = similar_artworks
+
+        context['review_form'] = ArtworkReviewForm()
+        context['production'] = not settings.DEBUG
+        context['debug'] = settings.DEBUG
+
         return context
 
 
@@ -578,3 +615,138 @@ def setup_test_data(request):
         return JsonResponse({
             'error': str(e)
         }, status=500)
+
+
+@method_decorator(require_http_methods(["POST"]), name='dispatch')
+class SubmitArtworkReviewView(CustomerRequiredMixin, View):
+    """
+    Handles creation and editing of artwork reviews by customers.
+
+    This view is protected by CustomerRequiredMixin, ensuring only
+    authenticated users with customer profiles can submit or edit reviews.
+    Each customer can only have one review per artwork (enforced by
+    database unique_together constraint). Attempting to review an artwork
+    twice will update the existing review.
+
+    **Access Control**
+    - Requires: Authenticated user with customer profile
+    - Returns 403 Forbidden if user is not a customer
+    - Returns 401 Unauthorized if user is not authenticated
+
+    **HTTP Methods**
+    - ``POST``: Submit or update artwork review
+
+    **POST Parameters**
+    - ``artwork_id`` (required): Primary key of the artwork being reviewed
+    - ``rating`` (required): Integer 1-5 rating value
+    - ``review_title`` (required): Title of the review
+    - ``review_text`` (required): Full review text (minimum 10 characters)
+
+    **Response Format (JSON)**
+    Success (200):
+    ```json
+    {
+        "success": true,
+        "message": "Review submitted successfully!" or "Review updated
+            successfully!"
+    }
+    ```
+
+    Error (400):
+    ```json
+    {
+        "error": "Please fix the errors in your review.",
+        "errors": {
+            "rating": ["field error message"],
+            "review_text": ["field error message"]
+        }
+    }
+    ```
+
+    **HTTP Status Codes**
+    - 200 OK: Review successfully created or updated
+    - 400 Bad Request: Form validation failed or missing artwork_id
+    - 401 Unauthorized: User is not authenticated
+    - 403 Forbidden: User is not a customer
+    - 404 Not Found: Artwork with given ID does not exist
+    - 500 Internal Server Error: Unexpected server error
+
+    **URL**
+    /artworks/reviews/submit/
+
+    **Behavior**
+    - **New Review**: Creates ArtworkReview with artwork FK and reviewer FK
+    - **Existing Review**: Updates existing review for same artwork+customer
+    - **Validation**: Enforces rating 1-5, title required, review min 10 chars
+    - **Customer Tied**: All reviews automatically tied to request.user
+    - **Edit Capability**: Customers can edit their own reviews via same
+        endpoint
+    """
+
+    def post(self, request):
+        # Get the artwork ID from POST data
+        artwork_id = request.POST.get('artwork_id')
+        if not artwork_id:
+            return JsonResponse({
+                'error': 'Artwork ID is required.'
+            }, status=400)
+
+        try:
+            artwork = Artwork.objects.get(id=artwork_id)
+        except Artwork.DoesNotExist:
+            return JsonResponse({
+                'error': 'Artwork not found.'
+            }, status=404)
+
+        # Check if user already has a review for this artwork
+        existing_review = ArtworkReview.objects.filter(
+            artwork=artwork,
+            reviewer=request.user
+        ).first()
+
+        # Get form data
+        rating = request.POST.get('rating')
+        review_title = request.POST.get('review_title')
+        review_text = request.POST.get('review_text')
+
+        # Validate form
+        form = ArtworkReviewForm(data={
+            'rating': rating,
+            'review_title': review_title,
+            'review_text': review_text
+        })
+
+        if not form.is_valid():
+            return JsonResponse({
+                'error': 'Please fix the errors in your review.',
+                'errors': form.errors
+            }, status=400)
+
+        try:
+            if existing_review:
+                # Update existing review
+                existing_review.rating = rating
+                existing_review.review_title = review_title
+                existing_review.review_text = review_text
+                existing_review.save()
+                message = 'Review updated successfully!'
+            else:
+                # Create new review
+                ArtworkReview.objects.create(
+                    artwork=artwork,
+                    reviewer=request.user,
+                    rating=rating,
+                    review_title=review_title,
+                    review_text=review_text
+                )
+                message = 'Review submitted successfully!'
+
+            return JsonResponse({
+                'success': True,
+                'message': message
+            }, status=200)
+
+        except Exception as e:
+            return JsonResponse({
+                'error': f'An error occurred: {str(e)}'
+            }, status=500)

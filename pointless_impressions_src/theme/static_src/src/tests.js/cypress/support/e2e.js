@@ -40,7 +40,7 @@ before(() => {
   
   cy.request({
     method: 'GET',
-    url: 'http://localhost:8000/artworks/api/setup-test-data/',
+    url: 'http://localhost:8001/artworks/api/setup-test-data/',
     failOnStatusCode: false
   }).then((response) => {
     if (response.status === 200 || response.status === 201) {
