@@ -19,6 +19,8 @@ jobs:
       run: cp Procfile.production Procfile
 
     - name: Login to Heroku Container Registry
+      env:
+        HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
       run: echo ${{ secrets.HEROKU_API_KEY }} | docker login --username=_ --password-stdin registry.heroku.com
 
     - name: Build and Push Docker Image to Heroku
@@ -27,5 +29,8 @@ jobs:
         docker push registry.heroku.com/${{ secrets.HEROKU_PRODUCTION_APP_NAME }}/web:latest
 
     - name: Release to Heroku
+      env:
+        HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
       run: |
+        heroku stack:set container -a ${{ secrets.HEROKU_PRODUCTION_APP_NAME }}
         heroku container:release web -a ${{ secrets.HEROKU_PRODUCTION_APP_NAME }}
