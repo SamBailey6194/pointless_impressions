@@ -56,31 +56,31 @@ python /app/manage.py migrate --noinput || {
 echo "Creating cache tables if needed..."
 python /app/manage.py createcachetable
 
-# Load initial data fixtures if database is empty
-echo "Checking if database is populated..."
+# Collect static files (for admin, CSS, JS)
+echo "Collecting static files..."
+python /app/manage.py collectstatic --noinput || {
+    echo "Warning: Static file collection failed. Continuing anyway..."
+}
+
+# Load initial data fixtures (always load to get latest data)
+echo "Loading initial data fixtures..."
 python /app/manage.py shell -c "
-from django.contrib.auth import get_user_model
 from django.core.management import call_command
 
-User = get_user_model()
-
-if User.objects.filter(pk=5, username='superuser').exists():
-    print('Database is already populated. Skipping fixtures.')
-else:
-    print('Database is empty. Loading initial data fixtures...')
-    try:
-        call_command('loaddata', 'account.json')
-        call_command('loaddata', 'account_group.json')
-        call_command('loaddata', 'profiles.json')
-        call_command('loaddata', 'artwork_categories.json')
-        call_command('loaddata', 'artwork_framing_conditions.json')
-        call_command('loaddata', 'photo.json')
-        call_command('loaddata', 'artwork.json')
-        print('All fixtures loaded successfully.')
-    except Exception as e:
-        print(f'Error loading fixtures: {e}')
-        # Exit with error if fixtures are required but fail
-        exit(1)
+print('Loading fixtures to ensure latest data...')
+try:
+    call_command('loaddata', 'account.json')
+    call_command('loaddata', 'account_group.json')
+    call_command('loaddata', 'profiles.json')
+    call_command('loaddata', 'artwork_categories.json')
+    call_command('loaddata', 'artwork_framing_conditions.json')
+    call_command('loaddata', 'photo.json')
+    call_command('loaddata', 'artwork.json')
+    print('All fixtures loaded successfully.')
+except Exception as e:
+    print(f'Error loading fixtures: {e}')
+    # Exit with error if fixtures fail
+    exit(1)
 "
 
 # Start Gunicorn with improved settings for staging
