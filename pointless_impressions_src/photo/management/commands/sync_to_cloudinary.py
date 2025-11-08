@@ -18,9 +18,6 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         recreate = options.get('recreate', False)
 
-        # Cloudinary is already configured in settings
-        # (cloudinary.config() is called in staging.py/production.py)
-
         photos = Photo.objects.all()
         self.stdout.write(f"Processing {photos.count()} photos...")
 
