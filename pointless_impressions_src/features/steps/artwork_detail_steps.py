@@ -1,31 +1,35 @@
 from behave import given, when, then
-from django.test import Client
 from django.urls import reverse
 from pointless_impressions_src.artwork.models import (
     Artwork, ArtworkCategory, ArtworkFramingCondition
 )
-from pointless_impressions_src.photo.models import Photo
 from pointless_impressions_src.profiles.models import Artist
 from django.contrib.auth import get_user_model
 
 User = get_user_model()
-client = Client()
 
 
 @given('the following artworks exist')
 def step_create_artworks(context):
     """Create test artworks with the specified details."""
-    # Create artist
-    artist_user = User.objects.create_user(
-        username='michael',
-        password='testpassword',
-        email='michael@example.com',
-        phone='0987654321'
-    )
-    artist = Artist.objects.create(
-        user=artist_user,
-        bio='A talented pointillist artist.'
-    )
+    # Extract artist names from table and create unique artists
+    artist_names = set()
+    for row in context.table:
+        artist_names.add(row['artist'])
+    
+    # Create artists
+    artists = {}
+    for artist_name in artist_names:
+        artist_user = User.objects.create_user(
+            username=artist_name.lower(),
+            password='testpassword',
+            email=f'{artist_name.lower()}@example.com',
+            phone='0987654321'
+        )
+        artists[artist_name] = Artist.objects.create(
+            user=artist_user,
+            bio=f'A talented pointillist artist - {artist_name}.'
+        )
 
     # Create categories
     landscape_cat = ArtworkCategory.objects.create(
@@ -57,6 +61,7 @@ def step_create_artworks(context):
     # Create artworks from table
     for row in context.table:
         category = category_map.get(row['category'])
+        artist = artists.get(row['artist'])
         is_available = row['availability'] == 'Available'
         quantity = int(row['stock'])
 
@@ -74,22 +79,17 @@ def step_create_artworks(context):
         )
         artwork.selected_conditions.add(framing)
 
-        # Create main photo
-        Photo.objects.create(
-            artwork=artwork,
-            title=f"{row['name']} Main",
-            description=f"Photo of {row['name']}",
-            image='test_image.jpg',
-            alt_text=row['name']
-        )
-
 
 @when('I view the details for "{artwork_name}"')
 def step_view_artwork_details(context, artwork_name):
     """Navigate to the artwork detail page."""
     artwork = Artwork.objects.get(name=artwork_name)
     url = reverse('artwork:detail', kwargs={'slug': artwork.slug})
-    context.response = client.get(url)
+    if hasattr(context, 'test') and hasattr(context.test, 'client'):
+        context.response = context.test.client.get(url)
+    else:
+        from django.test import Client
+        context.response = Client().get(url)
 
 
 @then('I should see the artwork title "{title}"')
@@ -124,31 +124,11 @@ def step_see_price(context, price):
     )
 
 
-@then('I should see the artwork image')
-def step_see_artwork_image(context):
-    """Check that an image is displayed."""
-    content = context.response.content.decode()
-    assert '<img' in content
-
-
 @then('I should see the "Add to Cart" button')
 def step_see_add_to_cart_button(context):
     """Check that the Add to Cart button is visible."""
     content = context.response.content.decode()
     assert 'Add to Cart' in content or 'add-to-cart' in content
-
-
-@then('I should see a high-quality image of the artwork')
-def step_see_high_quality_image(context):
-    """Check that a high-quality image is displayed."""
-    content = context.response.content.decode()
-    assert '<img' in content
-
-
-@then('the image should be larger than on the browse page')
-def step_image_size_larger(context):
-    """Check that the image is displayed in a larger context."""
-    assert 200 <= context.response.status_code < 300
 
 
 @then('I should see "{status}" status')

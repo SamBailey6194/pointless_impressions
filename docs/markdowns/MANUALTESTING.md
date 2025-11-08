@@ -14,6 +14,8 @@ This document outlines the manual tests to be carried out for each feature. Use 
   - [Backend Testing](#backend-testing)
     - [US001: Browse Available Artworks - In Artwork App](#us001-browse-available-artworks---in-artwork-app)
       - [Test the Artwork Model and Database Queries](#test-the-artwork-model-and-database-queries)
+    - [US002: View Artwork Details - In Artwork App](#us002-view-artwork-details---in-artwork-app)
+      - [Test the Artwork Model and Detail Retrieval](#test-the-artwork-model-and-detail-retrieval)
   - [Frontend Testing](#frontend-testing)
     - [US001: Browse Available Artworks - In Artwork App](#us001-browse-available-artworks---in-artwork-app-1)
       - [Test the Artwork Listing Page](#test-the-artwork-listing-page)
@@ -21,6 +23,19 @@ This document outlines the manual tests to be carried out for each feature. Use 
       - [Test Pagination (if applicable)](#test-pagination-if-applicable)
       - [Test Responsive Design](#test-responsive-design)
       - [Test Error Handling](#test-error-handling)
+    - [US002: View Artwork Details - In Artwork App](#us002-view-artwork-details---in-artwork-app-1)
+      - [Test Artwork Detail Page Access](#test-artwork-detail-page-access)
+      - [Test Artwork Title Display](#test-artwork-title-display)
+      - [Test Artwork Description Display](#test-artwork-description-display)
+      - [Test Price Display](#test-price-display)
+      - [Test Image Display](#test-image-display)
+      - [Test Availability Status](#test-availability-status)
+      - [Test Related Artworks Section](#test-related-artworks-section)
+      - [Test Framing Conditions](#test-framing-conditions)
+      - [Test Category Information](#test-category-information)
+      - [Test Responsive Design](#test-responsive-design-1)
+      - [Test Accessibility](#test-accessibility)
+      - [Test Error Handling](#test-error-handling-1)
 
 ---
 
@@ -56,6 +71,28 @@ Use `./dev.sh shell` to access the Django shell for executing the queries 2 to 1
 | 8 | Attempt to retrieve non-existent artwork by slug: `Artwork.objects.get(slug="nonexistent")` | Raises `Artwork.DoesNotExist` exception (proper error handling) | Pass |
 | 9 | Check artwork relationships: verify `artwork.artist` exists | Artwork has valid Artist foreign key relationship | Pass |
 | 10 | Check artwork photos: verify `artwork.main_photo` exists | Artwork has valid Photo relationship for main image | Pass |
+
+---
+
+### US002: View Artwork Details - In Artwork App
+
+#### Test the Artwork Model and Detail Retrieval
+
+Use `./dev.sh shell` to access the Django shell for executing the queries 2 to 12.
+
+| Step | Action | Expected Outcome | Pass / Fail |
+| :--- | :--- | :--- | :--- |
+| 1 | Start dev server with `./dev.sh start` | Server starts at http://localhost:8000 without errors | Pass |
+| 2 | Retrieve artwork by slug: `artwork = Artwork.objects.get(slug="city-icons-01")` and `print(artwork.slug)` | Returns correct Artwork object for "City Icons 01" with name, price, description, and is_available=True | Pass |
+| 3 | Check artwork title: `print(artwork.name)` | Returns "City Icons 01" | Pass |
+| 4 | Check artwork price: `print(artwork.price)` | Returns Decimal value 150.00 (or similar decimal format) | Pass |
+| 5 | Check artwork description: `print(artwork.description)` | Returns full description text for the artwork | Pass |
+| 6 | Check availability status: `print(artwork.is_available)` | Returns True for "City Icons 01" | Pass |
+| 7 | Retrieve artwork image: `print(artwork.main_photo)` | Returns Photo object associated with artwork | Pass |
+| 8 | Check artist relationship: `print(artwork.artist.user.username)` | Returns artist username; verifies ForeignKey relationship is intact | Pass |
+| 9 | Check category relationship: `print(artwork.category.name)` | Returns "Photography" for "City Icons 01"; verifies ForeignKey relationship is intact | Pass |
+| 10 | Check framing conditions: `print(list(artwork.selected_conditions.all()))` | Returns list of FramingCondition objects associated with artwork | Pass |
+| 11 | Attempt to retrieve non-existent artwork: `Artwork.objects.get(slug="fake-artwork")` | Raises `Artwork.DoesNotExist` exception (proper error handling) | Pass |
 
 ---
 
@@ -124,3 +161,95 @@ Use `./dev.sh shell` to access the Django shell for executing the queries 2 to 1
 | 3 | Refresh page during cart operation | Page reloads gracefully without errors | Pass |
 | 4 | Check browser console for errors | No JavaScript errors or warnings in browser developer tools console | Pass |
 | 5 | Verify images load correctly | No broken image icons, all artwork images display properly | Pass |
+
+---
+
+### US002: View Artwork Details - In Artwork App
+
+#### Test Artwork Detail Page Access
+
+| Step | Action | Expected Outcome | Pass / Fail |
+| :--- | :--- | :--- | :--- |
+| 1 | Navigate to http://localhost:8000/artworks/ and click on "City Icons 01" artwork card | Detail page loads and displays full artwork information (image, title, description, price) | Pass |
+| 2 | Navigate directly to http://localhost:8000/artworks/city-icons-01/ | Page loads successfully with URL slug `/artworks/city-icons-01/` visible in address bar | Pass |
+| 3 | Navigate to http://localhost:8000/artworks/non-existent-artwork/ | 404 error page displays with "404" message | Pass |
+
+#### Test Artwork Title Display
+
+| Step | Action | Expected Outcome | Pass / Fail |
+| :--- | :--- | :--- | :--- |
+| 1 | Load detail page for "City Icons 01" | Artwork title "City Icons 01" displays prominently as main heading (h1 element) | Pass |
+| 2 | Load detail page for any artwork | Title text is visible, clearly readable, and uses larger font-size than body text | Pass |
+
+#### Test Artwork Description Display
+
+| Step | Action | Expected Outcome | Pass / Fail |
+| :--- | :--- | :--- | :--- |
+| 1 | Load detail page for "City Icons 01" | Full artwork description is visible below the title | Pass |
+| 2 | Load detail page for any artwork | Description text is formatted and readable, with appropriate line spacing | Pass |
+
+#### Test Price Display
+
+| Step | Action | Expected Outcome | Pass / Fail |
+| :--- | :--- | :--- | :--- |
+| 1 | Load detail page for "City Icons 01" | Price displays in correct format: "£150.00" with currency symbol and decimal places | Pass |
+| 3 | Load detail page for any artwork | Currency symbol "£" is visible before the numeric price | Pass |
+
+#### Test Image Display
+
+| Step | Action | Expected Outcome | Pass / Fail |
+| :--- | :--- | :--- | :--- |
+| 1 | Load detail page for "City Icons 01" | Large artwork image is visible and loads completely | Pass |
+| 2 | Load detail page for any artwork | Image element displays with descriptive alt text (not empty or generic) | Pass |
+| 3 | Load detail page for any artwork | Image loads without 404 errors; broken image icon not displayed | Pass |
+
+#### Test Availability Status
+
+| Step | Action | Expected Outcome | Pass / Fail |
+| :--- | :--- | :--- | :--- |
+| 1 | View detail page for "City Icons 01" (available, in stock) | "Available" badge or status indicator is clearly visible and labeled | Pass |
+
+#### Test Related Artworks Section
+
+| Step | Action | Expected Outcome | Pass / Fail |
+| :--- | :--- | :--- | :--- |
+| 1 | Load detail page for "City Icons 01" | "Related Artworks" or similar section displays below main content with multiple artwork cards | Pass |
+| 2 | Load detail page for any artwork | Related artwork cards are visible and show thumbnail images, titles, and prices | Pass |
+| 3 | Load detail page for any artwork | Related artworks section is horizontally scrollable or displays as grid without overflow issues | Pass |
+| 4 | Click on a related artwork card | Navigate to that artwork's detail page; URL changes to reflect selected artwork (e.g., `/artworks/city-modernity/`) | Pass |
+
+#### Test Framing Conditions
+
+| Step | Action | Expected Outcome | Pass / Fail |
+| :--- | :--- | :--- | :--- |
+| 1 | Load detail page for "City Icons 01" | Framing options or conditions section displays with text or list of available framing choices | Pass |
+
+#### Test Category Information
+
+| Step | Action | Expected Outcome | Pass / Fail |
+| :--- | :--- | :--- | :--- |
+| 1 | Load detail page for "City Icons 01" | Category badge displays "Photography" | Pass |
+| 2 | Click on the category badge or link | Browser navigates to artwork list page filtered by category with URL containing category filter parameter | Pass |
+
+#### Test Responsive Design
+
+| Step | Action | Expected Outcome | Pass / Fail |
+| :--- | :--- | :--- | :--- |
+| 1 | View detail page on mobile (iPhone X, 375px width) | All key elements visible without horizontal scroll: title, image, price, and Add to Cart button | Pass |
+| 2 | View detail page on tablet (iPad, 768px width) | Title and image are prominently displayed and readable; layout adapts gracefully to wider screen | Pass |
+| 3 | View detail page on desktop (1280x720 or larger) | Title, image, and all details are visible with optimal spacing and readability | Pass |
+
+#### Test Accessibility
+
+| Step | Action | Expected Outcome | Pass / Fail |
+| :--- | :--- | :--- | :--- |
+| 1 | Load detail page and inspect page structure | Main heading (h1 element) is present at top of page | Pass |
+| 2 | Load detail page and open browser developer tools | All images have alt text attributes (not empty, contain descriptive text) | Pass |
+| 3 | Load detail page and test keyboard navigation | Add to Cart button (or equivalent CTA) is accessible and has appropriate HTML class attributes | Pass |
+
+#### Test Error Handling
+
+| Step | Action | Expected Outcome | Pass / Fail |
+| :--- | :--- | :--- | :--- |
+| 1 | Load detail page for "City Icons 01" | Even if image fails to load from server, page displays gracefully with no JavaScript console errors | Pass |
+| 2 | Navigate to `/artworks/invalid-slug-12345/` | 404 error page displays with "404" or "Not Found" message; no blank page or server error | Pass |

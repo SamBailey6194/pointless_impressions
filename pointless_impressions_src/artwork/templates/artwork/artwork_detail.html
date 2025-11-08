@@ -11,7 +11,7 @@
         <ul>
           <li><a href="/"><i class="fa-solid fa-home"></i> Home</a></li>
           <li><a href="{% url 'artwork:list' %}"><i class="fa-solid fa-palette"></i> Artworks</a></li>
-          <li>{{ artwork.name }}</li>
+          <li>{{ artwork_data.name }}</li>
         </ul>
       </div>
 
@@ -22,12 +22,13 @@
             {% for photo in artwork.photos.all %}
               <div class="carousel-item w-full h-full justify-center" id="slide-{{ forloop.counter0 }}">
                 <figure class="w-full h-full">
-                  {% if production %}
-                    {% cloudinary photo.image format="auto" quality="auto" width=400 class="w-full h-full object-cover" alt=photo.alt_text_or_default %}
-                  {% else %}
+                  {% if not production %}
                     <img src="{{ photo.get_image_url }}" 
                         alt="{{ photo.alt_text_or_default }}" 
-                        class="w-full h-full object-cover">
+                        class="w-full h-full object-cover"
+                        data-testid="artwork-image">
+                  {% else %}
+                    {% cloudinary photo.image format="auto" quality="auto" width=400 class="w-full h-full object-cover" alt=photo.alt_text_or_default %}
                   {% endif %}
                 </figure>
               </div>
@@ -43,19 +44,17 @@
             ❯
           </button>
         </div>
-
-        
         
         {% comment %} Thumbnail Navigation {% endcomment %}
         <div class="flex gap-2 mt-4 overflow-x-auto pb-2" id="thumbnail-container">
           {% for photo in artwork.photos.all %}
-            {% if production %}
+            {% if not production %}
               <button class="thumbnail-btn w-16 h-16 rounded border-2 border-gray-300 shrink-0 overflow-hidden hover:border-primary" data-slide="{{ forloop.counter0 }}">
-                {% cloudinary photo.image format="auto" quality="auto" class="w-full h-full object-cover" alt=photo.alt_text_or_default %}
+                <img src="{{ photo.get_image_url }}" alt="{{ photo.alt_text_or_default }}" class="w-full h-full object-cover">
               </button>
             {% else %}
               <button class="thumbnail-btn w-16 h-16 rounded border-2 border-gray-300 shrink-0 overflow-hidden hover:border-primary" data-slide="{{ forloop.counter0 }}">
-                <img src="{{ photo.get_image_url }}" alt="{{ photo.alt_text_or_default }}" class="w-full h-full object-cover">
+                {% cloudinary photo.image format="auto" quality="auto" class="w-full h-full object-cover" alt=photo.alt_text_or_default %}
               </button>
             {% endif %}
           {% endfor %}
@@ -65,20 +64,20 @@
       {% comment %} Details Section {% endcomment %}
       <div class="space-y-6">
         <div>
-          <h1 class="text-4xl font-bold mb-2">{{ artwork.name }}</h1>
-          <div class="badge badge-primary badge-lg">{{ artwork.category.friendly_name }}</div>
+          <h1 class="text-4xl font-bold mb-2">{{ artwork_data.name }}</h1>
+          <div class="badge badge-primary badge-lg" data-testid="artwork-category">{{ artwork.category.friendly_name }}</div>
         </div>
-        
-        {% if not artwork.is_in_stock %}
-          <div class="alert alert-warning">
+
+        {% if not artwork_data.is_in_stock %}
+          <div class="alert alert-warning" data-testid="availability-status">
             <i class="fa-solid fa-exclamation-triangle text-xl"></i>
             <div>
-              <h3 class="font-bold">Out of Stock</h3>
+              <h3 class="font-bold">Sold Out</h3>
               <div class="text-xs">This artwork is currently unavailable</div>
             </div>
           </div>
         {% else %}
-          <div class="alert alert-success">
+          <div class="alert alert-success" data-testid="availability-status">
             <i class="fa-solid fa-check-circle text-xl"></i>
             <div>
               <h3 class="font-bold">Available</h3>
@@ -90,7 +89,7 @@
         <div class="card">
           <div class="card-body">
             <div class="flex gap-2">
-              <span class="text-5xl font-bold text-primary">£{{ artwork.price }}</span>
+              <span class="text-5xl font-bold text-primary" data-testid="artwork-price">£{{ artwork_data.price }}</span>
             </div>
           </div>
         </div>
@@ -101,7 +100,7 @@
               <i class="fa-solid fa-info-circle"></i> Description
             </h2>
             <div class="prose max-w-none">
-              <p>{{ artwork.description }}</p>
+              <p>{{ artwork_data.description }}</p>
             </div>
           </div>
         </div>
@@ -114,25 +113,33 @@
             <div class="space-y-2">
               <div class="flex justify-between">
                 <span class="font-semibold">Artist:</span>
-                <span class="font-mono">{{ artwork.artist.user.username }}</span>
+                <a href="{% url 'artwork:list' %}?artist={{ artwork.artist.user.username }}" class="font-mono link link-primary" data-testid="artist-profile-link">
+                  <span data-testid="artist-name">{{ artwork.artist.user.username }}</span>
+                </a>
+              </div>
+              <div class="divider my-1"></div>
+              <div data-testid="artist-info" class="text-sm opacity-75">
+                <p>{{ artwork.artist.user.username }} is a featured artist on Pointless Impressions.</p>
               </div>
               <div class="divider my-1"></div>
               <div class="flex justify-between">
                 <span class="font-semibold">Category:</span>
-                <span class="badge badge-outline">{{ artwork.category.friendly_name }}</span>
+                <a href="{% url 'artwork:list' %}?category={{ artwork.category.slug }}" class="badge badge-outline link link-primary" data-testid="category-link">{{ artwork.category.friendly_name }}</a>
               </div>
               <div class="divider my-1"></div>
               <div class="flex justify-between">
-                <span class="font-semibold">Conditions:</span>
-                {% for condition in prefetched_conditions %}
-                <span class="badge badge-outline">{{ condition.condition_friendly_name }}</span>
-                {% endfor %}
+                <span class="font-semibold">Framing Options:</span>
+                <div data-testid="framing-options">
+                  {% for condition in prefetched_conditions %}
+                  <span class="badge badge-outline">{{ condition.condition_friendly_name }}</span>
+                  {% endfor %}
+                </div>
               </div>
               <div class="divider my-1"></div>
               <div class="flex justify-between items-center">
                 <span class="font-semibold">Rating:</span>
                 <div class="flex items-center gap-2">
-                  {% if artwork.average_rating %}
+                  {% if artwork_data.average_rating %}
                     <div class="rating rating-sm gap-1">
                       {% for i in "12345" %}
                         {% if forloop.counter <= artwork.average_rating %}
@@ -162,7 +169,7 @@
                     <i class="fa-solid fa-pen-to-square"></i> Login to Review
                   </a>
                 {% endif %}
-                {% if artwork.review_count > 0 %}
+                {% if artwork_data.review_count > 0 %}
                   <button class="btn btn-outline btn-lg flex-1" data-scroll-to-reviews onclick="document.getElementById('reviews_section').scrollIntoView({behavior: 'smooth'})">
                     <i class="fa-solid fa-eye"></i> View Reviews
                   </button>
@@ -181,7 +188,7 @@
         </div>
         
         <div class="space-y-3 md:space-y-0 md:flex md:items-center md:gap-4">
-          {% if artwork.is_in_stock %}
+          {% if artwork_data.is_in_stock %}
             <button class="btn btn-primary btn-lg md:flex-1">
               <i class="fa-solid fa-cart-plus"></i> Add to Cart
             </button>
@@ -208,22 +215,22 @@
         <h2 class="text-3xl font-bold mb-12 text-center">Other Artwork by {{ artwork.artist.user.username }}</h2>
         
         {% comment %} Horizontal Scrolling Container {% endcomment %}
-        <div class="relative">
-          <div class="flex overflow-x-auto gap-6 pb-4 snap-x snap-mandatory artwork-scrollbar">
+        <div class="relative" data-testid="related-artworks">
+          <div class="flex overflow-x-auto gap-6 pb-4 pr-6 snap-x snap-mandatory artwork-scrollbar" id="artist-carousel">
             {% for similar_artist in similar_artists %}
-              <div class="shrink-0 w-72 md:w-80 lg:w-96 snap-start h-full">
+              <div class="shrink-0 w-72 md:w-80 lg:w-96 snap-start h-full" data-testid="related-artwork-card">
                 <div class="rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-shadow duration-200 cursor-pointer card-adaptive h-full flex flex-col">
                   {% with image_to_render=similar_artist.main_photo %}
                     <figure>
                       {% if image_to_render %}
                         {% comment %} An image exists for this artwork {% endcomment %}
-                        {% if production %}
-                          {% cloudinary image_to_render.image format="auto" quality="auto" width=400 height=300 crop="fill" class="w-full h-64 object-cover" alt=image_to_render.alt_text_or_default %}
-                        {% else %}
+                        {% if not production %}
                           {% comment %} LOCAL: Use the artwork's local image URL {% endcomment %}
                           <img src="{{ image_to_render.get_image_url }}" 
                               alt="{{ image_to_render.alt_text_or_default }}" 
                               class="w-full h-64 object-cover">
+                        {% else %}
+                          {% cloudinary image_to_render.image format="auto" quality="auto" width=400 height=300 crop="fill" class="w-full h-64 object-cover" alt=image_to_render.alt_text_or_default %}
                         {% endif %}
                       {% endif %}
                     </figure>
@@ -245,9 +252,19 @@
                 </div>
               </div>
             {% empty %}
-              <p class="text-center w-full">No other {{ artwork.artist.user.username }} artwork available.</p>
+              <p class="text-center w-full">No other {{ artwork_data.artist.user.username }} artwork available.</p>
             {% endfor %}
           </div>
+          
+          {% comment %} Navigation Arrows {% endcomment %}
+          {% if similar_artists %}
+            <button class="carousel-nav-btn absolute left-5 top-1/3 -translate-y-1/2 z-10 btn btn-circle btn-sm border-0" data-carousel-id="artist-carousel" data-direction="-1" aria-label="Previous artwork by artist">
+              ❮
+            </button>
+            <button class="carousel-nav-btn absolute right-5 top-1/3 -translate-y-1/2 z-10 btn btn-circle btn-sm border-0" data-carousel-id="artist-carousel" data-direction="1" aria-label="Next artwork by artist">
+              ❯
+            </button>
+          {% endif %}
         </div>
         <div class="text-center m-8">
           <a href="{% url 'artwork:list' %}?artist={{ artwork.artist.user.username }}" class="btn btn-ghost btn-sm">
@@ -262,7 +279,7 @@
         
         {% comment %} Horizontal Scrolling Container {% endcomment %}
         <div class="relative">
-          <div class="flex overflow-x-auto gap-6 pb-4 snap-x snap-mandatory artwork-scrollbar">
+          <div class="flex overflow-x-auto gap-6 pb-4 pr-6 snap-x snap-mandatory artwork-scrollbar" id="art-category-carousel">
             {% for similar_artwork in similar_artworks %}
               <div class="shrink-0 w-72 md:w-80 lg:w-96 snap-start h-full">
                 <div class="rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-shadow duration-200 cursor-pointer card-adaptive h-full flex flex-col">
@@ -270,13 +287,13 @@
                     <figure>
                       {% if image_to_render %}
                         {% comment %} An image exists for this artwork {% endcomment %}
-                        {% if production %}
-                          {% cloudinary image_to_render.image format="auto" quality="auto" width=400 height=300 crop="fill" class="w-full h-64 object-cover" alt=image_to_render.alt_text_or_default %}
-                        {% else %}
+                        {% if not production %}
                           {% comment %} LOCAL: Use the artwork's local image URL {% endcomment %}
                           <img src="{{ image_to_render.get_image_url }}" 
                               alt="{{ image_to_render.alt_text_or_default }}" 
                               class="w-full h-64 object-cover">
+                        {% else %}
+                          {% cloudinary image_to_render.image format="auto" quality="auto" width=400 height=300 crop="fill" class="w-full h-64 object-cover" alt=image_to_render.alt_text_or_default %}
                         {% endif %}
                       {% endif %}
                     </figure>
@@ -298,9 +315,19 @@
                 </div>
               </div>
             {% empty %}
-              <p class="text-center w-full">No other {{ artwork.category.name }} artwork available.</p>
+              <p class="text-center w-full">No other {{ similar_artwork.category.name }} artwork available.</p>
             {% endfor %}
           </div>
+          
+          {% comment %} Navigation Arrows {% endcomment %}
+          {% if similar_artworks %}
+            <button class="carousel-nav-btn absolute left-5 top-1/3 -translate-y-1/2 z-10 btn btn-circle btn-sm border-0" data-carousel-id="art-category-carousel" data-direction="-1" aria-label="Previous artwork in category">
+              ❮
+            </button>
+            <button class="carousel-nav-btn absolute right-5 top-1/3 -translate-y-1/2 z-10 btn btn-circle btn-sm border-0" data-carousel-id="art-category-carousel" data-direction="1" aria-label="Next artwork in category">
+              ❯
+            </button>
+          {% endif %}
         </div>
         <div class="text-center mt-8">
           <a href="{% url 'artwork:list' %}?category={{ artwork.category.slug }}" class="btn btn-ghost btn-sm">

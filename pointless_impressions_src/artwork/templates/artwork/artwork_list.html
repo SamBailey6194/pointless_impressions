@@ -182,7 +182,7 @@
         {% endif %}
         <div id="artwork-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-6">
           {% for artwork in artworks %}
-            <div class="artwork-card card shadow-xl hover:shadow-2xl transition-shadow" data-sku="{{ artwork.sku }}">
+            <div class="artwork-card card shadow-xl hover:shadow-2xl transition-shadow" data-sku="{{ artwork.sku }}" data-testid="artwork-card">
               {% with image_to_render=artwork.main_photo %}
               <figure>
                 {% if image_to_render %}

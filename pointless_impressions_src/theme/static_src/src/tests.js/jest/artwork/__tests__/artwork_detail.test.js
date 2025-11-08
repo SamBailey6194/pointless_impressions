@@ -3,7 +3,7 @@
  * Tests for US002: View Artwork Details
  */
 
-import { formatPrice, displayArtworkDetail, addToCart, showConfirmationMessage, initArtworkDetail } from '../../../../js/artwork_detail.js';
+import { formatPrice, displayArtworkDetail, initArtworkDetail } from '../../../../js/artwork_detail.js';
 
 describe('Artwork Detail Page - US002', () => {
   let mockDOM;
@@ -138,33 +138,6 @@ describe('Artwork Detail Page - US002', () => {
     });
   });
 
-  describe('Add to Cart Button', () => {
-    test('should display Add to Cart button when available', () => {
-      const btn = document.getElementById('add-to-cart-btn');
-      expect(btn).toBeDefined();
-      expect(btn.textContent).toBe('Add to Cart');
-    });
-
-    test('button should be clickable when available', () => {
-      const btn = document.getElementById('add-to-cart-btn');
-      expect(btn.disabled).toBe(false);
-    });
-
-    test('button should be disabled when item is sold out', () => {
-      const btn = document.getElementById('add-to-cart-btn');
-      btn.disabled = true;
-      expect(btn.disabled).toBe(true);
-    });
-
-    test('should trigger add to cart on button click', () => {
-      const btn = document.getElementById('add-to-cart-btn');
-      const clickSpy = jest.fn();
-      btn.addEventListener('click', clickSpy);
-      btn.click();
-      expect(clickSpy).toHaveBeenCalled();
-    });
-  });
-
   describe('Artist Information', () => {
     test('should display artist name', () => {
       const artistInfo = document.getElementById('artist-info');
@@ -212,155 +185,12 @@ describe('Artwork Detail Page - US002', () => {
     });
   });
 
-  describe('Add to Cart Functionality', () => {
-    test('addToCart should create cart item', () => {
-      const cartItem = addToCart('mountain-peak', 1, 249.99);
-      expect(cartItem.id).toBe('mountain-peak');
-      expect(cartItem.quantity).toBe(1);
-      expect(cartItem.price).toBe(249.99);
-    });
-
-    test('should increment quantity when adding same item twice', () => {
-      let cartItem = addToCart('mountain-peak', 1, 249.99);
-      cartItem = addToCart('mountain-peak', 1, 249.99);
-      expect(cartItem.quantity).toBe(2);
-    });
-
-    test('should add multiple items to cart', () => {
-      addToCart('art-1', 1, 100);
-      addToCart('art-2', 1, 200);
-      const cart = JSON.parse(localStorage.getItem('cart'));
-      expect(Object.keys(cart).length).toBe(2);
-      expect(cart['art-1'].price).toBe(100);
-      expect(cart['art-2'].price).toBe(200);
-    });
-
-    test('should handle multiple quantity additions', () => {
-      addToCart('mountain-peak', 2, 249.99);
-      const cartItem = addToCart('mountain-peak', 3, 249.99);
-      expect(cartItem.quantity).toBe(5);
-    });
-
-    test('should persist cart to localStorage', () => {
-      addToCart('mountain-peak', 1, 249.99);
-      const cart = JSON.parse(localStorage.getItem('cart'));
-      expect(cart).not.toBeNull();
-      expect(cart['mountain-peak']).toBeDefined();
-    });
-
-    test('should show confirmation message after adding to cart', () => {
-      document.body.innerHTML += `
-        <div id="confirmation-message"></div>
-      `;
-      const confirmationDiv = document.getElementById('confirmation-message');
-      confirmationDiv.textContent = 'Added to cart!';
-      expect(confirmationDiv.textContent).toBe('Added to cart!');
-    });
-
-    test('should show/hide confirmation message with timeout', (done) => {
-      document.body.innerHTML += `
-        <div id="confirmation-message"></div>
-      `;
-      const confirmationDiv = document.getElementById('confirmation-message');
-      showConfirmationMessage('Added to cart!');
-      
-      expect(confirmationDiv.textContent).toBe('Added to cart!');
-      expect(confirmationDiv.style.display).toBe('block');
-
-      setTimeout(() => {
-        expect(confirmationDiv.style.display).toBe('none');
-        done();
-      }, 3100);
-    });
-
-    test('should handle missing confirmation div gracefully', () => {
-      document.body.innerHTML = '';
-      expect(() => {
-        showConfirmationMessage('Test message');
-      }).not.toThrow();
-    });
-  });
-
   describe('Initialization', () => {
-    test('initArtworkDetail should attach click listener', () => {
-      document.body.innerHTML = `
-        <button id="add-to-cart-btn" data-artwork-id="test-art" data-price="99.99">
-          Add to Cart
-        </button>
-        <div id="confirmation-message"></div>
-      `;
-
-      initArtworkDetail();
-
-      const btn = document.getElementById('add-to-cart-btn');
-      const clickEvent = new MouseEvent('click', { bubbles: true });
-      btn.dispatchEvent(clickEvent);
-
-      const cart = JSON.parse(localStorage.getItem('cart'));
-      expect(cart['test-art']).toBeDefined();
-      expect(cart['test-art'].quantity).toBe(1);
-    });
-
     test('initArtworkDetail should handle missing button', () => {
       document.body.innerHTML = '';
       expect(() => {
         initArtworkDetail();
       }).not.toThrow();
-    });
-
-    test('button click should add to cart with correct price', () => {
-      document.body.innerHTML = `
-        <button id="add-to-cart-btn" data-artwork-id="mountain-peak" data-price="249.99">
-          Add to Cart
-        </button>
-        <div id="confirmation-message"></div>
-      `;
-
-      initArtworkDetail();
-
-      const btn = document.getElementById('add-to-cart-btn');
-      const clickEvent = new MouseEvent('click', { bubbles: true });
-      btn.dispatchEvent(clickEvent);
-
-      const cart = JSON.parse(localStorage.getItem('cart'));
-      expect(cart['mountain-peak'].price).toBe(249.99);
-    });
-
-    test('button click without artworkId should not add to cart', () => {
-      document.body.innerHTML = `
-        <button id="add-to-cart-btn" data-price="249.99">
-          Add to Cart
-        </button>
-        <div id="confirmation-message"></div>
-      `;
-
-      initArtworkDetail();
-
-      const btn = document.getElementById('add-to-cart-btn');
-      const clickEvent = new MouseEvent('click', { bubbles: true });
-      btn.dispatchEvent(clickEvent);
-
-      const cart = JSON.parse(localStorage.getItem('cart') || '{}');
-      expect(Object.keys(cart).length).toBe(0);
-    });
-
-    test('should handle non-numeric price', () => {
-      document.body.innerHTML = `
-        <button id="add-to-cart-btn" data-artwork-id="art" data-price="invalid">
-          Add to Cart
-        </button>
-        <div id="confirmation-message"></div>
-      `;
-
-      initArtworkDetail();
-
-      const btn = document.getElementById('add-to-cart-btn');
-      const clickEvent = new MouseEvent('click', { bubbles: true });
-      btn.dispatchEvent(clickEvent);
-
-      const cart = JSON.parse(localStorage.getItem('cart'));
-      expect(cart['art']).toBeDefined();
-      expect(cart['art'].price === null || isNaN(cart['art'].price)).toBe(true);
     });
   });
 

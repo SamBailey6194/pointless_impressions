@@ -16,9 +16,6 @@ BASE_DIR = Path(__file__).resolve().parent.parent.parent
 ENV_PATH = BASE_DIR
 load_dotenv(os.path.join(ENV_PATH, ".env"))
 
-# Environment flag - should be overridden in environment-specific settings
-ENVIRONMENT = os.getenv("DJANGO_ENVIRONMENT", "development")
-
 # Application definition
 DJANGO_APPS = [
     "django.contrib.admin",

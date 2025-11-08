@@ -369,15 +369,22 @@ class ArtworkDetailView(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['production'] = not settings.DEBUG
-        context['placeholder_image'] = get_placeholder_image()
         artwork = self.get_object()
-        context['prefetched_conditions'] = artwork.prefetched_conditions
-        photos = artwork.photos.all()
+        placeholder = get_placeholder_image()
 
-        if artwork.main_photo:
-            photos = photos.exclude(pk=artwork.main_photo.pk)
-        context['photos'] = photos[:5]
+        serialized_data_list = _serialize_artwork_data(
+            [artwork], placeholder
+            )
+
+        artwork_data = serialized_data_list[0]
+
+        context['artwork_data'] = artwork_data
+
+        all_photos = artwork.photos.all()
+        context['carousel_photos'] = all_photos
+
+        context['prefetched_conditions'] = artwork.prefetched_conditions
+        context['reviews'] = artwork.reviews.all().order_by('-created_at')
 
         if artwork.artist:
             similar_artists = Artwork.objects.filter(
@@ -398,8 +405,10 @@ class ArtworkDetailView(DetailView):
                 'main_photo', 'artist__user'
             )[:10]
             context['similar_artworks'] = similar_artworks
+
         context['review_form'] = ArtworkReviewForm()
-        context['reviews'] = artwork.reviews.all().order_by('-created_at')
+        context['production'] = not settings.DEBUG
+        context['debug'] = settings.DEBUG
 
         return context
 
