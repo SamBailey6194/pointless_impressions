@@ -42,4 +42,4 @@ jobs:
       env: 
         HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
       run: |
-        heroku run python manage.py collectstatic --noinput -a ${{ secrets.HEROKU_STAGING_APP_NAME }}
+        heroku run -- python manage.py collectstatic --noinput -a ${{ secrets.HEROKU_STAGING_APP_NAME }}
