@@ -208,6 +208,7 @@ Staging is a near-production environment used to:
    - App name: `pointless-impressions-staging` (or similar)
    - Region: Choose closest to your users (e.g., Europe)
    - Click "Create app"
+   - Under the deploy tab select "Container Registry" as the deployment method
 
 2. **Set Up Heroku Config Vars:**
    - Go to the "Settings" tab of your new app

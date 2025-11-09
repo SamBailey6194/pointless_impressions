@@ -82,3 +82,10 @@ coverage.xml
 *.py,cover
 .cache
 pytest_cache/
+
+
+# -----------------------------
+# Other Ignores
+# -----------------------------
+fixture_passwords.txt
+.github/workflows/*

@@ -15,10 +15,12 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 
 WORKDIR /app
 
-# Install all system dependencies
+# Install all system dependencies FIRST (before any pip installs)
 RUN apt-get update && apt-get install -y \
     curl \
     gcc \
+    g++ \
+    make \
     libpq-dev \
     xz-utils \
     && rm -rf /var/lib/apt/lists/*
@@ -47,11 +49,8 @@ RUN npm ci
 COPY pointless_impressions_src/ ./pointless_impressions_src/
 COPY manage.py .
 
-# This runs 'npm run build' (which runs Tailwind)
-# AND 'python manage.py collectstatic' (which collects admin static)
-# The output will be in /app/staticfiles (defined in your settings)
-RUN npm run build && \
-    python manage.py collectstatic --noinput
+# Build CSS/JS only (collectstatic will run in entrypoint)
+RUN npm run build
 
 # ---------- Stage 2: Final Production/Staging Image ----------
 # This stage ONLY installs Python. It is small and secure.
@@ -81,10 +80,6 @@ RUN uv pip install --upgrade pip --system && \
 # Copy Django project (small layer)
 COPY pointless_impressions_src/ ./pointless_impressions_src/
 COPY manage.py .
-
-# Copy the fully collected staticfiles from the builder stage
-# This one line is the magic of multi-stage builds.
-COPY --from=builder /app/staticfiles/ ./staticfiles/
 
 # Create non-root user and give it ownership
 RUN useradd -m $USER && \

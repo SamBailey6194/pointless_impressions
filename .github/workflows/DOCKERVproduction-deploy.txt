@@ -1,0 +1,43 @@
+name: Production Deploy
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  deploy_production:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4
+
+    - name: Install Heroku CLI
+      run: curl https://cli-assets.heroku.com/install.sh | sh
+
+    - name: Procfile Setup for Production
+      run: cp Procfile.production Procfile
+
+    - name: Login to Heroku Container Registry
+      env:
+        HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
+      run: echo ${{ secrets.HEROKU_API_KEY }} | docker login --username=_ --password-stdin registry.heroku.com
+
+    - name: Build and Push Docker Image to Heroku
+      run: |
+        docker build -f Dockerfile.production -t registry.heroku.com/${{ secrets.HEROKU_PRODUCTION_APP_NAME }}/web:latest .
+        docker push registry.heroku.com/${{ secrets.HEROKU_PRODUCTION_APP_NAME }}/web:latest
+
+    - name: Release to Heroku
+      env:
+        HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
+      run: |
+        heroku stack:set container -a ${{ secrets.HEROKU_PRODUCTION_APP_NAME }}
+        heroku container:release web -a ${{ secrets.HEROKU_PRODUCTION_APP_NAME }}
+
+    - name: Collect Static Files
+      env: 
+        HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
+      run: |
+        heroku run -- python manage.py collectstatic --noinput -a ${{ secrets.HEROKU_PRODUCTION_APP_NAME }}
