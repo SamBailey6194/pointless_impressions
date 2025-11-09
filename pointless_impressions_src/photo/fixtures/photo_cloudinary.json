@@ -1,0 +1,1964 @@
+[
+    {
+        "pk": 1,
+        "model": "photo.Photo",
+        "fields": {
+            "photo_type": "site_asset",
+            "asset_identifier": "pointless_impressions_logo",
+            "title": "Pointless Impressions Logo",
+            "description": "Main image for Pointless Impressions website.",
+            "image": "https://res.cloudinary.com/djdhyhznc/image/upload/v1/pointless-impressions-staging/site_assets/pointless_impressions_logo.png",
+            "alt_text": "Pointless Impressions logo",
+            "uploaded_by": 1,
+            "uploaded_at": "2025-10-31T00:00:00Z"
+        }
+    },
+    {
+        "pk": 2,
+        "model": "photo.Photo",
+        "fields": {
+            "photo_type": "site_asset",
+            "asset_identifier": "pointless_impressions_logo_white_bg",
+            "title": "Pointless Impressions Logo White Background",
+            "description": "Main image for Pointless Impressions website.",
+            "image": "https://res.cloudinary.com/djdhyhznc/image/upload/v1/pointless-impressions-staging/site_assets/pointless_impressions_logo_white_bg.png",
+            "alt_text": "Pointless Impressions logo with white background",
+            "uploaded_by": 1,
+            "uploaded_at": "2025-10-31T00:00:00Z"
+        }
+    },
+    {
+        "pk": 3,
+        "model": "photo.Photo",
+        "fields": {
+            "photo_type": "site_asset",
+            "asset_identifier": "placeholder_image",
+            "title": "Placeholder Image",
+            "description": "Placeholder image for when no other image is available.",
+            "image": "https://res.cloudinary.com/djdhyhznc/image/upload/v1/pointless-impressions-staging/site_assets/noimage.png",
+            "alt_text": "Placeholder image with camera icon",
+            "uploaded_by": 1,
+            "uploaded_at": "2025-10-31T00:00:00Z"
+        }
+    },
+    {
+        "model": "photo.Photo",
+        "pk": 4,
+        "fields": {
+            "artwork": 1,
+            "photo_type": "artwork",
+            "asset_identifier": null,
+            "title": "City Icons 01 Framed",
+            "description": "City Icons 01 Framed Artwork",
+            "image": "https://res.cloudinary.com/djdhyhznc/image/upload/v1/pointless-impressions-staging/artwork/city_icons_01_framed.png",
+            "alt_text": "City Icons 01 Framed Artwork",
+            "uploaded_at": "2025-11-01T10:00:00Z",
+            "uploaded_by": 7
+        }
+    },
+    {
+        "model": "photo.Photo",
+        "pk": 5,
+        "fields": {
+            "artwork": 1,
+            "photo_type": "artwork",
+            "asset_identifier": null,
+            "title": "City Icons 01",
+            "description": "City Icons 01 Artwork",
+            "image": "https://res.cloudinary.com/djdhyhznc/image/upload/v1/pointless-impressions-staging/artwork/city_icons_01.png",
+            "alt_text": "City Icons 01 Artwork",
+            "uploaded_at": "2025-11-01T11:00:00Z",
+            "uploaded_by": 7
+        }
+    },
+    {
+        "model": "photo.Photo",
+        "pk": 6,
+        "fields": {
+            "artwork": 2,
+            "photo_type": "artwork",
+            "asset_identifier": null,
+            "title": "City Icons 02 Framed",
+            "description": "City Icons 02 Framed Artwork",
+            "image": "https://res.cloudinary.com/djdhyhznc/image/upload/v1/pointless-impressions-staging/artwork/city_icons_02_framed.png",
+            "alt_text": "City Icons 02 Framed Artwork",
+            "uploaded_at": "2025-11-01T12:00:00Z",
+            "uploaded_by": 7
+        }
+    },
+    {
+        "model": "photo.Photo",
+        "pk": 7,
+        "fields": {
+            "artwork": 2,
+            "photo_type": "artwork",
+            "asset_identifier": null,
+            "title": "City Icons 02",
+            "description": "City Icons 02 Artwork",
+            "image": "https://res.cloudinary.com/djdhyhznc/image/upload/v1/pointless-impressions-staging/artwork/city_icons_02.png",
+            "alt_text": "City Icons 02 Artwork",
+            "uploaded_at": "2025-11-01T13:00:00Z",
+            "uploaded_by": 7
+        }
+    },
+    {
+        "model": "photo.Photo",
+        "pk": 8,
+        "fields": {
+            "artwork": 3,
+            "photo_type": "artwork",
+            "asset_identifier": null,
+            "title": "City Icons 03 Framed",
+            "description": "City Icons 03 Framed Artwork",
+            "image": "https://res.cloudinary.com/djdhyhznc/image/upload/v1/pointless-impressions-staging/artwork/city_icons_03_framed.png",
+            "alt_text": "City Icons 03 Framed Artwork",
+            "uploaded_at": "2025-11-01T14:00:00Z",
+            "uploaded_by": 7
+        }
+    },
+    {
+        "model": "photo.Photo",
+        "pk": 9,
+        "fields": {
+            "artwork": 3,
+            "photo_type": "artwork",
+            "asset_identifier": null,
+            "title": "City Icons 03",
+            "description": "City Icons 03 Artwork",
+            "image": "https://res.cloudinary.com/djdhyhznc/image/upload/v1/pointless-impressions-staging/artwork/city_icons_03.png",
+            "alt_text": "City Icons 03 Artwork",
+            "uploaded_at": "2025-11-01T15:00:00Z",
+            "uploaded_by": 7
+        }
+    },
+    {
+        "model": "photo.Photo",
+        "pk": 10,
+        "fields": {
+            "artwork": 4,
+            "photo_type": "artwork",
+            "asset_identifier": null,
+            "title": "City Icons 04 Framed",
+            "description": "City Icons 04 Framed Artwork",
+            "image": "https://res.cloudinary.com/djdhyhznc/image/upload/v1/pointless-impressions-staging/artwork/city_icons_04_framed.png",
+            "alt_text": "City Icons 04 Framed Artwork",
+            "uploaded_at": "2025-11-01T14:00:00Z",
+            "uploaded_by": 7
+        }
+    },
+    {
+        "model": "photo.Photo",
+        "pk": 11,
+        "fields": {
+            "artwork": 4,
+            "photo_type": "artwork",
+            "asset_identifier": null,
+            "title": "City Icons 04",
+            "description": "City Icons 04 Artwork",
+            "image": "https://res.cloudinary.com/djdhyhznc/image/upload/v1/pointless-impressions-staging/artwork/city_icons_04.png",
+            "alt_text": "City Icons 04 Artwork",
+            "uploaded_at": "2025-11-01T15:00:00Z",
+            "uploaded_by": 7
+        }
+    },
+    {
+        "model": "photo.Photo",
+        "pk": 12,
+        "fields": {
+            "artwork": 5,
+            "photo_type": "artwork",
+            "asset_identifier": null,
+            "title": "City Icons 05 Framed",
+            "description": "City Icons 05 Framed Artwork",
+            "image": "https://res.cloudinary.com/djdhyhznc/image/upload/v1/pointless-impressions-staging/artwork/city_icons_05_framed.png",
+            "alt_text": "City Icons 05 Framed Artwork",
+            "uploaded_at": "2025-11-01T14:00:00Z",
+            "uploaded_by": 7
+        }
+    },
+    {
+        "model": "photo.Photo",
+        "pk": 13,
+        "fields": {
+            "artwork": 5,
+            "photo_type": "artwork",
+            "asset_identifier": null,
+            "title": "City Icons 05",
+            "description": "City Icons 05 Artwork",
+            "image": "https://res.cloudinary.com/djdhyhznc/image/upload/v1/pointless-impressions-staging/artwork/city_icons_05.png",
+            "alt_text": "City Icons 05 Artwork",
+            "uploaded_at": "2025-11-01T15:00:00Z",
+            "uploaded_by": 7
+        }
+    },
+    {
+        "model": "photo.Photo",
+        "pk": 14,
+        "fields": {
+            "artwork": 6,
+            "photo_type": "artwork",
+            "asset_identifier": null,
+            "title": "City Modernity Framed",
+            "description": "City Modernity Framed Artwork",
+            "image": "https://res.cloudinary.com/djdhyhznc/image/upload/v1/pointless-impressions-staging/artwork/city_modernity_01_framed.png",
+            "alt_text": "City Modernity Framed Artwork",
+            "uploaded_at": "2025-11-01T14:00:00Z",
+            "uploaded_by": 7
+        }
+    },
+    {
+        "model": "photo.Photo",
+        "pk": 15,
+        "fields": {
+            "artwork": 6,
+            "photo_type": "artwork",
+            "asset_identifier": null,
+            "title": "City Modernity",
+            "description": "City Modernity Artwork",
+            "image": "https://res.cloudinary.com/djdhyhznc/image/upload/v1/pointless-impressions-staging/artwork/city_modernity_01.png",
+            "alt_text": "City Modernity Artwork",
+            "uploaded_at": "2025-11-01T15:00:00Z",
+            "uploaded_by": 7
+        }
+    },
+    {
+        "model": "photo.Photo",
+        "pk": 16,
+        "fields": {
+            "artwork": 7,
+            "photo_type": "artwork",
+            "asset_identifier": null,
+            "title": "City Saints 01 Framed",
+            "description": "City Saints 01 Framed Artwork",
+            "image": "https://res.cloudinary.com/djdhyhznc/image/upload/v1/pointless-impressions-staging/artwork/city_saints_01_framed.png",
+            "alt_text": "City Saints 01 Framed Artwork",
+            "uploaded_at": "2025-11-01T14:00:00Z",
+            "uploaded_by": 7
+        }
+    },
+    {
+        "model": "photo.Photo",
+        "pk": 17,
+        "fields": {
+            "artwork": 7,
+            "photo_type": "artwork",
+            "asset_identifier": null,
+            "title": "City Saints 01",
+            "description": "City Saints 01 Artwork",
+            "image": "https://res.cloudinary.com/djdhyhznc/image/upload/v1/pointless-impressions-staging/artwork/city_saints_01.png",
+            "alt_text": "City Saints 01 Artwork",
+            "uploaded_at": "2025-11-01T15:00:00Z",
+            "uploaded_by": 7
+        }
+    },
+    {
+        "model": "photo.Photo",
+        "pk": 18,
+        "fields": {
+            "artwork": 8,
+            "photo_type": "artwork",
+            "asset_identifier": null,
+            "title": "City Saints 02 Framed",
+            "description": "City Saints 02 Framed Artwork",
+            "image": "https://res.cloudinary.com/djdhyhznc/image/upload/v1/pointless-impressions-staging/artwork/city_saints_02_framed.png",
+            "alt_text": "City Saints 02 Framed Artwork",
+            "uploaded_at": "2025-11-01T14:00:00Z",
+            "uploaded_by": 7
+        }
+    },
+    {
+        "model": "photo.Photo",
+        "pk": 19,
+        "fields": {
+            "artwork": 8,
+            "photo_type": "artwork",
+            "asset_identifier": null,
+            "title": "City Saints 02",
+            "description": "City Saints 02 Artwork",
+            "image": "https://res.cloudinary.com/djdhyhznc/image/upload/v1/pointless-impressions-staging/artwork/city_saints_02.png",
+            "alt_text": "City Saints 02 Artwork",
+            "uploaded_at": "2025-11-01T15:00:00Z",
+            "uploaded_by": 7
+        }
+    },
+    {
+        "model": "photo.Photo",
+        "pk": 20,
+        "fields": {
+            "artwork": 9,
+            "photo_type": "artwork",
+            "asset_identifier": null,
+            "title": "City The Buzz Framed",
+            "description": "City The Buzz Framed Artwork",
+            "image": "https://res.cloudinary.com/djdhyhznc/image/upload/v1/pointless-impressions-staging/artwork/city_the_buzz_01_framed.png",
+            "alt_text": "City The Buzz Framed Artwork",
+            "uploaded_at": "2025-11-01T14:00:00Z",
+            "uploaded_by": 7
+        }
+    },
+    {
+        "model": "photo.Photo",
+        "pk": 21,
+        "fields": {
+            "artwork": 9,
+            "photo_type": "artwork",
+            "asset_identifier": null,
+            "title": "City The Buzz",
+            "description": "City The Buzz Artwork",
+            "image": "https://res.cloudinary.com/djdhyhznc/image/upload/v1/pointless-impressions-staging/artwork/city_the_buzz_01.png",
+            "alt_text": "City The Buzz Artwork",
+            "uploaded_at": "2025-11-01T15:00:00Z",
+            "uploaded_by": 7
+        }
+    },
+    {
+        "model": "photo.Photo",
+        "pk": 22,
+        "fields": {
+            "artwork": 10,
+            "photo_type": "artwork",
+            "asset_identifier": null,
+            "title": "Digital Abstract Frames",
+            "description": "Digital Abstract Frames Artwork",
+            "image": "https://res.cloudinary.com/djdhyhznc/image/upload/v1/pointless-impressions-staging/artwork/digital_abstract_frames.png",
+            "alt_text": "Digital Abstract Frames Artwork",
+            "uploaded_at": "2025-11-01T16:00:00Z",
+            "uploaded_by": 7
+        }
+    },
+    {
+        "model": "photo.Photo",
+        "pk": 23,
+        "fields": {
+            "artwork": 10,
+            "photo_type": "artwork",
+            "asset_identifier": null,
+            "title": "Digital Abstract",
+            "description": "Digital Abstract Artwork",
+            "image": "https://res.cloudinary.com/djdhyhznc/image/upload/v1/pointless-impressions-staging/artwork/digital_abstract.png",
+            "alt_text": "Digital Abstract Artwork",
+            "uploaded_at": "2025-11-01T16:00:00Z",
+            "uploaded_by": 7
+        }
+    },
+    {
+        "model": "photo.Photo",
+        "pk": 24,
+        "fields": {
+            "artwork": 11,
+            "photo_type": "artwork",
+            "asset_identifier": null,
+            "title": "Digital Dotty Framed",
+            "description": "Digital Dotty Framed Artwork",
+            "image": "https://res.cloudinary.com/djdhyhznc/image/upload/v1/pointless-impressions-staging/artwork/digital_dotty_framed.png",
+            "alt_text": "Digital Dotty Framed Artwork",
+            "uploaded_at": "2025-11-01T16:00:00Z",
+            "uploaded_by": 7
+        }
+    },
+    {
+        "model": "photo.Photo",
+        "pk": 25,
+        "fields": {
+            "artwork": 11,
+            "photo_type": "artwork",
+            "asset_identifier": null,
+            "title": "Digital Dotty",
+            "description": "Digital Dotty Artwork",
+            "image": "https://res.cloudinary.com/djdhyhznc/image/upload/v1/pointless-impressions-staging/artwork/digital_dotty.png",
+            "alt_text": "Digital Dotty Artwork",
+            "uploaded_at": "2025-11-01T16:00:00Z",
+            "uploaded_by": 7
+        }
+    },
+    {
+        "model": "photo.Photo",
+        "pk": 26,
+        "fields": {
+            "artwork": 12,
+            "photo_type": "artwork",
+            "asset_identifier": null,
+            "title": "Digital Mixing It Framed",
+            "description": "Digital Mixing It Framed Artwork",
+            "image": "https://res.cloudinary.com/djdhyhznc/image/upload/v1/pointless-impressions-staging/artwork/digital_mixing_it_framed.png",
+            "alt_text": "Digital Mixing It Framed Artwork",
+            "uploaded_at": "2025-11-01T16:00:00Z",
+            "uploaded_by": 7
+        }
+    },
+    {
+        "model": "photo.Photo",
+        "pk": 27,
+        "fields": {
+            "artwork": 12,
+            "photo_type": "artwork",
+            "asset_identifier": null,
+            "title": "Digital Mixing It",
+            "description": "Digital Mixing It Artwork",
+            "image": "https://res.cloudinary.com/djdhyhznc/image/upload/v1/pointless-impressions-staging/artwork/digital_mixing_it.png",
+            "alt_text": "Digital Mixing It Artwork",
+            "uploaded_at": "2025-11-01T16:00:00Z",
+            "uploaded_by": 7
+        }
+    },
+    {
+        "model": "photo.Photo",
+        "pk": 28,
+        "fields": {
+            "artwork": 13,
+            "photo_type": "artwork",
+            "asset_identifier": null,
+            "title": "Digital Semis Framed",
+            "description": "Digital Semis Framed Artwork",
+            "image": "https://res.cloudinary.com/djdhyhznc/image/upload/v1/pointless-impressions-staging/artwork/digital_semis_framed.png",
+            "alt_text": "Digital Semis Framed Artwork",
+            "uploaded_at": "2025-11-01T16:00:00Z",
+            "uploaded_by": 7
+        }
+    },
+    {
+        "model": "photo.Photo",
+        "pk": 29,
+        "fields": {
+            "artwork": 13,
+            "photo_type": "artwork",
+            "asset_identifier": null,
+            "title": "Digital Semis",
+            "description": "Digital Semis Artwork",
+            "image": "https://res.cloudinary.com/djdhyhznc/image/upload/v1/pointless-impressions-staging/artwork/digital_semis.png",
+            "alt_text": "Digital Semis Artwork",
+            "uploaded_at": "2025-11-01T16:00:00Z",
+            "uploaded_by": 7
+        }
+    },
+    {
+        "model": "photo.Photo",
+        "pk": 30,
+        "fields": {
+            "artwork": 14,
+            "photo_type": "artwork",
+            "asset_identifier": null,
+            "title": "Digital Trucking Framed",
+            "description": "Digital Trucking Framed Artwork",
+            "image": "https://res.cloudinary.com/djdhyhznc/image/upload/v1/pointless-impressions-staging/artwork/digital_trucking_framed.png",
+            "alt_text": "Digital Trucking Framed Artwork",
+            "uploaded_at": "2025-11-01T16:00:00Z",
+            "uploaded_by": 7
+        }
+    },
+    {
+        "model": "photo.Photo",
+        "pk": 31,
+        "fields": {
+            "artwork": 14,
+            "photo_type": "artwork",
+            "asset_identifier": null,
+            "title": "Digital Trucking",
+            "description": "Digital Trucking Artwork",
+            "image": "https://res.cloudinary.com/djdhyhznc/image/upload/v1/pointless-impressions-staging/artwork/digital_trucking.png",
+            "alt_text": "Digital Trucking Artwork",
+            "uploaded_at": "2025-11-01T16:00:00Z",
+            "uploaded_by": 7
+        }
+    },
+    {
+        "model": "photo.Photo",
+        "pk": 32,
+        "fields": {
+            "artwork": 15,
+            "photo_type": "artwork",
+            "asset_identifier": null,
+            "title": "Digital Turrets Framed",
+            "description": "Digital Turrets Framed Artwork",
+            "image": "https://res.cloudinary.com/djdhyhznc/image/upload/v1/pointless-impressions-staging/artwork/digital_turrets_framed.png",
+            "alt_text": "Digital Turrets Framed Artwork",
+            "uploaded_at": "2025-11-01T16:00:00Z",
+            "uploaded_by": 7
+        }
+    },
+    {
+        "model": "photo.Photo",
+        "pk": 33,
+        "fields": {
+            "artwork": 15,
+            "photo_type": "artwork",
+            "asset_identifier": null,
+            "title": "Digital Turrets",
+            "description": "Digital Turrets Artwork",
+            "image": "https://res.cloudinary.com/djdhyhznc/image/upload/v1/pointless-impressions-staging/artwork/digital_turrets.png",
+            "alt_text": "Digital Turrets Artwork",
+            "uploaded_at": "2025-11-01T16:00:00Z",
+            "uploaded_by": 7
+        }
+    },
+    {
+        "model": "photo.Photo",
+        "pk": 34,
+        "fields": {
+            "artwork": 16,
+            "photo_type": "artwork",
+            "asset_identifier": null,
+            "title": "Gardens Bending Grass 01 Framed",
+            "description": "Gardens Bending Grass 01 Framed Artwork",
+            "image": "https://res.cloudinary.com/djdhyhznc/image/upload/v1/pointless-impressions-staging/artwork/gardens_bending_grass_01_framed.png",
+            "alt_text": "Gardens Bending Grass 01 Framed Artwork",
+            "uploaded_at": "2025-11-01T16:00:00Z",
+            "uploaded_by": 7
+        }
+    },
+    {
+        "model": "photo.Photo",
+        "pk": 35,
+        "fields": {
+            "artwork": 16,
+            "photo_type": "artwork",
+            "asset_identifier": null,
+            "title": "Gardens Bending Grass 01",
+            "description": "Gardens Bending Grass 01 Artwork",
+            "image": "https://res.cloudinary.com/djdhyhznc/image/upload/v1/pointless-impressions-staging/artwork/gardens_bending_grass_01.png",
+            "alt_text": "Gardens Bending Grass 01 Artwork",
+            "uploaded_at": "2025-11-01T16:00:00Z",
+            "uploaded_by": 7
+        }
+    },
+    {
+        "model": "photo.Photo",
+        "pk": 36,
+        "fields": {
+            "artwork": 17,
+            "photo_type": "artwork",
+            "asset_identifier": null,
+            "title": "Gardens Bending Grass 02 Framed",
+            "description": "Gardens Bending Grass 02 Framed Artwork",
+            "image": "https://res.cloudinary.com/djdhyhznc/image/upload/v1/pointless-impressions-staging/artwork/gardens_bending_grass_02_framed.png",
+            "alt_text": "Gardens Bending Grass 02 Framed Artwork",
+            "uploaded_at": "2025-11-01T16:00:00Z",
+            "uploaded_by": 7
+        }
+    },
+    {
+        "model": "photo.Photo",
+        "pk": 37,
+        "fields": {
+            "artwork": 17,
+            "photo_type": "artwork",
+            "asset_identifier": null,
+            "title": "Gardens Bending Grass 02",
+            "description": "Gardens Bending Grass 02 Artwork",
+            "image": "https://res.cloudinary.com/djdhyhznc/image/upload/v1/pointless-impressions-staging/artwork/gardens_bending_grass_02.png",
+            "alt_text": "Gardens Bending Grass 02 Artwork",
+            "uploaded_at": "2025-11-01T16:00:00Z",
+            "uploaded_by": 7
+        }
+    },
+    {
+        "model": "photo.Photo",
+        "pk": 38,
+        "fields": {
+            "artwork": 18,
+            "photo_type": "artwork",
+            "asset_identifier": null,
+            "title": "Gardens The Hive Framed",
+            "description": "Gardens The Hive Framed Artwork",
+            "image": "https://res.cloudinary.com/djdhyhznc/image/upload/v1/pointless-impressions-staging/artwork/gardens_the_hive_02_framed.png",
+            "alt_text": "Gardens The Hive Framed Artwork",
+            "uploaded_at": "2025-11-01T16:00:00Z",
+            "uploaded_by": 7
+        }
+    },
+    {
+        "model": "photo.Photo",
+        "pk": 39,
+        "fields": {
+            "artwork": 18,
+            "photo_type": "artwork",
+            "asset_identifier": null,
+            "title": "Gardens The Hive",
+            "description": "Gardens The Hive Artwork",
+            "image": "https://res.cloudinary.com/djdhyhznc/image/upload/v1/pointless-impressions-staging/artwork/gardens_the_hive_02.png",
+            "alt_text": "Gardens The Hive Artwork",
+            "uploaded_at": "2025-11-01T16:00:00Z",
+            "uploaded_by": 7
+        }
+    },
+    {
+        "model": "photo.Photo",
+        "pk": 40,
+        "fields": {
+            "artwork": 19,
+            "photo_type": "artwork",
+            "asset_identifier": null,
+            "title": "Gardens The Sunrise Framed",
+            "description": "Gardens The Sunrise Framed Artwork",
+            "image": "https://res.cloudinary.com/djdhyhznc/image/upload/v1/pointless-impressions-staging/artwork/gardens_the_sunrise_01_framed.png",
+            "alt_text": "Gardens The Sunrise Framed Artwork",
+            "uploaded_at": "2025-11-01T16:00:00Z",
+            "uploaded_by": 7
+        }
+    },
+    {
+        "model": "photo.Photo",
+        "pk": 41,
+        "fields": {
+            "artwork": 19,
+            "photo_type": "artwork",
+            "asset_identifier": null,
+            "title": "Gardens The Sunrise",
+            "description": "Gardens The Sunrise Artwork",
+            "image": "https://res.cloudinary.com/djdhyhznc/image/upload/v1/pointless-impressions-staging/artwork/gardens_the_sunrise_01.png",
+            "alt_text": "Gardens The Sunrise Artwork",
+            "uploaded_at": "2025-11-01T16:00:00Z",
+            "uploaded_by": 7
+        }
+    },
+    {
+        "model": "photo.Photo",
+        "pk": 42,
+        "fields": {
+            "artwork": 20,
+            "photo_type": "artwork",
+            "asset_identifier": null,
+            "title": "Landscape Foreign Shores Chile Framed",
+            "description": "Landscape Foreign Shores Chile Framed Artwork",
+            "image": "https://res.cloudinary.com/djdhyhznc/image/upload/v1/pointless-impressions-staging/artwork/landscape_foreign_shores_chile_01_framed.png",
+            "alt_text": "Landscape Foreign Shores Chile Framed Artwork",
+            "uploaded_at": "2025-11-01T16:00:00Z",
+            "uploaded_by": 7
+        }
+    },
+    {
+        "model": "photo.Photo",
+        "pk": 43,
+        "fields": {
+            "artwork": 20,
+            "photo_type": "artwork",
+            "asset_identifier": null,
+            "title": "Landscape Foreign Shores Chile",
+            "description": "Landscape Foreign Shores Chile Artwork",
+            "image": "https://res.cloudinary.com/djdhyhznc/image/upload/v1/pointless-impressions-staging/artwork/landscape_foreign_shores_chile_01.png",
+            "alt_text": "Landscape Foreign Shores Chile Artwork",
+            "uploaded_at": "2025-11-01T16:00:00Z",
+            "uploaded_by": 7
+        }
+    },
+    {
+        "model": "photo.Photo",
+        "pk": 44,
+        "fields": {
+            "artwork": 21,
+            "photo_type": "artwork",
+            "asset_identifier": null,
+            "title": "London Shard Of Glass Framed",
+            "description": "London Shard Of Glass Framed Artwork",
+            "image": "https://res.cloudinary.com/djdhyhznc/image/upload/v1/pointless-impressions-staging/artwork/london_shard_of_glass_01_framed.png",
+            "alt_text": "London Shard Of Glass Framed Artwork",
+            "uploaded_at": "2025-11-01T16:00:00Z",
+            "uploaded_by": 7
+        }
+    },
+    {
+        "model": "photo.Photo",
+        "pk": 45,
+        "fields": {
+            "artwork": 21,
+            "photo_type": "artwork",
+            "asset_identifier": null,
+            "title": "London Shard Of Glass",
+            "description": "London Shard Of Glass Artwork",
+            "image": "https://res.cloudinary.com/djdhyhznc/image/upload/v1/pointless-impressions-staging/artwork/london_shard_of_glass_01.png",
+            "alt_text": "London Shard Of Glass Artwork",
+            "uploaded_at": "2025-11-01T16:00:00Z",
+            "uploaded_by": 7
+        }
+    },
+    {
+        "model": "photo.Photo",
+        "pk": 46,
+        "fields": {
+            "artwork": 22,
+            "photo_type": "artwork",
+            "asset_identifier": null,
+            "title": "Painting Autumn Reflections Framed",
+            "description": "Painting Autumn Reflections Framed Artwork",
+            "image": "https://res.cloudinary.com/djdhyhznc/image/upload/v1/pointless-impressions-staging/artwork/painting_autumn_reflections_01_framed.png",
+            "alt_text": "Painting Autumn Reflections Framed Artwork",
+            "uploaded_at": "2025-11-01T16:00:00Z",
+            "uploaded_by": 7
+        }
+    },
+    {
+        "model": "photo.Photo",
+        "pk": 47,
+        "fields": {
+            "artwork": 22,
+            "photo_type": "artwork",
+            "asset_identifier": null,
+            "title": "Painting Autumn Reflections",
+            "description": "Painting Autumn Reflections Artwork",
+            "image": "https://res.cloudinary.com/djdhyhznc/image/upload/v1/pointless-impressions-staging/artwork/painting_autumn_reflections_01.png",
+            "alt_text": "Painting Autumn Reflections Artwork",
+            "uploaded_at": "2025-11-01T16:00:00Z",
+            "uploaded_by": 7
+        }
+    },
+    {
+        "model": "photo.Photo",
+        "pk": 48,
+        "fields": {
+            "artwork": 23,
+            "photo_type": "artwork",
+            "asset_identifier": null,
+            "title": "Painting Scottish Hills Framed",
+            "description": "Painting Scottish Hills Framed Artwork",
+            "image": "https://res.cloudinary.com/djdhyhznc/image/upload/v1/pointless-impressions-staging/artwork/painting_scottish_hills_framed.png",
+            "alt_text": "Painting Scottish Hills Framed Artwork",
+            "uploaded_at": "2025-11-01T16:00:00Z",
+            "uploaded_by": 7
+        }
+    },
+    {
+        "model": "photo.Photo",
+        "pk": 49,
+        "fields": {
+            "artwork": 23,
+            "photo_type": "artwork",
+            "asset_identifier": null,
+            "title": "Painting Scottish Hills",
+            "description": "Painting Scottish Hills Artwork",
+            "image": "https://res.cloudinary.com/djdhyhznc/image/upload/v1/pointless-impressions-staging/artwork/painting_scottish_hills.png",
+            "alt_text": "Painting Scottish Hills Artwork",
+            "uploaded_at": "2025-11-01T16:00:00Z",
+            "uploaded_by": 7
+        }
+    },
+    {
+        "model": "photo.Photo",
+        "pk": 50,
+        "fields": {
+            "artwork": 24,
+            "photo_type": "artwork",
+            "asset_identifier": null,
+            "title": "Painting The Bear Framed",
+            "description": "Painting The Bear Framed Artwork",
+            "image": "https://res.cloudinary.com/djdhyhznc/image/upload/v1/pointless-impressions-staging/artwork/painting_the_bear_framed.png",
+            "alt_text": "Painting The Bear Framed Artwork",
+            "uploaded_at": "2025-11-01T16:00:00Z",
+            "uploaded_by": 7
+        }
+    },
+    {
+        "model": "photo.Photo",
+        "pk": 51,
+        "fields": {
+            "artwork": 24,
+            "photo_type": "artwork",
+            "asset_identifier": null,
+            "title": "Painting The Bear",
+            "description": "Painting The Bear Artwork",
+            "image": "https://res.cloudinary.com/djdhyhznc/image/upload/v1/pointless-impressions-staging/artwork/painting_the_bear.png",
+            "alt_text": "Painting The Bear Artwork",
+            "uploaded_at": "2025-11-01T16:00:00Z",
+            "uploaded_by": 7
+        }
+    },
+    {
+        "model": "photo.Photo",
+        "pk": 52,
+        "fields": {
+            "artwork": 25,
+            "photo_type": "artwork",
+            "asset_identifier": null,
+            "title": "Painting The Elephant Framed",
+            "description": "Painting The Elephant Framed Artwork",
+            "image": "https://res.cloudinary.com/djdhyhznc/image/upload/v1/pointless-impressions-staging/artwork/painting_the_elephant_01_framed.png",
+            "alt_text": "Painting The Elephant Framed Artwork",
+            "uploaded_at": "2025-11-01T16:00:00Z",
+            "uploaded_by": 7
+        }
+    },
+    {
+        "model": "photo.Photo",
+        "pk": 53,
+        "fields": {
+            "artwork": 25,
+            "photo_type": "artwork",
+            "asset_identifier": null,
+            "title": "Painting The Elephant",
+            "description": "Painting The Elephant Artwork",
+            "image": "https://res.cloudinary.com/djdhyhznc/image/upload/v1/pointless-impressions-staging/artwork/painting_the_elephant_01.png",
+            "alt_text": "Painting The Elephant Artwork",
+            "uploaded_at": "2025-11-01T16:00:00Z",
+            "uploaded_by": 7
+        }
+    },
+    {
+        "model": "photo.Photo",
+        "pk": 54,
+        "fields": {
+            "artwork": 26,
+            "photo_type": "artwork",
+            "asset_identifier": null,
+            "title": "Painting The Giraffe Framed",
+            "description": "Painting The Giraffe Framed Artwork",
+            "image": "https://res.cloudinary.com/djdhyhznc/image/upload/v1/pointless-impressions-staging/artwork/painting_the_giraffe_framed.png",
+            "alt_text": "Painting The Giraffe Framed Artwork",
+            "uploaded_at": "2025-11-01T16:00:00Z",
+            "uploaded_by": 7
+        }
+    },
+    {
+        "model": "photo.Photo",
+        "pk": 55,
+        "fields": {
+            "artwork": 26,
+            "photo_type": "artwork",
+            "asset_identifier": null,
+            "title": "Painting The Giraffe",
+            "description": "Painting The Giraffe Artwork",
+            "image": "https://res.cloudinary.com/djdhyhznc/image/upload/v1/pointless-impressions-staging/artwork/painting_the_giraffe.png",
+            "alt_text": "Painting The Giraffe Artwork",
+            "uploaded_at": "2025-11-01T16:00:00Z",
+            "uploaded_by": 7
+        }
+    },
+    {
+        "model": "photo.Photo",
+        "pk": 56,
+        "fields": {
+            "artwork": 27,
+            "photo_type": "artwork",
+            "asset_identifier": null,
+            "title": "Painting The Lion Framed",
+            "description": "Painting The Lion Framed Artwork",
+            "image": "https://res.cloudinary.com/djdhyhznc/image/upload/v1/pointless-impressions-staging/artwork/painting_the_lion_framed.png",
+            "alt_text": "Painting The Lion Framed Artwork",
+            "uploaded_at": "2025-11-01T16:00:00Z",
+            "uploaded_by": 7
+        }
+    },
+    {
+        "model": "photo.Photo",
+        "pk": 57,
+        "fields": {
+            "artwork": 27,
+            "photo_type": "artwork",
+            "asset_identifier": null,
+            "title": "Painting The Lion",
+            "description": "Painting The Lion Artwork",
+            "image": "https://res.cloudinary.com/djdhyhznc/image/upload/v1/pointless-impressions-staging/artwork/painting_the_lion.png",
+            "alt_text": "Painting The Lion Artwork",
+            "uploaded_at": "2025-11-01T16:00:00Z",
+            "uploaded_by": 7
+        }
+    },
+    {
+        "model": "photo.Photo",
+        "pk": 58,
+        "fields": {
+            "artwork": 28,
+            "photo_type": "artwork",
+            "asset_identifier": null,
+            "title": "Painting The Rabbit Framed",
+            "description": "Painting The Rabbit Framed Artwork",
+            "image": "https://res.cloudinary.com/djdhyhznc/image/upload/v1/pointless-impressions-staging/artwork/painting_the_rabbit_framed.png",
+            "alt_text": "Painting The Rabbit Framed Artwork",
+            "uploaded_at": "2025-11-01T16:00:00Z",
+            "uploaded_by": 7
+        }
+    },
+    {
+        "model": "photo.Photo",
+        "pk": 59,
+        "fields": {
+            "artwork": 28,
+            "photo_type": "artwork",
+            "asset_identifier": null,
+            "title": "Painting The Rabbit",
+            "description": "Painting The Rabbit Artwork",
+            "image": "https://res.cloudinary.com/djdhyhznc/image/upload/v1/pointless-impressions-staging/artwork/painting_the_rabbit.png",
+            "alt_text": "Painting The Rabbit Artwork",
+            "uploaded_at": "2025-11-01T16:00:00Z",
+            "uploaded_by": 7
+        }
+    },
+    {
+        "model": "photo.Photo",
+        "pk": 60,
+        "fields": {
+            "artwork": 29,
+            "photo_type": "artwork",
+            "asset_identifier": null,
+            "title": "Painting The Rhino Framed",
+            "description": "Painting The Rhino Framed Artwork",
+            "image": "https://res.cloudinary.com/djdhyhznc/image/upload/v1/pointless-impressions-staging/artwork/painting_the_rhino_framed.png",
+            "alt_text": "Painting The Rhino Framed Artwork",
+            "uploaded_at": "2025-11-01T16:00:00Z",
+            "uploaded_by": 7
+        }
+    },
+    {
+        "model": "photo.Photo",
+        "pk": 61,
+        "fields": {
+            "artwork": 29,
+            "photo_type": "artwork",
+            "asset_identifier": null,
+            "title": "Painting The Rhino",
+            "description": "Painting The Rhino Artwork",
+            "image": "https://res.cloudinary.com/djdhyhznc/image/upload/v1/pointless-impressions-staging/artwork/painting_the_rhino.png",
+            "alt_text": "Painting The Rhino Artwork",
+            "uploaded_at": "2025-11-01T16:00:00Z",
+            "uploaded_by": 7
+        }
+    },
+    {
+        "model": "photo.Photo",
+        "pk": 62,
+        "fields": {
+            "artwork": 30,
+            "photo_type": "artwork",
+            "asset_identifier": null,
+            "title": "Pointillism Always A Child 01 Framed",
+            "description": "Pointillism Always A Child 01 Framed Artwork",
+            "image": "https://res.cloudinary.com/djdhyhznc/image/upload/v1/pointless-impressions-staging/artwork/pointillism_always_a_child_01_framed.png",
+            "alt_text": "Pointillism Always A Child 01 Framed Artwork",
+            "uploaded_at": "2025-11-01T16:00:00Z",
+            "uploaded_by": 7
+        }
+    },
+    {
+        "model": "photo.Photo",
+        "pk": 63,
+        "fields": {
+            "artwork": 30,
+            "photo_type": "artwork",
+            "asset_identifier": null,
+            "title": "Pointillism Always A Child 01",
+            "description": "Pointillism Always A Child 01 Artwork",
+            "image": "https://res.cloudinary.com/djdhyhznc/image/upload/v1/pointless-impressions-staging/artwork/pointillism_always_a_child_01.png",
+            "alt_text": "Pointillism Always A Child 01 Artwork",
+            "uploaded_at": "2025-11-01T16:00:00Z",
+            "uploaded_by": 7
+        }
+    },
+    {
+        "model": "photo.Photo",
+        "pk": 64,
+        "fields": {
+            "artwork": 31,
+            "photo_type": "artwork",
+            "asset_identifier": null,
+            "title": "Pointillism Always A Child 02 Framed",
+            "description": "Pointillism Always A Child 02 Framed Artwork",
+            "image": "https://res.cloudinary.com/djdhyhznc/image/upload/v1/pointless-impressions-staging/artwork/pointillism_always_a_child_02_framed.png",
+            "alt_text": "Pointillism Always A Child 02 Framed Artwork",
+            "uploaded_at": "2025-11-01T16:00:00Z",
+            "uploaded_by": 7
+        }
+    },
+    {
+        "model": "photo.Photo",
+        "pk": 65,
+        "fields": {
+            "artwork": 31,
+            "photo_type": "artwork",
+            "asset_identifier": null,
+            "title": "Pointillism Always A Child 02",
+            "description": "Pointillism Always A Child 02 Artwork",
+            "image": "https://res.cloudinary.com/djdhyhznc/image/upload/v1/pointless-impressions-staging/artwork/pointillism_always_a_child_02.png",
+            "alt_text": "Pointillism Always A Child 02 Artwork",
+            "uploaded_at": "2025-11-01T16:00:00Z",
+            "uploaded_by": 7
+        }
+    },
+    {
+        "model": "photo.Photo",
+        "pk": 66,
+        "fields": {
+            "artwork": 32,
+            "photo_type": "artwork",
+            "asset_identifier": null,
+            "title": "Pointillism Always A Child 03 Framed",
+            "description": "Pointillism Always A Child 03 Framed Artwork",
+            "image": "https://res.cloudinary.com/djdhyhznc/image/upload/v1/pointless-impressions-staging/artwork/pointillism_always_a_child_03_framed.png",
+            "alt_text": "Pointillism Always A Child 03 Framed Artwork",
+            "uploaded_at": "2025-11-01T16:00:00Z",
+            "uploaded_by": 7
+        }
+    },
+    {
+        "model": "photo.Photo",
+        "pk": 67,
+        "fields": {
+            "artwork": 32,
+            "photo_type": "artwork",
+            "asset_identifier": null,
+            "title": "Pointillism Always A Child 03",
+            "description": "Pointillism Always A Child 03 Artwork",
+            "image": "https://res.cloudinary.com/djdhyhznc/image/upload/v1/pointless-impressions-staging/artwork/pointillism_always_a_child_03.png",
+            "alt_text": "Pointillism Always A Child 03 Artwork",
+            "uploaded_at": "2025-11-01T16:00:00Z",
+            "uploaded_by": 7
+        }
+    },
+    {
+        "model": "photo.Photo",
+        "pk": 68,
+        "fields": {
+            "artwork": 33,
+            "photo_type": "artwork",
+            "asset_identifier": null,
+            "title": "Pointillism Always A Child 04 Framed",
+            "description": "Pointillism Always A Child 04 Framed Artwork",
+            "image": "https://res.cloudinary.com/djdhyhznc/image/upload/v1/pointless-impressions-staging/artwork/pointillism_always_a_child_04_framed.png",
+            "alt_text": "Pointillism Always A Child 04 Framed Artwork",
+            "uploaded_at": "2025-11-01T16:00:00Z",
+            "uploaded_by": 7
+        }
+    },
+    {
+        "model": "photo.Photo",
+        "pk": 69,
+        "fields": {
+            "artwork": 33,
+            "photo_type": "artwork",
+            "asset_identifier": null,
+            "title": "Pointillism Always A Child 04",
+            "description": "Pointillism Always A Child 04 Artwork",
+            "image": "https://res.cloudinary.com/djdhyhznc/image/upload/v1/pointless-impressions-staging/artwork/pointillism_always_a_child_04.png",
+            "alt_text": "Pointillism Always A Child 04 Artwork",
+            "uploaded_at": "2025-11-01T16:00:00Z",
+            "uploaded_by": 7
+        }
+    },
+    {
+        "model": "photo.Photo",
+        "pk": 70,
+        "fields": {
+            "artwork": 34,
+            "photo_type": "artwork",
+            "asset_identifier": null,
+            "title": "Pointillism Always A Child 05 Framed",
+            "description": "Pointillism Always A Child 05 Framed Artwork",
+            "image": "https://res.cloudinary.com/djdhyhznc/image/upload/v1/pointless-impressions-staging/artwork/pointillism_always_a_child_05_framed.png",
+            "alt_text": "Pointillism Always A Child 05 Framed Artwork",
+            "uploaded_at": "2025-11-01T16:00:00Z",
+            "uploaded_by": 7
+        }
+    },
+    {
+        "model": "photo.Photo",
+        "pk": 71,
+        "fields": {
+            "artwork": 34,
+            "photo_type": "artwork",
+            "asset_identifier": null,
+            "title": "Pointillism Always A Child 05",
+            "description": "Pointillism Always A Child 05 Artwork",
+            "image": "https://res.cloudinary.com/djdhyhznc/image/upload/v1/pointless-impressions-staging/artwork/pointillism_always_a_child_05.png",
+            "alt_text": "Pointillism Always A Child 05 Artwork",
+            "uploaded_at": "2025-11-01T16:00:00Z",
+            "uploaded_by": 7
+        }
+    },
+    {
+        "model": "photo.Photo",
+        "pk": 72,
+        "fields": {
+            "artwork": 35,
+            "photo_type": "artwork",
+            "asset_identifier": null,
+            "title": "Pointillism An Icon Framed",
+            "description": "Pointillism An Icon Framed Artwork",
+            "image": "https://res.cloudinary.com/djdhyhznc/image/upload/v1/pointless-impressions-staging/artwork/pointillism_an_icon_01_framed.png",
+            "alt_text": "Pointillism An Icon Framed Artwork",
+            "uploaded_at": "2025-11-01T16:00:00Z",
+            "uploaded_by": 7
+        }
+    },
+    {
+        "model": "photo.Photo",
+        "pk": 73,
+        "fields": {
+            "artwork": 35,
+            "photo_type": "artwork",
+            "asset_identifier": null,
+            "title": "Pointillism An Icon",
+            "description": "Pointillism An Icon Artwork",
+            "image": "https://res.cloudinary.com/djdhyhznc/image/upload/v1/pointless-impressions-staging/artwork/pointillism_an_icon_01.png",
+            "alt_text": "Pointillism An Icon Artwork",
+            "uploaded_at": "2025-11-01T16:00:00Z",
+            "uploaded_by": 7
+        }
+    },
+    {
+        "model": "photo.Photo",
+        "pk": 74,
+        "fields": {
+            "artwork": 36,
+            "photo_type": "artwork",
+            "asset_identifier": null,
+            "title": "Pointillism The Beauty Of Genesis 01 Framed",
+            "description": "Pointillism The Beauty Of Genesis 01 Framed Artwork",
+            "image": "https://res.cloudinary.com/djdhyhznc/image/upload/v1/pointless-impressions-staging/artwork/pointillism_the_beauty_of_genesis_01_framed.png",
+            "alt_text": "Pointillism The Beauty Of Genesis 01 Framed Artwork",
+            "uploaded_at": "2025-11-01T16:00:00Z",
+            "uploaded_by": 7
+        }
+    },
+    {
+        "model": "photo.Photo",
+        "pk": 75,
+        "fields": {
+            "artwork": 36,
+            "photo_type": "artwork",
+            "asset_identifier": null,
+            "title": "Pointillism The Beauty Of Genesis 01",
+            "description": "Pointillism The Beauty Of Genesis 01 Artwork",
+            "image": "https://res.cloudinary.com/djdhyhznc/image/upload/v1/pointless-impressions-staging/artwork/pointillism_the_beauty_of_genesis_01.png",
+            "alt_text": "Pointillism The Beauty Of Genesis 01 Artwork",
+            "uploaded_at": "2025-11-01T16:00:00Z",
+            "uploaded_by": 7
+        }
+    },
+    {
+        "model": "photo.Photo",
+        "pk": 76,
+        "fields": {
+            "artwork": 37,
+            "photo_type": "artwork",
+            "asset_identifier": null,
+            "title": "Pointillism The Beauty Of Genesis 02 Framed",
+            "description": "Pointillism The Beauty Of Genesis 02 Framed Artwork",
+            "image": "https://res.cloudinary.com/djdhyhznc/image/upload/v1/pointless-impressions-staging/artwork/pointillism_the_beauty_of_genesis_02_framed.png",
+            "alt_text": "Pointillism The Beauty Of Genesis 02 Framed Artwork",
+            "uploaded_at": "2025-11-01T16:00:00Z",
+            "uploaded_by": 7
+        }
+    },
+    {
+        "model": "photo.Photo",
+        "pk": 77,
+        "fields": {
+            "artwork": 37,
+            "photo_type": "artwork",
+            "asset_identifier": null,
+            "title": "Pointillism The Beauty Of Genesis 02",
+            "description": "Pointillism The Beauty Of Genesis 02 Artwork",
+            "image": "https://res.cloudinary.com/djdhyhznc/image/upload/v1/pointless-impressions-staging/artwork/pointillism_the_beauty_of_genesis_02.png",
+            "alt_text": "Pointillism The Beauty Of Genesis 02 Artwork",
+            "uploaded_at": "2025-11-01T16:00:00Z",
+            "uploaded_by": 7
+        }
+    },
+    {
+        "model": "photo.Photo",
+        "pk": 78,
+        "fields": {
+            "artwork": 38,
+            "photo_type": "artwork",
+            "asset_identifier": null,
+            "title": "Pointillism The Dog 01 Framed",
+            "description": "Pointillism The Dog 01 Framed Artwork",
+            "image": "https://res.cloudinary.com/djdhyhznc/image/upload/v1/pointless-impressions-staging/artwork/pointillism_the_dog_01_framed.png",
+            "alt_text": "Pointillism The Dog 01 Framed Artwork",
+            "uploaded_at": "2025-11-01T16:00:00Z",
+            "uploaded_by": 7
+        }
+    },
+    {
+        "model": "photo.Photo",
+        "pk": 79,
+        "fields": {
+            "artwork": 38,
+            "photo_type": "artwork",
+            "asset_identifier": null,
+            "title": "Pointillism The Dog 01",
+            "description": "Pointillism The Dog 01 Artwork",
+            "image": "https://res.cloudinary.com/djdhyhznc/image/upload/v1/pointless-impressions-staging/artwork/pointillism_the_dog_01.png",
+            "alt_text": "Pointillism The Dog 01 Artwork",
+            "uploaded_at": "2025-11-01T16:00:00Z",
+            "uploaded_by": 7
+        }
+    },
+    {
+        "model": "photo.Photo",
+        "pk": 80,
+        "fields": {
+            "artwork": 39,
+            "photo_type": "artwork",
+            "asset_identifier": null,
+            "title": "Pointillism The Dog 02 Framed",
+            "description": "Pointillism The Dog 02 Framed Artwork",
+            "image": "https://res.cloudinary.com/djdhyhznc/image/upload/v1/pointless-impressions-staging/artwork/pointillism_the_dog_02_framed.png",
+            "alt_text": "Pointillism The Dog 02 Framed Artwork",
+            "uploaded_at": "2025-11-01T16:00:00Z",
+            "uploaded_by": 7
+        }
+    },
+    {
+        "model": "photo.Photo",
+        "pk": 81,
+        "fields": {
+            "artwork": 39,
+            "photo_type": "artwork",
+            "asset_identifier": null,
+            "title": "Pointillism The Dog 02",
+            "description": "Pointillism The Dog 02 Artwork",
+            "image": "https://res.cloudinary.com/djdhyhznc/image/upload/v1/pointless-impressions-staging/artwork/pointillism_the_dog_02.png",
+            "alt_text": "Pointillism The Dog 02 Artwork",
+            "uploaded_at": "2025-11-01T16:00:00Z",
+            "uploaded_by": 7
+        }
+    },
+    {
+        "model": "photo.Photo",
+        "pk": 82,
+        "fields": {
+            "artwork": 40,
+            "photo_type": "artwork",
+            "asset_identifier": null,
+            "title": "Resurrection Engulfed In The Flames Framed",
+            "description": "Resurrection Engulfed In The Flames Framed Artwork",
+            "image": "https://res.cloudinary.com/djdhyhznc/image/upload/v1/pointless-impressions-staging/artwork/resurrection_engulfed_in_the_flames_framed.png",
+            "alt_text": "Resurrection Engulfed In The Flames Framed Artwork",
+            "uploaded_at": "2025-11-01T16:00:00Z",
+            "uploaded_by": 7
+        }
+    },
+    {
+        "model": "photo.Photo",
+        "pk": 83,
+        "fields": {
+            "artwork": 40,
+            "photo_type": "artwork",
+            "asset_identifier": null,
+            "title": "Resurrection Engulfed In The Flames",
+            "description": "Resurrection Engulfed In The Flames Artwork",
+            "image": "https://res.cloudinary.com/djdhyhznc/image/upload/v1/pointless-impressions-staging/artwork/resurrection_engulfed_in_the_flames.png",
+            "alt_text": "Resurrection Engulfed In The Flames Artwork",
+            "uploaded_at": "2025-11-01T16:00:00Z",
+            "uploaded_by": 7
+        }
+    },
+    {
+        "model": "photo.Photo",
+        "pk": 84,
+        "fields": {
+            "artwork": 41,
+            "photo_type": "artwork",
+            "asset_identifier": null,
+            "title": "Resurrection Surrender To The Flames Framed",
+            "description": "Resurrection Surrender To The Flames Framed Artwork",
+            "image": "https://res.cloudinary.com/djdhyhznc/image/upload/v1/pointless-impressions-staging/artwork/resurrection_surrender_to_the_flames_framed.png",
+            "alt_text": "Resurrection Surrender To The Flames Framed Artwork",
+            "uploaded_at": "2025-11-01T16:00:00Z",
+            "uploaded_by": 7
+        }
+    },
+    {
+        "model": "photo.Photo",
+        "pk": 85,
+        "fields": {
+            "artwork": 41,
+            "photo_type": "artwork",
+            "asset_identifier": null,
+            "title": "Resurrection Surrender To The Flames",
+            "description": "Resurrection Surrender To The Flames Artwork",
+            "image": "https://res.cloudinary.com/djdhyhznc/image/upload/v1/pointless-impressions-staging/artwork/resurrection_surrender_to_the_flames.png",
+            "alt_text": "Resurrection Surrender To The Flames Artwork",
+            "uploaded_at": "2025-11-01T16:00:00Z",
+            "uploaded_by": 7
+        }
+    },
+    {
+        "model": "photo.Photo",
+        "pk": 86,
+        "fields": {
+            "artwork": 42,
+            "photo_type": "artwork",
+            "asset_identifier": null,
+            "title": "Resurrection The Fire Of Purity Framed",
+            "description": "Resurrection The Fire Of Purity Framed Artwork",
+            "image": "https://res.cloudinary.com/djdhyhznc/image/upload/v1/pointless-impressions-staging/artwork/resurrection_the_fire_of_purity_framed.png",
+            "alt_text": "Resurrection The Fire Of Purity Framed Artwork",
+            "uploaded_at": "2025-11-01T16:00:00Z",
+            "uploaded_by": 7
+        }
+    },
+    {
+        "model": "photo.Photo",
+        "pk": 87,
+        "fields": {
+            "artwork": 42,
+            "photo_type": "artwork",
+            "asset_identifier": null,
+            "title": "Resurrection The Fire Of Purity",
+            "description": "Resurrection The Fire Of Purity Artwork",
+            "image": "https://res.cloudinary.com/djdhyhznc/image/upload/v1/pointless-impressions-staging/artwork/resurrection_the_fire_of_purity.png",
+            "alt_text": "Resurrection The Fire Of Purity Artwork",
+            "uploaded_at": "2025-11-01T16:00:00Z",
+            "uploaded_by": 7
+        }
+    },
+    {
+        "model": "photo.Photo",
+        "pk": 88,
+        "fields": {
+            "artwork": 43,
+            "photo_type": "artwork",
+            "asset_identifier": null,
+            "title": "Seascape Mists Of Time Framed",
+            "description": "Seascape Mists Of Time Framed Artwork",
+            "image": "https://res.cloudinary.com/djdhyhznc/image/upload/v1/pointless-impressions-staging/artwork/seascape_mists_of_time_01_framed.png",
+            "alt_text": "Seascape Mists Of Time Framed Artwork",
+            "uploaded_at": "2025-11-01T16:00:00Z",
+            "uploaded_by": 7
+        }
+    },
+    {
+        "model": "photo.Photo",
+        "pk": 89,
+        "fields": {
+            "artwork": 43,
+            "photo_type": "artwork",
+            "asset_identifier": null,
+            "title": "Seascape Mists Of Time",
+            "description": "Seascape Mists Of Time Artwork",
+            "image": "https://res.cloudinary.com/djdhyhznc/image/upload/v1/pointless-impressions-staging/artwork/seascape_mists_of_time_01.png",
+            "alt_text": "Seascape Mists Of Time Artwork",
+            "uploaded_at": "2025-11-01T16:00:00Z",
+            "uploaded_by": 7
+        }
+    },
+    {
+        "model": "photo.Photo",
+        "pk": 90,
+        "fields": {
+            "artwork": 44,
+            "photo_type": "artwork",
+            "asset_identifier": null,
+            "title": "Seascape Sentry Duty Framed",
+            "description": "Seascape Sentry Duty Framed Artwork",
+            "image": "https://res.cloudinary.com/djdhyhznc/image/upload/v1/pointless-impressions-staging/artwork/seascape_sentry_duty_01_framed.png",
+            "alt_text": "Seascape Sentry Duty Framed Artwork",
+            "uploaded_at": "2025-11-01T16:00:00Z",
+            "uploaded_by": 7
+        }
+    },
+    {
+        "model": "photo.Photo",
+        "pk": 91,
+        "fields": {
+            "artwork": 44,
+            "photo_type": "artwork",
+            "asset_identifier": null,
+            "title": "Seascape Sentry Duty",
+            "description": "Seascape Sentry Duty Artwork",
+            "image": "https://res.cloudinary.com/djdhyhznc/image/upload/v1/pointless-impressions-staging/artwork/seascape_sentry_duty_01.png",
+            "alt_text": "Seascape Sentry Duty Artwork",
+            "uploaded_at": "2025-11-01T16:00:00Z",
+            "uploaded_by": 7
+        }
+    },
+    {
+        "model": "photo.Photo",
+        "pk": 92,
+        "fields": {
+            "artwork": 45,
+            "photo_type": "artwork",
+            "asset_identifier": null,
+            "title": "Seascape The Beginning Framed",
+            "description": "Seascape The Beginning Framed Artwork",
+            "image": "https://res.cloudinary.com/djdhyhznc/image/upload/v1/pointless-impressions-staging/artwork/seascape_the_beginning_01_framed.png",
+            "alt_text": "Seascape The Beginning Framed Artwork",
+            "uploaded_at": "2025-11-01T16:00:00Z",
+            "uploaded_by": 7
+        }
+    },
+    {
+        "model": "photo.Photo",
+        "pk": 93,
+        "fields": {
+            "artwork": 45,
+            "photo_type": "artwork",
+            "asset_identifier": null,
+            "title": "Seascape The Beginning",
+            "description": "Seascape The Beginning Artwork",
+            "image": "https://res.cloudinary.com/djdhyhznc/image/upload/v1/pointless-impressions-staging/artwork/seascape_the_beginning_01.png",
+            "alt_text": "Seascape The Beginning Artwork",
+            "uploaded_at": "2025-11-01T16:00:00Z",
+            "uploaded_by": 7
+        }
+    },
+    {
+        "model": "photo.Photo",
+        "pk": 94,
+        "fields": {
+            "artwork": 46,
+            "photo_type": "artwork",
+            "asset_identifier": null,
+            "title": "Seascape The Landmark Framed",
+            "description": "Seascape The Landmark Framed Artwork",
+            "image": "https://res.cloudinary.com/djdhyhznc/image/upload/v1/pointless-impressions-staging/artwork/seascape_the_landmark_01_framed.png",
+            "alt_text": "Seascape The Landmark Framed Artwork",
+            "uploaded_at": "2025-11-01T16:00:00Z",
+            "uploaded_by": 7
+        }
+    },
+    {
+        "model": "photo.Photo",
+        "pk": 95,
+        "fields": {
+            "artwork": 46,
+            "photo_type": "artwork",
+            "asset_identifier": null,
+            "title": "Seascape The Landmark",
+            "description": "Seascape The Landmark Artwork",
+            "image": "https://res.cloudinary.com/djdhyhznc/image/upload/v1/pointless-impressions-staging/artwork/seascape_the_landmark_01.png",
+            "alt_text": "Seascape The Landmark Artwork",
+            "uploaded_at": "2025-11-01T16:00:00Z",
+            "uploaded_by": 7
+        }
+    },
+    {
+        "model": "photo.Photo",
+        "pk": 96,
+        "fields": {
+            "artwork": 47,
+            "photo_type": "artwork",
+            "asset_identifier": null,
+            "title": "Seascape Tides Out Framed",
+            "description": "Seascape Tides Out Framed Artwork",
+            "image": "https://res.cloudinary.com/djdhyhznc/image/upload/v1/pointless-impressions-staging/artwork/seascape_tides_out_01_framed.png",
+            "alt_text": "Seascape Tides Out Framed Artwork",
+            "uploaded_at": "2025-11-01T16:00:00Z",
+            "uploaded_by": 7
+        }
+    },
+    {
+        "model": "photo.Photo",
+        "pk": 97,
+        "fields": {
+            "artwork": 47,
+            "photo_type": "artwork",
+            "asset_identifier": null,
+            "title": "Seascape Tides Out",
+            "description": "Seascape Tides Out Artwork",
+            "image": "https://res.cloudinary.com/djdhyhznc/image/upload/v1/pointless-impressions-staging/artwork/seascape_tides_out_01.png",
+            "alt_text": "Seascape Tides Out Artwork",
+            "uploaded_at": "2025-11-01T16:00:00Z",
+            "uploaded_by": 7
+        }
+    },
+    {
+        "model": "photo.Photo",
+        "pk": 98,
+        "fields": {
+            "artwork": 48,
+            "photo_type": "artwork",
+            "asset_identifier": null,
+            "title": "Statue Absence Frames",
+            "description": "Statue Absence Frames Artwork",
+            "image": "https://res.cloudinary.com/djdhyhznc/image/upload/v1/pointless-impressions-staging/artwork/statue_absence_frames.png",
+            "alt_text": "Statue Absence Frames Artwork",
+            "uploaded_at": "2025-11-01T16:00:00Z",
+            "uploaded_by": 7
+        }
+    },
+    {
+        "model": "photo.Photo",
+        "pk": 99,
+        "fields": {
+            "artwork": 48,
+            "photo_type": "artwork",
+            "asset_identifier": null,
+            "title": "Statue Absence",
+            "description": "Statue Absence Artwork",
+            "image": "https://res.cloudinary.com/djdhyhznc/image/upload/v1/pointless-impressions-staging/artwork/statue_absence.png",
+            "alt_text": "Statue Absence Artwork",
+            "uploaded_at": "2025-11-01T16:00:00Z",
+            "uploaded_by": 7
+        }
+    },
+    {
+        "model": "photo.Photo",
+        "pk": 100,
+        "fields": {
+            "artwork": 49,
+            "photo_type": "artwork",
+            "asset_identifier": null,
+            "title": "Statue Angel Descends 01 Framed",
+            "description": "Statue Angel Descends 01 Framed Artwork",
+            "image": "https://res.cloudinary.com/djdhyhznc/image/upload/v1/pointless-impressions-staging/artwork/statue_angel_descends_01_framed.png",
+            "alt_text": "Statue Angel Descends 01 Framed Artwork",
+            "uploaded_at": "2025-11-01T16:00:00Z",
+            "uploaded_by": 7
+        }
+    },
+    {
+        "model": "photo.Photo",
+        "pk": 101,
+        "fields": {
+            "artwork": 49,
+            "photo_type": "artwork",
+            "asset_identifier": null,
+            "title": "Statue Angel Descends 01",
+            "description": "Statue Angel Descends 01 Artwork",
+            "image": "https://res.cloudinary.com/djdhyhznc/image/upload/v1/pointless-impressions-staging/artwork/statue_angel_descends_01.png",
+            "alt_text": "Statue Angel Descends 01 Artwork",
+            "uploaded_at": "2025-11-01T16:00:00Z",
+            "uploaded_by": 7
+        }
+    },
+    {
+        "model": "photo.Photo",
+        "pk": 102,
+        "fields": {
+            "artwork": 50,
+            "photo_type": "artwork",
+            "asset_identifier": null,
+            "title": "Statue Angel Descends 02 Framed",
+            "description": "Statue Angel Descends 02 Framed Artwork",
+            "image": "https://res.cloudinary.com/djdhyhznc/image/upload/v1/pointless-impressions-staging/artwork/statue_angel_descends_02_framed.png",
+            "alt_text": "Statue Angel Descends 02 Framed Artwork",
+            "uploaded_at": "2025-11-01T16:00:00Z",
+            "uploaded_by": 7
+        }
+    },
+    {
+        "model": "photo.Photo",
+        "pk": 103,
+        "fields": {
+            "artwork": 50,
+            "photo_type": "artwork",
+            "asset_identifier": null,
+            "title": "Statue Angel Descends 02",
+            "description": "Statue Angel Descends 02 Artwork",
+            "image": "https://res.cloudinary.com/djdhyhznc/image/upload/v1/pointless-impressions-staging/artwork/statue_angel_descends_02.png",
+            "alt_text": "Statue Angel Descends 02 Artwork",
+            "uploaded_at": "2025-11-01T16:00:00Z",
+            "uploaded_by": 7
+        }
+    },
+    {
+        "model": "photo.Photo",
+        "pk": 104,
+        "fields": {
+            "artwork": 51,
+            "photo_type": "artwork",
+            "asset_identifier": null,
+            "title": "Statue Angel Descends 03 Framed",
+            "description": "Statue Angel Descends 03 Framed Artwork",
+            "image": "https://res.cloudinary.com/djdhyhznc/image/upload/v1/pointless-impressions-staging/artwork/statue_angel_descends_03_framed.png",
+            "alt_text": "Statue Angel Descends 03 Framed Artwork",
+            "uploaded_at": "2025-11-01T16:00:00Z",
+            "uploaded_by": 7
+        }
+    },
+    {
+        "model": "photo.Photo",
+        "pk": 105,
+        "fields": {
+            "artwork": 51,
+            "photo_type": "artwork",
+            "asset_identifier": null,
+            "title": "Statue Angel Descends 03",
+            "description": "Statue Angel Descends 03 Artwork",
+            "image": "https://res.cloudinary.com/djdhyhznc/image/upload/v1/pointless-impressions-staging/artwork/statue_angel_descends_03.png",
+            "alt_text": "Statue Angel Descends 03 Artwork",
+            "uploaded_at": "2025-11-01T16:00:00Z",
+            "uploaded_by": 7
+        }
+    },
+    {
+        "model": "photo.Photo",
+        "pk": 106,
+        "fields": {
+            "artwork": 52,
+            "photo_type": "artwork",
+            "asset_identifier": null,
+            "title": "Statue Angel Descends 04 Framed",
+            "description": "Statue Angel Descends 04 Framed Artwork",
+            "image": "https://res.cloudinary.com/djdhyhznc/image/upload/v1/pointless-impressions-staging/artwork/statue_angel_descends_04_framed.png",
+            "alt_text": "Statue Angel Descends 04 Framed Artwork",
+            "uploaded_at": "2025-11-01T16:00:00Z",
+            "uploaded_by": 7
+        }
+    },
+    {
+        "model": "photo.Photo",
+        "pk": 107,
+        "fields": {
+            "artwork": 52,
+            "photo_type": "artwork",
+            "asset_identifier": null,
+            "title": "Statue Angel Descends 04",
+            "description": "Statue Angel Descends 04 Artwork",
+            "image": "https://res.cloudinary.com/djdhyhznc/image/upload/v1/pointless-impressions-staging/artwork/statue_angel_descends_04.png",
+            "alt_text": "Statue Angel Descends 04 Artwork",
+            "uploaded_at": "2025-11-01T16:00:00Z",
+            "uploaded_by": 7
+        }
+    },
+    {
+        "model": "photo.Photo",
+        "pk": 108,
+        "fields": {
+            "artwork": 53,
+            "photo_type": "artwork",
+            "asset_identifier": null,
+            "title": "Statue Angel Descends 05 Framed",
+            "description": "Statue Angel Descends 05 Framed Artwork",
+            "image": "https://res.cloudinary.com/djdhyhznc/image/upload/v1/pointless-impressions-staging/artwork/statue_angel_descends_05_framed.png",
+            "alt_text": "Statue Angel Descends 05 Framed Artwork",
+            "uploaded_at": "2025-11-01T16:00:00Z",
+            "uploaded_by": 7
+        }
+    },
+    {
+        "model": "photo.Photo",
+        "pk": 109,
+        "fields": {
+            "artwork": 53,
+            "photo_type": "artwork",
+            "asset_identifier": null,
+            "title": "Statue Angel Descends 05",
+            "description": "Statue Angel Descends 05 Artwork",
+            "image": "https://res.cloudinary.com/djdhyhznc/image/upload/v1/pointless-impressions-staging/artwork/statue_angel_descends_05.png",
+            "alt_text": "Statue Angel Descends 05 Artwork",
+            "uploaded_at": "2025-11-01T16:00:00Z",
+            "uploaded_by": 7
+        }
+    },
+    {
+        "model": "photo.Photo",
+        "pk": 110,
+        "fields": {
+            "artwork": 54,
+            "photo_type": "artwork",
+            "asset_identifier": null,
+            "title": "Statue Angel Descends 06 Framed",
+            "description": "Statue Angel Descends 06 Framed Artwork",
+            "image": "https://res.cloudinary.com/djdhyhznc/image/upload/v1/pointless-impressions-staging/artwork/statue_angel_descends_06_framed.png",
+            "alt_text": "Statue Angel Descends 06 Framed Artwork",
+            "uploaded_at": "2025-11-01T16:00:00Z",
+            "uploaded_by": 7
+        }
+    },
+    {
+        "model": "photo.Photo",
+        "pk": 111,
+        "fields": {
+            "artwork": 54,
+            "photo_type": "artwork",
+            "asset_identifier": null,
+            "title": "Statue Angel Descends 06",
+            "description": "Statue Angel Descends 06 Artwork",
+            "image": "https://res.cloudinary.com/djdhyhznc/image/upload/v1/pointless-impressions-staging/artwork/statue_angel_descends_06.png",
+            "alt_text": "Statue Angel Descends 06 Artwork",
+            "uploaded_at": "2025-11-01T16:00:00Z",
+            "uploaded_by": 7
+        }
+    },
+    {
+        "model": "photo.Photo",
+        "pk": 112,
+        "fields": {
+            "artwork": 55,
+            "photo_type": "artwork",
+            "asset_identifier": null,
+            "title": "Statue Angel Descends 07 Framed",
+            "description": "Statue Angel Descends 07 Framed Artwork",
+            "image": "https://res.cloudinary.com/djdhyhznc/image/upload/v1/pointless-impressions-staging/artwork/statue_angel_descends_07_framed.png",
+            "alt_text": "Statue Angel Descends 07 Framed Artwork",
+            "uploaded_at": "2025-11-01T16:00:00Z",
+            "uploaded_by": 7
+        }
+    },
+    {
+        "model": "photo.Photo",
+        "pk": 113,
+        "fields": {
+            "artwork": 55,
+            "photo_type": "artwork",
+            "asset_identifier": null,
+            "title": "Statue Angel Descends 07",
+            "description": "Statue Angel Descends 07 Artwork",
+            "image": "https://res.cloudinary.com/djdhyhznc/image/upload/v1/pointless-impressions-staging/artwork/statue_angel_descends_07.png",
+            "alt_text": "Statue Angel Descends 07 Artwork",
+            "uploaded_at": "2025-11-01T16:00:00Z",
+            "uploaded_by": 7
+        }
+    },
+    {
+        "model": "photo.Photo",
+        "pk": 114,
+        "fields": {
+            "artwork": 56,
+            "photo_type": "artwork",
+            "asset_identifier": null,
+            "title": "Statue Angel Descends 08 Framed",
+            "description": "Statue Angel Descends 08 Framed Artwork",
+            "image": "https://res.cloudinary.com/djdhyhznc/image/upload/v1/pointless-impressions-staging/artwork/statue_angel_descends_08_framed.png",
+            "alt_text": "Statue Angel Descends 08 Framed Artwork",
+            "uploaded_at": "2025-11-01T16:00:00Z",
+            "uploaded_by": 7
+        }
+    },
+    {
+        "model": "photo.Photo",
+        "pk": 115,
+        "fields": {
+            "artwork": 56,
+            "photo_type": "artwork",
+            "asset_identifier": null,
+            "title": "Statue Angel Descends 08",
+            "description": "Statue Angel Descends 08 Artwork",
+            "image": "https://res.cloudinary.com/djdhyhznc/image/upload/v1/pointless-impressions-staging/artwork/statue_angel_descends_08.png",
+            "alt_text": "Statue Angel Descends 08 Artwork",
+            "uploaded_at": "2025-11-01T16:00:00Z",
+            "uploaded_by": 7
+        }
+    },
+    {
+        "model": "photo.Photo",
+        "pk": 116,
+        "fields": {
+            "artwork": 57,
+            "photo_type": "artwork",
+            "asset_identifier": null,
+            "title": "Statue Angel Descends 09 Framed",
+            "description": "Statue Angel Descends 09 Framed Artwork",
+            "image": "https://res.cloudinary.com/djdhyhznc/image/upload/v1/pointless-impressions-staging/artwork/statue_angel_descends_09_framed.png",
+            "alt_text": "Statue Angel Descends 09 Framed Artwork",
+            "uploaded_at": "2025-11-01T16:00:00Z",
+            "uploaded_by": 7
+        }
+    },
+    {
+        "model": "photo.Photo",
+        "pk": 117,
+        "fields": {
+            "artwork": 57,
+            "photo_type": "artwork",
+            "asset_identifier": null,
+            "title": "Statue Angel Descends 09",
+            "description": "Statue Angel Descends 09 Artwork",
+            "image": "https://res.cloudinary.com/djdhyhznc/image/upload/v1/pointless-impressions-staging/artwork/statue_angel_descends_09.png",
+            "alt_text": "Statue Angel Descends 09 Artwork",
+            "uploaded_at": "2025-11-01T16:00:00Z",
+            "uploaded_by": 7
+        }
+    },
+    {
+        "model": "photo.Photo",
+        "pk": 118,
+        "fields": {
+            "artwork": 58,
+            "photo_type": "artwork",
+            "asset_identifier": null,
+            "title": "Statue Angel Descends 10 Framed",
+            "description": "Statue Angel Descends 10 Framed Artwork",
+            "image": "https://res.cloudinary.com/djdhyhznc/image/upload/v1/pointless-impressions-staging/artwork/statue_angel_descends_10_framed.png",
+            "alt_text": "Statue Angel Descends 10 Framed Artwork",
+            "uploaded_at": "2025-11-01T16:00:00Z",
+            "uploaded_by": 7
+        }
+    },
+    {
+        "model": "photo.Photo",
+        "pk": 119,
+        "fields": {
+            "artwork": 58,
+            "photo_type": "artwork",
+            "asset_identifier": null,
+            "title": "Statue Angel Descends 10",
+            "description": "Statue Angel Descends 10 Artwork",
+            "image": "https://res.cloudinary.com/djdhyhznc/image/upload/v1/pointless-impressions-staging/artwork/statue_angel_descends_10.png",
+            "alt_text": "Statue Angel Descends 10 Artwork",
+            "uploaded_at": "2025-11-01T16:00:00Z",
+            "uploaded_by": 7
+        }
+    },
+    {
+        "model": "photo.Photo",
+        "pk": 120,
+        "fields": {
+            "artwork": 59,
+            "photo_type": "artwork",
+            "asset_identifier": null,
+            "title": "Statue Angel Descends 11 Framed",
+            "description": "Statue Angel Descends 11 Framed Artwork",
+            "image": "https://res.cloudinary.com/djdhyhznc/image/upload/v1/pointless-impressions-staging/artwork/statue_angel_descends_11_framed.png",
+            "alt_text": "Statue Angel Descends 11 Framed Artwork",
+            "uploaded_at": "2025-11-01T16:00:00Z",
+            "uploaded_by": 7
+        }
+    },
+    {
+        "model": "photo.Photo",
+        "pk": 121,
+        "fields": {
+            "artwork": 59,
+            "photo_type": "artwork",
+            "asset_identifier": null,
+            "title": "Statue Angel Descends 11",
+            "description": "Statue Angel Descends 11 Artwork",
+            "image": "https://res.cloudinary.com/djdhyhznc/image/upload/v1/pointless-impressions-staging/artwork/statue_angel_descends_11.png",
+            "alt_text": "Statue Angel Descends 11 Artwork",
+            "uploaded_at": "2025-11-01T16:00:00Z",
+            "uploaded_by": 7
+        }
+    },
+    {
+        "model": "photo.Photo",
+        "pk": 122,
+        "fields": {
+            "artwork": 60,
+            "photo_type": "artwork",
+            "asset_identifier": null,
+            "title": "Statue Ascending Framed",
+            "description": "Statue Ascending Framed Artwork",
+            "image": "https://res.cloudinary.com/djdhyhznc/image/upload/v1/pointless-impressions-staging/artwork/statue_ascending_framed.png",
+            "alt_text": "Statue Ascending Framed Artwork",
+            "uploaded_at": "2025-11-01T16:00:00Z",
+            "uploaded_by": 7
+        }
+    },
+    {
+        "model": "photo.Photo",
+        "pk": 123,
+        "fields": {
+            "artwork": 60,
+            "photo_type": "artwork",
+            "asset_identifier": null,
+            "title": "Statue Ascending",
+            "description": "Statue Ascending Artwork",
+            "image": "https://res.cloudinary.com/djdhyhznc/image/upload/v1/pointless-impressions-staging/artwork/statue_ascending.png",
+            "alt_text": "Statue Ascending Artwork",
+            "uploaded_at": "2025-11-01T16:00:00Z",
+            "uploaded_by": 7
+        }
+    },
+    {
+        "model": "photo.Photo",
+        "pk": 124,
+        "fields": {
+            "artwork": 61,
+            "photo_type": "artwork",
+            "asset_identifier": null,
+            "title": "Statue Drops Of Memories Framed",
+            "description": "Statue Drops Of Memories Framed Artwork",
+            "image": "https://res.cloudinary.com/djdhyhznc/image/upload/v1/pointless-impressions-staging/artwork/statue_drops_of_memories_framed.png",
+            "alt_text": "Statue Drops Of Memories Framed Artwork",
+            "uploaded_at": "2025-11-01T16:00:00Z",
+            "uploaded_by": 7
+        }
+    },
+    {
+        "model": "photo.Photo",
+        "pk": 125,
+        "fields": {
+            "artwork": 61,
+            "photo_type": "artwork",
+            "asset_identifier": null,
+            "title": "Statue Drops Of Memories",
+            "description": "Statue Drops Of Memories Artwork",
+            "image": "https://res.cloudinary.com/djdhyhznc/image/upload/v1/pointless-impressions-staging/artwork/statue_drops_of_memories.png",
+            "alt_text": "Statue Drops Of Memories Artwork",
+            "uploaded_at": "2025-11-01T16:00:00Z",
+            "uploaded_by": 7
+        }
+    },
+    {
+        "model": "photo.Photo",
+        "pk": 126,
+        "fields": {
+            "artwork": 62,
+            "photo_type": "artwork",
+            "asset_identifier": null,
+            "title": "Statue Silent Weapons Framed",
+            "description": "Statue Silent Weapons Framed Artwork",
+            "image": "https://res.cloudinary.com/djdhyhznc/image/upload/v1/pointless-impressions-staging/artwork/statue_silent_weapons_framed.png",
+            "alt_text": "Statue Silent Weapons Framed Artwork",
+            "uploaded_at": "2025-11-01T16:00:00Z",
+            "uploaded_by": 7
+        }
+    },
+    {
+        "model": "photo.Photo",
+        "pk": 127,
+        "fields": {
+            "artwork": 62,
+            "photo_type": "artwork",
+            "asset_identifier": null,
+            "title": "Statue Silent Weapons",
+            "description": "Statue Silent Weapons Artwork",
+            "image": "https://res.cloudinary.com/djdhyhznc/image/upload/v1/pointless-impressions-staging/artwork/statue_silent_weapons.png",
+            "alt_text": "Statue Silent Weapons Artwork",
+            "uploaded_at": "2025-11-01T16:00:00Z",
+            "uploaded_by": 7
+        }
+    },
+    {
+        "model": "photo.Photo",
+        "pk": 128,
+        "fields": {
+            "artwork": 63,
+            "photo_type": "artwork",
+            "asset_identifier": null,
+            "title": "Statue The Crossing Framed",
+            "description": "Statue The Crossing Framed Artwork",
+            "image": "https://res.cloudinary.com/djdhyhznc/image/upload/v1/pointless-impressions-staging/artwork/statue_the_crossing_framed.png",
+            "alt_text": "Statue The Crossing Framed Artwork",
+            "uploaded_at": "2025-11-01T16:00:00Z",
+            "uploaded_by": 7
+        }
+    },
+    {
+        "model": "photo.Photo",
+        "pk": 129,
+        "fields": {
+            "artwork": 63,
+            "photo_type": "artwork",
+            "asset_identifier": null,
+            "title": "Statue The Crossing",
+            "description": "Statue The Crossing Artwork",
+            "image": "https://res.cloudinary.com/djdhyhznc/image/upload/v1/pointless-impressions-staging/artwork/statue_the_crossing.png",
+            "alt_text": "Statue The Crossing Artwork",
+            "uploaded_at": "2025-11-01T16:00:00Z",
+            "uploaded_by": 7
+        }
+    },
+    {
+        "model": "photo.Photo",
+        "pk": 130,
+        "fields": {
+            "artwork": 64,
+            "photo_type": "artwork",
+            "asset_identifier": null,
+            "title": "Statue The Remains Framed",
+            "description": "Statue The Remains Framed Artwork",
+            "image": "https://res.cloudinary.com/djdhyhznc/image/upload/v1/pointless-impressions-staging/artwork/statue_the_remains_framed.png",
+            "alt_text": "Statue The Remains Framed Artwork",
+            "uploaded_at": "2025-11-01T16:00:00Z",
+            "uploaded_by": 7
+        }
+    },
+    {
+        "model": "photo.Photo",
+        "pk": 131,
+        "fields": {
+            "artwork": 64,
+            "photo_type": "artwork",
+            "asset_identifier": null,
+            "title": "Statue The Remains",
+            "description": "Statue The Remains Artwork",
+            "image": "https://res.cloudinary.com/djdhyhznc/image/upload/v1/pointless-impressions-staging/artwork/statue_the_remains.png",
+            "alt_text": "Statue The Remains Artwork",
+            "uploaded_at": "2025-11-01T16:00:00Z",
+            "uploaded_by": 7
+        }
+    }
+]

@@ -65,6 +65,7 @@ class Photo(models.Model):
     description = models.TextField(blank=False)
 
     # Use Cloudinary for all environments (staging/prod required)
+    # CloudinaryField stores the Cloudinary URL in database
     image = CloudinaryField(
         'image',
         blank=False,

@@ -68,7 +68,9 @@ try:
     call_command('loaddata', 'profiles.json')
     call_command('loaddata', 'artwork_categories.json')
     call_command('loaddata', 'artwork_framing_conditions.json')
-    call_command('loaddata', 'photo.json')
+    # Note: photo.json is NOT loaded on Heroku as it contains local
+    # file paths that don't work with Cloudinary storage backend.
+    # Photos should be managed via Django admin interface on Heroku.
     call_command('loaddata', 'artwork.json')
     print('All fixtures loaded successfully.')
 except Exception as e:
