@@ -90,9 +90,21 @@ class AddToCartForm(forms.Form):
         quantity = self.cleaned_data.get('quantity')
         artwork_id = self.cleaned_data.get('artwork_id')
 
+        # Ensure quantity is at least 1 (prevent 0 or negative)
+        if quantity is not None and quantity < 1:
+            raise ValidationError('Quantity must be at least 1')
+
         if artwork_id:
             try:
                 artwork = Artwork.objects.get(id=artwork_id)
+
+                # Check stock availability
+                if not artwork.is_in_stock:
+                    raise ValidationError(
+                        'This artwork is currently out of stock'
+                        )
+
+                # Validate quantity doesn't exceed available stock
                 if quantity > artwork.quantity:
                     raise ValidationError(
                         f'Only {artwork.quantity} units available in stock'

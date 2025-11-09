@@ -65,7 +65,9 @@
       <div class="space-y-6">
         <div>
           <h1 class="text-4xl font-bold mb-2">{{ artwork_data.name }}</h1>
-          <div class="badge badge-primary badge-lg" data-testid="artwork-category">{{ artwork.category.friendly_name }}</div>
+          <div class="badge badge-primary badge-lg" data-testid="artwork-category">
+            <a href="{% url 'artwork:list' %}?category={{ artwork.category.slug }}" class="badge badge-primary badge-lg link link-hover">{{ artwork.category.friendly_name }}</a>
+          </div>
         </div>
 
         {% if not artwork_data.is_in_stock %}

@@ -85,6 +85,7 @@
   }
 
   // pointless_impressions_src/theme/static_src/src/js/add_to_cart_modal.js
+  var Toast = window.Toast;
   var addToCartModal = {
     // Current artwork being added
     currentArtwork: null,
@@ -187,16 +188,17 @@
      */
     validateQuantity() {
       const input = document.getElementById("quantity");
-      const max = parseInt(input.max) || 999;
-      const current = parseInt(input.value) || 1;
+      const max = this.currentArtwork?.quantity || parseInt(input.max) || 999;
+      let current = parseInt(input.value) || 1;
+      if (current < 1) {
+        input.value = 1;
+        this.showQtyError("Quantity must be at least 1");
+        return false;
+      }
       if (current > max) {
         input.value = max;
         this.showQtyError(`Maximum ${max} available`);
         return false;
-      }
-      if (current < 1) {
-        input.value = 1;
-        return true;
       }
       this.clearQtyError();
       return true;
@@ -221,33 +223,73 @@
      * @param {string} message - Error message to display
      */
     showError(message) {
-      const errorEl = document.getElementById("form_error");
-      document.getElementById("error_message").textContent = message;
-      errorEl.classList.remove("hidden");
-      document.getElementById("form_success").classList.add("hidden");
+      console.log("\u274C showError called with message:", message);
+      console.log("Toast object available?", !!Toast);
+      console.log("Toast.error available?", typeof Toast?.error);
+      const formErrorEl = document.getElementById("form_error");
+      const errorMessageEl = document.getElementById("error_message");
+      if (formErrorEl && errorMessageEl) {
+        errorMessageEl.textContent = message;
+        formErrorEl.classList.remove("hidden");
+        console.log("\u2705 Error displayed on modal");
+      }
+      if (Toast && typeof Toast.error === "function") {
+        Toast.error(message);
+        console.log("\u2705 Toast.error() called successfully");
+      } else {
+        console.error("\u274C Toast.error not available!", Toast);
+      }
     },
-    /**
+    /** 
      * Show form success message
      * @param {string} message - Success message to display
      */
     showSuccess(message) {
-      const successEl = document.getElementById("form_success");
-      document.getElementById("success_message").textContent = message;
-      successEl.classList.remove("hidden");
-      document.getElementById("form_error").classList.add("hidden");
+      console.log("\u2705 showSuccess called with message:", message);
+      console.log("Toast object available?", !!Toast);
+      console.log("Toast.success available?", typeof Toast?.success);
+      const formSuccessEl = document.getElementById("form_success");
+      const successMessageEl = document.getElementById("success_message");
+      if (formSuccessEl && successMessageEl) {
+        successMessageEl.textContent = message;
+        formSuccessEl.classList.remove("hidden");
+        console.log("\u2705 Success displayed on modal");
+      }
+      if (Toast && typeof Toast.success === "function") {
+        Toast.success(message);
+        console.log("\u2705 Toast.success() called successfully");
+      } else {
+        console.error("\u274C Toast.success not available!", Toast);
+      }
     },
     /**
      * Handle form submission
      * @param {Event} event - Form submit event
      */
     async handleSubmit(event) {
+      console.log("\u{1F4CB} handleSubmit called");
       event.preventDefault();
       if (!this.validateQuantity()) {
+        console.log("\u26A0\uFE0F Quantity validation failed");
         return;
       }
       const quantity = parseInt(document.getElementById("quantity").value) || 1;
       const framingOption = document.getElementById("framing_option").value;
       const notes = document.getElementById("notes").value.trim();
+      console.log("\u{1F4DD} Form values:", { quantity, framingOption, notes });
+      const framingSection = document.getElementById("framing_section");
+      console.log("\u{1F3A8} Framing section hidden?", framingSection.classList.contains("hidden"));
+      console.log("\u{1F3A8} Framing option value:", framingOption);
+      if (!framingSection.classList.contains("hidden") && !framingOption) {
+        console.log("\u274C Framing validation FAILED - showing error");
+        this.showError("Please select a framing option");
+        return;
+      }
+      if (quantity < 1 || quantity > this.currentArtwork.quantity) {
+        console.log("\u26A0\uFE0F Quantity out of range");
+        this.showError(`Quantity must be between 1 and ${this.currentArtwork.quantity}`);
+        return;
+      }
       const submitBtn = document.getElementById("submit_btn");
       const originalText = submitBtn.innerHTML;
       submitBtn.disabled = true;
@@ -289,7 +331,26 @@
     }
     if (quantityInput) {
       quantityInput.addEventListener("change", () => addToCartModal.validateQuantity());
-      quantityInput.addEventListener("input", () => addToCartModal.clearQtyError());
+      quantityInput.addEventListener("input", (e) => {
+        let value = parseInt(e.target.value) || 0;
+        if (value < 1) {
+          e.target.value = 1;
+          addToCartModal.showQtyError("Quantity must be at least 1");
+          return;
+        }
+        const max = addToCartModal.currentArtwork?.quantity || 999;
+        if (value > max) {
+          e.target.value = max;
+          addToCartModal.showQtyError(`Maximum ${max} available`);
+          return;
+        }
+        addToCartModal.clearQtyError();
+      });
+      quantityInput.addEventListener("paste", (e) => {
+        setTimeout(() => {
+          addToCartModal.validateQuantity();
+        }, 10);
+      });
     }
     if (form) {
       form.addEventListener("submit", (e) => addToCartModal.handleSubmit(e));

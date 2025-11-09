@@ -80,6 +80,7 @@
       <script src="https://cdn.jsdelivr.net/npm/@tarekraafat/autocomplete.js@10.2.9/dist/autoComplete.min.js"></script>
       <script src="{% static 'js/general.js' %}" defer></script>
       <script src="{% static 'js/header_footer.js' %}" defer></script>
+      <script src="{% static 'js/toasts.js' %}" defer></script>
     {% endblock %}
 
     {% block extracss %}{% endblock %}
@@ -149,6 +150,7 @@
 
     {% comment %} Notifications Area {% endcomment %}
     {% block notifications %}
+      {% include 'includes/toasts/toast.html' %}
     {% endblock %}
 
     {% comment %} Extra Notifications Area {% endcomment %}

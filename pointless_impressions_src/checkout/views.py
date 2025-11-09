@@ -3,7 +3,7 @@ from django.views import View
 from django.http import JsonResponse
 from django.views.decorators.http import require_http_methods
 from django.utils.decorators import method_decorator
-
+from django.contrib import messages
 from pointless_impressions_src.artwork.models import Artwork
 from .forms import (
     AddToCartForm,
@@ -34,7 +34,7 @@ class CartAPIView(View):
 @method_decorator(require_http_methods(['POST']), name='dispatch')
 class AddToCartView(CartAPIView):
     """
-    POST /api/cart/add/
+    POST /checkout/api/cart/add/
     Add item to cart
 
     Required POST data:
@@ -56,7 +56,7 @@ class AddToCartView(CartAPIView):
             return JsonResponse(
                 {
                     'success': False,
-                    'error': 'Form validation failed',
+                    'message': 'Form validation failed',
                     'errors': form.errors,
                 },
                 status=400
@@ -72,8 +72,30 @@ class AddToCartView(CartAPIView):
             artwork = Artwork.objects.get(id=artwork_id)
         except Artwork.DoesNotExist:
             return JsonResponse(
-                {'success': False, 'error': 'Artwork not found'},
+                {'success': False, 'message': 'Artwork not found'},
                 status=404
+            )
+
+        # SECURITY: Validate quantity is safe (prevent 0 or negative)
+        if quantity < 1:
+            return JsonResponse(
+                {
+                    'success': False,
+                    'message': 'Quantity must be at least 1',
+                    'type': 'error',
+                },
+                status=400
+            )
+
+        # SECURITY: Validate artwork is in stock (SSR protection)
+        if not artwork.is_in_stock or not artwork.is_available:
+            return JsonResponse(
+                {
+                    'success': False,
+                    'message': 'This artwork is no longer available',
+                    'type': 'error',
+                },
+                status=400
             )
 
         # Get or initialize cart from session
@@ -82,7 +104,24 @@ class AddToCartView(CartAPIView):
         # Add or update cart item
         artwork_key = str(artwork_id)
         if artwork_key in cart:
-            cart[artwork_key]['quantity'] += quantity
+            new_quantity = cart[artwork_key]['quantity'] + quantity
+        else:
+            new_quantity = quantity
+
+        # SECURITY: Validate total quantity doesn't exceed stock
+        if new_quantity > artwork.quantity:
+            return JsonResponse(
+                {
+                    'success': False,
+                    'message': f'Only {artwork.quantity} units available',
+                    'type': 'error',
+                },
+                status=400
+            )
+
+        # Update cart
+        if artwork_key in cart:
+            cart[artwork_key]['quantity'] = new_quantity
         else:
             cart[artwork_key] = {
                 'id': artwork_id,
@@ -98,23 +137,18 @@ class AddToCartView(CartAPIView):
             if notes:
                 cart[artwork_key]['notes'] = notes
 
-        # Validate total quantity doesn't exceed stock
-        if cart[artwork_key]['quantity'] > artwork.quantity:
-            return JsonResponse(
-                {
-                    'success': False,
-                    'error': f'Only {artwork.quantity} units available',
-                },
-                status=400
-            )
-
         # Save cart to session
         self.save_cart_to_session(cart)
+
+        # Add Django message for SSR (page reload) and API response
+        message_text = f'{artwork.name} added to cart'
+        messages.success(request, message_text)
 
         return JsonResponse(
             {
                 'success': True,
-                'message': f'{artwork.name} added to cart',
+                'message': message_text,
+                'type': 'success',
                 'cart_count': self.get_cart_count(),
                 'cart': cart,
             },
@@ -125,7 +159,7 @@ class AddToCartView(CartAPIView):
 @method_decorator(require_http_methods(['POST']), name='dispatch')
 class RemoveFromCartView(CartAPIView):
     """
-    POST /api/cart/remove/
+    POST /checkout/api/cart/remove/
     Remove item from cart
 
     Required POST data:
@@ -141,7 +175,7 @@ class RemoveFromCartView(CartAPIView):
             return JsonResponse(
                 {
                     'success': False,
-                    'error': 'Form validation failed',
+                    'message': 'Form validation failed',
                     'errors': form.errors,
                 },
                 status=400
@@ -154,17 +188,22 @@ class RemoveFromCartView(CartAPIView):
 
         if artwork_key not in cart:
             return JsonResponse(
-                {'success': False, 'error': 'Item not in cart'},
+                {'success': False, 'message': 'Item not in cart'},
                 status=404
             )
 
         del cart[artwork_key]
         self.save_cart_to_session(cart)
 
+        # Add Django message
+        message_text = 'Item removed from cart'
+        messages.success(request, message_text)
+
         return JsonResponse(
             {
                 'success': True,
-                'message': 'Item removed from cart',
+                'message': message_text,
+                'type': 'success',
                 'cart_count': self.get_cart_count(),
             },
             status=200
@@ -174,7 +213,7 @@ class RemoveFromCartView(CartAPIView):
 @method_decorator(require_http_methods(['POST']), name='dispatch')
 class UpdateCartQuantityView(CartAPIView):
     """
-    POST /api/cart/update/
+    POST /checkout/api/cart/update/
     Update quantity of item in cart
 
     Required POST data:
@@ -191,7 +230,7 @@ class UpdateCartQuantityView(CartAPIView):
             return JsonResponse(
                 {
                     'success': False,
-                    'error': 'Form validation failed',
+                    'message': 'Form validation failed',
                     'errors': form.errors,
                 },
                 status=400
@@ -205,7 +244,7 @@ class UpdateCartQuantityView(CartAPIView):
 
         if artwork_key not in cart:
             return JsonResponse(
-                {'success': False, 'error': 'Item not in cart'},
+                {'success': False, 'message': 'Item not in cart'},
                 status=404
             )
 
@@ -214,32 +253,60 @@ class UpdateCartQuantityView(CartAPIView):
             artwork = Artwork.objects.get(id=artwork_id)
         except Artwork.DoesNotExist:
             return JsonResponse(
-                {'success': False, 'error': 'Artwork not found'},
+                {'success': False, 'message': 'Artwork not found'},
                 status=404
+            )
+
+        # SECURITY: Validate quantity is not negative
+        if quantity < 0:
+            return JsonResponse(
+                {
+                    'success': False,
+                    'message': 'Quantity cannot be negative',
+                    'type': 'error',
+                },
+                status=400
             )
 
         if quantity == 0:
             # Remove item if quantity is 0
             del cart[artwork_key]
+            message_text = 'Item removed from cart'
         else:
-            # Validate quantity against stock
+            # SECURITY: Validate quantity against stock
+            if not artwork.is_in_stock or not artwork.is_available:
+                return JsonResponse(
+                    {
+                        'success': False,
+                        'message': 'This artwork is no longer available',
+                        'type': 'error',
+                    },
+                    status=400
+                )
+
             if quantity > artwork.quantity:
                 return JsonResponse(
                     {
                         'success': False,
-                        'error': f'Only {artwork.quantity} units available',
+                        'message': f'Only {artwork.quantity} units available',
+                        'type': 'error',
                     },
                     status=400
                 )
 
             cart[artwork_key]['quantity'] = quantity
+            message_text = 'Cart updated'
 
         self.save_cart_to_session(cart)
+
+        # Add Django message
+        messages.success(request, message_text)
 
         return JsonResponse(
             {
                 'success': True,
-                'message': 'Cart updated',
+                'message': message_text,
+                'type': 'success',
                 'cart_count': self.get_cart_count(),
             },
             status=200
@@ -249,7 +316,7 @@ class UpdateCartQuantityView(CartAPIView):
 @method_decorator(require_http_methods(['POST']), name='dispatch')
 class SyncCartView(CartAPIView):
     """
-    POST /api/cart/sync/
+    POST /checkout/api/cart/sync/
     Sync localStorage cart with backend session
 
     Required JSON body:
@@ -272,7 +339,7 @@ class SyncCartView(CartAPIView):
             data = json.loads(request.body)
         except json.JSONDecodeError:
             return JsonResponse(
-                {'success': False, 'error': 'Invalid JSON'},
+                {'success': False, 'message': 'Invalid JSON'},
                 status=400
             )
 
@@ -282,7 +349,7 @@ class SyncCartView(CartAPIView):
             return JsonResponse(
                 {
                     'success': False,
-                    'error': 'Form validation failed',
+                    'message': 'Form validation failed',
                     'errors': form.errors,
                 },
                 status=400
@@ -298,7 +365,7 @@ class SyncCartView(CartAPIView):
                 return JsonResponse(
                     {
                         'success': False,
-                        'error': f'Artwork {artwork_id} not found',
+                        'message': f'Artwork {artwork_id} not found',
                     },
                     status=404
                 )
@@ -306,10 +373,15 @@ class SyncCartView(CartAPIView):
         # Save synced cart to session
         self.save_cart_to_session(cart)
 
+        # Add Django message
+        message_text = 'Cart synced'
+        messages.success(request, message_text)
+
         return JsonResponse(
             {
                 'success': True,
-                'message': 'Cart synced',
+                'message': message_text,
+                'type': 'success',
                 'cart_count': self.get_cart_count(),
             },
             status=200

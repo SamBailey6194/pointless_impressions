@@ -91,6 +91,12 @@
     margin-top: auto;
   }
 
+  /* Toast Container - Aligned with header width */
+  #toast-container {
+    max-width: calc(100% - 2rem);
+    right: max(1rem, calc((100% - 80rem) / 2 + 1rem));
+  }
+
   /* Sections */
   .section-blue {
     background-color: var(--pointless-blue);
@@ -758,5 +764,38 @@
   .card-adaptive .card-meta {
     color: inherit;
     opacity: 0.6;
+  }
+}
+
+/* Toast Notification Animations */
+@layer utilities {
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+      transform: translateY(1rem);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes fade-out {
+    from {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    to {
+      opacity: 0;
+      transform: translateY(1rem);
+    }
+  }
+
+  .animate-fade-in {
+    animation: fade-in 0.3s ease-out;
+  }
+
+  .animate-fade-out {
+    animation: fade-out 0.3s ease-out;
   }
 }
