@@ -7,7 +7,20 @@
  * Tests for adding artwork to cart, updating quantities, and calculating totals
  */
 
-import { addToCart, removeFromCart, updateQuantity, getCart, calculateTotal, formatPrice } from '../../../../js/artwork_detail';
+import {
+  addToCart,
+  removeFromCart,
+  updateQuantity,
+  getCart,
+  calculateTotal,
+  formatPrice,
+  getCartItem,
+  updateCartItem,
+  getCartItemCount,
+  getTotalQuantity,
+  isCartEmpty,
+  clearCart,
+} from '../../../../js/cart';
 
 describe('Cart Functionality - US003', () => {
   beforeEach(() => {

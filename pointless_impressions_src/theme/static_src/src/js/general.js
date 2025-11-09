@@ -78,12 +78,8 @@ document.addEventListener("DOMContentLoaded", () => {
                 scrollCarousel(carouselId, direction, scrollMultiplier);
             });
         });
-
-        console.log(`Initialized ${carouselNavButtons.length} carousel navigation button(s)`);
     }
 
     // Initialize carousel navigation
     initializeCarouselNavigation();
-
-    console.log('General utilities loaded');
 });

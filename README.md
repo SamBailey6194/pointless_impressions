@@ -323,6 +323,7 @@ Please note for the Jest testing there was a need to create html fixture files a
 - **Carousel Accessibility**: Added ARIA labels and keyboard navigation support to the carousel for better accessibility.
 - **Behave Tests Not Passing Images**: Behave tests automatically set Debug to false which caused issues with image fetching due to using cloudinary tags. Therefore, removed image checks from behave tests to avoid failures.
 - **Cypress Tests not running due to lack of data-testids**: Cypress tests were not able to find elements due to missing data-testids. Added data-testids to relevant elements in the artwork detail template.
+- **Framing Option Selection in Cart**: The add to cart modal was not showing a dropdown selection for the framing options due to lack of JSON being passed to the template. Added a function to the Artwork model to return framing options as a list of tuples for the template to render the dropdown. Added the JSON dump to ArtworkListView and ArtworkDetailView CBVs. Then ensured the data was being fetched properly in the relevant html and js files.
 
 ### Unfixed Bugs
 

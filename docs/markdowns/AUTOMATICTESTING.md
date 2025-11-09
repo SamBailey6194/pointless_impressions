@@ -896,6 +896,51 @@ Photo forms use a DRY (Don't Repeat Yourself) approach with conditional field in
 | 3 | Add item with extremely large price (999999.99) | Price stored and calculated correctly | Pass |
 | 4 | Calculate total with many items (20+) | Accurate total calculated | Pass |
 
+###### Additional Cart Helper Functions Tests
+
+| Step | Action | Outcome | Pass / Fail |
+| :--- | :--- | :--- | :--- |
+| 1 | Call `getCartItem('artwork-1')` on existing item | Returns cart item object with id, quantity, price | Pass |
+| 2 | Call `getCartItem('non-existent')` | Returns undefined or null safely | Pass |
+| 3 | Call `updateCartItem('artwork-1', {quantity: 5})` | Item properties updated; overwrites existing cart item | Pass |
+| 4 | Call `getCartItemCount()` with empty cart | Returns 0 | Pass |
+| 5 | Call `getCartItemCount()` with 3 items | Returns 3 | Pass |
+| 6 | Call `getTotalQuantity()` with items (qty 2, qty 3, qty 1) | Returns 6 (sum of all quantities) | Pass |
+| 7 | Call `isCartEmpty()` with no items | Returns true | Pass |
+| 8 | Call `isCartEmpty()` with items | Returns false | Pass |
+| 9 | Call `clearCart()` | Clears all items from cart and localStorage | Pass |
+
+###### Add to Cart Modal Component Tests
+
+| Step | Action | Outcome | Pass / Fail |
+| :--- | :--- | :--- | :--- |
+| 1 | Verify modal element exists with id `add_to_cart_modal` | DIALOG element found in DOM | Pass |
+| 2 | Verify modal form element exists with id `add_to_cart_form` | FORM element found in DOM | Pass |
+| 3 | Verify quantity control elements exist | Button ids `qty_increase` and `qty_decrease` found | Pass |
+| 4 | Verify artwork info elements exist | Divs with ids `modal_artwork_name`, `modal_artwork_price`, `modal_artwork_stock` found | Pass |
+| 5 | Verify error/success message elements exist | DIVs with ids `form_error`, `form_success`, `error_message`, `success_message` found | Pass |
+| 6 | Initialize modal with `addToCartModal.init('artwork-1', 'Sunset', 199.99, '/img.jpg', 5, [])` | Modal displays artwork name "Sunset" and price "£199.99" | Pass |
+| 7 | After init, verify quantity set to 1 | Input element with id `quantity` has value "1" | Pass |
+| 8 | After init with 5 stock, verify max quantity | Input max attribute set to "5" | Pass |
+| 9 | Call `addToCartModal.increaseQuantity()` | Quantity increases from 1 to 2 | Pass |
+| 10 | Call `addToCartModal.decreaseQuantity()` on quantity 2 | Quantity decreases to 1 | Pass |
+| 11 | Call `addToCartModal.decreaseQuantity()` on quantity 1 | Quantity remains at 1 (minimum boundary) | Pass |
+| 12 | Call `addToCartModal.increaseQuantity()` at max stock | Quantity capped at stock limit (e.g., 5) | Pass |
+| 13 | Verify framing options display | SELECT element with framing options renders options correctly | Pass |
+| 14 | Verify special notes textarea exists | TEXTAREA with id `special_notes` found | Pass |
+| 15 | Verify notes character counter works | Character count updates as text entered | Pass |
+| 16 | Enter 500 characters in notes with 250 char limit | Character count shows visual feedback of overflow | Pass |
+| 17 | Call `addToCartModal.handleSubmit()` with valid data | Form submission triggered with correct payload | Pass |
+| 18 | Submit form with artwork id, quantity, framing, notes | Item added to cart via API call | Pass |
+| 19 | After successful submission, modal closes | DIALOG element closed or hidden | Pass |
+| 20 | After successful submission, success message displays | Success message shows "Added to cart" | Pass |
+| 21 | Submit form with missing artwork id | Error message displays validation error | Pass |
+| 22 | Submit form with quantity 0 | Error message indicates quantity must be > 0 | Pass |
+| 23 | Submit form with quantity exceeding stock | Error message indicates insufficient stock | Pass |
+| 24 | Verify modal accessibility features | Modal has proper ARIA attributes and keyboard support | Pass |
+| 25 | Tab through modal form elements | All interactive elements keyboard accessible | Pass |
+| 26 | Press Escape key in modal | Modal closes gracefully | Pass |
+
 ---
 
 #### BDD Testing via Cypress

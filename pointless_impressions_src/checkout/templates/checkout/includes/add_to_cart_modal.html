@@ -1,0 +1,144 @@
+{% comment %} Add to Cart Modal - DaisyUI Dialog with Crispy Forms Styling {% endcomment %}
+{% load static tailwind_tags cloudinary %}
+<dialog id="add_to_cart_modal" class="modal">
+  <div class="modal-box w-full max-w-md">
+    <h3 class="font-bold text-lg mb-4">
+      <i class="fa-solid fa-cart-plus mr-2"></i> Add to Cart
+    </h3>
+
+    {% comment %} Product Info Display {% endcomment %}
+    <div class="card mb-6">
+      <div class="card-body p-4">
+        <div class="flex gap-4">
+          {% comment %} Product Image {% endcomment %}
+          <div id="modal_image_container" class="w-20 h-20 shrink-0 rounded-lg overflow-hidden">
+            {% comment %} Local Image (loaded dynamically via JavaScript) {% endcomment %}
+            <img 
+              id="modal_artwork_image" 
+              src="" 
+              alt="Artwork" 
+              class="w-full h-full object-cover"
+              onerror="document.getElementById('modal_image_placeholder').classList.remove('hidden')"
+            />
+            {% comment %} Placeholder for missing images {% endcomment %}
+            <div id="modal_image_placeholder" class="w-full h-full items-center justify-center hidden">
+              <i class="fa-solid fa-image text-2xl"></i>
+            </div>
+          </div>
+
+          {% comment %} Product Details {% endcomment %}
+          <div class="flex-1">
+            <p class="text-sm text-base-content/70">Adding to cart:</p>
+            <p id="modal_artwork_name" class="font-semibold line-clamp-2"></p>
+            <p id="modal_artwork_price" class="font-bold text-lg mt-1"></p>
+            <p id="modal_artwork_stock" class="text-sm mt-1"></p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    {% comment %} Add to Cart Form {% endcomment %}
+    <form id="add_to_cart_form" class="space-y-4">
+      {% csrf_token %}
+
+      {% comment %} Hidden Artwork ID {% endcomment %}
+      <input type="hidden" id="modal_artwork_id" name="artwork_id" value="" />
+
+      {% comment %} Quantity Selection {% endcomment %}
+      <div class="form-control">
+        <label class="label">
+          <span class="label-text font-semibold">Quantity</span>
+          <span class="label-text-alt" id="max_quantity_info"></span>
+        </label>
+      <div class="flex gap-2 items-center">
+          <button type="button" class="btn btn-sm" id="qty_decrease">
+            <i class="fa-solid fa-minus"></i>
+          </button>
+          <input 
+            type="number" 
+            id="quantity" 
+            name="quantity" 
+            value="1" 
+            min="1" 
+            max="999"
+            class="custom-input w-20 text-center" 
+            required 
+          />
+          <button type="button" class="btn btn-sm" id="qty_increase">
+            <i class="fa-solid fa-plus"></i>
+          </button>
+          <span id="qty_error" class="text-error text-sm ml-auto hidden"></span>
+        </div>
+      </div>
+
+      {% comment %} Framing Options {% endcomment %}
+      <div id="framing_section" class="form-control">
+        <label class="label">
+          <span class="label-text font-semibold">Framing Option</span>
+        </label>
+        <select 
+          id="framing_option" 
+          name="framing_option" 
+          class="custom-input w-full"
+        >
+          <option value="" selected>Select framing option...</option>
+        </select>
+      </div>
+
+      {% comment %} Cart Notes {% endcomment %}
+      <div class="form-control">
+        <label class="label">
+          <span class="label-text font-semibold">Special Requests</span>
+          <span class="label-text-alt text-base-content/60">Optional</span>
+        </label>
+        <textarea 
+          id="notes" 
+          name="notes" 
+          placeholder="e.g., 'Gift wrapping requested'" 
+          class="custom-input w-full h-20 resize-none"
+          maxlength="500"
+        ></textarea>
+        <label class="label">
+          <span class="label-text-alt text-base-content/60" id="notes_count">0/500</span>
+        </label>
+      </div>
+
+      {% comment %} Error Message Display {% endcomment %}
+      <div id="form_error" class="alert alert-error gap-2 hidden">
+        <i class="fa-solid fa-circle-exclamation"></i>
+        <span id="error_message"></span>
+      </div>
+
+      {% comment %} Success Message Display {% endcomment %}
+      <div id="form_success" class="alert alert-success gap-2 hidden">
+        <i class="fa-solid fa-circle-check"></i>
+        <span id="success_message">Added to cart successfully!</span>
+      </div>
+
+      {% comment %} Form Actions {% endcomment %}
+      <div class="flex gap-2 justify-end pt-4">
+        <button 
+          type="button" 
+          class="btn btn-ghost btn-sm" 
+          id="cancel_btn"
+          onclick="document.getElementById('add_to_cart_modal').close()"
+        >
+          Cancel
+        </button>
+        <button 
+          type="submit" 
+          class="btn btn-sm gap-2"
+          id="submit_btn"
+        >
+          <i class="fa-solid fa-cart-plus"></i>
+          Add to Cart
+        </button>
+      </div>
+    </form>
+  </div>
+
+  {% comment %} Modal Backdrop - Close on outside click {% endcomment %}
+  <form method="dialog" class="modal-backdrop">
+    <button></button>
+  </form>
+</dialog>

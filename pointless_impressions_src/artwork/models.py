@@ -2,6 +2,7 @@ from django.db import models
 from django.utils.text import slugify
 import random
 import string
+import json
 from django.conf import settings
 from pointless_impressions_src.photo.models import Photo
 from pointless_impressions_src.profiles.models import Artist
@@ -58,7 +59,6 @@ class Artwork(models.Model):
             self.sku = self.generate_unique_sku()
         if not self.slug:
             self.slug = slugify(self.name)
-        # Set is_in_stock to True if quantity is not 0, else False
         self.is_in_stock = self.quantity != 0
         super().save(*args, **kwargs)
 
@@ -100,6 +100,23 @@ class Artwork(models.Model):
         """Get the alt text for the primary photo."""
         photo = self._get_primary_photo()
         return photo.alt_text_or_default if photo else self.name
+
+    def get_framing_options(self):
+        """Retrieve available framing options for this artwork."""
+        if hasattr(self, 'prefetched_conditions'):
+            conditions = self.prefetched_conditions
+        else:
+            conditions = self.selected_conditions.all()
+
+        options = []
+        for condition in conditions:
+            options.append({
+                'id': condition.id,
+                'name': condition.condition_name,
+                'friendly_name': condition.condition_friendly_name,
+                'slug': condition.slug
+            })
+        return json.dumps(options)
 
 
 class ArtworkCategory(models.Model):

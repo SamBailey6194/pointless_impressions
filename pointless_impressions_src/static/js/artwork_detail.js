@@ -1,5 +1,6 @@
 (() => {
-  // pointless_impressions_src/theme/static_src/src/js/artwork_detail.js
+  // pointless_impressions_src/theme/static_src/src/js/cart.js
+  var CART_STORAGE_KEY = "cart";
   function formatPrice(price) {
     if (typeof price !== "number") {
       return "\xA30.00";
@@ -9,6 +10,84 @@
       maximumFractionDigits: 2
     });
   }
+  function getCart() {
+    try {
+      return JSON.parse(localStorage.getItem(CART_STORAGE_KEY)) || {};
+    } catch (e) {
+      console.error("Error parsing cart from localStorage:", e);
+      return {};
+    }
+  }
+  function saveCart(cart) {
+    try {
+      localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cart));
+    } catch (e) {
+      console.error("Error saving cart to localStorage:", e);
+    }
+  }
+  function addToCart(artworkId, quantity = 1, price = 0, name = "") {
+    let cart = getCart();
+    if (cart[artworkId]) {
+      cart[artworkId].quantity += quantity;
+    } else {
+      cart[artworkId] = {
+        id: artworkId,
+        name,
+        quantity,
+        price
+      };
+    }
+    saveCart(cart);
+    return cart[artworkId];
+  }
+  function removeFromCart(artworkId) {
+    let cart = getCart();
+    if (cart[artworkId]) {
+      delete cart[artworkId];
+      saveCart(cart);
+      return true;
+    }
+    return false;
+  }
+  function updateQuantity(artworkId, newQuantity) {
+    let cart = getCart();
+    if (cart[artworkId]) {
+      if (newQuantity <= 0) {
+        return removeFromCart(artworkId) ? null : cart[artworkId];
+      }
+      cart[artworkId].quantity = newQuantity;
+      saveCart(cart);
+      return cart[artworkId];
+    }
+    return null;
+  }
+  function calculateTotal() {
+    const cart = getCart();
+    let total = 0;
+    Object.keys(cart).forEach((artworkId) => {
+      const item = cart[artworkId];
+      total += item.quantity * item.price;
+    });
+    return Math.round(total * 100) / 100;
+  }
+  function getTotalQuantity() {
+    const cart = getCart();
+    let total = 0;
+    Object.keys(cart).forEach((artworkId) => {
+      total += cart[artworkId].quantity;
+    });
+    return total;
+  }
+  function updateCartCountBadge() {
+    const cartCountEl = document.querySelector("[data-cart-count]");
+    if (cartCountEl) {
+      const count = getTotalQuantity();
+      cartCountEl.textContent = count;
+      cartCountEl.style.display = count > 0 ? "block" : "none";
+    }
+  }
+
+  // pointless_impressions_src/theme/static_src/src/js/artwork_detail.js
   function displayArtworkDetail(artworkData) {
     if (!artworkData) {
       console.error("No artwork data provided");
@@ -36,47 +115,19 @@
       statusElement.textContent = artworkData.availability || "Unknown";
     }
   }
-  function addToCart(artworkId, quantity = 1, price = 0) {
-    let cart = JSON.parse(localStorage.getItem("cart")) || {};
-    if (cart[artworkId]) {
-      cart[artworkId].quantity += quantity;
-    } else {
-      cart[artworkId] = {
-        id: artworkId,
-        quantity,
-        price
-      };
-    }
-    localStorage.setItem("cart", JSON.stringify(cart));
-    return cart[artworkId];
+  function addToCartDetail(artworkId, quantity = 1, price = 0) {
+    const item = addToCart(artworkId, quantity, price);
+    updateCartCountBadge();
+    return item;
   }
-  function removeFromCart(artworkId) {
-    let cart = JSON.parse(localStorage.getItem("cart")) || {};
-    if (cart[artworkId]) {
-      delete cart[artworkId];
-    }
-    localStorage.setItem("cart", JSON.stringify(cart));
+  function removeFromCartDetail(artworkId) {
+    removeFromCart(artworkId);
+    updateCartCountBadge();
   }
-  function updateQuantity(artworkId, newQuantity) {
-    let cart = JSON.parse(localStorage.getItem("cart")) || {};
-    if (cart[artworkId]) {
-      cart[artworkId].quantity = newQuantity;
-      localStorage.setItem("cart", JSON.stringify(cart));
-      return cart[artworkId];
-    }
-    return null;
-  }
-  function getCart() {
-    return JSON.parse(localStorage.getItem("cart")) || {};
-  }
-  function calculateTotal() {
-    const cart = getCart();
-    let total = 0;
-    Object.keys(cart).forEach((artworkId) => {
-      const item = cart[artworkId];
-      total += item.quantity * item.price;
-    });
-    return Math.round(total * 100) / 100;
+  function updateQuantityDetail(artworkId, newQuantity) {
+    const item = updateQuantity(artworkId, newQuantity);
+    updateCartCountBadge();
+    return item;
   }
   function initArtworkDetail() {
     const addToCartBtn = document.getElementById("add-to-cart-btn");

@@ -50,10 +50,8 @@
           scrollCarousel(carouselId, direction, scrollMultiplier);
         });
       });
-      console.log(`Initialized ${carouselNavButtons.length} carousel navigation button(s)`);
     }
     initializeCarouselNavigation();
-    console.log("General utilities loaded");
   });
 })();
 //# sourceMappingURL=general.js.map

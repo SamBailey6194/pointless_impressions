@@ -89,7 +89,7 @@
         <div class="card">
           <div class="card-body">
             <div class="flex gap-2">
-              <span class="text-5xl font-bold text-primary" data-testid="artwork-price">£{{ artwork_data.price }}</span>
+              <span class="text-5xl font-bold text-primary" data-testid="artwork-price">£{{ artwork_data.price|floatformat:2 }}</span>
             </div>
           </div>
         </div>
@@ -113,8 +113,8 @@
             <div class="space-y-2">
               <div class="flex justify-between">
                 <span class="font-semibold">Artist:</span>
-                <a href="{% url 'artwork:list' %}?artist={{ artwork.artist.user.username }}" class="font-mono link link-primary" data-testid="artist-profile-link">
-                  <span data-testid="artist-name">{{ artwork.artist.user.username }}</span>
+                <a href="{% url 'artwork:list' %}?artist={{ artwork.artist.user.username }}" class="font-mono" data-testid="artist-profile-link">
+                  <span data-testid="artist-name" class="badge badge-outline link link-hover">{{ artwork.artist.user.username }}</span>
                 </a>
               </div>
               <div class="divider my-1"></div>
@@ -124,14 +124,14 @@
               <div class="divider my-1"></div>
               <div class="flex justify-between">
                 <span class="font-semibold">Category:</span>
-                <a href="{% url 'artwork:list' %}?category={{ artwork.category.slug }}" class="badge badge-outline link link-primary" data-testid="category-link">{{ artwork.category.friendly_name }}</a>
+                <a href="{% url 'artwork:list' %}?category={{ artwork.category.slug }}" class="badge badge-outline link link-hover" data-testid="category-link">{{ artwork.category.friendly_name }}</a>
               </div>
               <div class="divider my-1"></div>
               <div class="flex justify-between">
                 <span class="font-semibold">Framing Options:</span>
                 <div data-testid="framing-options">
                   {% for condition in prefetched_conditions %}
-                  <span class="badge badge-outline">{{ condition.condition_friendly_name }}</span>
+                  <a href="{% url 'artwork:list' %}?selected_conditions={{ condition.slug }}" class="badge badge-outline link link-hover">{{ condition.condition_friendly_name }}</a>
                   {% endfor %}
                 </div>
               </div>
@@ -189,7 +189,15 @@
         
         <div class="space-y-3 md:space-y-0 md:flex md:items-center md:gap-4">
           {% if artwork_data.is_in_stock %}
-            <button class="btn btn-primary btn-lg md:flex-1">
+            <button 
+              class="btn btn-primary btn-lg md:flex-1 add-to-cart-btn"
+              data-artwork-id="{{ artwork.id }}"
+              data-artwork-name="{{ artwork_data.name }}"
+              data-artwork-price="{{ artwork_data.price }}"
+              data-artwork-image="{% if artwork.main_photo %}{{ artwork.main_photo.get_image_url }}{% endif %}"
+              data-artwork-quantity="{{ artwork_data.quantity }}"
+              onclick="if(window.addToCartModal) { const framingOptions = window.framingOptionsData || []; addToCartModal.init(this.dataset.artworkId, this.dataset.artworkName, parseFloat(this.dataset.artworkPrice), this.dataset.artworkImage, parseInt(this.dataset.artworkQuantity), framingOptions); } else alert('Modal not loaded yet')"
+            >
               <i class="fa-solid fa-cart-plus"></i> Add to Cart
             </button>
           {% else %}
@@ -411,6 +419,18 @@
   {% endblock %}
 {% endblock %}
 
+{% block extramodals %}
+  {% include 'checkout/includes/add_to_cart_modal.html' %}
+{% endblock %}
+
 {% block postloadjs %}
+{{ block.super }}
+<script src="{% static 'js/cart.js' %}" type="module" defer></script>
+<script src="{% static 'js/add_to_cart_modal.js' %}" type="module" defer></script>
 <script src="{% static 'js/artwork_detail.js' %}" defer></script>
+
+<script type="text/javascript">
+  // Store framing options globally so onclick handler can access them
+  window.framingOptionsData = JSON.parse('{{ framing_options_json|safe }}');
+</script>
 {% endblock %}

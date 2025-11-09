@@ -1,4 +1,5 @@
 from django import template
+import json
 
 
 register = template.Library()
@@ -32,3 +33,19 @@ def is_sort_active(context, sort_key, direction='asc'):
     current_direction = context['request'].GET.get('direction', 'asc')
 
     return current_sort == sort_key and current_direction == direction
+
+
+@register.filter
+def framing_conditions_json(conditions):
+    """
+    Converts a list of framing conditions into a JSON string
+    suitable for embedding in HTML data attributes.
+    """
+    framing_options = []
+    for cond in conditions:
+        framing_options.append({
+            'id': cond.id,
+            'name': cond.name,
+            'slug': cond.slug
+        })
+    return json.dumps(framing_options)

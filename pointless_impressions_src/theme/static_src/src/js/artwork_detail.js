@@ -4,20 +4,16 @@
  * cart functionality, and review submission
  */
 
-/**
- * Format price with currency symbol and thousand separators
- * @param {number} price - The price to format
- * @returns {string} Formatted price with £ symbol
- */
-export function formatPrice(price) {
-  if (typeof price !== 'number') {
-    return '£0.00';
-  }
-  return '£' + price.toLocaleString('en-GB', {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  });
-}
+// Import cart functions from cart.js
+import {
+  formatPrice,
+  addToCart,
+  removeFromCart,
+  updateQuantity,
+  getCart,
+  calculateTotal,
+  updateCartCountBadge,
+} from './cart.js';
 
 /**
  * Display artwork detail information on the page
@@ -64,44 +60,20 @@ export function displayArtworkDetail(artworkData) {
  * @param {number} price - Price of artwork
  * @returns {object} Cart item object
  */
-export function addToCart(artworkId, quantity = 1, price = 0) {
-  // Get existing cart from localStorage or create new one
-  let cart = JSON.parse(localStorage.getItem('cart')) || {};
-
-  // Check if item already exists in cart
-  if (cart[artworkId]) {
-    // Increment quantity
-    cart[artworkId].quantity += quantity;
-  } else {
-    // Add new item
-    cart[artworkId] = {
-      id: artworkId,
-      quantity: quantity,
-      price: price,
-    };
-  }
-
-  // Save updated cart to localStorage
-  localStorage.setItem('cart', JSON.stringify(cart));
-
-  return cart[artworkId];
+export function addToCartDetail(artworkId, quantity = 1, price = 0) {
+  // Call cart.js function and update UI
+  const item = addToCart(artworkId, quantity, price);
+  updateCartCountBadge();
+  return item;
 }
 
 /**
  * Remove artwork from cart
  * @param {string} artworkId - The artwork identifier to remove
  */
-export function removeFromCart(artworkId) {
-  // Get existing cart from localStorage
-  let cart = JSON.parse(localStorage.getItem('cart')) || {};
-
-  // Remove item if it exists
-  if (cart[artworkId]) {
-    delete cart[artworkId];
-  }
-
-  // Save updated cart to localStorage
-  localStorage.setItem('cart', JSON.stringify(cart));
+export function removeFromCartDetail(artworkId) {
+  removeFromCart(artworkId);
+  updateCartCountBadge();
 }
 
 /**
@@ -110,48 +82,17 @@ export function removeFromCart(artworkId) {
  * @param {number} newQuantity - The new quantity
  * @returns {object} Updated cart item object or null if not found
  */
-export function updateQuantity(artworkId, newQuantity) {
-  // Get existing cart from localStorage
-  let cart = JSON.parse(localStorage.getItem('cart')) || {};
-
-  // Check if item exists in cart
-  if (cart[artworkId]) {
-    cart[artworkId].quantity = newQuantity;
-
-    // Save updated cart to localStorage
-    localStorage.setItem('cart', JSON.stringify(cart));
-
-    return cart[artworkId];
-  }
-
-  return null;
+export function updateQuantityDetail(artworkId, newQuantity) {
+  const item = updateQuantity(artworkId, newQuantity);
+  updateCartCountBadge();
+  return item;
 }
 
 /**
  * Get entire cart from localStorage
  * @returns {object} Cart object with all items
  */
-export function getCart() {
-  return JSON.parse(localStorage.getItem('cart')) || {};
-}
-
-/**
- * Calculate total price of all items in cart
- * @returns {number} Total price
- */
-export function calculateTotal() {
-  const cart = getCart();
-  let total = 0;
-
-  // Sum up all item prices (quantity * price)
-  Object.keys(cart).forEach((artworkId) => {
-    const item = cart[artworkId];
-    total += item.quantity * item.price;
-  });
-
-  // Round to 2 decimal places to avoid floating point errors
-  return Math.round(total * 100) / 100;
-}
+export { getCart, calculateTotal };
 
 /**
  * Initialize artwork detail page
@@ -396,8 +337,12 @@ function initializeReviewFunctionality() {
 }
 
 // Make review functions globally accessible
+// Make review functions globally available
 window.submitReview = submitReview;
 window.showNotification = showNotification;
+
+// Export formatPrice explicitly for tests (imported from cart.js)
+export { formatPrice };
 
 // Initialize on page load
 if (document.readyState === 'loading') {

@@ -51,6 +51,7 @@ LOCAL_APPS = [
     "pointless_impressions_src.search",
     "pointless_impressions_src.profiles",
     "pointless_impressions_src.dashboard",
+    "pointless_impressions_src.checkout",
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS

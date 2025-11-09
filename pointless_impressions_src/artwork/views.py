@@ -125,7 +125,12 @@ def _serialize_artwork_data(artwork_queryset, placeholder_image):
 
         # Framing Condition Data
         conditions = [
-            {'name': cond.condition_name, 'slug': cond.slug}
+            {
+                'id': cond.id,
+                'name': cond.condition_name,
+                'friendly_name': cond.condition_friendly_name,
+                'slug': cond.slug
+            }
             for cond in getattr(artwork, 'prefetched_conditions', [])
         ]
 
@@ -136,7 +141,7 @@ def _serialize_artwork_data(artwork_queryset, placeholder_image):
             'artist': artist_data,
             'full_description': full_desc,
             'description': truncated_desc,
-            'price': float(artwork.price),
+            'price': round(float(artwork.price), 2),
             'category': artwork.category.name if artwork.category else None,
             'selected_conditions': conditions,
             'is_available': artwork.is_available,
@@ -286,6 +291,13 @@ class ArtworkListView(ListView):
 
         cleaned_artwork_data = []
         for artwork in raw_artwork_data:
+            framing_options = []
+            for cond in artwork['selected_conditions']:
+                framing_options.append({
+                    'id': cond.get('id'),
+                    'name': cond['name'],
+                    'slug': cond['slug']
+                })
             cleaned_artwork_data.append({
                 'id': artwork['id'],
                 'name': artwork['name'],
@@ -296,6 +308,7 @@ class ArtworkListView(ListView):
                 'selected_conditions': [
                     cond['name'] for cond in artwork['selected_conditions']
                 ],
+                'framing_options': framing_options,
                 'is_available': artwork['is_available'],
                 'is_in_stock': artwork['is_in_stock'],
                 'is_featured': artwork['is_featured'],
@@ -308,6 +321,7 @@ class ArtworkListView(ListView):
         context['artworks_json_data'] = json.dumps(
             cleaned_artwork_data, cls=DjangoJSONEncoder
             )
+
         return context
 
 
@@ -343,7 +357,7 @@ class ArtworkDetailView(DetailView):
             Prefetch(
                 'selected_conditions',
                 queryset=ArtworkFramingCondition.objects.only(
-                    'condition_name', 'id', 'slug'
+                    'condition_name', 'id', 'slug', 'condition_friendly_name'
                     ), to_attr='prefetched_conditions'
             )
         ).order_by('id')
@@ -385,6 +399,18 @@ class ArtworkDetailView(DetailView):
 
         context['prefetched_conditions'] = artwork.prefetched_conditions
         context['reviews'] = artwork.reviews.all().order_by('-created_at')
+
+        framing_options = []
+        for condition in artwork.prefetched_conditions:
+            framing_options.append({
+                'id': condition.id,
+                'name': (
+                    condition.condition_friendly_name or
+                    condition.condition_name
+                    ),
+                'slug': condition.slug
+            })
+        context['framing_options_json'] = json.dumps(framing_options)
 
         if artwork.artist:
             similar_artists = Artwork.objects.filter(
