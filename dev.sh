@@ -69,6 +69,7 @@ show_help() {
     echo "  migrate       Run Django migrations"
     echo "  makemigrations Run Django makemigrations"
     echo "  createsuperuser Create a Django superuser"
+    echo "  flush         Flush the database (DANGER: deletes all data)"
     echo "  test          Run all Django TestCase tests"
     echo "  test [app]    Run Django TestCase tests (optionally specify app name)"
     echo "  behave        Run all Behave tests"
@@ -162,6 +163,16 @@ case "${1:-help}" in
         docker compose -f docker-compose.dev.yml exec web python /app/manage.py makemigrations
         print_success "Migrations created!"
         ;;
+    flush)
+        print_warning "This will delete all data in the database. Are you sure? (y/N)"
+        read -r response
+        if [[ "$response" =~ ^[Yy]$ ]]; then
+            docker compose -f docker-compose.dev.yml exec web python /app/manage.py flush --noinput
+            print_success "Database flushed!"
+        else
+            print_status "Flush operation cancelled."
+        fi
+        ;;
     createsuperuser)
         print_status "Creating superuser..."
         docker compose -f docker-compose.dev.yml exec web python /app/manage.py createsuperuser
@@ -249,12 +260,11 @@ case "${1:-help}" in
             print_status "Clean operation cancelled."
         fi
         ;;
-
     loadfixtures)
         print_status "Flushing existing data..."
         docker compose -f docker-compose.dev.yml exec web python /app/manage.py flush --noinput
         print_status "Loading initial data fixtures into the database..."
-        docker compose -f docker-compose.dev.yml exec web python /app/manage.py loaddata photo.json artwork.json artwork_categories.json artwork_framing_options.json profiles.json account_group.json account.json
+        docker compose -f docker-compose.dev.yml exec web python /app/manage.py loaddata account_group.json account.json profiles.json artwork_categories.json artwork_framing_options.json photo.json artwork.json
         print_success "Fixtures loaded successfully!"
         ;;
     status)

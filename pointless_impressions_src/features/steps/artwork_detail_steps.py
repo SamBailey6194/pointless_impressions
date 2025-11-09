@@ -194,19 +194,18 @@ def step_see_framing_conditions(context):
     assert 'framed' in content.lower() or 'framing' in content.lower()
 
 
-@when('I click the "Add to Cart" button')
-def step_click_add_to_cart(context):
-    """Click the Add to Cart button."""
-    # This would require JavaScript interaction in a real scenario
-    # For now, we're simulating the POST request
-    artwork = Artwork.objects.filter(is_available=True).first()
-    context.cart_item = artwork
+# NOTE: 'I click the "Add to Cart" button' step is defined in
+# artwork_cart_steps.py with session-based cart logic
 
 
 @then('the artwork should be added to my cart')
 def step_artwork_added_to_cart(context):
     """Verify the artwork was added to cart."""
-    assert context.cart_item is not None
+    # Check that cart has items in the session
+    client = context.test.client if hasattr(context, 'test') else context.client
+    session = client.session
+    cart = session.get('cart', {})
+    assert len(cart) > 0, "Cart is empty"
 
 
 @then('I should see a confirmation message')

@@ -82,6 +82,9 @@ def step_create_artworks(context):
         condition_description="Artwork is unframed."
     )
 
+    # Store created artworks in context for later access in steps
+    context.artworks = {}
+
     for row in context.table:
         is_in_stock = row['is_in_stock'].lower() == 'true'
         quantity_value = 1 if is_in_stock else 0
@@ -100,6 +103,8 @@ def step_create_artworks(context):
             updated_at=timezone.now(),
         )
         art.selected_conditions.add(default_framing_condition)
+        # Store artwork by name for access in other steps
+        context.artworks[row['name']] = art
 
 
 # --------------------------

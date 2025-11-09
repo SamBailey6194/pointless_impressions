@@ -1,1 +1,59 @@
-(()=>{document.addEventListener("DOMContentLoaded",()=>{function a(e,r,s=1){let t=document.getElementById(e);if(!t)return;let l=t.querySelector(".shrink-0");if(!l)return;let n=l.offsetWidth,d=window.getComputedStyle(t).gap,f=parseFloat(d.split(" ")[0])||24;if(n===0){console.error(`Item width is zero in carousel "${e}"`);return}let g=n+f,c=t.scrollLeft,i=t.scrollWidth-t.clientWidth,o=c+r*g*s;o<0?o=i:o>i&&(c>=i?o=0:o=i),t.scrollTo({left:o,behavior:"smooth"})}function u(){let e=document.querySelectorAll(".carousel-nav-btn");e.length!==0&&(e.forEach(r=>{r.addEventListener("click",function(s){s.preventDefault();let t=this.getAttribute("data-carousel-id"),l=parseInt(this.getAttribute("data-direction")),n=parseFloat(this.getAttribute("data-scroll-multiplier"))||1;a(t,l,n)})}),console.log(`Initialized ${e.length} carousel navigation button(s)`))}u(),console.log("General utilities loaded")});})();
+(() => {
+  // pointless_impressions_src/theme/static_src/src/js/general.js
+  document.addEventListener("DOMContentLoaded", () => {
+    function scrollCarousel(carouselId, direction, scrollMultiplier = 1) {
+      const carousel = document.getElementById(carouselId);
+      if (!carousel) {
+        return;
+      }
+      const itemElement = carousel.querySelector(".shrink-0");
+      if (!itemElement) {
+        return;
+      }
+      const itemWidth = itemElement.offsetWidth;
+      const carouselStyle = window.getComputedStyle(carousel);
+      const gapStyle = carouselStyle.gap;
+      const gap = parseFloat(gapStyle.split(" ")[0]) || 24;
+      if (itemWidth === 0) {
+        console.error(`Item width is zero in carousel "${carouselId}"`);
+        return;
+      }
+      const scrollAmount = itemWidth + gap;
+      const currentScroll = carousel.scrollLeft;
+      const maxScroll = carousel.scrollWidth - carousel.clientWidth;
+      let newScroll = currentScroll + direction * scrollAmount * scrollMultiplier;
+      if (newScroll < 0) {
+        newScroll = maxScroll;
+      } else if (newScroll > maxScroll) {
+        if (currentScroll >= maxScroll) {
+          newScroll = 0;
+        } else {
+          newScroll = maxScroll;
+        }
+      }
+      carousel.scrollTo({
+        left: newScroll,
+        behavior: "smooth"
+      });
+    }
+    function initializeCarouselNavigation() {
+      const carouselNavButtons = document.querySelectorAll(".carousel-nav-btn");
+      if (carouselNavButtons.length === 0) {
+        return;
+      }
+      carouselNavButtons.forEach((button) => {
+        button.addEventListener("click", function(e) {
+          e.preventDefault();
+          const carouselId = this.getAttribute("data-carousel-id");
+          const direction = parseInt(this.getAttribute("data-direction"));
+          const scrollMultiplier = parseFloat(this.getAttribute("data-scroll-multiplier")) || 1;
+          scrollCarousel(carouselId, direction, scrollMultiplier);
+        });
+      });
+      console.log(`Initialized ${carouselNavButtons.length} carousel navigation button(s)`);
+    }
+    initializeCarouselNavigation();
+    console.log("General utilities loaded");
+  });
+})();
+//# sourceMappingURL=general.js.map

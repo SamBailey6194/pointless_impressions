@@ -88,6 +88,72 @@ export function addToCart(artworkId, quantity = 1, price = 0) {
 }
 
 /**
+ * Remove artwork from cart
+ * @param {string} artworkId - The artwork identifier to remove
+ */
+export function removeFromCart(artworkId) {
+  // Get existing cart from localStorage
+  let cart = JSON.parse(localStorage.getItem('cart')) || {};
+
+  // Remove item if it exists
+  if (cart[artworkId]) {
+    delete cart[artworkId];
+  }
+
+  // Save updated cart to localStorage
+  localStorage.setItem('cart', JSON.stringify(cart));
+}
+
+/**
+ * Update quantity of artwork in cart
+ * @param {string} artworkId - The artwork identifier
+ * @param {number} newQuantity - The new quantity
+ * @returns {object} Updated cart item object or null if not found
+ */
+export function updateQuantity(artworkId, newQuantity) {
+  // Get existing cart from localStorage
+  let cart = JSON.parse(localStorage.getItem('cart')) || {};
+
+  // Check if item exists in cart
+  if (cart[artworkId]) {
+    cart[artworkId].quantity = newQuantity;
+
+    // Save updated cart to localStorage
+    localStorage.setItem('cart', JSON.stringify(cart));
+
+    return cart[artworkId];
+  }
+
+  return null;
+}
+
+/**
+ * Get entire cart from localStorage
+ * @returns {object} Cart object with all items
+ */
+export function getCart() {
+  return JSON.parse(localStorage.getItem('cart')) || {};
+}
+
+/**
+ * Calculate total price of all items in cart
+ * @returns {number} Total price
+ */
+export function calculateTotal() {
+  const cart = getCart();
+  let total = 0;
+
+  // Sum up all item prices (quantity * price)
+  Object.keys(cart).forEach((artworkId) => {
+    const item = cart[artworkId];
+    total += item.quantity * item.price;
+  });
+
+  // Round to 2 decimal places to avoid floating point errors
+  return Math.round(total * 100) / 100;
+}
+
+/**
  * Initialize artwork detail page
  */
 export function initArtworkDetail() {
