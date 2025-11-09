@@ -1,2 +1,1 @@
-release: python manage.py migrate --noinput && python manage.py loaddata account.json account_group.json profiles.json artwork_categories.json artwork_framing_conditions.json photo_cloudinary.json artwork.json
 web: gunicorn pointless_impressions_src.pointless_impressions.wsgi --log-file -
