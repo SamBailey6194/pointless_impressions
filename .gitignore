@@ -87,3 +87,8 @@ pytest_cache/
 # Fixture Password Ignore
 # -----------------------------
 fixture_passwords.txt
+
+# -----------------------------
+# Media files
+# -----------------------------
+pointless_impressions_src/media/

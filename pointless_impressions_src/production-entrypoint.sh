@@ -54,39 +54,26 @@ python /app/manage.py migrate --noinput || {
 echo "Creating cache tables if needed..."
 python /app/manage.py createcachetable
 
-# Load initial data fixtures if database is empty
-echo "Checking if database is populated..."
+# Load initial data fixtures (always load to get latest data)
+echo "Loading initial data fixtures..."
 python /app/manage.py shell -c "
-from django.contrib.auth import get_user_model
 from django.core.management import call_command
-import os
 
-User = get_user_model()
-
-if User.objects.filter(username='superuser').exists():
-    print('Database already populated. Skipping fixture loading.')
-else:
-    print('Database is empty. Loading fixtures...')
-    try:
-        call_command('loaddata', 'account.json')
-        print('Loaded account.json')
-        call_command('loaddata', 'account_group.json')
-        print('Loaded account_group.json')
-        call_command('loaddata', 'profiles.json')
-        print('Loaded profiles.json')
-        call_command('loaddata', 'artwork_categories.json')
-        print('Loaded artwork_categories.json')
-        call_command('loaddata', 'artwork_framing_conditions.json')
-        print('Loaded artwork_framing_conditions.json')
-        call_command('loaddata', 'photo.json')
-        print('Loaded photo.json')
-        call_command('loaddata', 'artwork.json')
-        print('Loaded artwork.json')
-        print('All fixtures loaded successfully.')
-    except Exception as e:
-        print(f'Error loading fixtures: {e}')
-        print('Please check your fixture files and paths.')
-        os._exit(1) # Exit with an error code
+print('Loading fixtures to ensure latest data...')
+try:
+    call_command('loaddata', 'account.json')
+    call_command('loaddata', 'account_group.json')
+    call_command('loaddata', 'profiles.json')
+    call_command('loaddata', 'artwork_categories.json')
+    call_command('loaddata', 'artwork_framing_conditions.json')
+    call_command('loaddata', 'photo_cloudinary.json')
+    # Always reload artwork.json to ensure main_photo assignments are correct
+    call_command('loaddata', 'artwork.json')
+    print('All fixtures loaded successfully.')
+except Exception as e:
+    print(f'Error loading fixtures: {e}')
+    # Exit with error if fixtures fail
+    exit(1)
 "
 
 # Start Gunicorn with production settings

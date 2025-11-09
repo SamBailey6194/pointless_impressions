@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.views.generic import TemplateView
 from pointless_impressions_src.artwork.models import Artwork
 
@@ -9,6 +10,7 @@ class HomeView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['page_slug'] = 'home'
+        context['DEBUG'] = settings.DEBUG
         # Section classes for the three-section template
         context['section_1_class'] = 'py-20 section-blue w-full'
         context['section_2_class'] = 'py-16 section-alt w-full'
