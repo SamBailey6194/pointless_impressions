@@ -1,6 +1,6 @@
 (() => {
   // pointless_impressions_src/theme/static_src/src/js/cart.js
-  var CART_STORAGE_KEY = "cart";
+  var CART_UUID_KEY = "cart_uuid";
   var API_ENDPOINTS = {
     ADD: "/checkout/api/cart/add/",
     REMOVE: "/checkout/api/cart/remove/",
@@ -16,72 +16,91 @@
       maximumFractionDigits: 2
     });
   }
-  function getCart() {
+  function getCartUUID() {
+    return localStorage.getItem(CART_UUID_KEY) || null;
+  }
+  function saveCartUUID(uuid) {
+    if (uuid) {
+      localStorage.setItem(CART_UUID_KEY, uuid);
+    }
+  }
+  async function fetchCartFromBackend() {
+    const cart_uuid = getCartUUID();
+    if (!cart_uuid) return {};
     try {
-      return JSON.parse(localStorage.getItem(CART_STORAGE_KEY)) || {};
+      const response = await fetch(`/checkout/api/cart/fetch/?cart_uuid=${cart_uuid}`);
+      if (!response.ok) throw new Error("Failed to fetch cart");
+      return await response.json();
     } catch (e) {
-      console.error("Error parsing cart from localStorage:", e);
+      console.error("Error fetching cart from backend:", e);
       return {};
     }
   }
-  function saveCart(cart) {
-    try {
-      localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cart));
-    } catch (e) {
-      console.error("Error saving cart to localStorage:", e);
-    }
-  }
-  function getTotalQuantity() {
-    const cart = getCart();
-    let total = 0;
-    Object.keys(cart).forEach((artworkId) => {
-      total += cart[artworkId].quantity;
-    });
-    return total;
-  }
   async function addToCartViaAPI(artworkId, quantity = 1, options = {}) {
     const csrfToken = document.querySelector("[name=csrfmiddlewaretoken]")?.value;
-    if (!csrfToken) {
-      console.warn("CSRF token not found for API request");
-      throw new Error("CSRF token not found");
-    }
+    const cart_uuid = getCartUUID();
+    if (!csrfToken) throw new Error("CSRF token not found");
     const formData = new FormData();
     formData.append("artwork_id", artworkId);
     formData.append("quantity", quantity);
-    if (options.framing_option) {
-      formData.append("framing_option", options.framing_option);
-    }
-    if (options.notes) {
-      formData.append("notes", options.notes);
-    }
+    if (options.framing_option) formData.append("framing_option", options.framing_option);
+    if (options.notes) formData.append("notes", options.notes);
+    let url = API_ENDPOINTS.ADD;
+    if (cart_uuid) url += `?cart_uuid=${cart_uuid}`;
     try {
-      const response = await fetch(API_ENDPOINTS.ADD, {
+      const response = await fetch(url, {
         method: "POST",
-        headers: {
-          "X-CSRFToken": csrfToken
-        },
+        headers: { "X-CSRFToken": csrfToken },
         body: formData
       });
       const data = await response.json();
-      if (!response.ok) {
-        throw new Error(data.error || "Failed to add item to cart");
-      }
-      if (data.cart) {
-        saveCart(data.cart);
-      }
+      if (!response.ok) throw new Error(data.error || "Failed to add item to cart");
+      if (data.cart_uuid) saveCartUUID(data.cart_uuid);
       return data;
     } catch (error) {
       console.error("Error adding to cart via API:", error);
       throw error;
     }
   }
-  function updateCartCountBadge() {
-    const cartCountEl = document.querySelector("[data-cart-count]");
-    if (cartCountEl) {
-      const count = getTotalQuantity();
-      cartCountEl.textContent = count;
-      cartCountEl.style.display = count > 0 ? "block" : "none";
+  async function syncCartWithBackend() {
+    return { success: true, cart_uuid: getCartUUID() };
+  }
+  async function getTotalQuantity() {
+    const cart = await fetchCartFromBackend();
+    let total = 0;
+    if (cart.items) {
+      cart.items.forEach((item) => {
+        total += item.quantity;
+      });
     }
+    return total;
+  }
+  async function calculateTotal() {
+    const cart = await fetchCartFromBackend();
+    let total = 0;
+    if (cart.items) {
+      cart.items.forEach((item) => {
+        total += item.total || item.price * item.quantity;
+      });
+    }
+    return Math.round(total * 100) / 100;
+  }
+  function initCart() {
+    syncCartWithBackend().then((response) => {
+      if (response?.success) {
+        if (window.updateCartDisplay && typeof window.updateCartDisplay === "function") {
+          window.updateCartDisplay();
+        }
+      }
+    }).catch((err) => {
+      console.error("\u274C Failed to sync cart on page load:", err);
+    });
+  }
+  if (typeof window !== "undefined") {
+    window.initCart = initCart;
+    window.getTotalQuantity = getTotalQuantity;
+    window.calculateTotal = calculateTotal;
+    window.formatPrice = formatPrice;
   }
 
   // pointless_impressions_src/theme/static_src/src/js/add_to_cart_modal.js
@@ -223,19 +242,14 @@
      * @param {string} message - Error message to display
      */
     showError(message) {
-      console.log("\u274C showError called with message:", message);
-      console.log("Toast object available?", !!Toast);
-      console.log("Toast.error available?", typeof Toast?.error);
       const formErrorEl = document.getElementById("form_error");
       const errorMessageEl = document.getElementById("error_message");
       if (formErrorEl && errorMessageEl) {
         errorMessageEl.textContent = message;
         formErrorEl.classList.remove("hidden");
-        console.log("\u2705 Error displayed on modal");
       }
       if (Toast && typeof Toast.error === "function") {
         Toast.error(message);
-        console.log("\u2705 Toast.error() called successfully");
       } else {
         console.error("\u274C Toast.error not available!", Toast);
       }
@@ -245,19 +259,14 @@
      * @param {string} message - Success message to display
      */
     showSuccess(message) {
-      console.log("\u2705 showSuccess called with message:", message);
-      console.log("Toast object available?", !!Toast);
-      console.log("Toast.success available?", typeof Toast?.success);
       const formSuccessEl = document.getElementById("form_success");
       const successMessageEl = document.getElementById("success_message");
       if (formSuccessEl && successMessageEl) {
         successMessageEl.textContent = message;
         formSuccessEl.classList.remove("hidden");
-        console.log("\u2705 Success displayed on modal");
       }
       if (Toast && typeof Toast.success === "function") {
         Toast.success(message);
-        console.log("\u2705 Toast.success() called successfully");
       } else {
         console.error("\u274C Toast.success not available!", Toast);
       }
@@ -267,27 +276,18 @@
      * @param {Event} event - Form submit event
      */
     async handleSubmit(event) {
-      console.log("\u{1F4CB} handleSubmit called");
       event.preventDefault();
-      if (!this.validateQuantity()) {
-        console.log("\u26A0\uFE0F Quantity validation failed");
-        return;
-      }
+      if (!this.validateQuantity()) return;
       const quantity = parseInt(document.getElementById("quantity").value) || 1;
       const framingOption = document.getElementById("framing_option").value;
       const notes = document.getElementById("notes").value.trim();
-      console.log("\u{1F4DD} Form values:", { quantity, framingOption, notes });
       const framingSection = document.getElementById("framing_section");
-      console.log("\u{1F3A8} Framing section hidden?", framingSection.classList.contains("hidden"));
-      console.log("\u{1F3A8} Framing option value:", framingOption);
       if (!framingSection.classList.contains("hidden") && !framingOption) {
-        console.log("\u274C Framing validation FAILED - showing error");
-        this.showError("Please select a framing option");
+        this.showError("Please select a framing option.");
         return;
       }
       if (quantity < 1 || quantity > this.currentArtwork.quantity) {
-        console.log("\u26A0\uFE0F Quantity out of range");
-        this.showError(`Quantity must be between 1 and ${this.currentArtwork.quantity}`);
+        this.showError("Invalid quantity.");
         return;
       }
       const submitBtn = document.getElementById("submit_btn");
@@ -295,22 +295,29 @@
       submitBtn.disabled = true;
       submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Adding...';
       try {
-        const options = {};
-        if (framingOption) {
-          options.framing_option = framingOption;
+        const response = await addToCartViaAPI(
+          this.currentArtwork.id,
+          quantity,
+          { framing_option: framingOption, notes }
+        );
+        if (response.success) {
+          this.showSuccess(response.message || "Added to cart!");
+          if (window.updateCartDisplay && typeof window.updateCartDisplay === "function") {
+            window.updateCartDisplay();
+          }
+          setTimeout(() => {
+            document.getElementById("add_to_cart_modal").close();
+            setTimeout(() => {
+              if (window.showCartDropdown && typeof window.showCartDropdown === "function") {
+                window.showCartDropdown();
+              }
+            }, 250);
+          }, 1200);
+        } else {
+          this.showError(response.message || "Failed to add to cart.");
         }
-        if (notes) {
-          options.notes = notes;
-        }
-        const response = await addToCartViaAPI(this.currentArtwork.id, quantity, options);
-        updateCartCountBadge();
-        this.showSuccess(`Added ${quantity} ${quantity === 1 ? "item" : "items"} to cart!`);
-        setTimeout(() => {
-          document.getElementById("add_to_cart_modal").close();
-        }, 1500);
       } catch (error) {
-        console.error("Error:", error);
-        this.showError(error.message || "Failed to add item to cart. Please try again.");
+        this.showError(error.message || "Failed to add to cart.");
       } finally {
         submitBtn.disabled = false;
         submitBtn.innerHTML = originalText;

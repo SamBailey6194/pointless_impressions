@@ -222,22 +222,27 @@
 
         {% comment %} Cart Dropdown {% endcomment %}
         <div class="flex flex-col items-center">
-          <div class="dropdown dropdown-end">
+          <div class="dropdown dropdown-end" id="cart-dropdown">
             <label tabindex="0" class="btn btn-ghost btn-circle">
               <div class="indicator">
                 <i class="fa-solid fa-cart-shopping text-lg"></i>
-                <span class="badge badge-sm indicator-item translate-x-5 -translate-y-4">8</span>
+                <span class="badge badge-sm indicator-item translate-x-5 -translate-y-4" id="cart-count-badge">0</span>
               </div>
             </label>
             <div tabindex="0" class="card card-compact dropdown-content w-80 shadow-lg mt-3 z-10">
               <div class="card-body">
-                <span class="font-bold text-lg text-[var(--pointless-blue)]">8 Items in Cart</span>
-                <span class="text-[var(--pointless-blue)]">Subtotal: £999.00</span>
-                <div class="card-actions">
-                  <button class="btn w-full hover:bg-[var(--pointless-red)] hover:border-[var(--pointless-yellow)]">
+                <span class="font-bold text-lg text-[var(--pointless-blue)]">
+                  <span id="cart-items-text">0 Items</span> in Cart
+                </span>
+                <span id="cart-items-list">
+                  {% comment %} Cart items will be dynamically rendered here by JS {% endcomment %}
+                </span>
+                <span class="text-[var(--pointless-blue)] font-bold">Subtotal: <span id="cart-subtotal">£0.00</span></span>
+                <span class="card-actions">
+                  <a href="{% url 'checkout:checkout' %}" class="btn btn-ghost w-full">
                     <i class="fa-solid fa-shopping-bag"></i> View Cart
-                  </button>
-                </div>
+                  </a>
+                </span>
               </div>
             </div>
           </div>

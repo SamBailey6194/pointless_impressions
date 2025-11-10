@@ -33,7 +33,6 @@
      * @param {number} duration - Optional custom duration in milliseconds
      */
     show(message, type = "info", duration = null) {
-      console.log(`\u{1F35E} Toast.show() called: type="${type}", message="${message}"`);
       const toastConfig = this.types[type] || this.types.info;
       const displayDuration = duration || toastConfig.duration;
       let container = document.getElementById("toast-container");
@@ -41,9 +40,6 @@
         console.error("\u{1F6A8} Toast container NOT found in DOM! Ensure toast.html is included in base.html");
         return;
       }
-      console.log("\u2705 Toast container found:", container);
-      console.log("\u{1F4CF} Container classes:", container.className);
-      console.log("\u{1F3A8} Toast type config:", toastConfig);
       const toastEl = document.createElement("div");
       toastEl.className = `alert ${toastConfig.className} gap-2 shadow-lg pointer-events-auto animate-fade-in`;
       toastEl.innerHTML = `
@@ -52,16 +48,11 @@
       </svg>
       <span>${message}</span>
     `;
-      console.log("\u{1F195} Toast element created:", toastEl);
-      console.log("\u{1F4CB} Toast element classes:", toastEl.className);
       container.appendChild(toastEl);
-      console.log("\u2705 Toast element added to container");
       setTimeout(() => {
-        console.log(`\u23F1\uFE0F Toast auto-removing after ${displayDuration}ms`);
         toastEl.classList.add("animate-fade-out");
         setTimeout(() => {
           toastEl.remove();
-          console.log("\u{1F5D1}\uFE0F Toast element removed from DOM");
         }, 300);
       }, displayDuration);
     },
@@ -116,7 +107,6 @@
           case "warning":
             toastType = "warning";
             break;
-          case "debug":
           case "info":
           default:
             toastType = "info";

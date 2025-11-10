@@ -44,7 +44,6 @@ const Toast = {
    * @param {number} duration - Optional custom duration in milliseconds
    */
   show(message, type = 'info', duration = null) {
-    console.log(`🍞 Toast.show() called: type="${type}", message="${message}"`);
     const toastConfig = this.types[type] || this.types.info;
     const displayDuration = duration || toastConfig.duration;
 
@@ -54,10 +53,6 @@ const Toast = {
       console.error('🚨 Toast container NOT found in DOM! Ensure toast.html is included in base.html');
       return;
     }
-
-    console.log('✅ Toast container found:', container);
-    console.log('📏 Container classes:', container.className);
-    console.log('🎨 Toast type config:', toastConfig);
 
     // Create toast element
     const toastEl = document.createElement('div');
@@ -69,20 +64,14 @@ const Toast = {
       <span>${message}</span>
     `;
 
-    console.log('🆕 Toast element created:', toastEl);
-    console.log('📋 Toast element classes:', toastEl.className);
-
     // Add to container
     container.appendChild(toastEl);
-    console.log('✅ Toast element added to container');
 
     // Auto-remove after duration
     setTimeout(() => {
-      console.log(`⏱️ Toast auto-removing after ${displayDuration}ms`);
       toastEl.classList.add('animate-fade-out');
       setTimeout(() => {
         toastEl.remove();
-        console.log('🗑️ Toast element removed from DOM');
       }, 300);
     }, displayDuration);
   },
@@ -143,7 +132,6 @@ const Toast = {
         case 'warning':
           toastType = 'warning';
           break;
-        case 'debug':
         case 'info':
         default:
           toastType = 'info';

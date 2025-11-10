@@ -179,23 +179,17 @@ const addToCartModal = {
    * @param {string} message - Error message to display
    */
   showError(message) {
-    console.log('❌ showError called with message:', message);
-    console.log('Toast object available?', !!Toast);
-    console.log('Toast.error available?', typeof Toast?.error);
-    
     // Show error on the modal itself
     const formErrorEl = document.getElementById('form_error');
     const errorMessageEl = document.getElementById('error_message');
     if (formErrorEl && errorMessageEl) {
       errorMessageEl.textContent = message;
       formErrorEl.classList.remove('hidden');
-      console.log('✅ Error displayed on modal');
     }
     
     // Also show toast for backup
     if (Toast && typeof Toast.error === 'function') {
       Toast.error(message);
-      console.log('✅ Toast.error() called successfully');
     } else {
       console.error('❌ Toast.error not available!', Toast);
     }
@@ -206,23 +200,17 @@ const addToCartModal = {
    * @param {string} message - Success message to display
    */
   showSuccess(message) {
-    console.log('✅ showSuccess called with message:', message);
-    console.log('Toast object available?', !!Toast);
-    console.log('Toast.success available?', typeof Toast?.success);
-    
     // Show success on the modal itself
     const formSuccessEl = document.getElementById('form_success');
     const successMessageEl = document.getElementById('success_message');
     if (formSuccessEl && successMessageEl) {
       successMessageEl.textContent = message;
       formSuccessEl.classList.remove('hidden');
-      console.log('✅ Success displayed on modal');
     }
     
     // Also show toast for backup
     if (Toast && typeof Toast.success === 'function') {
       Toast.success(message);
-      console.log('✅ Toast.success() called successfully');
     } else {
       console.error('❌ Toast.success not available!', Toast);
     }
@@ -233,73 +221,50 @@ const addToCartModal = {
    * @param {Event} event - Form submit event
    */
   async handleSubmit(event) {
-    console.log('📋 handleSubmit called');
     event.preventDefault();
-
-    // Validate quantity
-    if (!this.validateQuantity()) {
-      console.log('⚠️ Quantity validation failed');
-      return;
-    }
-
+    if (!this.validateQuantity()) return;
     const quantity = parseInt(document.getElementById('quantity').value) || 1;
     const framingOption = document.getElementById('framing_option').value;
     const notes = document.getElementById('notes').value.trim();
-
-    console.log('📝 Form values:', { quantity, framingOption, notes });
-
-    // Validate framing option if section is visible (has options available)
     const framingSection = document.getElementById('framing_section');
-    console.log('🎨 Framing section hidden?', framingSection.classList.contains('hidden'));
-    console.log('🎨 Framing option value:', framingOption);
-    
     if (!framingSection.classList.contains('hidden') && !framingOption) {
-      console.log('❌ Framing validation FAILED - showing error');
-      this.showError('Please select a framing option');
+      this.showError('Please select a framing option.');
       return;
     }
-
-    // Validate quantity is within range
     if (quantity < 1 || quantity > this.currentArtwork.quantity) {
-      console.log('⚠️ Quantity out of range');
-      this.showError(`Quantity must be between 1 and ${this.currentArtwork.quantity}`);
+      this.showError('Invalid quantity.');
       return;
     }
-
-    // Show loading state
     const submitBtn = document.getElementById('submit_btn');
     const originalText = submitBtn.innerHTML;
     submitBtn.disabled = true;
     submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Adding...';
-
     try {
-      // Prepare options object
-      const options = {};
-      if (framingOption) {
-        options.framing_option = framingOption;
+      const response = await addToCartViaAPI(
+        this.currentArtwork.id,
+        quantity,
+        { framing_option: framingOption, notes }
+      );
+      if (response.success) {
+        this.showSuccess(response.message || 'Added to cart!');
+        if (window.updateCartDisplay && typeof window.updateCartDisplay === 'function') {
+          window.updateCartDisplay();
+        }
+        setTimeout(() => {
+          document.getElementById('add_to_cart_modal').close();
+          // Wait for modal to close, then show cart dropdown
+          setTimeout(() => {
+            if (window.showCartDropdown && typeof window.showCartDropdown === 'function') {
+              window.showCartDropdown();
+            }
+          }, 250); // 250ms after modal closes
+        }, 1200);
+      } else {
+        this.showError(response.message || 'Failed to add to cart.');
       }
-      if (notes) {
-        options.notes = notes;
-      }
-
-      // Add to cart via API
-      const response = await addToCartViaAPI(this.currentArtwork.id, quantity, options);
-
-      // Update cart UI
-      updateCartCountBadge();
-
-      // Show success message
-      this.showSuccess(`Added ${quantity} ${quantity === 1 ? 'item' : 'items'} to cart!`);
-
-      // Close modal after 1.5 seconds
-      setTimeout(() => {
-        document.getElementById('add_to_cart_modal').close();
-      }, 1500);
     } catch (error) {
-      console.error('Error:', error);
-      this.showError(error.message || 'Failed to add item to cart. Please try again.');
+      this.showError(error.message || 'Failed to add to cart.');
     } finally {
-      // Restore button state
       submitBtn.disabled = false;
       submitBtn.innerHTML = originalText;
     }

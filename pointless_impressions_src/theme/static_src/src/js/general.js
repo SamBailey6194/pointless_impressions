@@ -28,11 +28,6 @@ document.addEventListener("DOMContentLoaded", () => {
         const gapStyle = carouselStyle.gap;
         const gap = parseFloat(gapStyle.split(' ')[0]) || 24;
 
-        if (itemWidth === 0) {
-            console.error(`Item width is zero in carousel "${carouselId}"`);
-            return;
-        }
-
         const scrollAmount = itemWidth + gap;
 
         // Get current scroll position and max scroll position

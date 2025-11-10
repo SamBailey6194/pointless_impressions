@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% load static cloudinary tailwind_tags %}
+
+{% block content %}
+    {% block section_1 %}
+    <section class="section-alt py-16 w-full">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            {% comment %} Breadcrumbs {% endcomment %}
+            <div class="breadcrumbs text-sm mb-6">
+                <ul>
+                    <li>
+                        <a href="/"><i class="fa-solid fa-home"></i> Home</a>
+                    </li>
+                    <li>
+                        <a href="{% url 'artwork:list' %}"><i class="fa-solid fa-palette"></i> Artworks</a>
+                    </li>
+                    <li>
+                        <p><i class="fa-solid fa-check"></i> Checkout</p>
+                    </li>
+                </ul>
+            </div>
+            {% comment %} Checkout Heading {% endcomment %}
+            <h1 class="text-4xl font-bold mb-4">Checkout</h1>
+            {% comment %} Checkout Instructions {% endcomment %}
+            <p class="mb-8">Please review your order and provide your payment details to complete the purchase.</p>
+        </div>
+    </section>
+    {% endblock %}
+
+    {% block section_2 %}
+    <section class="section-blue py-16 w-full">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+        </div>
+    </section>
+    {% endblock %}
+
+    {% block section_3 %}
+    <section class="section-alt py-16 w-full">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+        </div>
+    </section>
+    {% endblock %}
+{% endblock %}

@@ -1,4 +1,71 @@
 (() => {
+  // pointless_impressions_src/theme/static_src/src/js/cart.js
+  var CART_UUID_KEY = "cart_uuid";
+  function formatPrice(price) {
+    if (typeof price !== "number") {
+      return "\xA30.00";
+    }
+    return "\xA3" + price.toLocaleString("en-GB", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    });
+  }
+  function getCartUUID() {
+    return localStorage.getItem(CART_UUID_KEY) || null;
+  }
+  async function fetchCartFromBackend() {
+    const cart_uuid = getCartUUID();
+    if (!cart_uuid) return {};
+    try {
+      const response = await fetch(`/checkout/api/cart/fetch/?cart_uuid=${cart_uuid}`);
+      if (!response.ok) throw new Error("Failed to fetch cart");
+      return await response.json();
+    } catch (e) {
+      console.error("Error fetching cart from backend:", e);
+      return {};
+    }
+  }
+  async function syncCartWithBackend() {
+    return { success: true, cart_uuid: getCartUUID() };
+  }
+  async function getTotalQuantity() {
+    const cart = await fetchCartFromBackend();
+    let total = 0;
+    if (cart.items) {
+      cart.items.forEach((item) => {
+        total += item.quantity;
+      });
+    }
+    return total;
+  }
+  async function calculateTotal() {
+    const cart = await fetchCartFromBackend();
+    let total = 0;
+    if (cart.items) {
+      cart.items.forEach((item) => {
+        total += item.total || item.price * item.quantity;
+      });
+    }
+    return Math.round(total * 100) / 100;
+  }
+  function initCart2() {
+    syncCartWithBackend().then((response) => {
+      if (response?.success) {
+        if (window.updateCartDisplay && typeof window.updateCartDisplay === "function") {
+          window.updateCartDisplay();
+        }
+      }
+    }).catch((err) => {
+      console.error("\u274C Failed to sync cart on page load:", err);
+    });
+  }
+  if (typeof window !== "undefined") {
+    window.initCart = initCart2;
+    window.getTotalQuantity = getTotalQuantity;
+    window.calculateTotal = calculateTotal;
+    window.formatPrice = formatPrice;
+  }
+
   // pointless_impressions_src/theme/static_src/src/js/header_footer.js
   document.addEventListener("DOMContentLoaded", () => {
     const header = document.querySelector("header");
@@ -169,6 +236,93 @@
         }
       });
     });
+    window.updateCartDisplay = async function() {
+      if (typeof getTotalQuantity === "function" && typeof calculateTotal === "function" && typeof formatPrice === "function") {
+        let totalQuantity = 0;
+        let subtotal = 0;
+        let cart = {};
+        try {
+          totalQuantity = await getTotalQuantity();
+          subtotal = await calculateTotal();
+          if (typeof fetchCartFromBackend === "function") {
+            cart = await fetchCartFromBackend();
+          }
+        } catch (e) {
+          console.error("Failed to fetch cart data:", e);
+        }
+        const formattedPrice = formatPrice(subtotal);
+        const badge = document.getElementById("cart-count-badge");
+        if (badge) badge.textContent = totalQuantity;
+        const itemsText = document.getElementById("cart-items-text");
+        if (itemsText) itemsText.textContent = totalQuantity === 1 ? "1 Item" : `${totalQuantity} Items`;
+        const subtotalEl = document.getElementById("cart-subtotal");
+        if (subtotalEl) subtotalEl.textContent = formattedPrice;
+        const itemsList = document.getElementById("cart-items-list");
+        if (itemsList && cart.items && Array.isArray(cart.items)) {
+          if (cart.items.length === 0) {
+            itemsList.innerHTML = '<span class="text-sm">Your cart is empty.</span>';
+          } else {
+            let tableHtml = `<table class="w-full text-xs">
+            <thead>
+              <tr>
+                <th class="w-1/4 text-left font-semibold">Image</th>
+                <th class="w-1/4 text-left font-semibold">Item</th>
+                <th class="w-1/4 text-center font-semibold">Qty</th>
+                <th class="w-1/4 text-right font-semibold">Price</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${cart.items.map((item) => `
+                <tr>
+                  <td class="py-1 pr-2"><img src="${item.image_url}" alt="${item.name}" class="h-10 w-10 object-cover rounded"/></td>
+                  <td class="py-1 pr-2">${item.name}</td>
+                  <td class="py-1 text-center">x${item.quantity}</td>
+                  <td class="py-1 text-right">${formatPrice(item.total)}</td>
+                </tr>
+              `).join("")}
+            </tbody>
+          </table>`;
+            itemsList.innerHTML = tableHtml;
+          }
+        }
+      }
+    };
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", () => {
+        setTimeout(() => window.updateCartDisplay(), 100);
+        if (typeof initCart === "function") {
+          initCart();
+        }
+      });
+    } else {
+      setTimeout(() => window.updateCartDisplay(), 100);
+      if (typeof initCart === "function") {
+        initCart();
+      }
+    }
+    window.addEventListener("storage", (e) => {
+      if (e.key === "cart_uuid" || e.key === null) {
+        window.updateCartDisplay();
+      }
+    });
+    window.showCartDropdown = function() {
+      const cartDropdown = document.getElementById("cart-dropdown");
+      if (!cartDropdown) return;
+      const rect = cartDropdown.getBoundingClientRect();
+      if (rect.top < 0 || rect.bottom > window.innerHeight) {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }
+      const label = cartDropdown.querySelector('label[tabindex="0"]');
+      if (label) {
+        setTimeout(() => {
+          label.focus();
+          cartDropdown.classList.add("dropdown-open");
+          setTimeout(() => {
+            cartDropdown.classList.remove("dropdown-open");
+          }, 2500);
+        }, 400);
+      }
+    };
   });
 })();
 //# sourceMappingURL=header_footer.js.map

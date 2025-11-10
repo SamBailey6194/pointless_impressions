@@ -5,6 +5,11 @@ app_name = 'checkout'
 
 urlpatterns = [
     path(
+        '',
+        views.CheckoutView.as_view(),
+        name='checkout'
+    ),
+    path(
         'api/cart/add/',
         views.AddToCartView.as_view(),
         name='api_add_to_cart'
@@ -23,5 +28,10 @@ urlpatterns = [
         'api/cart/sync/',
         views.SyncCartView.as_view(),
         name='api_sync_cart'
+    ),
+    path(
+        'api/cart/fetch/',
+        views.CartFetchView.as_view(),
+        name='api_cart_fetch'
     ),
 ]

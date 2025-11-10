@@ -21,7 +21,6 @@ import {
  */
 export function displayArtworkDetail(artworkData) {
   if (!artworkData) {
-    console.error('No artwork data provided');
     return;
   }
 

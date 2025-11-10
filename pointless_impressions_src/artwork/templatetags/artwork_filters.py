@@ -49,3 +49,63 @@ def framing_conditions_json(conditions):
             'slug': cond.slug
         })
     return json.dumps(framing_options)
+
+
+@register.filter
+def jsonify(value):
+    """
+    Converts any value to a JSON string suitable for embedding
+    in HTML data attributes.
+
+    Useful for converting Django queryset objects or other data
+    to JSON for JavaScript access.
+    """
+    # Handle RelatedManager or QuerySet
+    if hasattr(value, 'all') and callable(value.all):
+        items = []
+        for item in value.all():
+            friendly_name = getattr(
+                item, 'condition_friendly_name', None
+            )
+            condition_name = getattr(
+                item, 'condition_name', None
+            )
+            name = friendly_name or condition_name or str(item)
+            items.append({
+                'id': int(item.id),
+                'name': str(name),
+                'slug': str(getattr(item, 'slug', '')),
+            })
+        return json.dumps(items)
+
+    # Handle iterables (list, tuple, QuerySet without .all())
+    try:
+        # Try to iterate - if it's iterable and not a string/dict
+        if hasattr(value, '__iter__') and not isinstance(
+            value, (str, dict)
+        ):
+            items = []
+            for item in value:
+                # If item is a model instance
+                if hasattr(item, 'id'):
+                    friendly_name = getattr(
+                        item, 'condition_friendly_name', None
+                    )
+                    condition_name = getattr(
+                        item, 'condition_name', None
+                    )
+                    name = (
+                        friendly_name or condition_name or str(item)
+                    )
+                    items.append({
+                        'id': int(item.id),
+                        'name': str(name),
+                        'slug': str(getattr(item, 'slug', '')),
+                    })
+                else:
+                    items.append(item)
+            return json.dumps(items)
+    except (TypeError, AttributeError):
+        pass
+
+    return json.dumps(value)
