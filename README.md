@@ -24,6 +24,7 @@
       - [Artwork List Page](#artwork-list-page)
       - [Artwork Detail Page](#artwork-detail-page)
       - [Add to Cart Modal](#add-to-cart-modal)
+      - [Checkout Page](#checkout-page)
       - [Toast Notification System](#toast-notification-system)
       - [Integration Features](#integration-features)
     - [Features Left to Implement](#features-left-to-implement)
@@ -277,6 +278,18 @@ I implemented a comprehensive SEO strategy directly within the Django `base.html
 - Cart button shows mini-cart preview with quick access to checkout
 - Account menu shows recent orders and quick links
 
+**Cart Dropdown in Header:**
+- The cart icon in the header displays a badge with the current item count and subtotal.
+- Clicking the cart icon reveals a dropdown showing all cart items in a table with image, name, quantity, and price.
+- Users can quickly review their cart contents and subtotal without leaving the current page.
+- The dropdown updates instantly after any cart change (add, update, remove) via AJAX.
+- Clicking "View Cart" in the dropdown takes the user directly to the checkout page.
+
+**Real-Time Updates & Persistence:**
+- Cart state is persisted using localStorage and synchronized with the backend session.
+- All cart actions (add, update, remove) trigger real-time UI updates in the header dropdown and badge.
+- Cart remains consistent across page reloads and navigation.
+
 ---
 
 #### Footer
@@ -496,6 +509,48 @@ I implemented a comprehensive SEO strategy directly within the Django `base.html
 
 ---
 
+#### Checkout Page
+
+**Order Summary Panel:**
+- Displays all cart items in a table with image, name, quantity, framing option, and price.
+- Subtotal, delivery info, and total are clearly shown and update dynamically.
+- Delivery information is stacked vertically and offset to the right for clarity.
+
+**Editable Cart Items:**
+- Users can update quantity and framing option directly in the order summary.
+- Quantity input is validated: cannot exceed available stock, cannot go below 1, and setting to 0 removes the item.
+- Framing option is a dropdown populated with available choices for each artwork.
+- "Update" button triggers AJAX update; changes are reflected immediately without page reload.
+- "Remove" button allows users to delete items from the cart instantly.
+
+**Cart Synchronization:**
+- Cart UUID is synced between localStorage and cookies to ensure backend and frontend are always in sync.
+- All cart data is fetched from the backend to prevent stale or out-of-sync UI.
+
+**AJAX Integration:**
+- All cart updates (quantity, framing, removal) use AJAX for a seamless user experience.
+- Order summary and cart dropdown update in real time after any change.
+
+**Validation & Error Handling:**
+- Quantity and framing option are validated both client-side and server-side.
+- Error messages are displayed via toast notifications for invalid actions (e.g., exceeding stock).
+
+**Checkout Actions:**
+- "Proceed to Payment" button is enabled only if the cart is valid and not empty.
+- Delivery address and payment method sections are shown after order summary (if user is authenticated).
+- Guest checkout prompts for login or registration before payment.
+
+**Security & SEO:**
+- Checkout page uses `<meta name="robots" content="noindex, nofollow" />` to prevent indexing.
+- All sensitive actions are protected by CSRF tokens and session validation.
+
+**Accessibility & Responsiveness:**
+- Fully responsive layout for mobile and desktop.
+- All form controls are accessible via keyboard and screen readers.
+- Clear focus states and error indicators for all inputs.
+
+---
+
 #### Toast Notification System
 
 **Architecture:**
@@ -580,6 +635,7 @@ Toast.handleAPIError(error)                // Displays API error messages
 - **Autocomplete**: Tarekraafat autocomplete library provides suggestions as user types
 - **Quick Navigation**: Click suggestion → Detail page or filtered list
 
+---
 
 ### Features Left to Implement
 
@@ -654,6 +710,8 @@ Please note for the Jest testing there was a need to create html fixture files a
 - **Framing Option Selection in Cart**: The add to cart modal was not showing a dropdown selection for the framing options due to lack of JSON being passed to the template. Added a function to the Artwork model to return framing options as a list of tuples for the template to render the dropdown. Added the JSON dump to ArtworkListView and ArtworkDetailView CBVs. Then ensured the data was being fetched properly in the relevant html and js files.
 - **Add to Cart Submission**: The add to cart modal was not submitting the form properly due to handling of JSON responses for framing conditions. Updated the `artwork_detail.html` to have the postloadjs hold the framing conditions JSON data for the modal to fetch and render the dropdown properly.
 - **Toasts Were Displayed Outside the Header Container**: The toasts were being displayed outside the header container due to styling issues. Added a custom `#toast-container` styling to the source CSS file to ensure proper positioning.
+- **Local Storage and SSR**: The cookie and local storage uuid's for the cart were not syncing, meaning the django session was not receiving the cart data properly and the order summary on the checkout page was not receiving the information. Fixed by sending the cart uuid from local storage to the server via a cookie on each request.
+- **Network Error when updating order in checkout**: The checkout page was throwing a network error when trying to update the order summary due to the `header_footer.js` sending too many requests for the cart uuid. Added a debounce wrapper which fixed the network errors by ensuring only one cart fetch runs within a short time window, preventing multiple overlapping requests that the browser would otherwise abort.
 
 ### Unfixed Bugs
 
@@ -1131,3 +1189,4 @@ Below are my credits for where I got inspiration for some of the code and conten
 - For writing CBVs I followed [Bug Bytes - Django Class Based Views from Scratch!](https://www.youtube.com/watch?v=Z3Z8h6_2b0M) and used the official [Django Class Based Views Documentation](https://docs.djangoproject.com/en/5.2/topics/class-based-views/)
 - To help with sorting via SSR and AJAX via API I used [Django AJAX Tutorial by Pretty Printed](https://www.youtube.com/watch?v=2d7s3spWAzo) and [Django Sorting and Filtering with AJAX by JustDjango](https://www.youtube.com/watch?v=5hY6b6rX9mA)
 - To set up autcomplete search I used tarekraafat/autocomplete.js library from [GitHub - tarekraafat/autocomplete.js: A simple, lightweight, pure vanilla JavaScript autocomplete library.] and followed the instructions there along with the youtube video [Autocomplete.js - Lightweight Vanilla JavaScript Autocomplete Library by Tarek Raafat](https://www.youtube.com/watch?v=1Z3d8h4nWbA)
+- To understand local storage and cookie storage for SSR and passing information betweeen them I used [MDN Web Docs - Window.localStorage](https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage) and [MDN Web Docs - Document.cookie](https://developer.mozilla.org/en-US/docs/Web/API/Document/cookie) along with the video by [Web Storage API Tutorial by Traversy Media](https://www.youtube.com/watch?v=H7Dt6Y6n0nA) and Django session management video by [Django Sessions Explained by Pretty Printed](https://www.youtube.com/watch?v=3b8j4KXU6jY). This helped me write the APIs to sync JavaScript local storage cart uuid with Django session cookie for proper order management.

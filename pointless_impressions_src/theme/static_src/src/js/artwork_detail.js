@@ -7,10 +7,10 @@
 // Import cart functions from cart.js
 import {
   formatPrice,
-  addToCart,
-  removeFromCart,
-  updateQuantity,
-  getCart,
+  addToCartViaAPI as addToCart,
+  removeFromCartViaAPI as removeFromCart,
+  updateQuantityViaAPI as updateQuantity,
+  fetchCartFromBackend as getCart,
   calculateTotal,
   updateCartCountBadge,
 } from './cart.js';

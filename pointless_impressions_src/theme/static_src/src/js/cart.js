@@ -2,12 +2,6 @@
  * Cart Management Module
  * Handles localStorage-based cart operations with optional backend API sync
  * Compatible with Jest and Cypress testing
- * 
- * Usage:
- *   import { addToCart, removeFromCart, getCart, calculateTotal, formatPrice } from './cart.js';
- *   
- *   addToCart('artwork-123', 1, 199.99);
- *   const total = calculateTotal();
  */
 
 const CART_UUID_KEY = 'cart_uuid';
@@ -73,14 +67,43 @@ export function clearCartUUID() {
  */
 export async function fetchCartFromBackend() {
   const cart_uuid = getCartUUID();
+  console.log('[cart.js] fetchCartFromBackend cart_uuid:', cart_uuid);
   if (!cart_uuid) return {};
+  let fetchAborted = false;
+  function onUnload() {
+    fetchAborted = true;
+    console.log('[cart.js] Window is unloading, fetch may be aborted');
+  }
+  window.addEventListener('beforeunload', onUnload);
   try {
-    const response = await fetch(`/checkout/api/cart/fetch/?cart_uuid=${cart_uuid}`);
+    const url = `/checkout/api/cart/fetch/?cart_uuid=${cart_uuid}`;
+    console.log('[cart.js] Fetching cart from:', url);
+    const fetchPromise = fetch(url);
+    fetchPromise.then(() => {
+      if (fetchAborted) {
+        console.log('[cart.js] Fetch completed but window was unloading');
+      } else {
+        console.log('[cart.js] Fetch completed successfully');
+      }
+    }).catch((err) => {
+      if (fetchAborted) {
+        console.log('[cart.js] Fetch error but window was unloading:', err);
+      }
+    });
+    const response = await fetchPromise;
     if (!response.ok) throw new Error('Failed to fetch cart');
+    window.removeEventListener('beforeunload', onUnload);
     return await response.json();
   } catch (e) {
-    console.error('Error fetching cart from backend:', e);
+    if (fetchAborted) {
+      console.error('[cart.js] Error fetching cart: fetch was aborted due to unload', e);
+    } else {
+      console.error('[cart.js] Error fetching cart from backend:', e);
+    }
     return {};
+  }
+  finally {
+    window.removeEventListener('beforeunload', onUnload);
   }
 }
 
@@ -269,4 +292,8 @@ if (typeof window !== 'undefined') {
   window.getTotalQuantity = getTotalQuantity;
   window.calculateTotal = calculateTotal;
   window.formatPrice = formatPrice;
+  window.updateQuantityViaAPI = updateQuantityViaAPI;
+  window.removeFromCartViaAPI = removeFromCartViaAPI;
+  window.addToCartViaAPI = addToCartViaAPI;
+  window.fetchCartFromBackend = fetchCartFromBackend;
 }

@@ -1,4 +1,4 @@
-import { fetchCartFromBackend, formatPrice, getTotalQuantity, calculateTotal } from './cart.js';
+import { fetchCartFromBackend, formatPrice, getTotalQuantity, calculateTotal, getCartUUID } from './cart.js';
 
 document.addEventListener("DOMContentLoaded", () => {
   // Elements
@@ -222,60 +222,81 @@ document.addEventListener("DOMContentLoaded", () => {
   /**
    * Update cart display in header with current cart data (async)
    */
-  window.updateCartDisplay = async function() {
-    if (typeof getTotalQuantity === 'function' && typeof calculateTotal === 'function' && typeof formatPrice === 'function') {
-      let totalQuantity = 0;
-      let subtotal = 0;
-      let cart = {};
-      try {
-        totalQuantity = await getTotalQuantity();
-        subtotal = await calculateTotal();
-        if (typeof fetchCartFromBackend === 'function') {
-          cart = await fetchCartFromBackend();
-        }
-      } catch (e) {
-        console.error('Failed to fetch cart data:', e);
-      }
-      const formattedPrice = formatPrice(subtotal);
-      // Update badge
-      const badge = document.getElementById('cart-count-badge');
-      if (badge) badge.textContent = totalQuantity;
-      // Update items text
-      const itemsText = document.getElementById('cart-items-text');
-      if (itemsText) itemsText.textContent = totalQuantity === 1 ? '1 Item' : `${totalQuantity} Items`;
-      // Update subtotal
-      const subtotalEl = document.getElementById('cart-subtotal');
-      if (subtotalEl) subtotalEl.textContent = formattedPrice;
-      // Render cart items in the span as a table
-      const itemsList = document.getElementById('cart-items-list');
-      if (itemsList && cart.items && Array.isArray(cart.items)) {
-        if (cart.items.length === 0) {
-          itemsList.innerHTML = '<span class="text-sm">Your cart is empty.</span>';
-        } else {
-          let tableHtml = `<table class="w-full text-xs">
-            <thead>
-              <tr>
-                <th class="w-1/4 text-left font-semibold">Image</th>
-                <th class="w-1/4 text-left font-semibold">Item</th>
-                <th class="w-1/4 text-center font-semibold">Qty</th>
-                <th class="w-1/4 text-right font-semibold">Price</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${cart.items.map(item => `
-                <tr>
-                  <td class="py-1 pr-2"><img src="${item.image_url}" alt="${item.name}" class="h-10 w-10 object-cover rounded"/></td>
-                  <td class="py-1 pr-2">${item.name}</td>
-                  <td class="py-1 text-center">x${item.quantity}</td>
-                  <td class="py-1 text-right">${formatPrice(item.total)}</td>
-                </tr>
-              `).join('')}
-            </tbody>
-          </table>`;
-          itemsList.innerHTML = tableHtml;
-        }
-      }
+  let updateCartDisplayTimeout = null;
+  window.updateCartDisplay = function() {
+    if (updateCartDisplayTimeout) {
+      clearTimeout(updateCartDisplayTimeout);
     }
+    updateCartDisplayTimeout = setTimeout(async () => {
+      console.log('[header_footer.js] updateCartDisplay (debounced) called');
+      if (typeof getTotalQuantity === 'function' && typeof calculateTotal === 'function' && typeof formatPrice === 'function') {
+        const cart_uuid = getCartUUID();
+        console.log('[header_footer.js] cart_uuid:', cart_uuid);
+        if (!cart_uuid) {
+          // No cart yet, clear UI
+          const badge = document.getElementById('cart-count-badge');
+          if (badge) badge.textContent = '0';
+          const itemsText = document.getElementById('cart-items-text');
+          if (itemsText) itemsText.textContent = '0 Items';
+          const subtotalEl = document.getElementById('cart-subtotal');
+          if (subtotalEl) subtotalEl.textContent = formatPrice(0);
+          const itemsList = document.getElementById('cart-items-list');
+          if (itemsList) itemsList.innerHTML = '<span class="text-sm">Your cart is empty.</span>';
+          return;
+        }
+        let totalQuantity = 0;
+        let subtotal = 0;
+        let cart = {};
+        try {
+          totalQuantity = await getTotalQuantity();
+          subtotal = await calculateTotal();
+          if (typeof fetchCartFromBackend === 'function') {
+            cart = await fetchCartFromBackend();
+          }
+        } catch (e) {
+          console.error('[header_footer.js] Failed to fetch cart data:', e);
+        }
+        const formattedPrice = formatPrice(subtotal);
+        // Update badge
+        const badge = document.getElementById('cart-count-badge');
+        if (badge) badge.textContent = totalQuantity;
+        // Update items text
+        const itemsText = document.getElementById('cart-items-text');
+        if (itemsText) itemsText.textContent = totalQuantity === 1 ? '1 Item' : `${totalQuantity} Items`;
+        // Update subtotal
+        const subtotalEl = document.getElementById('cart-subtotal');
+        if (subtotalEl) subtotalEl.textContent = formattedPrice;
+        // Render cart items in the span as a table
+        const itemsList = document.getElementById('cart-items-list');
+        if (itemsList && cart.items && Array.isArray(cart.items)) {
+          if (cart.items.length === 0) {
+            itemsList.innerHTML = '<span class="text-sm">Your cart is empty.</span>';
+          } else {
+            let tableHtml = `<table class="w-full text-xs">
+              <thead>
+                <tr>
+                  <th class="w-1/4 text-left font-semibold">Image</th>
+                  <th class="w-1/4 text-left font-semibold">Item</th>
+                  <th class="w-1/4 text-center font-semibold">Qty</th>
+                  <th class="w-1/4 text-right font-semibold">Price</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${cart.items.map(item => `
+                  <tr>
+                    <td class="py-1 pr-2"><img src="${item.image_url}" alt="${item.name}" class="h-10 w-10 object-cover rounded"/></td>
+                    <td class="py-1 pr-2">${item.name}</td>
+                    <td class="py-1 text-center">x${item.quantity}</td>
+                    <td class="py-1 text-right">${formatPrice(item.total)}</td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>`;
+            itemsList.innerHTML = tableHtml;
+          }
+        }
+      }
+    }, 150); // 150ms debounce
   };
 
   // Initial cart display update on page load

@@ -67,16 +67,31 @@ class CheckoutView(TemplateView):
         )
         cart, _ = CartAPIView().get_or_create_cart(self.request, cart_uuid)
 
+        from .forms import CartItemUpdateForm
         cart_items = []
         total_price = 0
         total_quantity = 0
 
         if cart:
-            for item in cart.items.select_related('artwork').all():
+            for item in cart.items.select_related(
+                    'artwork', 'framing_condition'
+                    ).all():
                 artwork = item.artwork
                 item_total = float(artwork.price) * item.quantity
                 total_price += item_total
                 total_quantity += item.quantity
+                # Prepare initial data for the form
+                initial = {
+                    'quantity': item.quantity,
+                    'framing_option': (
+                        item.framing_condition.id if
+                        item.framing_condition else None,
+                        )
+                }
+                form = CartItemUpdateForm(
+                    initial=initial,
+                    artwork=artwork
+                )
                 cart_items.append({
                     'artwork': artwork,
                     'quantity': item.quantity,
@@ -84,6 +99,7 @@ class CheckoutView(TemplateView):
                     'total': item_total,
                     'framing_option': item.framing_condition,
                     'notes': item.notes,
+                    'form': form,
                 })
 
         # Delivery cost and grand total
@@ -93,7 +109,7 @@ class CheckoutView(TemplateView):
         if total_price >= free_delivery_threshold:
             delivery_cost = 0
         else:
-            delivery_cost = 10.00  # Example flat rate, adjust as needed
+            delivery_cost = 10.00
         grand_total = total_price + delivery_cost
 
         context.update({
