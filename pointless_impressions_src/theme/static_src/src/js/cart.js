@@ -42,13 +42,22 @@ export function getCartUUID() {
 }
 
 /**
+ * Send UUID to backend and store in localStorage
+ * @param {string} uuid
+ */
+export function setCartUUID(uuid) {
+  if (uuid) {
+    localStorage.setItem(CART_UUID_KEY, uuid);
+    document.cookie = 'cart_uuid=' + uuid + ';path=/;max-age=2592000'; // 30 days
+  }
+}
+
+/**
  * Save cart UUID to localStorage
  * @param {string} uuid
  */
 export function saveCartUUID(uuid) {
-  if (uuid) {
-    localStorage.setItem(CART_UUID_KEY, uuid);
-  }
+  setCartUUID(uuid);
 }
 
 /**

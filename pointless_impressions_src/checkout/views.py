@@ -1,5 +1,6 @@
 from django.views.decorators.csrf import csrf_exempt
 import json
+from django.conf import settings
 from django.views import View
 from django.views.generic import TemplateView
 from django.http import JsonResponse
@@ -39,6 +40,23 @@ class CheckoutView(TemplateView):
     """
     template_name = 'checkout/checkout.html'
 
+    def get(self, request, *args, **kwargs):
+        context = self.get_context_data(**kwargs)
+        response = self.render_to_response(context)
+        cart_uuid = None
+        cart = None
+        # Get cart by UUID (from GET param or cookie) or user
+        cart_uuid = (
+            request.GET.get('cart_uuid') or
+            request.COOKIES.get('cart_uuid')
+        )
+        cart, _ = CartAPIView().get_or_create_cart(request, cart_uuid)
+        if cart:
+            response.set_cookie(
+                'cart_uuid', str(cart.uuid), max_age=2592000, path='/'
+                )
+        return response
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
@@ -46,7 +64,7 @@ class CheckoutView(TemplateView):
         cart_uuid = (
             self.request.GET.get('cart_uuid') or
             self.request.COOKIES.get('cart_uuid')
-            )
+        )
         cart, _ = CartAPIView().get_or_create_cart(self.request, cart_uuid)
 
         cart_items = []
@@ -68,10 +86,23 @@ class CheckoutView(TemplateView):
                     'notes': item.notes,
                 })
 
+        # Delivery cost and grand total
+        free_delivery_threshold = getattr(
+            settings, 'DELIVERY_FREE_THRESHOLD', 100.00
+        )
+        if total_price >= free_delivery_threshold:
+            delivery_cost = 0
+        else:
+            delivery_cost = 10.00  # Example flat rate, adjust as needed
+        grand_total = total_price + delivery_cost
+
         context.update({
             'cart_items': cart_items,
             'total_price': total_price,
             'total_quantity': total_quantity,
+            'delivery_cost': delivery_cost,
+            'grand_total': grand_total,
+            'free_delivery_threshold': free_delivery_threshold,
         })
 
         return context
@@ -306,7 +337,7 @@ class RemoveFromCartView(CartAPIView):
 
         # Get or create cart from UUID or user
         cart_uuid = request.GET.get('cart_uuid')
-        cart, _ = self.get_or_create_cart(cart_uuid)
+        cart, _ = self.get_or_create_cart(request, cart_uuid)
 
         if not cart:
             return JsonResponse(

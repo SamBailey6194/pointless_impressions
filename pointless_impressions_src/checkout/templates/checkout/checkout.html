@@ -30,7 +30,7 @@
     {% block section_2 %}
     <section class="section-blue py-16 w-full">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-
+            {% include 'checkout/includes/order_summary.html' %}
         </div>
     </section>
     {% endblock %}
@@ -38,7 +38,7 @@
     {% block section_3 %}
     <section class="section-alt py-16 w-full">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-
+            {% include 'checkout/includes/checkout_form.html' %}
         </div>
     </section>
     {% endblock %}

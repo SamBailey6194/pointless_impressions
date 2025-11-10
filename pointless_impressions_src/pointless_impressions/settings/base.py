@@ -174,5 +174,7 @@ MEDIA_ROOT = BASE_DIR / "media"
 # Default primary key field type
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-# Default static version for cache busting
+# Free delivery threshold (in GBP)
+DELIVERY_FREE_THRESHOLD = 500.00
+
 STATIC_VERSION = os.getenv("STATIC_VERSION", "1.0.0")

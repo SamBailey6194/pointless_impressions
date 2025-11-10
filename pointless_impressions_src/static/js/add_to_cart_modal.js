@@ -19,10 +19,14 @@
   function getCartUUID() {
     return localStorage.getItem(CART_UUID_KEY) || null;
   }
-  function saveCartUUID(uuid) {
+  function setCartUUID(uuid) {
     if (uuid) {
       localStorage.setItem(CART_UUID_KEY, uuid);
+      document.cookie = "cart_uuid=" + uuid + ";path=/;max-age=2592000";
     }
+  }
+  function saveCartUUID(uuid) {
+    setCartUUID(uuid);
   }
   async function fetchCartFromBackend() {
     const cart_uuid = getCartUUID();
