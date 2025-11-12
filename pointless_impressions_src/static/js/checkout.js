@@ -1,1 +1,74 @@
-(()=>{var y="cart_uuid",d={ADD:"/checkout/api/cart/add/",REMOVE:"/checkout/api/cart/remove/",UPDATE:"/checkout/api/cart/update/",SYNC:"/checkout/api/cart/sync/"};function g(o){return typeof o!="number"?"\xA30.00":"\xA3"+o.toLocaleString("en-GB",{minimumFractionDigits:2,maximumFractionDigits:2})}function s(){return localStorage.getItem(y)||null}function v(o){o&&(localStorage.setItem(y,o),document.cookie="cart_uuid="+o+";path=/;max-age=2592000")}function l(o){v(o)}async function f(){let o=s();if(console.log("[cart.js] fetchCartFromBackend cart_uuid:",o),!o)return{};let c=!1;function n(){c=!0,console.log("[cart.js] Window is unloading, fetch may be aborted")}window.addEventListener("beforeunload",n);try{let e=`/checkout/api/cart/fetch/?cart_uuid=${o}`;console.log("[cart.js] Fetching cart from:",e);let r=fetch(e);r.then(()=>{console.log(c?"[cart.js] Fetch completed but window was unloading":"[cart.js] Fetch completed successfully")}).catch(a=>{c&&console.log("[cart.js] Fetch error but window was unloading:",a)});let t=await r;if(!t.ok)throw new Error("Failed to fetch cart");return window.removeEventListener("beforeunload",n),await t.json()}catch(e){return console.error(c?"[cart.js] Error fetching cart: fetch was aborted due to unload":"[cart.js] Error fetching cart from backend:",e),{}}finally{window.removeEventListener("beforeunload",n)}}async function k(o,c=1,n={}){let e=document.querySelector("[name=csrfmiddlewaretoken]")?.value,r=s();if(!e)throw new Error("CSRF token not found");let t=new FormData;t.append("artwork_id",o),t.append("quantity",c),n.framing_option&&t.append("framing_option",n.framing_option),n.notes&&t.append("notes",n.notes);let a=d.ADD;r&&(a+=`?cart_uuid=${r}`);try{let i=await fetch(a,{method:"POST",headers:{"X-CSRFToken":e},body:t}),u=await i.json();if(!i.ok)throw new Error(u.error||"Failed to add item to cart");return u.cart_uuid&&l(u.cart_uuid),u}catch(i){throw console.error("Error adding to cart via API:",i),i}}async function m(o){let c=document.querySelector("[name=csrfmiddlewaretoken]")?.value,n=s();if(!c)throw new Error("CSRF token not found");let e=new FormData;e.append("artwork_id",o);let r=d.REMOVE;n&&(r+=`?cart_uuid=${n}`);try{let t=await fetch(r,{method:"POST",headers:{"X-CSRFToken":c},body:e}),a=await t.json();if(!t.ok)throw new Error(a.error||"Failed to remove item from cart");return a.cart_uuid&&l(a.cart_uuid),a}catch(t){throw console.error("Error removing from cart via API:",t),t}}async function w(o,c){let n=document.querySelector("[name=csrfmiddlewaretoken]")?.value,e=s();if(!n)throw new Error("CSRF token not found");let r=new FormData;r.append("artwork_id",o),r.append("quantity",c);let t=d.UPDATE;e&&(t+=`?cart_uuid=${e}`);try{let a=await fetch(t,{method:"POST",headers:{"X-CSRFToken":n},body:r}),i=await a.json();if(!a.ok)throw new Error(i.error||"Failed to update quantity");return i.cart_uuid&&l(i.cart_uuid),i}catch(a){throw console.error("Error updating quantity via API:",a),a}}async function C(){return{success:!0,cart_uuid:s()}}async function E(){let o=await f(),c=0;return o.items&&o.items.forEach(n=>{c+=n.quantity}),c}async function D(){let o=await f(),c=0;return o.items&&o.items.forEach(n=>{c+=n.total||n.price*n.quantity}),Math.round(c*100)/100}function I(){C().then(o=>{o?.success&&window.updateCartDisplay&&typeof window.updateCartDisplay=="function"&&window.updateCartDisplay()}).catch(o=>{console.error("\u274C Failed to sync cart on page load:",o)})}typeof window<"u"&&(window.initCart=I,window.getTotalQuantity=E,window.calculateTotal=D,window.formatPrice=g,window.updateQuantityViaAPI=w,window.removeFromCartViaAPI=m,window.addToCartViaAPI=k,window.fetchCartFromBackend=f);document.addEventListener("DOMContentLoaded",function(){async function o(){let e=document.querySelector("#order-summary-section");if(!e){window.location.reload();return}try{let r=await fetch(window.location.href,{headers:{"X-Requested-With":"XMLHttpRequest"}});if(!r.ok)throw new Error("Failed to fetch updated order summary");let t=await r.text(),a=document.createElement("div");a.innerHTML=t;let i=a.querySelector("#order-summary-section");i?e.replaceWith(i):window.location.reload()}catch{window.location.reload()}}async function c(e,r){try{if(await m(e),r){let t=r.closest("tr");t?t.remove():r.closest(".border.rounded-lg").remove()}await o(),window.updateCartDisplay&&window.updateCartDisplay()}catch{alert("Failed to remove cart item.")}}async function n(e,r){return Promise.resolve()}document.body.addEventListener("click",async function(e){if(e.target.classList.contains("js-qty-plus")){e.preventDefault();let r=e.target.closest(".js-cart-item-form");if(!r)return;let t=r.querySelector('input[name="quantity"]');if(!t)return;let a=parseInt(t.value,10)||0,i=parseInt(t.getAttribute("max"),10)||999;a<i&&(t.value=a+1,t.dispatchEvent(new Event("change",{bubbles:!0})))}if(e.target.classList.contains("js-qty-minus")){e.preventDefault();let r=e.target.closest(".js-cart-item-form");if(!r)return;let t=r.querySelector('input[name="quantity"]');if(!t)return;let a=parseInt(t.value,10)||0,i=parseInt(t.getAttribute("min"),10)||0;a>i&&(t.value=a-1,t.dispatchEvent(new Event("change",{bubbles:!0})))}if(e.target.classList.contains("js-remove-item")){e.preventDefault();let r=e.target.closest(".js-cart-item-form"),t=e.target.getAttribute("data-artwork-id")||r?.getAttribute("data-artwork-id");console.log("[checkout.js] Remove item:",t),await c(t,r)}}),document.body.addEventListener("submit",async function(e){if(e.target.classList.contains("js-cart-item-form")){e.preventDefault();let r=e.target,t=r.getAttribute("data-artwork-id"),a=r.querySelector('input[name="quantity"]'),i=r.querySelector('select[name="framing_option"]'),u=parseInt(a?a.value:1,10),p=i?i.value:"";if(console.log("[checkout.js] Submit update:",{artworkId:t,quantity:u,framingOption:p}),u===0){await c(t,r);return}try{await w(t,u),i&&await n(t,p),await o(),window.updateCartDisplay&&window.updateCartDisplay()}catch(h){console.error("[checkout.js] Failed to update cart item:",h),alert("Failed to update cart item.")}}})});})();
+(() => {
+  // pointless_impressions_src/theme/static_src/src/js/checkout.js
+  document.addEventListener("DOMContentLoaded", function() {
+    async function refreshOrderSummary() {
+      const orderSummary = document.querySelector("#order-summary-section");
+      if (!orderSummary) {
+        window.location.reload();
+        return;
+      }
+      try {
+        const response = await fetch(window.location.href, { headers: { "X-Requested-With": "XMLHttpRequest" } });
+        if (!response.ok) throw new Error("Failed to fetch updated order summary");
+        const html = await response.text();
+        const tempDiv = document.createElement("div");
+        tempDiv.innerHTML = html;
+        const newSummary = tempDiv.querySelector("#order-summary-section");
+        if (newSummary) {
+          orderSummary.replaceWith(newSummary);
+        } else {
+          window.location.reload();
+        }
+      } catch (err) {
+        window.location.reload();
+      }
+    }
+    document.body.addEventListener("click", async function(e) {
+      if (e.target.classList.contains("js-qty-plus") || e.target.classList.contains("js-qty-minus")) {
+        e.preventDefault();
+        const form = e.target.closest(".js-cart-item-form");
+        if (!form) return;
+        const qtyInput = form.querySelector('input[name="quantity"]');
+        if (!qtyInput) return;
+        let val = parseInt(qtyInput.value, 10) || 0;
+        const max = parseInt(qtyInput.getAttribute("max"), 10) || 999;
+        const min = parseInt(qtyInput.getAttribute("min"), 10) || 0;
+        if (e.target.classList.contains("js-qty-plus") && val < max) {
+          qtyInput.value = val + 1;
+        } else if (e.target.classList.contains("js-qty-minus") && val > min) {
+          qtyInput.value = val - 1;
+        }
+        qtyInput.dispatchEvent(new Event("change", { bubbles: true }));
+      }
+    });
+    document.body.addEventListener("submit", async function(e) {
+      if (e.target.classList.contains("js-cart-item-form")) {
+        e.preventDefault();
+        const form = e.target;
+        const artworkIdInput = form.querySelector('input[name="artwork_id"]');
+        const quantityInput = form.querySelector('input[name="quantity"]');
+        if (!artworkIdInput || !quantityInput) {
+          console.error("Artwork ID or quantity input not found in form.");
+          return;
+        }
+        const artworkId = artworkIdInput.value;
+        const quantity = parseInt(quantityInput.value, 10);
+        let result;
+        if (quantity === 0) {
+          result = await window.cart.removeCartItem(artworkId);
+        } else {
+          result = await window.cart.updateCartItem(artworkId, quantity);
+        }
+        if (result.success) {
+          await refreshOrderSummary();
+          if (window.showNotification) {
+            window.showNotification(result.message, "success");
+          } else {
+            alert(result.message, "error");
+          }
+        }
+      }
+    });
+  });
+})();
+//# sourceMappingURL=checkout.js.map

@@ -1,19 +1,8 @@
 /**
  * Artwork Detail Page - Main Script
  * Handles displaying artwork details, images, carousel navigation,
- * cart functionality, and review submission
+ * and review submission
  */
-
-// Import cart functions from cart.js
-import {
-  formatPrice,
-  addToCartViaAPI as addToCart,
-  removeFromCartViaAPI as removeFromCart,
-  updateQuantityViaAPI as updateQuantity,
-  fetchCartFromBackend as getCart,
-  calculateTotal,
-  updateCartCountBadge,
-} from './cart.js';
 
 /**
  * Display artwork detail information on the page
@@ -39,7 +28,7 @@ export function displayArtworkDetail(artworkData) {
   }
 
   if (priceElement) {
-    priceElement.textContent = formatPrice(artworkData.price);
+    priceElement.textContent = artworkData.price || '';
   }
 
   if (imageElement) {
@@ -53,65 +42,9 @@ export function displayArtworkDetail(artworkData) {
 }
 
 /**
- * Add artwork to cart
- * @param {string} artworkId - The artwork identifier
- * @param {number} quantity - Quantity to add
- * @param {number} price - Price of artwork
- * @returns {object} Cart item object
- */
-export function addToCartDetail(artworkId, quantity = 1, price = 0) {
-  // Call cart.js function and update UI
-  const item = addToCart(artworkId, quantity, price);
-  updateCartCountBadge();
-  return item;
-}
-
-/**
- * Remove artwork from cart
- * @param {string} artworkId - The artwork identifier to remove
- */
-export function removeFromCartDetail(artworkId) {
-  removeFromCart(artworkId);
-  updateCartCountBadge();
-}
-
-/**
- * Update quantity of artwork in cart
- * @param {string} artworkId - The artwork identifier
- * @param {number} newQuantity - The new quantity
- * @returns {object} Updated cart item object or null if not found
- */
-export function updateQuantityDetail(artworkId, newQuantity) {
-  const item = updateQuantity(artworkId, newQuantity);
-  updateCartCountBadge();
-  return item;
-}
-
-/**
- * Get entire cart from localStorage
- * @returns {object} Cart object with all items
- */
-export { getCart, calculateTotal };
-
-/**
  * Initialize artwork detail page
  */
 export function initArtworkDetail() {
-  // Add event listeners for Add to Cart button
-  const addToCartBtn = document.getElementById('add-to-cart-btn');
-  if (addToCartBtn) {
-    addToCartBtn.addEventListener('click', () => {
-      // Get artwork data from data attributes or DOM
-      const artworkId = addToCartBtn.dataset.artworkId;
-      const price = parseFloat(addToCartBtn.dataset.price);
-
-      if (artworkId) {
-        addToCart(artworkId, 1, price);
-        showConfirmationMessage('Added to cart!');
-      }
-    });
-  }
-
   // Initialize carousel thumbnail listeners
   const thumbnailContainer = document.getElementById('thumbnail-container');
   if (thumbnailContainer) {
@@ -339,9 +272,6 @@ function initializeReviewFunctionality() {
 // Make review functions globally available
 window.submitReview = submitReview;
 window.showNotification = showNotification;
-
-// Export formatPrice explicitly for tests (imported from cart.js)
-export { formatPrice };
 
 // Initialize on page load
 if (document.readyState === 'loading') {

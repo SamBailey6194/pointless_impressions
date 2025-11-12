@@ -222,14 +222,10 @@ function initArtworkListEnhancements() {
 
     updateSortButtonStates();
 
-    // Only enhance with JSON data if we have it AND the user is interacting with sorting/filtering
-    // This allows server-side rendered images to be visible by default
     if (typeof window.ARTWORKS_JSON_DATA !== 'undefined' && window.ARTWORKS_JSON_DATA.length > 0) {
         masterArtworkList = window.ARTWORKS_JSON_DATA;
         isEnhanced = true;
 
-        // Only render if we have SORT parameters (not filter parameters)
-        // Filter parameters cause a page reload, so server-side rendering handles them
         const params = new URLSearchParams(window.location.search);
         const hasActiveSorting = params.has('sort') || params.has('direction');
         
@@ -293,7 +289,50 @@ function initPriceFilterValidation() {
     validatePrices();
 }
 
+// -------------------------------------------------------------------
+// Handle Artwork List Click
+// -------------------------------------------------------------------
+function handleArtworkListClick(event) {
+  const button = event.target.closest('.add-to-cart-btn');
+  
+  if (!button) {
+    return;
+  }
+
+  const { 
+    artworkId, 
+    artworkName, 
+    artworkPrice, 
+    artworkImage, 
+    artworkQuantity 
+  } = button.dataset;
+
+  const framingOptions = JSON.parse(button.dataset.framingOptions || '[]');
+
+  if (window.addToCartModal) {
+    window.addToCartModal.init(
+      artworkId,
+      artworkName,
+      parseFloat(artworkPrice),
+      artworkImage,
+      parseInt(artworkQuantity, 10),
+      framingOptions
+    );
+  } else {
+    alert('Error: Modal component is not loaded.');
+  }
+}
+
+
+// -------------------------------------------------------------------
+// DOMContentLoaded Initialization
+// -------------------------------------------------------------------
 document.addEventListener("DOMContentLoaded", function() {
     initArtworkListEnhancements();
     initPriceFilterValidation();
+
+    const artworkListContainer = document.getElementById('artwork-list');
+    if (artworkListContainer) {
+      artworkListContainer.addEventListener('click', handleArtworkListClick);
+    }
 });

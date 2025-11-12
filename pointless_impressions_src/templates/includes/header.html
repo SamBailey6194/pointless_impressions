@@ -1,5 +1,7 @@
 {% load static cloudinary tailwind_tags %}
 
+<body data-toast-success="{{ messages.success|escapejs }}" data-toast-error="{{ messages.error|escapejs }}">
+
 <div class="w-full">
   {% comment %} Main Navbar - Logo and Actions {% endcomment %}
   <nav class="navbar shadow-lg min-h-16">
@@ -49,7 +51,7 @@
                     <ul tabindex="0" class="menu menu-sm dropdown-content z-10 p-2 shadow-lg rounded-box w-52 ml-32">
                         {% for category in artwork_categories %}
                             <li>
-                                <a href="{% url 'artwork:list' %}?category={{ category.slug }}" class="hover:bg-[var(--pointless-yellow)]">
+                                <a href="{% url 'artwork:list' %}?category={{ category.slug }}" class="hover:bg-(--pointless-yellow)">
                                     {{ category.friendly_name|default:category.name }}
                                 </a>
                             </li>
@@ -66,7 +68,7 @@
                     <ul tabindex="0" class="menu menu-sm dropdown-content z-10 p-2 shadow-lg rounded-box w-52 ml-28">
                         {% for framing in framing_options %}
                             <li>
-                                <a href="{% url 'artwork:list' %}?selected_condition={{ framing.slug }}" class="hover:bg-[var(--pointless-yellow)]">
+                                <a href="{% url 'artwork:list' %}?selected_condition={{ framing.slug }}" class="hover:bg-(--pointless-yellow)">
                                     {{ framing.condition_friendly_name|default:framing.condition_name }}
                                 </a>
                             </li>
@@ -83,7 +85,7 @@
                   <ul tabindex="0" class="menu menu-sm dropdown-content z-10 p-2 shadow-lg rounded-box w-52 ml-14">
                       {% for artist in artists %}
                           <li>
-                              <a href="{% url 'artwork:list' %}?artist={{ artist.user.username }}" class="hover:bg-[var(--pointless-yellow)]">
+                              <a href="{% url 'artwork:list' %}?artist={{ artist.user.username }}" class="hover:bg-(--pointless-yellow)">
                                   {{ artist.user.username|title }}
                               </a>
                           </li>
@@ -144,13 +146,13 @@
             </label>      
             <ul tabindex="0" class="menu menu-sm dropdown-content mt-3 z-10 p-2 shadow-lg rounded-box w-52">
               {% if request.user.is_authenticated %}
-                <li class="menu-title text-[var(--pointless-blue)] md:hidden">
+                <li class="menu-title text-(--pointless-blue) md:hidden">
                   <span>Welcome, {{ request.user.username|title }}</span>
                 </li>
                 {% comment %} Django Site Admin for Developers {% endcomment %}
                 {% if request.user.is_staff %}
                   <li>
-                    <a href="#" class="hover:bg-[var(--pointless-yellow)]">
+                    <a href="#" class="hover:bg-(--pointless-yellow)">
                       <i class="fa-solid fa-shield-halved"></i> Site Admin (Dev)
                     </a>
                   </li>
@@ -158,7 +160,7 @@
                 {% comment %} Custom Dashboard Access for Admin {% endcomment %}
                 {% if request.user.is_dashboard_admin %}
                   <li>
-                    <a href="#" class="hover:bg-[var(--pointless-yellow)]">
+                    <a href="#" class="hover:bg-(--pointless-yellow)">
                       <i class="fa-solid fa-cog"></i> Admin Dashboard
                     </a>
                   </li>
@@ -167,44 +169,39 @@
                 {% comment %}
                 {% if hasattr(request.user, 'artist_profile') %}
                   <li>
-                    <a href="#" class="hover:bg-[var(--pointless-yellow)]">
+                    <a href="#" class="hover:bg-(--pointless-yellow)">
                       <i class="fa-solid fa-paint-brush"></i> Artist Dashboard
                     </a>
                   </li>
                 {% endif %}
                 {% endcomment %}
                 <li>
-                  <a href="#" class="hover:bg-[var(--pointless-yellow)]">
+                  <a href="#" class="hover:bg-(--pointless-yellow)">
                     <i class="fa-solid fa-user-circle"></i> My Profile
                   </a>
                 </li>
                 <li>
-                  <a href="#" class="hover:bg-[var(--pointless-yellow)]">
+                  <a href="#" class="hover:bg-(--pointless-yellow)">
                     <i class="fa-solid fa-box"></i> My Orders
-                  </a>
-                </li>
-                <li>
-                  <a href="#" class="hover:bg-[var(--pointless-yellow)]">
-                    <i class="fa-solid fa-heart"></i> Wishlist
                   </a>
                 </li>
                 <div class="divider my-1"></div>
                 <li>
-                  <a href="#" class="hover:bg-[var(--pointless-red)] hover:text-white">
+                  <a href="#" class="hover:bg-(--pointless-red) hover:text-white">
                     <i class="fa-solid fa-sign-out-alt"></i> Logout
                   </a>
                 </li>
               {% else %}
-                <li class="menu-title text-[var(--pointless-blue)] md:hidden">
+                <li class="menu-title text-(--pointless-blue) md:hidden">
                   <span>Welcome, Guest</span>
                 </li>
                 <li>
-                  <a href="#" class="hover:bg-[var(--pointless-yellow)]">
+                  <a href="#" class="hover:bg-(--pointless-yellow)">
                     <i class="fa-solid fa-sign-in-alt"></i> Login
                   </a>
                 </li>
                 <li>
-                  <a href="#" class="hover:bg-[var(--pointless-yellow)]">
+                  <a href="#" class="hover:bg-(--pointless-yellow)">
                     <i class="fa-solid fa-user-plus"></i> Sign Up
                   </a>
                 </li>
@@ -221,39 +218,7 @@
         </div>
 
         {% comment %} Cart Dropdown {% endcomment %}
-        <div class="flex flex-col items-center">
-          <div class="dropdown dropdown-end" id="cart-dropdown">
-            <label tabindex="0" class="btn btn-ghost btn-circle">
-              <div class="indicator">
-                <i class="fa-solid fa-cart-shopping text-lg"></i>
-                <span class="badge badge-sm indicator-item translate-x-5 -translate-y-4" id="cart-count-badge">0</span>
-              </div>
-            </label>
-            <div tabindex="0" class="card card-compact dropdown-content w-80 shadow-lg mt-3 z-10">
-              <div class="card-body">
-                <span class="font-bold text-lg text-[var(--pointless-blue)]">
-                  <span id="cart-items-text">0 Items</span> in Cart
-                </span>
-                <span id="cart-items-list">
-                  {% comment %} Cart items will be dynamically rendered here by JS {% endcomment %}
-                </span>
-                <span class="text-[var(--pointless-blue)] font-bold">Subtotal: <span id="cart-subtotal">£0.00</span></span>
-                <span class="card-actions">
-                  <a href="{% url 'checkout:checkout' %}" class="btn btn-ghost w-full">
-                    <i class="fa-solid fa-shopping-bag"></i> View Cart
-                  </a>
-                </span>
-              </div>
-            </div>
-          </div>
-          <div class="hidden md:block text-sm mt-1">
-            {% if request.user.is_authenticated %}
-              <span class="font-medium">{{ request.user.username|title }}'s Cart</span>
-            {% else %}
-              <span class="font-medium">Your Cart</span>
-            {% endif %}
-          </div>
-        </div>
+        {% include 'checkout/includes/cart_dropdown.html' %}
 
         {% comment %} Mobile Hamburger Menu {% endcomment %}
         <div class="dropdown dropdown-end md:hidden">
@@ -262,12 +227,12 @@
           </label>
           <ul tabindex="0" class="menu menu-sm dropdown-content mt-3 z-50 p-2 shadow-lg rounded-box w-48 right-0">
             <li>
-              <a href="{% url 'home' %}" class="hover:bg-[var(--pointless-yellow)]">
+              <a href="{% url 'home' %}" class="hover:bg-(--pointless-yellow)">
                 <i class="fa-solid fa-home"></i> Home
               </a>
             </li>
             <li class="dropdown">
-              <a tabindex="0" class="hover:bg-[var(--pointless-yellow)]">
+              <a tabindex="0" class="hover:bg-(--pointless-yellow)">
                 <i class="fa-solid fa-store"></i> Shop
                 <i class="fa-solid fa-circle-chevron-down"></i>
               </a>
@@ -324,15 +289,15 @@
                 </ul>
               </ul>
             </li>
-            <li><a href="/blog/" class="hover:bg-[var(--pointless-yellow)]">
+            <li><a href="/blog/" class="hover:bg-(--pointless-yellow)">
                 <i class="fa-solid fa-blog"></i> Blog
               </a>
             </li>
-            <li><a href="/about/" class="hover:bg-[var(--pointless-yellow)]">
+            <li><a href="/about/" class="hover:bg-(--pointless-yellow)">
                 <i class="fa-solid fa-info-circle"></i> About
               </a>
             </li>
-            <li><a href="/contact/" class="hover:bg-[var(--pointless-yellow)]">
+            <li><a href="/contact/" class="hover:bg-(--pointless-yellow)">
                 <i class="fa-solid fa-envelope"></i> Contact
               </a>
             </li>
@@ -373,5 +338,5 @@
   </div>
 
   {% comment %} Yellow line under the search bar {% endcomment %}
-  <div class="border-t border-[var(--pointless-yellow)]"></div>
+  <div class="border-t border-(--pointless-yellow)"></div>
 </div>

@@ -130,6 +130,23 @@
     color: var(--pointless-black) !important;
   }
 
+  .select-dropdown {
+    background-color: var(--pointless-white) !important;
+    border: 1px solid var(--pointless-blue) !important;
+    color: var(--pointless-black) !important;
+    font-family: var(--font-Poppins);
+    padding: 0.5rem;
+    border-radius: 0.25rem;
+    box-shadow: none !important;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .select-dropdown:focus {
+    outline: none;
+    border-color: var(--pointless-blue) !important;
+    box-shadow: 0 0 0 3px rgba(5, 81, 135, 0.2) !important;
+  }
+
   .card {
     background-color: var(--pointless-white) !important;
     color: var(--pointless-black) !important;
@@ -159,6 +176,12 @@
     }
 
     .custom-input::placeholder {
+      color: var(--pointless-white) !important;
+    }
+
+    .select-dropdown {
+      background-color: var(--pointless-black) !important;
+      border-color: var(--pointless-blue) !important;
       color: var(--pointless-white) !important;
     }
 

@@ -1,1 +1,148 @@
-(()=>{var s="cart_uuid",l={ADD:"/checkout/api/cart/add/",REMOVE:"/checkout/api/cart/remove/",UPDATE:"/checkout/api/cart/update/",SYNC:"/checkout/api/cart/sync/"};function h(t){return typeof t!="number"?"\xA30.00":"\xA3"+t.toLocaleString("en-GB",{minimumFractionDigits:2,maximumFractionDigits:2})}function u(){return localStorage.getItem(s)||null}function y(t){t&&(localStorage.setItem(s,t),document.cookie="cart_uuid="+t+";path=/;max-age=2592000")}function w(t){y(t)}function D(){localStorage.removeItem(s)}async function f(){let t=u();if(console.log("[cart.js] fetchCartFromBackend cart_uuid:",t),!t)return{};let o=!1;function r(){o=!0,console.log("[cart.js] Window is unloading, fetch may be aborted")}window.addEventListener("beforeunload",r);try{let n=`/checkout/api/cart/fetch/?cart_uuid=${t}`;console.log("[cart.js] Fetching cart from:",n);let c=fetch(n);c.then(()=>{console.log(o?"[cart.js] Fetch completed but window was unloading":"[cart.js] Fetch completed successfully")}).catch(a=>{o&&console.log("[cart.js] Fetch error but window was unloading:",a)});let e=await c;if(!e.ok)throw new Error("Failed to fetch cart");return window.removeEventListener("beforeunload",r),await e.json()}catch(n){return console.error(o?"[cart.js] Error fetching cart: fetch was aborted due to unload":"[cart.js] Error fetching cart from backend:",n),{}}finally{window.removeEventListener("beforeunload",r)}}async function g(t,o=1,r={}){let n=document.querySelector("[name=csrfmiddlewaretoken]")?.value,c=u();if(!n)throw new Error("CSRF token not found");let e=new FormData;e.append("artwork_id",t),e.append("quantity",o),r.framing_option&&e.append("framing_option",r.framing_option),r.notes&&e.append("notes",r.notes);let a=l.ADD;c&&(a+=`?cart_uuid=${c}`);try{let i=await fetch(a,{method:"POST",headers:{"X-CSRFToken":n},body:e}),d=await i.json();if(!i.ok)throw new Error(d.error||"Failed to add item to cart");return d.cart_uuid&&w(d.cart_uuid),d}catch(i){throw console.error("Error adding to cart via API:",i),i}}async function k(t){let o=document.querySelector("[name=csrfmiddlewaretoken]")?.value,r=u();if(!o)throw new Error("CSRF token not found");let n=new FormData;n.append("artwork_id",t);let c=l.REMOVE;r&&(c+=`?cart_uuid=${r}`);try{let e=await fetch(c,{method:"POST",headers:{"X-CSRFToken":o},body:n}),a=await e.json();if(!e.ok)throw new Error(a.error||"Failed to remove item from cart");return a.cart_uuid&&w(a.cart_uuid),a}catch(e){throw console.error("Error removing from cart via API:",e),e}}async function C(t,o){let r=document.querySelector("[name=csrfmiddlewaretoken]")?.value,n=u();if(!r)throw new Error("CSRF token not found");let c=new FormData;c.append("artwork_id",t),c.append("quantity",o);let e=l.UPDATE;n&&(e+=`?cart_uuid=${n}`);try{let a=await fetch(e,{method:"POST",headers:{"X-CSRFToken":r},body:c}),i=await a.json();if(!a.ok)throw new Error(i.error||"Failed to update quantity");return i.cart_uuid&&w(i.cart_uuid),i}catch(a){throw console.error("Error updating quantity via API:",a),a}}async function E(){return{success:!0,cart_uuid:u()}}async function I(){let t=await f();return t.items?t.items.length:0}async function p(){let t=await f(),o=0;return t.items&&t.items.forEach(r=>{o+=r.quantity}),o}async function _(){let t=await f(),o=0;return t.items&&t.items.forEach(r=>{o+=r.total||r.price*r.quantity}),Math.round(o*100)/100}function x(){m(),window.addEventListener("storage",t=>{t.key===s&&m()})}function m(){let t=document.querySelector("[data-cart-count]");if(t){let o=p();t.textContent=o,t.style.display=o>0?"block":"none"}}function F(){E().then(t=>{t?.success&&window.updateCartDisplay&&typeof window.updateCartDisplay=="function"&&window.updateCartDisplay()}).catch(t=>{console.error("\u274C Failed to sync cart on page load:",t)})}typeof window<"u"&&(window.initCart=F,window.getTotalQuantity=p,window.calculateTotal=_,window.formatPrice=h,window.updateQuantityViaAPI=C,window.removeFromCartViaAPI=k,window.addToCartViaAPI=g,window.fetchCartFromBackend=f);})();
+(() => {
+  // pointless_impressions_src/theme/static_src/src/js/cart.js
+  function getCsrfToken() {
+    const tokenEl = document.querySelector("[name=csrfmiddlewaretoken]");
+    return tokenEl ? tokenEl.value : "";
+  }
+  async function fetchCartFromServer() {
+    try {
+      const response = await fetch("/checkout/", {
+        method: "GET",
+        headers: {
+          "X-Requested-With": "XMLHttpRequest"
+        },
+        credentials: "include"
+      });
+      if (!response.ok) {
+        throw new Error("Failed to fetch cart data");
+      }
+      return await response.json();
+    } catch (error) {
+      console.error("Error fetching cart:", error);
+      return { items: [], total_items: 0 };
+    }
+  }
+  async function updateCartCountBadge() {
+    const cartCountEl = document.querySelector("[data-cart-count]");
+    if (cartCountEl) {
+      const cart = await fetchCartFromServer();
+      const count = cart.total_items || 0;
+      cartCountEl.textContent = count;
+      cartCountEl.style.display = count > 0 ? "inline-block" : "none";
+    }
+  }
+  async function addItemToCart(item) {
+    try {
+      const formData = new FormData();
+      formData.append("artwork_id", item.id);
+      formData.append("quantity", item.quantity);
+      const response = await fetch("/checkout/", {
+        method: "POST",
+        body: formData,
+        headers: {
+          "X-CSRFToken": getCsrfToken(),
+          "X-Requested-With": "XMLHttpRequest"
+        },
+        credentials: "include"
+      });
+      if (!response.ok) {
+        throw new Error("Failed to add item to cart");
+      }
+      await updateCartCountBadge();
+    } catch (error) {
+      console.error("Error adding item to cart:", error);
+    }
+  }
+  async function removeCartItem(itemId) {
+    try {
+      const formData = new FormData();
+      formData.append("artwork_id", itemId);
+      formData.append("quantity", 0);
+      const response = await fetch("/checkout/", {
+        method: "POST",
+        body: formData,
+        headers: {
+          "X-CSRFToken": getCsrfToken(),
+          "X-Requested-With": "XMLHttpRequest"
+        },
+        credentials: "include"
+      });
+      if (!response.ok) {
+        throw new Error("Failed to remove item from cart");
+      }
+      await updateCartCountBadge();
+    } catch (error) {
+      console.error("Error removing item from cart:", error);
+    }
+  }
+  async function refreshAndOpenCartDropdown() {
+    const response = await fetch("/checkout/cart-dropdown/", {
+      method: "GET",
+      headers: {
+        "X-Requested-With": "XMLHttpRequest"
+      },
+      credentials: "include"
+    });
+    if (!response.ok) {
+      throw new Error("Failed to refresh cart dropdown");
+    }
+    const html = await response.text();
+    const cartDropdown = document.getElementById("cart-dropdown");
+    if (cartDropdown) {
+      cartDropdown.innerHTML = html;
+    }
+  }
+  async function submitAddToCartForm(form) {
+    try {
+      const formData = new FormData(form);
+      const response = await fetch(form.action, {
+        method: "POST",
+        body: formData,
+        headers: {
+          "X-Requested-With": "XMLHttpRequest"
+        },
+        credentials: "include"
+      });
+      if (!response.ok) {
+        throw new Error("Failed to submit AddToCart form");
+      }
+      const data = await response.json();
+      if (data.success) {
+        const artworkDetailContainer = document.getElementById("artwork-detail-container");
+        if (artworkDetailContainer) {
+          artworkDetailContainer.innerHTML = data.html;
+        }
+        await refreshAndOpenCartDropdown();
+      } else {
+        console.error("Form submission errors:", data.errors);
+      }
+    } catch (error) {
+      console.error("Error submitting AddToCart form:", error);
+    }
+  }
+  function initCart() {
+    updateCartCountBadge().catch((error) => {
+      console.error("Failed to initialize cart:", error);
+    });
+  }
+  if (typeof window !== "undefined") {
+    window.cart = {
+      init: initCart,
+      add: addItemToCart,
+      remove: removeCartItem,
+      updateBadge: updateCartCountBadge,
+      refreshAndOpenDropdown: refreshAndOpenCartDropdown
+    };
+    document.addEventListener("DOMContentLoaded", () => {
+      initCart();
+      const addToCartForm = document.getElementById("add-to-cart-form");
+      if (addToCartForm) {
+        addToCartForm.addEventListener("submit", async (event) => {
+          event.preventDefault();
+          await submitAddToCartForm(addToCartForm);
+        });
+      }
+    });
+  }
+})();
+//# sourceMappingURL=cart.js.map

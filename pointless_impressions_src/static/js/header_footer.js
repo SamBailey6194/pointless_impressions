@@ -1,20 +1,185 @@
-(()=>{var D="cart_uuid",I={ADD:"/checkout/api/cart/add/",REMOVE:"/checkout/api/cart/remove/",UPDATE:"/checkout/api/cart/update/",SYNC:"/checkout/api/cart/sync/"};function h(o){return typeof o!="number"?"\xA30.00":"\xA3"+o.toLocaleString("en-GB",{minimumFractionDigits:2,maximumFractionDigits:2})}function w(){return localStorage.getItem(D)||null}function A(o){o&&(localStorage.setItem(D,o),document.cookie="cart_uuid="+o+";path=/;max-age=2592000")}function x(o){A(o)}async function g(){let o=w();if(console.log("[cart.js] fetchCartFromBackend cart_uuid:",o),!o)return{};let i=!1;function e(){i=!0,console.log("[cart.js] Window is unloading, fetch may be aborted")}window.addEventListener("beforeunload",e);try{let d=`/checkout/api/cart/fetch/?cart_uuid=${o}`;console.log("[cart.js] Fetching cart from:",d);let l=fetch(d);l.then(()=>{console.log(i?"[cart.js] Fetch completed but window was unloading":"[cart.js] Fetch completed successfully")}).catch(s=>{i&&console.log("[cart.js] Fetch error but window was unloading:",s)});let a=await l;if(!a.ok)throw new Error("Failed to fetch cart");return window.removeEventListener("beforeunload",e),await a.json()}catch(d){return console.error(i?"[cart.js] Error fetching cart: fetch was aborted due to unload":"[cart.js] Error fetching cart from backend:",d),{}}finally{window.removeEventListener("beforeunload",e)}}async function F(o,i=1,e={}){let d=document.querySelector("[name=csrfmiddlewaretoken]")?.value,l=w();if(!d)throw new Error("CSRF token not found");let a=new FormData;a.append("artwork_id",o),a.append("quantity",i),e.framing_option&&a.append("framing_option",e.framing_option),e.notes&&a.append("notes",e.notes);let s=I.ADD;l&&(s+=`?cart_uuid=${l}`);try{let u=await fetch(s,{method:"POST",headers:{"X-CSRFToken":d},body:a}),p=await u.json();if(!u.ok)throw new Error(p.error||"Failed to add item to cart");return p.cart_uuid&&x(p.cart_uuid),p}catch(u){throw console.error("Error adding to cart via API:",u),u}}async function q(o){let i=document.querySelector("[name=csrfmiddlewaretoken]")?.value,e=w();if(!i)throw new Error("CSRF token not found");let d=new FormData;d.append("artwork_id",o);let l=I.REMOVE;e&&(l+=`?cart_uuid=${e}`);try{let a=await fetch(l,{method:"POST",headers:{"X-CSRFToken":i},body:d}),s=await a.json();if(!a.ok)throw new Error(s.error||"Failed to remove item from cart");return s.cart_uuid&&x(s.cart_uuid),s}catch(a){throw console.error("Error removing from cart via API:",a),a}}async function P(o,i){let e=document.querySelector("[name=csrfmiddlewaretoken]")?.value,d=w();if(!e)throw new Error("CSRF token not found");let l=new FormData;l.append("artwork_id",o),l.append("quantity",i);let a=I.UPDATE;d&&(a+=`?cart_uuid=${d}`);try{let s=await fetch(a,{method:"POST",headers:{"X-CSRFToken":e},body:l}),u=await s.json();if(!s.ok)throw new Error(u.error||"Failed to update quantity");return u.cart_uuid&&x(u.cart_uuid),u}catch(s){throw console.error("Error updating quantity via API:",s),s}}async function B(){return{success:!0,cart_uuid:w()}}async function C(){let o=await g(),i=0;return o.items&&o.items.forEach(e=>{i+=e.quantity}),i}async function E(){let o=await g(),i=0;return o.items&&o.items.forEach(e=>{i+=e.total||e.price*e.quantity}),Math.round(i*100)/100}function U(){B().then(o=>{o?.success&&window.updateCartDisplay&&typeof window.updateCartDisplay=="function"&&window.updateCartDisplay()}).catch(o=>{console.error("\u274C Failed to sync cart on page load:",o)})}typeof window<"u"&&(window.initCart=U,window.getTotalQuantity=C,window.calculateTotal=E,window.formatPrice=h,window.updateQuantityViaAPI=P,window.removeFromCartViaAPI=q,window.addToCartViaAPI=F,window.fetchCartFromBackend=g);document.addEventListener("DOMContentLoaded",()=>{let o=document.querySelector("header"),i=document.querySelector("footer"),e=document.getElementById("mobile-search-bar"),d=document.querySelectorAll(".dropdown"),l=0,a=!1,s=window.GLOBAL_URLS&&window.GLOBAL_URLS.AUTOCOMPLETE_API;window.toggleMobileSearch=function(){if(e&&(e.classList.toggle("hidden"),!e.classList.contains("hidden"))){let t=e.querySelector('input[name="q"]');t&&setTimeout(()=>t.focus(),100)}};function u(t,n){let c=t.trim();if(c){let r=n.closest("form");if(r){let f=r.querySelector('input[name="q"]');f&&(f.value=c),r.submit()}}}function p(t){if(!s){console.warn("Autocomplete API URL is missing. Autocomplete feature disabled.");return}if(typeof autoComplete>"u"){console.warn("autoComplete library is not loaded. Search will work without autocomplete suggestions.");return}try{let n=t.id||`search-input-${Math.random().toString(36).substr(2,9)}`;t.id||(t.id=n),new autoComplete({selector:`#${n}`,placeHolder:"Search products, categories...",data:{src:async c=>{try{return await(await fetch(`${s}?term=${c}`)).json()}catch(r){return console.error("Autocomplete fetch failed:",r),[]}}},resultItem:{highlight:!0},threshold:2,events:{input:{selection:c=>{let r=c.target,f=c.detail.selection.value;r.value=f,u(f,r)}}}})}catch(n){console.error("Failed to initialize autoComplete:",n)}}if(document.querySelectorAll('input[type="text"][name="q"]').forEach(t=>{p(t),t.addEventListener("keypress",r=>{r.key==="Enter"&&(r.preventDefault(),u(t.value,t))});let n=t.closest("form"),c=n?n.querySelector('button[type="submit"]'):null;c&&c.addEventListener("click",r=>{r.preventDefault(),u(t.value,t)})}),o&&window.addEventListener("scroll",()=>{a||(window.requestAnimationFrame(()=>{let t=window.scrollY,n=t>l&&t>80;o.style.transform=n?"translateY(-100%)":"translateY(0)",l=t,a=!1}),a=!0)}),d.forEach(t=>{let n=t.querySelector('[tabindex="0"]'),c=t.querySelector(".dropdown-content");n&&c&&(document.addEventListener("click",r=>{t.contains(r.target)||n.blur()}),document.addEventListener("keydown",r=>{r.key==="Escape"&&n.blur()}),n.addEventListener("click",()=>{setTimeout(()=>{let r=c.querySelector('input[type="text"]');r&&r.focus()},100)}))}),e){let t;window.addEventListener("scroll",()=>{clearTimeout(t),t=setTimeout(()=>{e.classList.contains("hidden")||e.classList.add("hidden")},2e3)})}document.addEventListener("keydown",t=>{if(t.key==="Tab"&&e&&!e.classList.contains("hidden")){let n=document.activeElement;e.contains(n)||setTimeout(()=>{e.contains(document.activeElement)||e.classList.add("hidden")},100)}}),document.querySelectorAll('[class*="cart"]').forEach(t=>{t.addEventListener("click",n=>{t.textContent.includes("View Cart")&&n.preventDefault()})});let b=null;window.updateCartDisplay=function(){b&&clearTimeout(b),b=setTimeout(async()=>{if(console.log("[header_footer.js] updateCartDisplay (debounced) called"),typeof C=="function"&&typeof E=="function"&&typeof h=="function"){let t=w();if(console.log("[header_footer.js] cart_uuid:",t),!t){let y=document.getElementById("cart-count-badge");y&&(y.textContent="0");let m=document.getElementById("cart-items-text");m&&(m.textContent="0 Items");let L=document.getElementById("cart-subtotal");L&&(L.textContent=h(0));let _=document.getElementById("cart-items-list");_&&(_.innerHTML='<span class="text-sm">Your cart is empty.</span>');return}let n=0,c=0,r={};try{n=await C(),c=await E(),typeof g=="function"&&(r=await g())}catch(y){console.error("[header_footer.js] Failed to fetch cart data:",y)}let f=h(c),v=document.getElementById("cart-count-badge");v&&(v.textContent=n);let T=document.getElementById("cart-items-text");T&&(T.textContent=n===1?"1 Item":`${n} Items`);let S=document.getElementById("cart-subtotal");S&&(S.textContent=f);let k=document.getElementById("cart-items-list");if(k&&r.items&&Array.isArray(r.items))if(r.items.length===0)k.innerHTML='<span class="text-sm">Your cart is empty.</span>';else{let y=`<table class="w-full text-xs">
-              <thead>
-                <tr>
-                  <th class="w-1/4 text-left font-semibold">Image</th>
-                  <th class="w-1/4 text-left font-semibold">Item</th>
-                  <th class="w-1/4 text-center font-semibold">Qty</th>
-                  <th class="w-1/4 text-right font-semibold">Price</th>
-                </tr>
-              </thead>
-              <tbody>
-                ${r.items.map(m=>`
-                  <tr>
-                    <td class="py-1 pr-2"><img src="${m.image_url}" alt="${m.name}" class="h-10 w-10 object-cover rounded"/></td>
-                    <td class="py-1 pr-2">${m.name}</td>
-                    <td class="py-1 text-center">x${m.quantity}</td>
-                    <td class="py-1 text-right">${h(m.total)}</td>
-                  </tr>
-                `).join("")}
-              </tbody>
-            </table>`;k.innerHTML=y}}},150)},document.readyState==="loading"?document.addEventListener("DOMContentLoaded",()=>{setTimeout(()=>window.updateCartDisplay(),100),typeof initCart=="function"&&initCart()}):(setTimeout(()=>window.updateCartDisplay(),100),typeof initCart=="function"&&initCart()),window.addEventListener("storage",t=>{(t.key==="cart_uuid"||t.key===null)&&window.updateCartDisplay()}),window.showCartDropdown=function(){let t=document.getElementById("cart-dropdown");if(!t)return;let n=t.getBoundingClientRect();(n.top<0||n.bottom>window.innerHeight)&&window.scrollTo({top:0,behavior:"smooth"});let c=t.querySelector('label[tabindex="0"]');c&&setTimeout(()=>{c.focus(),t.classList.add("dropdown-open"),setTimeout(()=>{t.classList.remove("dropdown-open")},2500)},400)}});})();
+(() => {
+  // pointless_impressions_src/theme/static_src/src/js/header_footer.js
+  document.addEventListener("DOMContentLoaded", () => {
+    const header = document.querySelector("header");
+    const footer = document.querySelector("footer");
+    const mobileSearchBar = document.getElementById("mobile-search-bar");
+    const dropdowns = document.querySelectorAll(".dropdown");
+    let lastScroll = 0;
+    let ticking = false;
+    const AUTOCOMPLETE_API_URL = window.GLOBAL_URLS && window.GLOBAL_URLS.AUTOCOMPLETE_API;
+    window.toggleMobileSearch = function() {
+      if (mobileSearchBar) {
+        mobileSearchBar.classList.toggle("hidden");
+        if (!mobileSearchBar.classList.contains("hidden")) {
+          const searchInput = mobileSearchBar.querySelector('input[name="q"]');
+          if (searchInput) {
+            setTimeout(() => searchInput.focus(), 100);
+          }
+        }
+      }
+    };
+    function performSearch(query, inputElement) {
+      const trimmedQuery = query.trim();
+      if (trimmedQuery) {
+        const form = inputElement.closest("form");
+        if (form) {
+          const queryInput = form.querySelector('input[name="q"]');
+          if (queryInput) {
+            queryInput.value = trimmedQuery;
+          }
+          form.submit();
+        }
+      }
+    }
+    function initAutoComplete(inputElement) {
+      if (!AUTOCOMPLETE_API_URL) {
+        console.warn("Autocomplete API URL is missing. Autocomplete feature disabled.");
+        return;
+      }
+      if (typeof autoComplete === "undefined") {
+        console.warn("autoComplete library is not loaded. Search will work without autocomplete suggestions.");
+        return;
+      }
+      try {
+        const inputId = inputElement.id || `search-input-${Math.random().toString(36).substr(2, 9)}`;
+        if (!inputElement.id) {
+          inputElement.id = inputId;
+        }
+        new autoComplete({
+          selector: `#${inputId}`,
+          placeHolder: "Search products, categories...",
+          data: {
+            src: async (query) => {
+              try {
+                const response = await fetch(`${AUTOCOMPLETE_API_URL}?term=${query}`);
+                const data = await response.json();
+                return data;
+              } catch (error) {
+                console.error("Autocomplete fetch failed:", error);
+                return [];
+              }
+            }
+          },
+          resultItem: {
+            highlight: true
+          },
+          threshold: 2,
+          events: {
+            input: {
+              selection: (event) => {
+                const inputElement2 = event.target;
+                const selectedValue = event.detail.selection.value;
+                inputElement2.value = selectedValue;
+                performSearch(selectedValue, inputElement2);
+              }
+            }
+          }
+        });
+      } catch (error) {
+        console.error("Failed to initialize autoComplete:", error);
+      }
+    }
+    const searchInputs = document.querySelectorAll('input[type="text"][name="q"]');
+    searchInputs.forEach((input) => {
+      initAutoComplete(input);
+      input.addEventListener("keypress", (e) => {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          performSearch(input.value, input);
+        }
+      });
+      const form = input.closest("form");
+      const searchBtn = form ? form.querySelector('button[type="submit"]') : null;
+      if (searchBtn) {
+        searchBtn.addEventListener("click", (e) => {
+          e.preventDefault();
+          performSearch(input.value, input);
+        });
+      }
+    });
+    if (header) {
+      window.addEventListener("scroll", () => {
+        if (!ticking) {
+          window.requestAnimationFrame(() => {
+            const currentScroll = window.scrollY;
+            const scrollingDown = currentScroll > lastScroll && currentScroll > 80;
+            header.style.transform = scrollingDown ? "translateY(-100%)" : "translateY(0)";
+            lastScroll = currentScroll;
+            ticking = false;
+          });
+          ticking = true;
+        }
+      });
+    }
+    dropdowns.forEach((dropdown) => {
+      const trigger = dropdown.querySelector('[tabindex="0"]');
+      const menu = dropdown.querySelector(".dropdown-content");
+      if (trigger && menu) {
+        document.addEventListener("click", (e) => {
+          if (!dropdown.contains(e.target)) {
+            trigger.blur();
+          }
+        });
+        document.addEventListener("keydown", (e) => {
+          if (e.key === "Escape") {
+            trigger.blur();
+          }
+        });
+        trigger.addEventListener("click", () => {
+          setTimeout(() => {
+            const searchInput = menu.querySelector('input[type="text"]');
+            if (searchInput) {
+              searchInput.focus();
+            }
+          }, 100);
+        });
+      }
+    });
+    if (mobileSearchBar) {
+      let mobileSearchTimeout;
+      window.addEventListener("scroll", () => {
+        clearTimeout(mobileSearchTimeout);
+        mobileSearchTimeout = setTimeout(() => {
+          if (!mobileSearchBar.classList.contains("hidden")) {
+            mobileSearchBar.classList.add("hidden");
+          }
+        }, 2e3);
+      });
+    }
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Tab") {
+        if (mobileSearchBar && !mobileSearchBar.classList.contains("hidden")) {
+          const activeElement = document.activeElement;
+          if (!mobileSearchBar.contains(activeElement)) {
+            setTimeout(() => {
+              if (!mobileSearchBar.contains(document.activeElement)) {
+                mobileSearchBar.classList.add("hidden");
+              }
+            }, 100);
+          }
+        }
+      }
+    });
+    window.refreshCartDropdown = cart.refreshAndOpenDropdown;
+    function showToast(message, type = "success") {
+      const toast = document.createElement("div");
+      toast.className = `toast toast-${type}`;
+      toast.textContent = message;
+      document.body.appendChild(toast);
+      setTimeout(() => {
+        toast.classList.add("fade-out");
+        toast.addEventListener("transitionend", () => toast.remove());
+      }, 3e3);
+    }
+    const successMessage = document.body.dataset.toastSuccess;
+    const errorMessage = document.body.dataset.toastError;
+    if (successMessage) {
+      showToast(successMessage, "success");
+    }
+    if (errorMessage) {
+      showToast(errorMessage, "error");
+    }
+  });
+})();
+//# sourceMappingURL=header_footer.js.map

@@ -4,7 +4,6 @@ from django.utils import timezone
 from pointless_impressions_src.artwork.models import (
     Artwork, ArtworkFramingCondition
     )
-import uuid
 from datetime import timedelta
 
 
@@ -23,22 +22,23 @@ class Cart(models.Model):
         updated_at: Timestamp when cart was last modified
         expires_at: Timestamp when cart will be deleted (30 days from update)
         is_active: Boolean flag to mark cart as active/inactive
+        data: JSON object to store cart data
 
     Usage:
         - Authenticated users: cart.user is set
-        - Anonymous users: cart.uuid is used, no user set
+        - Anonymous users: cart.session_id is used, no user set
         - Cart persists for 30 days from last update
-        - Survives private browsing by storing UUID in cookies
+        - Survives private browsing by storing session_id in cookies
     """
-    uuid = models.UUIDField(
-        default=uuid.uuid4,
+    session_id = models.CharField(
+        max_length=255,
         unique=True,
         db_index=True,
         help_text="Unique identifier for cart (used for anonymous users)"
     )
     user = models.OneToOneField(
         settings.AUTH_USER_MODEL,
-        on_delete=models.CASCADE,
+        on_delete=models.SET_NULL,
         null=True,
         blank=True,
         related_name='cart',
@@ -59,11 +59,15 @@ class Cart(models.Model):
         default=True,
         help_text="Whether cart is active"
     )
+    data = models.JSONField(
+        default=dict,
+        help_text="Stores cart data as a JSON object."
+    )
 
     class Meta:
         ordering = ['-updated_at']
         indexes = [
-            models.Index(fields=['uuid']),
+            models.Index(fields=['session_id']),
             models.Index(fields=['user']),
             models.Index(fields=['expires_at']),
         ]
@@ -71,63 +75,74 @@ class Cart(models.Model):
     def __str__(self):
         if self.user:
             return f"Cart for {self.user.username}"
-        return f"Cart {self.uuid}"
+        return f"Cart {self.session_id}"
 
     def save(self, *args, **kwargs):
-        """Override save to set expires_at on update"""
-        if not self.id:  # New cart
+        """
+        Override save to set expires_at on update.
+        Ensure session_id is set and data is a valid JSON object.
+        """
+        if not self.id:
             self.expires_at = timezone.now() + timedelta(days=30)
+            if not self.session_id:
+                self.session_id = ""
         else:  # Existing cart
             self.expires_at = timezone.now() + timedelta(days=30)
+
+        # Ensure data is a valid JSON object
+        if not isinstance(self.data, dict):
+            self.data = {}
+
         super().save(*args, **kwargs)
 
-    def get_total_items(self):
-        """Get total quantity of items in cart"""
-        return sum(item.quantity for item in self.items.all())
-
-    def get_total_price(self):
-        """Get total price of all items in cart"""
-        return sum(
-            float(item.artwork.price) * item.quantity
-            for item in self.items.all()
-        )
-
-    def get_cart_items_list(self):
-        """Get cart items as list of dicts (for API responses)"""
-        items = []
-        for item in self.items.all():
-            items.append({
-                'id': item.artwork.id,
-                'name': item.artwork.name,
-                'price': float(item.artwork.price),
-                'quantity': item.quantity,
-                'slug': item.artwork.slug,
-                'framing_option': item.framing_option,
-                'notes': item.notes,
-                'total': float(item.artwork.price) * item.quantity,
-            })
-        return items
-
     @classmethod
-    def get_or_create_from_uuid(cls, cart_uuid):
+    def get_or_create_from_sessionid(cls, session_id):
         """
-        Get cart by UUID or create new one if it doesn't exist.
-
-        Args:
-            cart_uuid: UUID string or object
-
-        Returns:
-            Tuple of (cart, created) like get_or_create
+        Use session_id to get or create cart.
+        session_id is used to uniquely identify the cart.
         """
-        try:
-            uuid_obj = uuid.UUID(str(cart_uuid))
-            cart, created = cls.objects.get_or_create(
-                uuid=uuid_obj,
-                defaults={'is_active': True}
-            )
-            return cart, created
-        except (ValueError, TypeError):
-            return None, False
+        cart, created = cls.objects.get_or_create(
+            session_id=session_id,
+            defaults={'is_active': True, 'data': {}}
+        )
+        return cart, created
+
+    def add_or_update_item(self, artwork_id, quantity, framing_option, notes):
+        """
+        Add or update an item in the cart.
+
+        :param artwork_id: ID of the artwork to add or update
+        :param quantity: Quantity to add
+        :param framing_option: Framing option for the artwork
+        :param notes: Additional notes for the item
+        """
+        artwork_id = str(artwork_id)
+        framing_option_str = str(framing_option)
+
+        if artwork_id in self.data:
+            existing_item = self.data[artwork_id]
+            if existing_item.get('framing_option') == framing_option_str:
+                # Increment the quantity
+                existing_item['quantity'] += quantity
+                existing_item['notes'] = notes
+            else:
+                # Add a new entry for a different framing option
+                self.data[artwork_id] = {
+                    'artwork_id': artwork_id,
+                    'quantity': quantity,
+                    'framing_option': framing_option_str,
+                    'notes': notes,
+                }
+        else:
+            # Add a new item to the cart
+            self.data[artwork_id] = {
+                'artwork_id': artwork_id,
+                'quantity': quantity,
+                'framing_option': framing_option_str,
+                'notes': notes,
+            }
+
+        self.save()
 
 
 class CartItem(models.Model):
@@ -163,7 +178,8 @@ class CartItem(models.Model):
     )
     artwork = models.ForeignKey(
         Artwork,
-        on_delete=models.CASCADE,
+        on_delete=models.SET_NULL,
+        null=True,
         related_name='cart_items',
         help_text="Artwork in cart"
     )
@@ -194,11 +210,12 @@ class CartItem(models.Model):
     )
 
     class Meta:
-        unique_together = ('cart', 'artwork')
+        unique_together = ('cart', 'artwork', 'framing_condition')
         ordering = ['created_at']
         indexes = [
             models.Index(fields=['cart']),
             models.Index(fields=['artwork']),
+            models.Index(fields=['framing_condition']),
         ]
 
     def __str__(self):

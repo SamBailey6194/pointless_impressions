@@ -3,19 +3,20 @@ from django.db.models import Prefetch, Avg, Count
 from django.conf import settings
 import json
 from django.http import JsonResponse, Http404
-from django.core.serializers.json import DjangoJSONEncoder
 from django.utils.translation import gettext as _
 from django.template.defaultfilters import truncatewords
 from django.views.decorators.http import require_http_methods
 from django.utils import timezone
 from django.contrib.auth import get_user_model
 from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import csrf_exempt
 from .models import (
     Artwork, ArtworkCategory, ArtworkFramingCondition, ArtworkReview
-    )
-from .forms import ArtworkReviewForm
+)
+from .forms import ArtworkReviewForm, AddToCartForm
 from pointless_impressions_src.photo.models import Photo
 from pointless_impressions_src.profiles.models import Artist
+from pointless_impressions_src.checkout.models import Cart
 from pointless_impressions_src.profiles.mixins import CustomerRequiredMixin
 
 
@@ -198,7 +199,7 @@ class ArtworkListView(ListView):
         A JSON string containing artwork data for use in frontend scripts.
 
     **Template:**
-    :template:`artwork/artwork.html`
+    :template:`artwork/artwork_list.html`
     """
 
     model = Artwork
@@ -275,52 +276,24 @@ class ArtworkListView(ListView):
         context['placeholder_image'] = get_placeholder_image()
         context['artwork_categories'] = (
             ArtworkCategory.objects.all()
-            )
+        )
         context['framing_conditions'] = (
             ArtworkFramingCondition.objects.all()
-            )
+        )
         context['all_artists'] = Artist.objects.select_related(
             'user').filter(user__is_active=True).order_by('user__username')
-        # Prepare JSON data for artworks on the current page
-        artworks_on_page = context['artworks']
-        placeholder = context['placeholder_image']
 
+        # Prepare AddToCartForm for each artwork
+        artworks_on_page = context['artworks']
+        for artwork in artworks_on_page:
+            artwork.add_to_cart_form = AddToCartForm(artwork_id=artwork.id)
+
+        # Prepare JSON data for artworks on the current page
+        placeholder = context['placeholder_image']
         raw_artwork_data = _serialize_artwork_data(
             artworks_on_page, placeholder
-            )
-
-        cleaned_artwork_data = []
-        for artwork in raw_artwork_data:
-            framing_options = []
-            for cond in artwork['selected_conditions']:
-                framing_options.append({
-                    'id': cond.get('id'),
-                    'name': cond['name'],
-                    'slug': cond['slug']
-                })
-            cleaned_artwork_data.append({
-                'id': artwork['id'],
-                'name': artwork['name'],
-                'description': artwork['description'],
-                'full_description': artwork['full_description'],
-                'price': float(artwork['price']),
-                'category': artwork['category'],
-                'selected_conditions': [
-                    cond['name'] for cond in artwork['selected_conditions']
-                ],
-                'framing_options': framing_options,
-                'is_available': artwork['is_available'],
-                'is_in_stock': artwork['is_in_stock'],
-                'is_featured': artwork['is_featured'],
-                'sku': artwork['sku'],
-                'slug': artwork['slug'],
-                'image_url': artwork['image_url'],
-                'image_public_id': artwork['image_public_id'],
-                'image_alt_text': artwork['image_alt_text'],
-            })
-        context['artworks_json_data'] = json.dumps(
-            cleaned_artwork_data, cls=DjangoJSONEncoder
-            )
+        )
+        context['artworks_json_data'] = json.dumps(raw_artwork_data)
 
         return context
 
@@ -328,6 +301,7 @@ class ArtworkListView(ListView):
 # ---------------------------
 # Artwork detail view
 # ---------------------------
+@method_decorator(csrf_exempt, name='dispatch')
 class ArtworkDetailView(DetailView):
     """
     Renders the public artwork detail page.
@@ -388,10 +362,9 @@ class ArtworkDetailView(DetailView):
 
         serialized_data_list = _serialize_artwork_data(
             [artwork], placeholder
-            )
+        )
 
         artwork_data = serialized_data_list[0]
-
         context['artwork_data'] = artwork_data
 
         all_photos = artwork.photos.all()
@@ -407,7 +380,7 @@ class ArtworkDetailView(DetailView):
                 'name': (
                     condition.condition_friendly_name or
                     condition.condition_name
-                    ),
+                ),
                 'slug': condition.slug
             })
         context['framing_options_json'] = json.dumps(framing_options)
@@ -433,10 +406,97 @@ class ArtworkDetailView(DetailView):
             context['similar_artworks'] = similar_artworks
 
         context['review_form'] = ArtworkReviewForm()
+        context['add_to_cart_form'] = AddToCartForm(artwork_id=artwork.id)
         context['production'] = not settings.DEBUG
         context['debug'] = settings.DEBUG
 
+        # Pass the stock quantity to the context
+        context['stock'] = artwork.stock
+
+        # Set the form action to the current page URL
+        context['form_action'] = self.request.path
+
+        # Include session ID in the context for the frontend
+        context['sessionid'] = self.request.session.session_key
+
+        # Ensure x_requested_with is defined
+        x_requested_with = (
+            self.request.headers.get('x-requested-with') or
+            self.request.META.get('HTTP_X_REQUESTED_WITH')
+        )
+
+        # Debugging: Log session ID and cart state on GET
+        session_id = self.request.session.session_key
+        if not session_id:
+            self.request.session.create()
+            session_id = self.request.session.session_key
+
+        cart = Cart.objects.filter(
+            session_id=session_id, is_active=True
+        ).first()
+
         return context
+
+    def post(self, request, *args, **kwargs):
+        """
+        Handles the Add to Cart functionality.
+        Validates the AddToCartForm and updates the cart in the database.
+        """
+        artwork = self.get_object()
+        form = AddToCartForm(request.POST, artwork_id=artwork.id)
+
+        if form.is_valid():
+            # Retrieve or create the cart for the current session
+            session_id = request.session.session_key
+            if not session_id:
+                request.session.create()
+                session_id = request.session.session_key
+
+            cart, created = Cart.get_or_create_from_sessionid(session_id)
+
+            # Add or update the item in the cart
+            artwork_id = str(artwork.id)
+            framing_option = form.cleaned_data.get('framing_option')
+            framing_option_str = str(framing_option)
+            notes = form.cleaned_data.get('notes', '')
+            price = round(float(artwork.price), 2)
+
+            # Check if the item already exists in the cart
+            if artwork_id in cart.data:
+                existing_item = cart.data[artwork_id]
+                if existing_item.get('framing_option') == framing_option_str:
+                    # Increment the quantity
+                    existing_item['quantity'] += form.cleaned_data['quantity']
+                    existing_item['notes'] = notes
+                else:
+                    # Add a new entry for a different framing option
+                    cart.data[artwork_id] = {
+                        'artwork_id': artwork.id,
+                        'quantity': form.cleaned_data['quantity'],
+                        'framing_option': framing_option_str,
+                        'notes': notes,
+                        'price': price,
+                    }
+            else:
+                # Add a new item to the cart
+                cart.data[artwork_id] = {
+                    'artwork_id': artwork.id,
+                    'quantity': form.cleaned_data['quantity'],
+                    'framing_option': framing_option_str,
+                    'notes': notes,
+                    'price': price,
+                }
+
+            cart.save()
+
+            return JsonResponse(
+                {'success': True, 'message': 'Item added to cart.'}
+            )
+
+        # If the form is invalid, return errors
+        return JsonResponse(
+            {'success': False, 'errors': form.errors}, status=400
+        )
 
 
 # ---------------------------

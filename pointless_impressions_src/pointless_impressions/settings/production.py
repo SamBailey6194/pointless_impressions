@@ -14,8 +14,9 @@ if not SECRET_KEY:
     raise ValueError("DJANGO_SECRET_KEY environment variable is required")
 
 DEBUG = False
-ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "localhost").split(",")
 PRODUCTION = True
+SESSION_COOKIE_SECURE = True
+SESSION_COOKIE_SAMESITE = "Strict"
 
 # Database configuration (using course database maker)
 DATABASES = {
@@ -44,10 +45,6 @@ if EMAIL_BACKEND == "django.core.mail.backends.smtp.EmailBackend":
         EMAIL_HOST, EMAIL_HOST_USER, EMAIL_HOST_PASSWORD, DEFAULT_FROM_EMAIL
     ]
     if not all(required_email_vars):
-        print(
-            "Warning: SMTP email backend requires EMAIL_HOST, "
-            "EMAIL_HOST_USER, EMAIL_HOST_PASSWORD, DEFAULT_FROM_EMAIL"
-        )
         # Fall back to console backend for development
         EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 
@@ -129,3 +126,6 @@ CSP_CONNECT_SRC = (
     S3_DOMAIN,
     'https://res.cloudinary.com',
 )
+
+# Adjust logging for production
+LOGGING['handlers']['file']['level'] = 'WARNING'

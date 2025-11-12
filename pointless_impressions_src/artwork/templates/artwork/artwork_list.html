@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% load static cloudinary tailwind_tags %}
+{% load static cloudinary tailwind_tags crispy_forms_tags %}
 {% load artwork_filters %}
 
 {% block content %}
@@ -208,19 +208,7 @@
                 
                 <div class="card-actions justify-between items-center mt-4">
                   {% if artwork.is_in_stock %}
-                    <button 
-                      class="btn btn-sm add-to-cart-btn"
-                      data-artwork-id="{{ artwork.id }}"
-                      data-artwork-name="{{ artwork.name }}"
-                      data-artwork-price="{{ artwork.price }}"
-                      data-artwork-image="{% if artwork.main_photo %}{{ artwork.main_photo.get_image_url }}{% endif %}"
-                      data-artwork-quantity="{{ artwork.quantity }}"
-                      data-framing-options="{{ artwork.prefetched_conditions|jsonify }}"
-                      onclick="if(window.addToCartModal) { const framingOptions = JSON.parse(this.dataset.framingOptions || '[]'); addToCartModal.init(this.dataset.artworkId, this.dataset.artworkName, parseFloat(this.dataset.artworkPrice), this.dataset.artworkImage, parseInt(this.dataset.artworkQuantity), framingOptions); } else alert('Modal not loaded yet')"
-                    >
-                      <i class="fa-solid fa-cart-plus"></i> Add to Cart
-                    </button>
-                    <a href="{% url 'artwork:detail' artwork.slug %}" class="btn btn-outline btn-sm">
+                    <a href="{% url 'artwork:detail' artwork.slug %}" class="btn btn-outline btn-sm ml-auto">
                       <i class="fa-solid fa-eye"></i> Details
                     </a>
                   {% else %}
@@ -260,10 +248,6 @@
   </section>
 {% endblock %}
 
-{% block extramodals %}
-  {% include 'checkout/includes/add_to_cart_modal.html' %}
-{% endblock %}
-
 {% block postloadjs %}
 {{ block.super }}
 {% comment %} Inject SSR data for JavaScript enhancement {% endcomment %}
@@ -278,9 +262,6 @@
   window.CLOUDINARY_CLOUD_NAME = "{{ settings.CLOUDINARY_CLOUD_NAME }}";
   window.PLACEHOLDER_IMAGE_PUBLIC_ID = "{{ placeholder_image.asset_identifier|default:'placeholder_image' }}";
 </script>
-
-{% comment %} Load cart and modal modules {% endcomment %}
-<script src="{% static 'js/add_to_cart_modal.js' %}" type="module" defer></script>
 
 {% comment %} Load the artwork enhancement JavaScript {% endcomment %}
 <script src="{% static 'js/artwork_list.js' %}"></script>

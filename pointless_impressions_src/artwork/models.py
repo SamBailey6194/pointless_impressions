@@ -101,6 +101,11 @@ class Artwork(models.Model):
         photo = self._get_primary_photo()
         return photo.alt_text_or_default if photo else self.name
 
+    @property
+    def stock(self):
+        """Get the current stock quantity for this artwork."""
+        return self.quantity
+
     def get_framing_options(self):
         """Retrieve available framing options for this artwork."""
         if hasattr(self, 'prefetched_conditions'):
@@ -168,12 +173,14 @@ class ArtworkReview(models.Model):
     """Model to represent reviews for artworks."""
     artwork = models.ForeignKey(
         Artwork,
-        on_delete=models.CASCADE,
+        on_delete=models.SET_NULL,
+        null=True,
         related_name='reviews'
     )
     reviewer = models.ForeignKey(
         settings.AUTH_USER_MODEL,
-        on_delete=models.CASCADE,
+        on_delete=models.SET_NULL,
+        null=True,
         related_name='reviews_written'
     )
     review_title = models.CharField(

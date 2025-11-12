@@ -1,8 +1,182 @@
-(()=>{var C="cart_uuid",h={ADD:"/checkout/api/cart/add/",REMOVE:"/checkout/api/cart/remove/",UPDATE:"/checkout/api/cart/update/",SYNC:"/checkout/api/cart/sync/"};function y(t){return typeof t!="number"?"\xA30.00":"\xA3"+t.toLocaleString("en-GB",{minimumFractionDigits:2,maximumFractionDigits:2})}function d(){return localStorage.getItem(C)||null}function T(t){t&&(localStorage.setItem(C,t),document.cookie="cart_uuid="+t+";path=/;max-age=2592000")}function g(t){T(t)}async function l(){let t=d();if(console.log("[cart.js] fetchCartFromBackend cart_uuid:",t),!t)return{};let e=!1;function o(){e=!0,console.log("[cart.js] Window is unloading, fetch may be aborted")}window.addEventListener("beforeunload",o);try{let r=`/checkout/api/cart/fetch/?cart_uuid=${t}`;console.log("[cart.js] Fetching cart from:",r);let n=fetch(r);n.then(()=>{console.log(e?"[cart.js] Fetch completed but window was unloading":"[cart.js] Fetch completed successfully")}).catch(i=>{e&&console.log("[cart.js] Fetch error but window was unloading:",i)});let a=await n;if(!a.ok)throw new Error("Failed to fetch cart");return window.removeEventListener("beforeunload",o),await a.json()}catch(r){return console.error(e?"[cart.js] Error fetching cart: fetch was aborted due to unload":"[cart.js] Error fetching cart from backend:",r),{}}finally{window.removeEventListener("beforeunload",o)}}async function m(t,e=1,o={}){let r=document.querySelector("[name=csrfmiddlewaretoken]")?.value,n=d();if(!r)throw new Error("CSRF token not found");let a=new FormData;a.append("artwork_id",t),a.append("quantity",e),o.framing_option&&a.append("framing_option",o.framing_option),o.notes&&a.append("notes",o.notes);let i=h.ADD;n&&(i+=`?cart_uuid=${n}`);try{let c=await fetch(i,{method:"POST",headers:{"X-CSRFToken":r},body:a}),u=await c.json();if(!c.ok)throw new Error(u.error||"Failed to add item to cart");return u.cart_uuid&&g(u.cart_uuid),u}catch(c){throw console.error("Error adding to cart via API:",c),c}}async function v(t){let e=document.querySelector("[name=csrfmiddlewaretoken]")?.value,o=d();if(!e)throw new Error("CSRF token not found");let r=new FormData;r.append("artwork_id",t);let n=h.REMOVE;o&&(n+=`?cart_uuid=${o}`);try{let a=await fetch(n,{method:"POST",headers:{"X-CSRFToken":e},body:r}),i=await a.json();if(!a.ok)throw new Error(i.error||"Failed to remove item from cart");return i.cart_uuid&&g(i.cart_uuid),i}catch(a){throw console.error("Error removing from cart via API:",a),a}}async function E(t,e){let o=document.querySelector("[name=csrfmiddlewaretoken]")?.value,r=d();if(!o)throw new Error("CSRF token not found");let n=new FormData;n.append("artwork_id",t),n.append("quantity",e);let a=h.UPDATE;r&&(a+=`?cart_uuid=${r}`);try{let i=await fetch(a,{method:"POST",headers:{"X-CSRFToken":o},body:n}),c=await i.json();if(!i.ok)throw new Error(c.error||"Failed to update quantity");return c.cart_uuid&&g(c.cart_uuid),c}catch(i){throw console.error("Error updating quantity via API:",i),i}}async function _(){return{success:!0,cart_uuid:d()}}async function k(){let t=await l(),e=0;return t.items&&t.items.forEach(o=>{e+=o.quantity}),e}async function x(){let t=await l(),e=0;return t.items&&t.items.forEach(o=>{e+=o.total||o.price*o.quantity}),Math.round(e*100)/100}function f(){let t=document.querySelector("[data-cart-count]");if(t){let e=k();t.textContent=e,t.style.display=e>0?"block":"none"}}function A(){_().then(t=>{t?.success&&window.updateCartDisplay&&typeof window.updateCartDisplay=="function"&&window.updateCartDisplay()}).catch(t=>{console.error("\u274C Failed to sync cart on page load:",t)})}typeof window<"u"&&(window.initCart=A,window.getTotalQuantity=k,window.calculateTotal=x,window.formatPrice=y,window.updateQuantityViaAPI=E,window.removeFromCartViaAPI=v,window.addToCartViaAPI=m,window.fetchCartFromBackend=l);function j(t){if(!t)return;let e=document.getElementById("artwork-title"),o=document.getElementById("artwork-description"),r=document.getElementById("artwork-price"),n=document.getElementById("artwork-image"),a=document.getElementById("availability-status");e&&(e.textContent=t.name||""),o&&(o.textContent=t.description||""),r&&(r.textContent=y(t.price)),n&&(n.src=t.image||"",n.alt=t.alt_text||t.name||""),a&&(a.textContent=t.availability||"Unknown")}function V(t,e=1,o=0){let r=m(t,e,o);return f(),r}function M(t){v(t),f()}function O(t,e){let o=E(t,e);return f(),o}function I(){let t=document.getElementById("add-to-cart-btn");t&&t.addEventListener("click",()=>{let o=t.dataset.artworkId,r=parseFloat(t.dataset.price);o&&(m(o,1,r),D("Added to cart!"))});let e=document.getElementById("thumbnail-container");e&&e.querySelectorAll(".thumbnail-btn").forEach(r=>{r.addEventListener("click",n=>{n.preventDefault();let a=parseInt(r.dataset.slide);p(a)})}),document.addEventListener("keydown",o=>{o.key==="ArrowLeft"?F():o.key==="ArrowRight"&&b()}),R()}function D(t){let e=document.getElementById("confirmation-message");e&&(e.textContent=t,e.style.display="block",setTimeout(()=>{e.style.display="none"},3e3))}var s=0;function p(t){let o=document.querySelectorAll(".carousel-item").length;s=t,s>=o&&(s=0),s<0&&(s=o-1);let r=document.getElementById(`slide-${s}`);r&&r.scrollIntoView({behavior:"smooth",block:"nearest",inline:"nearest"}),P()}function b(){p(s+1)}function F(){p(s-1)}function P(){document.querySelectorAll(".thumbnail-btn").forEach((e,o)=>{o===s?(e.classList.add("border-primary"),e.classList.remove("border-gray-300")):(e.classList.remove("border-primary"),e.classList.add("border-gray-300"))})}window.goToSlide=p;window.nextSlide=b;window.previousSlide=F;async function S(){let t=document.getElementById("review_form"),e=document.getElementById("review_modal"),o=new FormData(t);try{let r=await fetch(t.action,{method:"POST",body:o,headers:{"X-Requested-With":"XMLHttpRequest"}}),n=await r.json();r.ok?(w(n.message,"success"),t.reset(),e.close(),setTimeout(()=>{window.location.reload()},1e3)):(w(n.error||"An error occurred","error"),n.errors&&console.error("Form errors:",n.errors))}catch(r){console.error("Error:",r),w("Failed to submit review. Please try again.","error")}}function w(t,e="info"){let o=document.createElement("div"),r=e==="success"?"alert-success":"alert-error";o.className=`alert ${r} fixed bottom-4 right-4 shadow-lg max-w-md z-50`,o.innerHTML=`
+(() => {
+  // pointless_impressions_src/theme/static_src/src/js/artwork_detail.js
+  function displayArtworkDetail(artworkData) {
+    if (!artworkData) {
+      return;
+    }
+    const titleElement = document.getElementById("artwork-title");
+    const descriptionElement = document.getElementById("artwork-description");
+    const priceElement = document.getElementById("artwork-price");
+    const imageElement = document.getElementById("artwork-image");
+    const statusElement = document.getElementById("availability-status");
+    if (titleElement) {
+      titleElement.textContent = artworkData.name || "";
+    }
+    if (descriptionElement) {
+      descriptionElement.textContent = artworkData.description || "";
+    }
+    if (priceElement) {
+      priceElement.textContent = artworkData.price || "";
+    }
+    if (imageElement) {
+      imageElement.src = artworkData.image || "";
+      imageElement.alt = artworkData.alt_text || artworkData.name || "";
+    }
+    if (statusElement) {
+      statusElement.textContent = artworkData.availability || "Unknown";
+    }
+  }
+  function initArtworkDetail() {
+    const thumbnailContainer = document.getElementById("thumbnail-container");
+    if (thumbnailContainer) {
+      const thumbnails = thumbnailContainer.querySelectorAll(".thumbnail-btn");
+      thumbnails.forEach((thumb) => {
+        thumb.addEventListener("click", (e) => {
+          e.preventDefault();
+          const slideNum = parseInt(thumb.dataset.slide);
+          goToSlide(slideNum);
+        });
+      });
+    }
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "ArrowLeft") {
+        previousSlide();
+      } else if (e.key === "ArrowRight") {
+        nextSlide();
+      }
+    });
+    initializeReviewFunctionality();
+  }
+  function showConfirmationMessage(message) {
+    const confirmationDiv = document.getElementById("confirmation-message");
+    if (confirmationDiv) {
+      confirmationDiv.textContent = message;
+      confirmationDiv.style.display = "block";
+      setTimeout(() => {
+        confirmationDiv.style.display = "none";
+      }, 3e3);
+    }
+  }
+  var currentSlide = 0;
+  function goToSlide(n) {
+    const slides = document.querySelectorAll(".carousel-item");
+    const totalSlides = slides.length;
+    currentSlide = n;
+    if (currentSlide >= totalSlides) {
+      currentSlide = 0;
+    }
+    if (currentSlide < 0) {
+      currentSlide = totalSlides - 1;
+    }
+    const slideElement = document.getElementById(`slide-${currentSlide}`);
+    if (slideElement) {
+      slideElement.scrollIntoView({
+        behavior: "smooth",
+        block: "nearest",
+        inline: "nearest"
+      });
+    }
+    updateThumbnails();
+  }
+  function nextSlide() {
+    goToSlide(currentSlide + 1);
+  }
+  function previousSlide() {
+    goToSlide(currentSlide - 1);
+  }
+  function updateThumbnails() {
+    const thumbnails = document.querySelectorAll(".thumbnail-btn");
+    thumbnails.forEach((thumb, index) => {
+      if (index === currentSlide) {
+        thumb.classList.add("border-primary");
+        thumb.classList.remove("border-gray-300");
+      } else {
+        thumb.classList.remove("border-primary");
+        thumb.classList.add("border-gray-300");
+      }
+    });
+  }
+  window.goToSlide = goToSlide;
+  window.nextSlide = nextSlide;
+  window.previousSlide = previousSlide;
+  async function submitReview() {
+    const form = document.getElementById("review_form");
+    const modal = document.getElementById("review_modal");
+    const formData = new FormData(form);
+    try {
+      const response = await fetch(form.action, {
+        method: "POST",
+        body: formData,
+        headers: {
+          "X-Requested-With": "XMLHttpRequest"
+        }
+      });
+      const data = await response.json();
+      if (response.ok) {
+        showNotification(data.message, "success");
+        form.reset();
+        modal.close();
+        setTimeout(() => {
+          window.location.reload();
+        }, 1e3);
+      } else {
+        showNotification(data.error || "An error occurred", "error");
+        if (data.errors) {
+          console.error("Form errors:", data.errors);
+        }
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      showNotification("Failed to submit review. Please try again.", "error");
+    }
+  }
+  function showNotification(message, type = "info") {
+    const toast = document.createElement("div");
+    const alertClass = type === "success" ? "alert-success" : "alert-error";
+    toast.className = `alert ${alertClass} fixed bottom-4 right-4 shadow-lg max-w-md z-50`;
+    toast.innerHTML = `
     <div>
       <svg class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${e==="success"?"M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z":"M12 8v4m0 4v.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"}"></path>
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${type === "success" ? "M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" : "M12 8v4m0 4v.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"}"></path>
       </svg>
-      <span>${t}</span>
+      <span>${message}</span>
     </div>
-  `,document.body.appendChild(o),setTimeout(()=>{o.remove()},5e3)}function B(){let t=document.querySelector("[data-scroll-to-reviews]");t&&t.addEventListener("click",function(){let e=document.getElementById("reviews_section");e&&e.scrollIntoView({behavior:"smooth"})})}function L(){let t=document.getElementById("review_form");t&&t.addEventListener("submit",function(e){e.preventDefault(),S()})}function R(){L(),B()}window.submitReview=S;window.showNotification=w;document.readyState==="loading"?document.addEventListener("DOMContentLoaded",I):I();})();
+  `;
+    document.body.appendChild(toast);
+    setTimeout(() => {
+      toast.remove();
+    }, 5e3);
+  }
+  function handleViewReviewsScroll() {
+    const viewReviewsBtn = document.querySelector("[data-scroll-to-reviews]");
+    if (viewReviewsBtn) {
+      viewReviewsBtn.addEventListener("click", function() {
+        const reviewsSection = document.getElementById("reviews_section");
+        if (reviewsSection) {
+          reviewsSection.scrollIntoView({ behavior: "smooth" });
+        }
+      });
+    }
+  }
+  function initializeReviewForm() {
+    const reviewForm = document.getElementById("review_form");
+    if (reviewForm) {
+      reviewForm.addEventListener("submit", function(e) {
+        e.preventDefault();
+        submitReview();
+      });
+    }
+  }
+  function initializeReviewFunctionality() {
+    initializeReviewForm();
+    handleViewReviewsScroll();
+  }
+  window.submitReview = submitReview;
+  window.showNotification = showNotification;
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initArtworkDetail);
+  } else {
+    initArtworkDetail();
+  }
+})();
+//# sourceMappingURL=artwork_detail.js.map
