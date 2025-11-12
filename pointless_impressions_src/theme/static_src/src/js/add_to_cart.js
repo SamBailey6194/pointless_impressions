@@ -108,7 +108,7 @@ async function refreshAndOpenCartDropdownWithDelay() {
     }
 
     const data = await response.json();
-    console.log('Cart dropdown data:', data); // Debugging response data
+    console.log('Cart dropdown data fetched from server:', data); // Debugging server response
 
     const cartDropdown = document.getElementById('cart-dropdown');
     if (cartDropdown) {
@@ -135,7 +135,7 @@ async function refreshAndOpenCartDropdownWithDelay() {
  * Get session ID from cookies.
  * @returns {string|null} The session ID or null if not found.
  */
-function getSessionToken() {
+export function getSessionToken() {
   try {
     console.log('Attempting to retrieve session ID from cookies...'); // Debugging log
     console.log('Document cookies:', document.cookie); // Log all cookies
@@ -160,6 +160,7 @@ function getSessionToken() {
 
 document.addEventListener('DOMContentLoaded', () => {
   console.log('Document loaded, initializing AddToCart functionality'); // Debugging log
+
   handleAddToCartFormSubmission();
   handleQuantityButtons();
 
@@ -168,8 +169,20 @@ document.addEventListener('DOMContentLoaded', () => {
   if (addToCartForm) {
     addToCartForm.addEventListener('submit', (event) => {
       event.preventDefault();
-      console.log('AddToCart form submit event triggered'); // Debugging log
+      console.log('AddToCart form submit event triggered');
       submitAddToCartForm(addToCartForm);
     });
+  }
+
+  // Debugging: Ensure cart initialization happens on page load
+  console.log('Initializing cart on page load...');
+  window.cart.init();
+
+  // Debugging: Check if cart dropdown is refreshed on reload
+  const cartDropdown = document.getElementById('cart-dropdown');
+  if (cartDropdown) {
+    console.log('Cart dropdown element found on page load:', cartDropdown); // Debugging log
+  } else {
+    console.warn('Cart dropdown element not found on page load.'); // Debugging warning
   }
 });

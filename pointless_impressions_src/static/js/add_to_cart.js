@@ -228,7 +228,7 @@
         throw new Error("Failed to refresh cart dropdown");
       }
       const data = await response.json();
-      console.log("Cart dropdown data:", data);
+      console.log("Cart dropdown data fetched from server:", data);
       const cartDropdown = document.getElementById("cart-dropdown");
       if (cartDropdown) {
         console.log("Updating cart dropdown HTML...");
@@ -274,6 +274,14 @@
         console.log("AddToCart form submit event triggered");
         submitAddToCartForm2(addToCartForm);
       });
+    }
+    console.log("Initializing cart on page load...");
+    window.cart.init();
+    const cartDropdown = document.getElementById("cart-dropdown");
+    if (cartDropdown) {
+      console.log("Cart dropdown element found on page load:", cartDropdown);
+    } else {
+      console.warn("Cart dropdown element not found on page load.");
     }
   });
 })();

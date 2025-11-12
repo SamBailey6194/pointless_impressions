@@ -85,26 +85,41 @@ class CheckoutView(TemplateView):
 class CartDropdownView(View):
     def get(self, request, *args, **kwargs):
         session_id = request.session.session_key
+        logger.debug(f"Fetching cart for session_id: {session_id}")
+        print(f"Fetching cart for session_id: {session_id}")
 
         # Fetch the cart using the session key
         cart = Cart.objects.filter(
             session_id=session_id, is_active=True
         ).first()
+        logger.debug(f"Cart fetched: {cart}")
+        print(f"Cart fetched: {cart}")
 
         cart_items = []
         total_quantity = 0
         total_price = 0
         if cart and cart.data:
+            artwork_ids = list(cart.data.keys())
+            artworks = Artwork.objects.filter(id__in=artwork_ids).in_bulk()
+            logger.debug(f"Artworks fetched for cart items: {artworks}")
+            print(f"Artworks fetched for cart items: {artworks}")
+
             for artwork_id, item in cart.data.items():
-                artwork = Artwork.objects.filter(id=artwork_id).first()
-                cart_items.append({
-                    "artwork": artwork,
-                    "quantity": item.get("quantity", 0),
-                    "notes": item.get("notes", ""),
-                    "price": item.get("price", 0),
-                })
-                total_quantity += item.get("quantity", 0)
-                total_price += item.get("quantity", 0) * item.get("price", 0)
+                artwork = artworks.get(int(artwork_id))
+                if artwork:
+                    cart_items.append({
+                        "artwork": artwork,
+                        "quantity": item.get("quantity", 0),
+                        "notes": item.get("notes", ""),
+                        "price": item.get("price", 0),
+                    })
+                    total_quantity += item.get("quantity", 0)
+                    total_price += (
+                        item.get("quantity", 0) * item.get("price", 0)
+                        )
+                else:
+                    logger.debug(f"Artwork with ID {artwork_id} not found.")
+                    print(f"Artwork with ID {artwork_id} not found.")
 
         html = render_to_string(
             "checkout/includes/cart_dropdown.html",
@@ -114,4 +129,6 @@ class CartDropdownView(View):
                 "total_price": total_price
             }
         )
+        logger.debug("Cart dropdown HTML rendered successfully")
+        print("Cart dropdown HTML rendered successfully")
         return JsonResponse({"html": html})

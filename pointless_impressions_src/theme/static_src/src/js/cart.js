@@ -2,6 +2,7 @@
  * Cart Management Module (SSR-Compatible)
  * Handles cart operations using server-side sessionid.
  */
+import { getSessionToken } from './add_to_cart.js';
 
 // -----------------------------------------------------------------------------
 // Helpers
@@ -183,6 +184,42 @@ export function initCart() {
   updateCartCountBadge().catch((error) => {
     console.error('Failed to initialize cart:', error);
   });
+}
+
+/**
+ * Fetch and update the cart dropdown on page load.
+ */
+export async function fetchAndUpdateCartDropdown() {
+  try {
+    const sessionid = getSessionToken(); // Ensure session ID is retrieved
+    console.log('Fetching cart dropdown with session ID:', sessionid);
+
+    const response = await fetch('/checkout/cart-dropdown/', {
+      method: 'GET',
+      headers: {
+        'X-Requested-With': 'XMLHttpRequest',
+        'X-Session-Token': sessionid,
+      },
+      credentials: 'include',
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch cart dropdown: ${response.status}`);
+    }
+
+    const data = await response.json();
+    console.log('Cart dropdown data fetched:', data);
+
+    const cartDropdown = document.getElementById('cart-dropdown');
+    if (cartDropdown) {
+      cartDropdown.innerHTML = data.html;
+      console.log('Cart dropdown updated successfully');
+    } else {
+      console.warn('Cart dropdown element not found');
+    }
+  } catch (error) {
+    console.error('Error fetching and updating cart dropdown:', error);
+  }
 }
 
 // -----------------------------------------------------------------------------

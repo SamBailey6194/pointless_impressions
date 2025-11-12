@@ -3,7 +3,13 @@
  * Handles common functionality like carousel scrolling, tooltips, etc.
  */
 
+import { fetchAndUpdateCartDropdown } from './cart.js';
+
 document.addEventListener("DOMContentLoaded", () => {
+    // Fetch and update the cart dropdown on page load
+    console.log('Document loaded, initializing cart dropdown update from general.js');
+    fetchAndUpdateCartDropdown();
+
     /**
      * Scroll a carousel container left or right with looping
      * @param {string} carouselId - The ID of the carousel container element
