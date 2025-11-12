@@ -3,6 +3,7 @@ from django.template.loader import render_to_string
 from django.views import View
 from django.views.generic import TemplateView
 from .models import Cart
+from pointless_impressions_src.artwork.models import Artwork
 import logging
 
 logger = logging.getLogger(__name__)
@@ -47,7 +48,7 @@ class CheckoutView(TemplateView):
             sessionid = self.request.COOKIES.get('sessionid')
             if sessionid:
                 cart = Cart.objects.filter(
-                    uuid=sessionid, is_active=True
+                    session_id=sessionid, is_active=True
                 ).first()
 
         # Prepare cart items and totals
@@ -92,16 +93,15 @@ class CartDropdownView(View):
 
         cart_items = []
         total_quantity = 0
-        total_price = 0  # Initialize total price
+        total_price = 0
         if cart and cart.data:
             for artwork_id, item in cart.data.items():
+                artwork = Artwork.objects.filter(id=artwork_id).first()
                 cart_items.append({
-                    "artwork": {
-                        "id": artwork_id,
-                        "quantity": item.get("quantity", 0),
-                        "notes": item.get("notes", ""),
-                        "price": item.get("price", 0),  # Include price
-                    },
+                    "artwork": artwork,
+                    "quantity": item.get("quantity", 0),
+                    "notes": item.get("notes", ""),
+                    "price": item.get("price", 0),
                 })
                 total_quantity += item.get("quantity", 0)
                 total_price += item.get("quantity", 0) * item.get("price", 0)
