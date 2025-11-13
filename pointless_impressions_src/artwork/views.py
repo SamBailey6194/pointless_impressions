@@ -453,7 +453,7 @@ class ArtworkDetailView(DetailView):
             cart.add_or_update_item(
                 artwork=artwork,
                 quantity=quantity,
-                framing_option=framing_condition,
+                framing_condition=framing_condition,
                 notes=notes
             )
 

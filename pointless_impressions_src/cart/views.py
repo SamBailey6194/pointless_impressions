@@ -116,7 +116,7 @@ class CartDropdownView(View):
                 total_price = cart.get_total_price()
 
         html = render_to_string(
-            'checkout/includes/cart_dropdown.html',
+            'cart/includes/cart_dropdown.html',
             {
                 'cart_items': cart_items_data,
                 'total_quantity': total_quantity,

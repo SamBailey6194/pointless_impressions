@@ -57,7 +57,7 @@
             {% if total_quantity > 0 %}
                 <span class="text-(--pointless-blue) font-bold">Subtotal: £{{ total_price|floatformat:2 }}</span>
                 <span class="card-actions">
-                    <a href="{% url 'checkout:checkout' %}" class="btn btn-ghost w-full">
+                    <a href="{% url 'cart:checkout' %}" class="btn btn-ghost w-full">
                     <i class="fa-solid fa-shopping-bag"></i> View Cart
                     </a>
                 </span>

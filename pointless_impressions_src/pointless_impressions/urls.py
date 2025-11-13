@@ -30,7 +30,7 @@ urlpatterns = [
     path('photos/', include('pointless_impressions_src.photo.urls')),
     path('search/', include('pointless_impressions_src.search.urls')),
     path('checkout/', include(
-        'pointless_impressions_src.checkout.urls', namespace='checkout'),
+        'pointless_impressions_src.cart.urls', namespace='checkout'),
         ),
 ]
 
