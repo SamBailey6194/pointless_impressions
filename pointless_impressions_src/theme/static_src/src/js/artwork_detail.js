@@ -1,8 +1,10 @@
 /**
  * Artwork Detail Page - Main Script
- * Handles displaying artwork details, images, carousel navigation,
- * and review submission
+ * Handles displaying artwork details, initializing the carousel,
+ * and review submission.
  */
+
+import { getCsrfToken } from "./cart";
 
 /**
  * Display artwork detail information on the page
@@ -45,119 +47,13 @@ export function displayArtworkDetail(artworkData) {
  * Initialize artwork detail page
  */
 export function initArtworkDetail() {
-  // Initialize carousel thumbnail listeners
-  const thumbnailContainer = document.getElementById('thumbnail-container');
-  if (thumbnailContainer) {
-    const thumbnails = thumbnailContainer.querySelectorAll('.thumbnail-btn');
-    thumbnails.forEach((thumb) => {
-      thumb.addEventListener('click', (e) => {
-        e.preventDefault();
-        const slideNum = parseInt(thumb.dataset.slide);
-        goToSlide(slideNum);
-      });
-    });
-  }
-
-  // Add keyboard navigation
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'ArrowLeft') {
-      previousSlide();
-    } else if (e.key === 'ArrowRight') {
-      nextSlide();
+  if (window.carousel && window.carousel.initArtworkDetailCarousel) {
+        window.carousel.initArtworkDetailCarousel();
+    } else {
+        console.error('Carousel script not loaded.');
     }
-  });
-
-  // Initialize review functionality
   initializeReviewFunctionality();
 }
-
-/**
- * Show confirmation message when item is added to cart
- * @param {string} message - Message to display
- */
-export function showConfirmationMessage(message) {
-  const confirmationDiv = document.getElementById('confirmation-message');
-  if (confirmationDiv) {
-    confirmationDiv.textContent = message;
-    confirmationDiv.style.display = 'block';
-
-    // Hide after 3 seconds
-    setTimeout(() => {
-      confirmationDiv.style.display = 'none';
-    }, 3000);
-  }
-}
-
-/**
- * Carousel Navigation Functions
- */
-let currentSlide = 0;
-
-/**
- * Go to a specific slide in the carousel
- * @param {number} n - The slide number
- */
-export function goToSlide(n) {
-  const slides = document.querySelectorAll('.carousel-item');
-  const totalSlides = slides.length;
-
-  currentSlide = n;
-
-  // Loop around carousel
-  if (currentSlide >= totalSlides) {
-    currentSlide = 0;
-  }
-  if (currentSlide < 0) {
-    currentSlide = totalSlides - 1;
-  }
-
-  // Scroll to the slide
-  const slideElement = document.getElementById(`slide-${currentSlide}`);
-  if (slideElement) {
-    slideElement.scrollIntoView({
-      behavior: 'smooth',
-      block: 'nearest',
-      inline: 'nearest',
-    });
-  }
-
-  updateThumbnails();
-}
-
-/**
- * Go to next slide
- */
-export function nextSlide() {
-  goToSlide(currentSlide + 1);
-}
-
-/**
- * Go to previous slide
- */
-export function previousSlide() {
-  goToSlide(currentSlide - 1);
-}
-
-/**
- * Update thumbnail border styles to highlight current slide
- */
-function updateThumbnails() {
-  const thumbnails = document.querySelectorAll('.thumbnail-btn');
-  thumbnails.forEach((thumb, index) => {
-    if (index === currentSlide) {
-      thumb.classList.add('border-primary');
-      thumb.classList.remove('border-gray-300');
-    } else {
-      thumb.classList.remove('border-primary');
-      thumb.classList.add('border-gray-300');
-    }
-  });
-}
-
-// Make carousel functions globally accessible for onclick handlers
-window.goToSlide = goToSlide;
-window.nextSlide = nextSlide;
-window.previousSlide = previousSlide;
 
 /**
  * Review Submission Handling
@@ -177,60 +73,36 @@ async function submitReview() {
       body: formData,
       headers: {
         'X-Requested-With': 'XMLHttpRequest',
+        'X-CSRFToken': getCCsrfToken()
       }
     });
 
     const data = await response.json();
 
     if (response.ok) {
-      // Success
-      showNotification(data.message, 'success');
+      if (window.Toast) {
+        window.Toast.show(data.message, 'success');
+      }
+      
       form.reset();
-      modal.close();
-
-      // Refresh reviews section after 1 second
+      if (modal) modal.close();
       setTimeout(() => {
         window.location.reload();
       }, 1000);
-    } else {
-      // Error
-      showNotification(data.error || 'An error occurred', 'error');
 
-      if (data.errors) {
-        console.error('Form errors:', data.errors);
+    } else {
+      const errorMsg = data.error || (data.errors ? Object.values(data.errors).join(' ') : 'An error occurred.');
+      if (window.Toast) {
+        window.Toast.show(errorMsg, 'error');
       }
+      console.error('Form errors:', data.errors);
     }
   } catch (error) {
-    console.error('Error:', error);
-    showNotification('Failed to submit review. Please try again.', 'error');
+    console.error('Error submitting review:', error);
+    if (window.Toast) {
+      window.Toast.show('Failed to submit review. Please try again.', 'error');
+    }
   }
-}
-
-/**
- * Show notification toast
- * @param {string} message - Message to display
- * @param {string} type - Notification type (success, error, info)
- */
-function showNotification(message, type = 'info') {
-  const toast = document.createElement('div');
-  const alertClass = type === 'success' ? 'alert-success' : 'alert-error';
-
-  toast.className = `alert ${alertClass} fixed bottom-4 right-4 shadow-lg max-w-md z-50`;
-  toast.innerHTML = `
-    <div>
-      <svg class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${type === 'success' ? 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z' : 'M12 8v4m0 4v.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z'}"></path>
-      </svg>
-      <span>${message}</span>
-    </div>
-  `;
-
-  document.body.appendChild(toast);
-
-  // Remove after 5 seconds
-  setTimeout(() => {
-    toast.remove();
-  }, 5000);
 }
 
 /**
@@ -268,10 +140,8 @@ function initializeReviewFunctionality() {
   handleViewReviewsScroll();
 }
 
-// Make review functions globally accessible
-// Make review functions globally available
+// Make review submit function globally available
 window.submitReview = submitReview;
-window.showNotification = showNotification;
 
 // Initialize on page load
 if (document.readyState === 'loading') {

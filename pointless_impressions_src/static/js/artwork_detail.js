@@ -1,4 +1,59 @@
 (() => {
+  // pointless_impressions_src/theme/static_src/src/js/cart.js
+  async function updateCartDropdownHTML() {
+    const cartDropdown = document.getElementById("cart-dropdown");
+    if (!cartDropdown) {
+      console.warn("Cart dropdown element not found. Cannot update.");
+      return;
+    }
+    try {
+      const response = await fetch("/checkout/cart-dropdown/", {
+        method: "GET",
+        headers: {
+          "X-Requested-With": "XMLHttpRequest"
+        },
+        // This sends the 'sessionid' cookie automatically
+        credentials: "include"
+      });
+      if (!response.ok) {
+        throw new Error(`Failed to fetch cart: ${response.status}`);
+      }
+      const data = await response.json();
+      cartDropdown.innerHTML = data.html;
+      console.log("Cart dropdown HTML updated.");
+    } catch (error) {
+      console.error("Error refreshing cart dropdown:", error);
+      cartDropdown.innerHTML = '<div class="p-4 text-error">Could not load cart.</div>';
+    }
+  }
+  function openCartDropdown() {
+    const cartDropdown = document.getElementById("cart-dropdown");
+    if (!cartDropdown) return;
+    const dropdownContainer = cartDropdown.closest(".dropdown");
+    if (dropdownContainer) {
+      dropdownContainer.classList.add("dropdown-open");
+      setTimeout(() => {
+        dropdownContainer.classList.remove("dropdown-open");
+      }, 3e3);
+    }
+  }
+  function initCart() {
+    console.log("Initializing cart on page load...");
+    updateCartDropdownHTML();
+  }
+  if (typeof window !== "undefined") {
+    window.cart = {
+      init: initCart,
+      updateCartDropdownHTML,
+      openCartDropdown
+    };
+  }
+  document.addEventListener("DOMContentLoaded", () => {
+    if (window.cart) {
+      window.cart.init();
+    }
+  });
+
   // pointless_impressions_src/theme/static_src/src/js/artwork_detail.js
   function displayArtworkDetail(artworkData) {
     if (!artworkData) {
@@ -27,78 +82,13 @@
     }
   }
   function initArtworkDetail() {
-    const thumbnailContainer = document.getElementById("thumbnail-container");
-    if (thumbnailContainer) {
-      const thumbnails = thumbnailContainer.querySelectorAll(".thumbnail-btn");
-      thumbnails.forEach((thumb) => {
-        thumb.addEventListener("click", (e) => {
-          e.preventDefault();
-          const slideNum = parseInt(thumb.dataset.slide);
-          goToSlide(slideNum);
-        });
-      });
+    if (window.carousel && window.carousel.initArtworkDetailCarousel) {
+      window.carousel.initArtworkDetailCarousel();
+    } else {
+      console.error("Carousel script not loaded.");
     }
-    document.addEventListener("keydown", (e) => {
-      if (e.key === "ArrowLeft") {
-        previousSlide();
-      } else if (e.key === "ArrowRight") {
-        nextSlide();
-      }
-    });
     initializeReviewFunctionality();
   }
-  function showConfirmationMessage(message) {
-    const confirmationDiv = document.getElementById("confirmation-message");
-    if (confirmationDiv) {
-      confirmationDiv.textContent = message;
-      confirmationDiv.style.display = "block";
-      setTimeout(() => {
-        confirmationDiv.style.display = "none";
-      }, 3e3);
-    }
-  }
-  var currentSlide = 0;
-  function goToSlide(n) {
-    const slides = document.querySelectorAll(".carousel-item");
-    const totalSlides = slides.length;
-    currentSlide = n;
-    if (currentSlide >= totalSlides) {
-      currentSlide = 0;
-    }
-    if (currentSlide < 0) {
-      currentSlide = totalSlides - 1;
-    }
-    const slideElement = document.getElementById(`slide-${currentSlide}`);
-    if (slideElement) {
-      slideElement.scrollIntoView({
-        behavior: "smooth",
-        block: "nearest",
-        inline: "nearest"
-      });
-    }
-    updateThumbnails();
-  }
-  function nextSlide() {
-    goToSlide(currentSlide + 1);
-  }
-  function previousSlide() {
-    goToSlide(currentSlide - 1);
-  }
-  function updateThumbnails() {
-    const thumbnails = document.querySelectorAll(".thumbnail-btn");
-    thumbnails.forEach((thumb, index) => {
-      if (index === currentSlide) {
-        thumb.classList.add("border-primary");
-        thumb.classList.remove("border-gray-300");
-      } else {
-        thumb.classList.remove("border-primary");
-        thumb.classList.add("border-gray-300");
-      }
-    });
-  }
-  window.goToSlide = goToSlide;
-  window.nextSlide = nextSlide;
-  window.previousSlide = previousSlide;
   async function submitReview() {
     const form = document.getElementById("review_form");
     const modal = document.getElementById("review_modal");
@@ -108,44 +98,33 @@
         method: "POST",
         body: formData,
         headers: {
-          "X-Requested-With": "XMLHttpRequest"
+          "X-Requested-With": "XMLHttpRequest",
+          "X-CSRFToken": getCCsrfToken()
         }
       });
       const data = await response.json();
       if (response.ok) {
-        showNotification(data.message, "success");
+        if (window.Toast) {
+          window.Toast.show(data.message, "success");
+        }
         form.reset();
-        modal.close();
+        if (modal) modal.close();
         setTimeout(() => {
           window.location.reload();
         }, 1e3);
       } else {
-        showNotification(data.error || "An error occurred", "error");
-        if (data.errors) {
-          console.error("Form errors:", data.errors);
+        const errorMsg = data.error || (data.errors ? Object.values(data.errors).join(" ") : "An error occurred.");
+        if (window.Toast) {
+          window.Toast.show(errorMsg, "error");
         }
+        console.error("Form errors:", data.errors);
       }
     } catch (error) {
-      console.error("Error:", error);
-      showNotification("Failed to submit review. Please try again.", "error");
+      console.error("Error submitting review:", error);
+      if (window.Toast) {
+        window.Toast.show("Failed to submit review. Please try again.", "error");
+      }
     }
-  }
-  function showNotification(message, type = "info") {
-    const toast = document.createElement("div");
-    const alertClass = type === "success" ? "alert-success" : "alert-error";
-    toast.className = `alert ${alertClass} fixed bottom-4 right-4 shadow-lg max-w-md z-50`;
-    toast.innerHTML = `
-    <div>
-      <svg class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${type === "success" ? "M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" : "M12 8v4m0 4v.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"}"></path>
-      </svg>
-      <span>${message}</span>
-    </div>
-  `;
-    document.body.appendChild(toast);
-    setTimeout(() => {
-      toast.remove();
-    }, 5e3);
   }
   function handleViewReviewsScroll() {
     const viewReviewsBtn = document.querySelector("[data-scroll-to-reviews]");
@@ -172,7 +151,6 @@
     handleViewReviewsScroll();
   }
   window.submitReview = submitReview;
-  window.showNotification = showNotification;
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", initArtworkDetail);
   } else {

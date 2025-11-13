@@ -161,24 +161,20 @@
         }
       }
     });
-    window.refreshCartDropdown = cart.refreshAndOpenDropdown;
-    function showToast(message, type = "success") {
-      const toast = document.createElement("div");
-      toast.className = `toast toast-${type}`;
-      toast.textContent = message;
-      document.body.appendChild(toast);
-      setTimeout(() => {
-        toast.classList.add("fade-out");
-        toast.addEventListener("transitionend", () => toast.remove());
-      }, 3e3);
+    if (window.cart && window.cart.refreshAndOpenDropdown) {
+      window.refreshAndOpenDropdown = window.cart.refreshAndOpenDropdown;
     }
     const successMessage = document.body.dataset.toastSuccess;
     const errorMessage = document.body.dataset.toastError;
-    if (successMessage) {
-      showToast(successMessage, "success");
-    }
-    if (errorMessage) {
-      showToast(errorMessage, "error");
+    if (window.Toast) {
+      if (successMessage) {
+        window.Toast.show(successMessage, "success");
+      }
+      if (errorMessage) {
+        window.Toast.show(errorMessage, "error");
+      }
+    } else {
+      console.warn("Toast system not loaded, messages will not appear.");
     }
   });
 })();

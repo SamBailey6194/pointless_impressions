@@ -196,7 +196,10 @@
                 <i class="fa-solid fa-cart-plus"></i> Add to Cart
               </h2>
               <div class="card-body bg-gray-300 dark:bg-gray-700 rounded-lg">
-                {% crispy add_to_cart_form %}
+                <form method="post" action="" id="add_to_cart_form">
+                  {% csrf_token %}
+                  {% crispy add_to_cart_form %}
+                </form>
               </div>
             </div>
           {% else %}

@@ -204,36 +204,28 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // Replace refreshCartDropdown with the function from cart.js
-  window.refreshCartDropdown = cart.refreshAndOpenDropdown;
-
-  /**
-   * Show a toast notification.
-   * @param {string} message - The message to display.
-   * @param {string} type - The type of toast ('success' or 'error').
-   */
-  function showToast(message, type = 'success') {
-    const toast = document.createElement('div');
-    toast.className = `toast toast-${type}`;
-    toast.textContent = message;
-
-    document.body.appendChild(toast);
-
-    setTimeout(() => {
-      toast.classList.add('fade-out');
-      toast.addEventListener('transitionend', () => toast.remove());
-    }, 3000);
+// ----------------------------------------------
+// Handle cart dropdown refresh
+// ----------------------------------------------
+  if (window.cart && window.cart.refreshAndOpenDropdown) {
+    window.refreshAndOpenDropdown = window.cart.refreshAndOpenDropdown;
   }
 
-  // Example usage of toast notifications
+// ----------------------------------------------
+// Display toast messages from data attributes
+// ----------------------------------------------
   const successMessage = document.body.dataset.toastSuccess;
   const errorMessage = document.body.dataset.toastError;
 
-  if (successMessage) {
-    showToast(successMessage, 'success');
-  }
+  if (window.Toast) {
+    if (successMessage) {
+      window.Toast.show(successMessage, 'success');
+    }
 
-  if (errorMessage) {
-    showToast(errorMessage, 'error');
+    if (errorMessage) {
+      window.Toast.show(errorMessage, 'error');
+    }
+  } else {
+    console.warn('Toast system not loaded, messages will not appear.');
   }
 });

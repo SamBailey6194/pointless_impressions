@@ -1,11 +1,11 @@
 /**
- * Cart Management Module (SSR-Compatible)
- * Handles cart operations using server-side sessionid.
+ * Global Cart Management
+ * Handles loading the cart dropdown on page load and
+ * provides helper functions for other scripts.
  */
-import { getSessionToken } from './add_to_cart.js';
 
 // -----------------------------------------------------------------------------
-// Helpers
+// Helper Functions (Exported for other scripts)
 // -----------------------------------------------------------------------------
 
 /**
@@ -18,208 +18,87 @@ export function getCsrfToken() {
 }
 
 /**
- * Fetch cart data from the server.
- * @returns {Promise<object>} The cart data.
+ * Get session ID from cookies.
+ * @returns {string|null} The session ID or null if not found.
  */
-async function fetchCartFromServer() {
+export function getSessionToken() {
   try {
-    const response = await fetch('/checkout/', {
-      method: 'GET',
-      headers: { 
-        'X-Requested-With': 'XMLHttpRequest',
-      },
-      credentials: 'include',
-    });
-
-    if (!response.ok) {
-      throw new Error('Failed to fetch cart data');
-    }
-
-    return await response.json();
+    const sessionid = document.cookie
+      .split('; ')
+      .find(row => row.startsWith('sessionid='))
+      ?.split('=')[1];
+    return sessionid || null;
   } catch (error) {
-    console.error('Error fetching cart:', error);
-    return { items: [], total_items: 0 };
+    console.error('Error retrieving session ID:', error);
+    return null;
   }
 }
 
-/**
- * Update cart count badge in header.
- */
-export async function updateCartCountBadge() {
-  const cartCountEl = document.querySelector('[data-cart-count]');
-  if (cartCountEl) {
-    const cart = await fetchCartFromServer();
-    const count = cart.total_items || 0;
-    cartCountEl.textContent = count;
-    cartCountEl.style.display = count > 0 ? 'inline-block' : 'none';
-  }
-}
+// -----------------------------------------------------------------------------
+// Core Cart Dropdown Logic
+// -----------------------------------------------------------------------------
 
 /**
- * Add an item to the cart on the server.
- * @param {Object} item - The item to add (id, quantity, etc.).
+ * Fetches the latest cart HTML from the server and updates the dropdown.
  */
-export async function addItemToCart(item) {
-  try {
-    const formData = new FormData();
-    formData.append('artwork_id', item.id);
-    formData.append('quantity', item.quantity);
-
-    const response = await fetch('/checkout/', {
-      method: 'POST',
-      body: formData,
-      headers: {
-        'X-CSRFToken': getCsrfToken(),
-        'X-Requested-With': 'XMLHttpRequest',
-      },
-      credentials: 'include',
-    });
-
-    if (!response.ok) {
-      throw new Error('Failed to add item to cart');
-    }
-
-    await updateCartCountBadge();
-  } catch (error) {
-    console.error('Error adding item to cart:', error);
-  }
-}
-
-/**
- * Remove an item from the cart on the server.
- * @param {number} itemId - The ID of the item to remove.
- */
-export async function removeCartItem(itemId) {
-  try {
-    const formData = new FormData();
-    formData.append('artwork_id', itemId);
-    formData.append('quantity', 0); // Setting quantity to 0 removes the item
-
-    const response = await fetch('/checkout/', {
-      method: 'POST',
-      body: formData,
-      headers: {
-        'X-CSRFToken': getCsrfToken(),
-        'X-Requested-With': 'XMLHttpRequest',
-      },
-      credentials: 'include',
-    });
-
-    if (!response.ok) {
-      throw new Error('Failed to remove item from cart');
-    }
-
-    await updateCartCountBadge();
-  } catch (error) {
-    console.error('Error removing item from cart:', error);
-  }
-}
-
-/**
- * Refresh and open the cart dropdown.
- */
-export async function refreshAndOpenCartDropdown() {
-  const response = await fetch('/checkout/cart-dropdown/', {
-    method: 'GET',
-    headers: {
-      'X-Requested-With': 'XMLHttpRequest',
-    },
-    credentials: 'include', 
-  });
-  if (!response.ok) {
-    throw new Error('Failed to refresh cart dropdown');
-  }
-
-  const html = await response.text();
+async function updateCartDropdownHTML() {
   const cartDropdown = document.getElementById('cart-dropdown');
-  
-  if (cartDropdown) {
-    cartDropdown.innerHTML = html;
+  if (!cartDropdown) {
+    console.warn('Cart dropdown element not found. Cannot update.');
+    return;
   }
-}
 
-/**
- * Submit the AddToCart form via AJAX.
- */
-export async function submitAddToCartForm(form) {
   try {
-    const formData = new FormData(form);
-    const response = await fetch(form.action, {
-      method: 'POST',
-      body: formData,
-      headers: {
-        'X-Requested-With': 'XMLHttpRequest',
-      },
-      credentials: 'include',
-    });
-
-    if (!response.ok) {
-      throw new Error('Failed to submit AddToCart form');
-    }
-
-    const data = await response.json();
-
-    if (data.success) {
-      // Update the artwork detail page
-      const artworkDetailContainer = document.getElementById('artwork-detail-container');
-      if (artworkDetailContainer) {
-        artworkDetailContainer.innerHTML = data.html;
-      }
-
-      // Refresh and open the cart dropdown
-      await refreshAndOpenCartDropdown();
-    } else {
-      console.error('Form submission errors:', data.errors);
-    }
-  } catch (error) {
-    console.error('Error submitting AddToCart form:', error);
-  }
-}
-
-/**
- * Initialize cart system.
- * Updates the cart count badge on page load.
- */
-export function initCart() {
-  updateCartCountBadge().catch((error) => {
-    console.error('Failed to initialize cart:', error);
-  });
-}
-
-/**
- * Fetch and update the cart dropdown on page load.
- */
-export async function fetchAndUpdateCartDropdown() {
-  try {
-    const sessionid = getSessionToken(); // Ensure session ID is retrieved
-    console.log('Fetching cart dropdown with session ID:', sessionid);
-
     const response = await fetch('/checkout/cart-dropdown/', {
       method: 'GET',
       headers: {
         'X-Requested-With': 'XMLHttpRequest',
-        'X-Session-Token': sessionid,
       },
-      credentials: 'include',
+      // This sends the 'sessionid' cookie automatically
+      credentials: 'include', 
     });
 
     if (!response.ok) {
-      throw new Error(`Failed to fetch cart dropdown: ${response.status}`);
+      throw new Error(`Failed to fetch cart: ${response.status}`);
     }
 
+    // Our CartDropdownView returns JSON: {'html': '...'}
     const data = await response.json();
-    console.log('Cart dropdown data fetched:', data);
-
-    const cartDropdown = document.getElementById('cart-dropdown');
-    if (cartDropdown) {
-      cartDropdown.innerHTML = data.html;
-      console.log('Cart dropdown updated successfully');
-    } else {
-      console.warn('Cart dropdown element not found');
-    }
+    cartDropdown.innerHTML = data.html;
+    console.log('Cart dropdown HTML updated.');
+    
   } catch (error) {
-    console.error('Error fetching and updating cart dropdown:', error);
+    console.error('Error refreshing cart dropdown:', error);
+    cartDropdown.innerHTML = '<div class="p-4 text-error">Could not load cart.</div>';
   }
+}
+
+/**
+ * Finds the cart dropdown and adds the 'dropdown-open' class to show it.
+ */
+function openCartDropdown() {
+  const cartDropdown = document.getElementById('cart-dropdown');
+  if (!cartDropdown) return;
+
+  const dropdownContainer = cartDropdown.closest('.dropdown');
+  if (dropdownContainer) {
+    dropdownContainer.classList.add('dropdown-open');
+    
+    // Optional: close it after 3 seconds
+    setTimeout(() => {
+       dropdownContainer.classList.remove('dropdown-open');
+    }, 3000);
+  }
+}
+
+/**
+ * Initialize cart system on page load.
+ * Fetches the current cart state and populates the dropdown.
+ */
+function initCart() {
+  console.log('Initializing cart on page load...');
+  // Just update the HTML, don't auto-open it
+  updateCartDropdownHTML();
 }
 
 // -----------------------------------------------------------------------------
@@ -228,20 +107,16 @@ export async function fetchAndUpdateCartDropdown() {
 if (typeof window !== 'undefined') {
   window.cart = {
     init: initCart,
-    add: addItemToCart,
-    remove: removeCartItem,
-    updateBadge: updateCartCountBadge,
-    refreshAndOpenDropdown: refreshAndOpenCartDropdown,
+    updateCartDropdownHTML: updateCartDropdownHTML,
+    openCartDropdown: openCartDropdown,
   };
-
-  document.addEventListener('DOMContentLoaded', () => {
-    initCart();
-    const addToCartForm = document.getElementById('add-to-cart-form');
-    if (addToCartForm) {
-      addToCartForm.addEventListener('submit', async (event) => {
-        event.preventDefault();
-        await submitAddToCartForm(addToCartForm);
-      });
-    }
-  });
 }
+
+// -----------------------------------------------------------------------------
+// Run on page load
+// -----------------------------------------------------------------------------
+document.addEventListener('DOMContentLoaded', () => {
+  if (window.cart) {
+    window.cart.init();
+  }
+});

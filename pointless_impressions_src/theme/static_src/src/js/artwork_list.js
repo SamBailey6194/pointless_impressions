@@ -72,13 +72,14 @@ export function renderArtworkList(artworks) {
                     
                     <div class="card-actions justify-between items-center mt-4">
                         ${artwork.is_in_stock ? `
-                            <button class="add-to-cart btn btn-primary btn-sm">
-                                <i class="fa-solid fa-cart-plus"></i> Add to Cart
-                            </button>
-                            <a href="${detailUrl}" class="btn btn-outline btn-sm"><i class="fa-solid fa-eye"></i> Details</a>
+                            <a href="${detailUrl}" class="btn btn-outline btn-sm ml-auto">
+                                <i class="fa-solid fa-eye"></i> Details
+                            </a>
                         ` : `
                             <span class="sold-out badge badge-error">Sold Out</span>
-                            <a href="${detailUrl}" class="btn btn-outline btn-sm"><i class="fa-solid fa-eye"></i> Details</a>
+                            <a href="${detailUrl}" class="btn btn-outline btn-sm">
+                                <i class="fa-solid fa-eye"></i> Details
+                            </a>
                         `}
                     </div>
                 </div>`;
@@ -290,49 +291,9 @@ function initPriceFilterValidation() {
 }
 
 // -------------------------------------------------------------------
-// Handle Artwork List Click
-// -------------------------------------------------------------------
-function handleArtworkListClick(event) {
-  const button = event.target.closest('.add-to-cart-btn');
-  
-  if (!button) {
-    return;
-  }
-
-  const { 
-    artworkId, 
-    artworkName, 
-    artworkPrice, 
-    artworkImage, 
-    artworkQuantity 
-  } = button.dataset;
-
-  const framingOptions = JSON.parse(button.dataset.framingOptions || '[]');
-
-  if (window.addToCartModal) {
-    window.addToCartModal.init(
-      artworkId,
-      artworkName,
-      parseFloat(artworkPrice),
-      artworkImage,
-      parseInt(artworkQuantity, 10),
-      framingOptions
-    );
-  } else {
-    alert('Error: Modal component is not loaded.');
-  }
-}
-
-
-// -------------------------------------------------------------------
 // DOMContentLoaded Initialization
 // -------------------------------------------------------------------
 document.addEventListener("DOMContentLoaded", function() {
     initArtworkListEnhancements();
     initPriceFilterValidation();
-
-    const artworkListContainer = document.getElementById('artwork-list');
-    if (artworkListContainer) {
-      artworkListContainer.addEventListener('click', handleArtworkListClick);
-    }
 });

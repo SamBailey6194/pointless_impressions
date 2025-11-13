@@ -78,10 +78,10 @@
     {% block corejs %}
       <script src="https://kit.fontawesome.com/b28d0f6314.js" crossorigin="anonymous"></script>
       <script src="https://cdn.jsdelivr.net/npm/@tarekraafat/autocomplete.js@10.2.9/dist/autoComplete.min.js"></script>
-      <script src="{% static 'js/general.js' %}" defer></script>
-      <script src="{% static 'js/cart.js' %}" defer></script>
-      <script src="{% static 'js/header_footer.js' %}" defer></script>
       <script src="{% static 'js/toasts.js' %}" defer></script>
+      <script src="{% static 'js/cart.js' %}" defer></script>
+      <script src="{% static 'js/carousel.js' %}" defer></script>
+      <script src="{% static 'js/header_footer.js' %}" defer></script>
     {% endblock %}
 
     {% block extracss %}{% endblock %}
@@ -100,7 +100,7 @@
     </header>
 
     {% comment %} Main Content Area {% endcomment %}
-    <main class="flex-grow pt-24 md:pt-28 lg:pt-32">
+    <main class="grow pt-24 md:pt-28 lg:pt-32">
       {% comment %} Full Content Block for pages that need complete control {% endcomment %}
       {% block content %}
         
