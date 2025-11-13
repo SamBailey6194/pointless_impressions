@@ -5,7 +5,7 @@
     return tokenEl ? tokenEl.value : "";
   }
   async function updateCartDropdownHTML() {
-    const cartDropdown = document.getElementById("cart-dropdown");
+    const cartDropdown = document.getElementById("cart-dropdown-content");
     if (!cartDropdown) {
       console.warn("Cart dropdown element not found. Cannot update.");
       return;
@@ -16,7 +16,6 @@
         headers: {
           "X-Requested-With": "XMLHttpRequest"
         },
-        // This sends the 'sessionid' cookie automatically
         credentials: "include"
       });
       if (!response.ok) {
@@ -31,7 +30,7 @@
     }
   }
   function openCartDropdown() {
-    const cartDropdown = document.getElementById("cart-dropdown");
+    const cartDropdown = document.getElementById("cart-dropdown-content");
     if (!cartDropdown) return;
     const dropdownContainer = cartDropdown.closest(".dropdown");
     if (dropdownContainer) {
@@ -90,10 +89,8 @@
   }
   async function submitAddToCartForm(form) {
     const formData = new FormData(form);
-    console.log("Submitting AddToCart form via AJAX...");
     try {
       const response = await fetch(form.action, {
-        // form.action is ""
         method: "POST",
         headers: {
           "X-Requested-With": "XMLHttpRequest",
@@ -109,6 +106,7 @@
         }
         if (window.cart) {
           await window.cart.updateCartDropdownHTML();
+          window.scrollTo({ top: 0, behavior: "smooth" });
           window.cart.openCartDropdown();
         }
       } else {

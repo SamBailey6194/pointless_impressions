@@ -218,7 +218,36 @@
         </div>
 
         {% comment %} Cart Dropdown {% endcomment %}
-        {% include 'cart/includes/cart_dropdown.html' %}
+        <div class="flex flex-col items-center">
+            <div class="dropdown dropdown-end">
+
+                <label tabindex="0" class="btn btn-ghost btn-circle">
+                    <div class="indicator">
+                        <i class="fa-solid fa-cart-shopping text-lg"></i>
+                        <span class="badge badge-sm indicator-item translate-x-5 -translate-y-4" id="cart-count-badge">{{ total_quantity|default:"0" }}</span>
+                    </div>
+                </label>
+                
+                <div tabindex="0" 
+                     id="cart-dropdown-content" 
+                     class="card card-compact dropdown-content w-80 shadow-lg mt-3 z-10">
+                    
+                    <div class="card-body">
+                        <p>Loading cart...</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="hidden md:block text-sm mt-1">
+                {% if not forloop.parentloop %}
+                    {% if request.user.is_authenticated %}
+                        <span class="font-medium">{{ request.user.username|title }}'s Cart</span>
+                    {% else %}
+                        <span class="font-medium">Your Cart</span>
+                    {% endif %}
+                {% endif %}
+            </div>
+        </div>
 
         {% comment %} Mobile Hamburger Menu {% endcomment %}
         <div class="dropdown dropdown-end md:hidden">

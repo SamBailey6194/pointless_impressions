@@ -148,6 +148,8 @@ TEMPLATES = [
                 "django.contrib.messages.context_processors.messages",
                 "pointless_impressions_src.pointless_impressions."
                 "context_processors.global_context",
+                "pointless_impressions_src.cart.context_processors."
+                "cart_context_processor",
             ],
         },
     },

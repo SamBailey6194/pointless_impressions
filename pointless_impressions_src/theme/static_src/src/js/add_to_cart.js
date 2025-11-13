@@ -16,7 +16,7 @@ function handleQuantityButtons() {
   const stockQuantityEl = document.getElementById('stock_quantity');
   
   if (!decrementButton || !incrementButton || !quantityInput || !stockQuantityEl) {
-    return; // Elements not found
+    return;
   }
   
   const stockQuantity = parseInt(stockQuantityEl.value, 10);
@@ -50,10 +50,9 @@ function handleQuantityButtons() {
  */
 async function submitAddToCartForm(form) {
   const formData = new FormData(form);
-  console.log('Submitting AddToCart form via AJAX...');
 
   try {
-    const response = await fetch(form.action, { // form.action is ""
+    const response = await fetch(form.action, {
       method: 'POST',
       headers: {
         'X-Requested-With': 'XMLHttpRequest',
@@ -66,23 +65,19 @@ async function submitAddToCartForm(form) {
     const data = await response.json();
 
     if (data.success) {
-      // 1. Show success toast
       if (window.Toast) {
         window.Toast.show(data.message, 'success');
       }
-      
-      // 2. Refresh the cart dropdown HTML
+
       if (window.cart) {
         await window.cart.updateCartDropdownHTML();
-        // 3. Open the dropdown to show the user
+        window.scrollTo({ top: 0, behavior: 'smooth' });
         window.cart.openCartDropdown();
       }
       
     } else {
-      // Handle form validation errors
       let errorMsg = 'Failed to add item. Please try again.';
       if (data.errors) {
-        // Convert Django form errors to a string
         errorMsg = Object.values(data.errors).map(e => e[0]).join(' ');
       }
       if (window.Toast) {
@@ -109,7 +104,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const addToCartForm = document.getElementById('add_to_cart_form');
   if (addToCartForm) {
     addToCartForm.addEventListener('submit', (event) => {
-      event.preventDefault(); // <-- This is the key!
+      event.preventDefault();
       console.log('AddToCart form submit intercepted by AJAX');
       submitAddToCartForm(addToCartForm);
     });

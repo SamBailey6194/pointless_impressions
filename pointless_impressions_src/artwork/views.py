@@ -458,7 +458,7 @@ class ArtworkDetailView(DetailView):
             )
 
             return JsonResponse(
-                {'success': True, 'message': 'Artwork added to cart.'}
+                {'success': True, 'message': ' Artwork added to cart.'}
                 )
 
         return JsonResponse(

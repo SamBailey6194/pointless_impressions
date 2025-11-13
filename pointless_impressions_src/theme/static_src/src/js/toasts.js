@@ -52,7 +52,7 @@ const Toast = {
     toastEl.className = `${toastConfig.className} gap-2 pointer-events-auto animate-fade-in`;
     toastEl.innerHTML = `
       <div class="flex items-center">
-        <i class="fa-solid ${toastConfig.icon} fa-lg"></i>
+        <i class="fa-solid ${toastConfig.icon} fa-lg mr-2"></i>
         <span>${message}</span>
       </div>
     `;

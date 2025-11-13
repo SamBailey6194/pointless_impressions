@@ -42,7 +42,7 @@ export function getSessionToken() {
  * Fetches the latest cart HTML from the server and updates the dropdown.
  */
 async function updateCartDropdownHTML() {
-  const cartDropdown = document.getElementById('cart-dropdown');
+  const cartDropdown = document.getElementById('cart-dropdown-content');
   if (!cartDropdown) {
     console.warn('Cart dropdown element not found. Cannot update.');
     return;
@@ -54,7 +54,6 @@ async function updateCartDropdownHTML() {
       headers: {
         'X-Requested-With': 'XMLHttpRequest',
       },
-      // This sends the 'sessionid' cookie automatically
       credentials: 'include', 
     });
 
@@ -77,7 +76,7 @@ async function updateCartDropdownHTML() {
  * Finds the cart dropdown and adds the 'dropdown-open' class to show it.
  */
 function openCartDropdown() {
-  const cartDropdown = document.getElementById('cart-dropdown');
+  const cartDropdown = document.getElementById('cart-dropdown-content');
   if (!cartDropdown) return;
 
   const dropdownContainer = cartDropdown.closest('.dropdown');
@@ -97,7 +96,6 @@ function openCartDropdown() {
  */
 function initCart() {
   console.log('Initializing cart on page load...');
-  // Just update the HTML, don't auto-open it
   updateCartDropdownHTML();
 }
 

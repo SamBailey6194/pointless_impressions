@@ -91,7 +91,10 @@ class Cart(models.Model):
         """
         cart, created = cls.objects.get_or_create(
             session_id=session_id,
-            expires_at=timezone.now() + timedelta(days=30)
+            defaults={
+                'is_active': True,
+                'expires_at': timezone.now() + timedelta(days=30)
+            }
         )
         return cart, created
 

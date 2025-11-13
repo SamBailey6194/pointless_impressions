@@ -14,7 +14,7 @@
     }
   }
   async function updateCartDropdownHTML() {
-    const cartDropdown = document.getElementById("cart-dropdown");
+    const cartDropdown = document.getElementById("cart-dropdown-content");
     if (!cartDropdown) {
       console.warn("Cart dropdown element not found. Cannot update.");
       return;
@@ -25,7 +25,6 @@
         headers: {
           "X-Requested-With": "XMLHttpRequest"
         },
-        // This sends the 'sessionid' cookie automatically
         credentials: "include"
       });
       if (!response.ok) {
@@ -40,7 +39,7 @@
     }
   }
   function openCartDropdown() {
-    const cartDropdown = document.getElementById("cart-dropdown");
+    const cartDropdown = document.getElementById("cart-dropdown-content");
     if (!cartDropdown) return;
     const dropdownContainer = cartDropdown.closest(".dropdown");
     if (dropdownContainer) {
