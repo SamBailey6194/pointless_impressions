@@ -9,14 +9,13 @@ from django.views.decorators.http import require_http_methods
 from django.utils import timezone
 from django.contrib.auth import get_user_model
 from django.utils.decorators import method_decorator
-from django.views.decorators.csrf import csrf_exempt
 from .models import (
     Artwork, ArtworkCategory, ArtworkFramingCondition, ArtworkReview
 )
 from .forms import ArtworkReviewForm, AddToCartForm
 from pointless_impressions_src.photo.models import Photo
 from pointless_impressions_src.profiles.models import Artist
-from pointless_impressions_src.checkout.models import Cart
+from pointless_impressions_src.cart.models import Cart
 from pointless_impressions_src.profiles.mixins import CustomerRequiredMixin
 
 
@@ -301,7 +300,6 @@ class ArtworkListView(ListView):
 # ---------------------------
 # Artwork detail view
 # ---------------------------
-@method_decorator(csrf_exempt, name='dispatch')
 class ArtworkDetailView(DetailView):
     """
     Renders the public artwork detail page.
@@ -312,6 +310,10 @@ class ArtworkDetailView(DetailView):
     **Context**
     ``artwork``
         An instance of the Artwork model.
+
+    Add to Cart Form:
+        An instance of the AddToCartForm for adding the artwork to cart.
+        Uses AJAX submission for the frontend to make UX seamless.
 
     **Template:**
     :template:`artwork/artwork_detail.html`
@@ -419,21 +421,11 @@ class ArtworkDetailView(DetailView):
         # Include session ID in the context for the frontend
         context['sessionid'] = self.request.session.session_key
 
-        # Ensure x_requested_with is defined
-        x_requested_with = (
-            self.request.headers.get('x-requested-with') or
-            self.request.META.get('HTTP_X_REQUESTED_WITH')
-        )
-
-        # Debugging: Log session ID and cart state on GET
+        # Ensuring session ID exists
         session_id = self.request.session.session_key
         if not session_id:
             self.request.session.create()
             session_id = self.request.session.session_key
-
-        cart = Cart.objects.filter(
-            session_id=session_id, is_active=True
-        ).first()
 
         return context
 
@@ -454,46 +446,21 @@ class ArtworkDetailView(DetailView):
 
             cart, created = Cart.get_or_create_from_sessionid(session_id)
 
-            # Add or update the item in the cart
-            artwork_id = str(artwork.id)
-            framing_option = form.cleaned_data.get('framing_option')
-            framing_option_str = str(framing_option)
+            quantity = form.cleaned_data.get('quantity')
+            framing_condition = form.cleaned_data.get('framing_option')
             notes = form.cleaned_data.get('notes', '')
-            price = round(float(artwork.price), 2)
 
-            # Check if the item already exists in the cart
-            if artwork_id in cart.data:
-                existing_item = cart.data[artwork_id]
-                if existing_item.get('framing_option') == framing_option_str:
-                    # Increment the quantity
-                    existing_item['quantity'] += form.cleaned_data['quantity']
-                    existing_item['notes'] = notes
-                else:
-                    # Add a new entry for a different framing option
-                    cart.data[artwork_id] = {
-                        'artwork_id': artwork.id,
-                        'quantity': form.cleaned_data['quantity'],
-                        'framing_option': framing_option_str,
-                        'notes': notes,
-                        'price': price,
-                    }
-            else:
-                # Add a new item to the cart
-                cart.data[artwork_id] = {
-                    'artwork_id': artwork.id,
-                    'quantity': form.cleaned_data['quantity'],
-                    'framing_option': framing_option_str,
-                    'notes': notes,
-                    'price': price,
-                }
-
-            cart.save()
-
-            return JsonResponse(
-                {'success': True, 'message': 'Item added to cart.'}
+            cart.add_or_update_item(
+                artwork=artwork,
+                quantity=quantity,
+                framing_option=framing_condition,
+                notes=notes
             )
 
-        # If the form is invalid, return errors
+            return JsonResponse(
+                {'success': True, 'message': 'Artwork added to cart.'}
+                )
+
         return JsonResponse(
             {'success': False, 'errors': form.errors}, status=400
         )

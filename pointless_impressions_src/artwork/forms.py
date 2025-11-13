@@ -362,7 +362,6 @@ class AddToCartForm(forms.Form):
             pass
 
         self.helper = FormHelper()
-        self.helper.form_action = reverse('checkout:cart_dropdown')
         self.helper.form_method = 'post'
         self.helper.form_tag = True
 

@@ -1,10 +1,11 @@
 from django.db import models
 from django.conf import settings
 from django.utils import timezone
+from django.db.models import F, Sum, ExpressionWrapper
+from datetime import timedelta
 from pointless_impressions_src.artwork.models import (
     Artwork, ArtworkFramingCondition
     )
-from datetime import timedelta
 
 
 # Write your models here.
@@ -16,7 +17,7 @@ class Cart(models.Model):
     Supports both authenticated users and anonymous guests.
 
     Attributes:
-        uuid: Unique identifier for the cart (for anonymous users)
+        session_id: Unique identifier for the cart (for anonymous users)
         user: Foreign key to User (for authenticated users, nullable)
         created_at: Timestamp when cart was created
         updated_at: Timestamp when cart was last modified
@@ -59,10 +60,6 @@ class Cart(models.Model):
         default=True,
         help_text="Whether cart is active"
     )
-    data = models.JSONField(
-        default=dict,
-        help_text="Stores cart data as a JSON object."
-    )
 
     class Meta:
         ordering = ['-updated_at']
@@ -82,16 +79,7 @@ class Cart(models.Model):
         Override save to set expires_at on update.
         Ensure session_id is set and data is a valid JSON object.
         """
-        if not self.id:
-            self.expires_at = timezone.now() + timedelta(days=30)
-            if not self.session_id:
-                self.session_id = ""
-        else:  # Existing cart
-            self.expires_at = timezone.now() + timedelta(days=30)
-
-        # Ensure data is a valid JSON object
-        if not isinstance(self.data, dict):
-            self.data = {}
+        self.expires_at = timezone.now() + timedelta(days=30)
 
         super().save(*args, **kwargs)
 
@@ -103,11 +91,17 @@ class Cart(models.Model):
         """
         cart, created = cls.objects.get_or_create(
             session_id=session_id,
-            defaults={'is_active': True, 'data': {}}
+            expires_at=timezone.now() + timedelta(days=30)
         )
         return cart, created
 
-    def add_or_update_item(self, artwork_id, quantity, framing_option, notes):
+    def add_or_update_item(
+            self,
+            artwork,
+            quantity,
+            framing_condition=None,
+            notes=''
+            ):
         """
         Add or update an item in the cart.
 
@@ -116,33 +110,61 @@ class Cart(models.Model):
         :param framing_option: Framing option for the artwork
         :param notes: Additional notes for the item
         """
-        artwork_id = str(artwork_id)
-        framing_option_str = str(framing_option)
+        try:
+            quantity = int(quantity)
+            if quantity < 1:
+                quantity = 1
+        except (ValueError, TypeError):
+            return None, False
 
-        if artwork_id in self.data:
-            existing_item = self.data[artwork_id]
-            if existing_item.get('framing_option') == framing_option_str:
-                # Increment the quantity
-                existing_item['quantity'] += quantity
-                existing_item['notes'] = notes
-            else:
-                # Add a new entry for a different framing option
-                self.data[artwork_id] = {
-                    'artwork_id': artwork_id,
-                    'quantity': quantity,
-                    'framing_option': framing_option_str,
-                    'notes': notes,
-                }
-        else:
-            # Add a new item to the cart
-            self.data[artwork_id] = {
-                'artwork_id': artwork_id,
-                'quantity': quantity,
-                'framing_option': framing_option_str,
-                'notes': notes,
+        lookup_fields = {
+            'cart': self,
+            'artwork': artwork,
+            'framing_condition': framing_condition,
+        }
+
+        item, created = CartItem.objects.get_or_create(
+            **lookup_fields,
+            defaults={
+                'quantity': 0,
             }
+        )
+
+        item.quantity = F('quantity') + quantity
+
+        if created or notes:
+            item.notes = notes
+
+        item.save()
+
+        item.refresh_from_db()
+
+        if item.quantity <= 0:
+            item.delete()
+            item = None
 
         self.save()
+
+        return item, created
+
+    def get_total_quantity(self):
+        """Get total quantity of items in the cart"""
+        total = self.items.aggregate(
+            cart_quantity=Sum('quantity')
+        )
+        return total['cart_quantity'] or 0
+
+    def get_total_price(self):
+        """Get total price of all items in the cart"""
+        total = self.items.annotate(
+            line_item_total=ExpressionWrapper(
+                F('artwork__price') * F('quantity'),
+                output_field=models.FloatField()
+                )
+        ).aggregate(
+            cart_total=Sum('line_item_total')
+        )
+        return total['cart_total'] or 0
 
 
 class CartItem(models.Model):
