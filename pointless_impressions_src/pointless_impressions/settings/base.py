@@ -215,7 +215,13 @@ MEDIA_ROOT = BASE_DIR / "media"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # Free delivery threshold (in GBP)
-DELIVERY_FREE_THRESHOLD = 500.00
+DELIVERY_FEE_TIERS = [
+    (4, 12.00),
+    (3, 18.00),
+    (2, 25.00),
+    (1, 30.00),
+]
+FREE_DELIVERY_THRESHOLD = 5
 
 STATIC_VERSION = os.getenv("STATIC_VERSION", "1.0.0")
 

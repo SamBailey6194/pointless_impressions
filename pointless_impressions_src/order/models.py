@@ -60,6 +60,12 @@ class Order(models.Model):
         null=True,
         help_text="Phone number of guest user (if applicable)"
     )
+    guest_access_code = models.UUIDField(
+        default=uuid.uuid4,
+        editable=False,
+        unique=True,
+        help_text="Unique access code for guest users to view their order"
+    )
     created_at = models.DateTimeField(
         auto_now_add=True,
         help_text="Timestamp when the order was created"

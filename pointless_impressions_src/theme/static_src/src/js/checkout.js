@@ -22,6 +22,28 @@ async function updateCartItem(artworkId, quantity, framing) {
 
 document.addEventListener('DOMContentLoaded', function () {
 
+  const checkoutForm = document.getElementById('checkout-form');
+  const confirmModal = document.getElementById('confirm-order-modal');
+  const finalConfirmBtn = document.getElementById('modal-confirm-btn');
+  const modalLoadingSpinner = document.getElementById('modal-loading-spinner');
+
+  if (checkoutForm && confirmModal && finalConfirmBtn) {
+    checkoutForm.addEventListener('submit', function (e) {
+      e.preventDefault();
+      // Show the confirmation modal
+      confirmModal.showModal();
+    });
+
+    finalConfirmBtn.addEventListener('click', async function () {
+      if (modalLoadingSpinner) {
+        modalLoadingSpinner.style.display = 'block';
+      }
+      finalConfirmBtn.disabled = true;
+
+      checkoutForm.submit();
+    });
+  }
+  
   async function refreshOrderSummary() {
     console.log('Refreshing page to update totals...');
     window.location.reload();

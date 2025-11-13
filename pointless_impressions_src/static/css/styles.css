@@ -12,6 +12,7 @@
     --color-gray-200: oklch(92.8% 0.006 264.531);
     --color-gray-300: oklch(87.2% 0.01 258.338);
     --color-gray-400: oklch(70.7% 0.022 261.325);
+    --color-gray-600: oklch(44.6% 0.03 256.802);
     --color-gray-700: oklch(37.3% 0.034 259.733);
     --color-black: #000;
     --color-white: #fff;
@@ -2666,6 +2667,9 @@
   .my-2 {
     margin-block: calc(var(--spacing) * 2);
   }
+  .my-4 {
+    margin-block: calc(var(--spacing) * 4);
+  }
   .my-8 {
     margin-block: calc(var(--spacing) * 8);
   }
@@ -3218,8 +3222,14 @@
       }
     }
   }
+  .mr-1 {
+    margin-right: calc(var(--spacing) * 1);
+  }
   .mr-2 {
     margin-right: calc(var(--spacing) * 2);
+  }
+  .mr-4 {
+    margin-right: calc(var(--spacing) * 4);
   }
   .mb-1 {
     margin-bottom: calc(var(--spacing) * 1);
@@ -3689,6 +3699,10 @@
   .w-auto {
     width: auto;
   }
+  .w-fit {
+    width: -moz-fit-content;
+    width: fit-content;
+  }
   .w-full {
     width: 100%;
   }
@@ -3724,9 +3738,6 @@
   }
   .shrink-0 {
     flex-shrink: 0;
-  }
-  .flex-grow {
-    flex-grow: 1;
   }
   .grow {
     flex-grow: 1;
@@ -3978,6 +3989,12 @@
   .bg-primary {
     background-color: var(--color-primary);
   }
+  .loading-spinner {
+    @layer daisyui.modifier {
+      -webkit-mask-image: url("data:image/svg+xml,%3Csvg width='24' height='24' stroke='black' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cg transform-origin='center'%3E%3Ccircle cx='12' cy='12' r='9.5' fill='none' stroke-width='3' stroke-linecap='round'%3E%3CanimateTransform attributeName='transform' type='rotate' from='0 12 12' to='360 12 12' dur='2s' repeatCount='indefinite'/%3E%3Canimate attributeName='stroke-dasharray' values='0,150;42,150;42,150' keyTimes='0;0.475;1' dur='1.5s' repeatCount='indefinite'/%3E%3Canimate attributeName='stroke-dashoffset' values='0;-16;-59' keyTimes='0;0.475;1' dur='1.5s' repeatCount='indefinite'/%3E%3C/circle%3E%3C/g%3E%3C/svg%3E");
+              mask-image: url("data:image/svg+xml,%3Csvg width='24' height='24' stroke='black' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cg transform-origin='center'%3E%3Ccircle cx='12' cy='12' r='9.5' fill='none' stroke-width='3' stroke-linecap='round'%3E%3CanimateTransform attributeName='transform' type='rotate' from='0 12 12' to='360 12 12' dur='2s' repeatCount='indefinite'/%3E%3Canimate attributeName='stroke-dasharray' values='0,150;42,150;42,150' keyTimes='0;0.475;1' dur='1.5s' repeatCount='indefinite'/%3E%3Canimate attributeName='stroke-dashoffset' values='0;-16;-59' keyTimes='0;0.475;1' dur='1.5s' repeatCount='indefinite'/%3E%3C/circle%3E%3C/g%3E%3C/svg%3E");
+    }
+  }
   .mask-star-2 {
     @layer daisyui.modifier {
       -webkit-mask-image: url("data:image/svg+xml,%3csvg width='192' height='180' xmlns='http://www.w3.org/2000/svg'%3e%3cpath fill='black' d='m96 153.044-58.779 26.243 7.02-63.513L.894 68.481l63.117-13.01L96 0l31.989 55.472 63.117 13.01-43.347 47.292 7.02 63.513z' fill-rule='evenodd'/%3e%3c/svg%3e");
@@ -3993,6 +4010,9 @@
   }
   .p-2 {
     padding: calc(var(--spacing) * 2);
+  }
+  .p-3 {
+    padding: calc(var(--spacing) * 3);
   }
   .p-4 {
     padding: calc(var(--spacing) * 4);
@@ -4059,6 +4079,9 @@
   }
   .py-3 {
     padding-block: calc(var(--spacing) * 3);
+  }
+  .py-4 {
+    padding-block: calc(var(--spacing) * 4);
   }
   .py-6 {
     padding-block: calc(var(--spacing) * 6);
@@ -4280,6 +4303,9 @@
   }
   .text-gray-400 {
     color: var(--color-gray-400);
+  }
+  .text-gray-600 {
+    color: var(--color-gray-600);
   }
   .text-gray-700 {
     color: var(--color-gray-700);
@@ -4681,6 +4707,11 @@
       width: calc(var(--spacing) * 64);
     }
   }
+  .lg\:w-66 {
+    @media (width >= 64rem) {
+      width: calc(var(--spacing) * 66);
+    }
+  }
   .lg\:w-96 {
     @media (width >= 64rem) {
       width: calc(var(--spacing) * 96);
@@ -4844,6 +4875,18 @@
     background-color: var(--pointless-white) !important;
     color: var(--pointless-black) !important;
   }
+  .checkout-card {
+    background-color: var(--color-gray-300) !important;
+    color: var(--pointless-black) !important;
+  }
+  .checkout-card p,
+  .checkout-card small {
+    color: var(--pointless-black) !important;
+  }
+  .form-divider {
+    border-top: 1px solid var(--pointless-black);
+    margin: 1.5rem 0;
+  }
   @media (prefers-color-scheme: dark) {
     header, footer {
       background-color: var(--pointless-blue);
@@ -4889,6 +4932,17 @@
     .card {
       background-color: var(--pointless-black) !important;
       color: var(--pointless-white) !important;
+    }
+    .checkout-card {
+      background-color: var(--color-gray-700) !important;
+      color: var(--pointless-white) !important;
+    }
+    .checkout-card p,
+    .checkout-card small {
+      color: var(--pointless-white) !important;
+    }
+    .form-divider {
+      border-top: 1px solid var(--pointless-white);
     }
   }
 }

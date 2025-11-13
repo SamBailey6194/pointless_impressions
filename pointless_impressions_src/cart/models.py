@@ -169,6 +169,35 @@ class Cart(models.Model):
         )
         return total['cart_total'] or 0
 
+    def get_delivery_cost(self):
+        """Get delivery cost based on total price and defined tiers"""
+        quantity = self.get_total_quantity()
+
+        if quantity == 0:
+            return 0.00
+
+        if quantity >= settings.FREE_DELIVERY_THRESHOLD:
+            return 0.00
+
+        for (min_items, free) in settings.DELIVERY_FEE_TIERS:
+            if quantity >= min_items:
+                return free
+
+        return (
+            settings.DELIVERY_FEE_TIERS[-1][1] if
+            settings.DELIVERY_FEE_TIERS else 0.00
+            )
+
+    def get_grand_total(self):
+        """Get grand total including delivery cost"""
+        total_price = self.get_total_price()
+
+        if total_price == 0:
+            return 0.00
+
+        delivery_cost = self.get_delivery_cost()
+        return total_price + delivery_cost
+
 
 class CartItem(models.Model):
     """

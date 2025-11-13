@@ -13,14 +13,18 @@ class OrderForm(forms.Form):
         required=True,
         label="Email Address",
         help_text="We'll send your order confirmation here.",
-        widget=forms.EmailInput(attrs={'placeholder': 'your@email.com'})
+        widget=forms.EmailInput(attrs={
+            'placeholder': 'your@email.com',
+            })
     )
 
     phone = forms.CharField(
         required=True,
         label="Phone Number",
         help_text="Enter your contact phone number.",
-        widget=forms.TextInput(attrs={'placeholder': '+1234567890'})
+        widget=forms.TextInput(attrs={
+            'placeholder': '+1234567890',
+            })
     )
 
     shipping_name_addressee = forms.CharField(label="Full Name")
@@ -70,84 +74,176 @@ class OrderForm(forms.Form):
 
         self.helper = FormHelper()
         self.helper.form_method = 'post'
-        self.helper.form_action = reverse('order:confirmation')
+        self.helper.form_action = reverse('orders:confirmation')
         self.helper.form_tag = True
 
         self.helper.layout = Layout(
-            HTML(
-                "<h3 class='text-lg font-semibold mb-4'>"
-                "Contact Information"
-                "</h3>"
-                ),
             Div(
-                Field('email', css_class='w-full lg:w-1/2 mb-4'),
-                Field('phone', css_class='w-full lg:w-1/2 mb-4'),
-                css_class='contact-group lg:flex lg:gap-4 mb-4'
-            ),
-
-            HTML(
-                "<h3 class='text-lg font-semibold mb-4'>Shipping Address</h3>"
-                ),
-            Div(
-                Div(id="saved-shipping-address-container", css_class="mb-4"),
-                Field('shipping_name_addressee', css_class='mb-4'),
-                Field('shipping_address_line_1', css_class='mb-4'),
-                Field('shipping_address_line_2', css_class='mb-4'),
-                Div(
-                    Field('shipping_city', css_class='w-full lg:w-1/2'),
-                    Field('shipping_county', css_class='w-full lg:w-1/2'),
-                    css_class='lg:flex lg:gap-4 mb-4'
-                ),
-                Div(
-                    Field('shipping_postcode', css_class='w-full lg:w-1/2'),
-                    Field('shipping_country', css_class='w-full lg:w-1/2'),
-                    css_class='lg:flex lg:gap-4 mb-4'
-                ),
-                css_class='shipping-group'
-            ),
-
-            Field('billing_same_as_shipping', css_class='mb-4'),
-
-            Div(
-                HTML(
-                    "<h3 class='text-xl font-semibold mb-2'>"
-                    "Billing Address"
-                    "</h3>"
-                    ),
                 Div(
                     HTML(
-                        "<p class='mb-4'>"
-                        "Same as shipping address"
-                        "</p>"
+                        "<h3 class='card-title mb-2'>Contact Information</h3>"
+                        ),
+                    Div(
+                        Field(
+                            'email',
+                            css_class='custom-input w-full lg:w-66'
+                            ),
+                        Field(
+                            'phone',
+                            css_class='custom-input w-full lg:w-66'
+                            ),
+                        css_class='lg:flex lg:gap-4 mb-2'
                     ),
-                    HTML(
-                        "<p class='mb-4' id='billing-confirmation-text'></p>"
-                    ),
-                    css_class='billing-confirmation-container mb-4',
-                    style="display: none;"
-                ),
-                Div(id="saved-billing-address-container", css_class="mb-4"),
-                Field('billing_name_addressee', css_class='mb-4'),
-                Field('billing_address_line_1', css_class='mb-4'),
-                Field('billing_address_line_2', css_class='mb-4'),
-                Div(
-                    Field('billing_city', css_class='w-full lg:w-1/2'),
-                    Field('billing_county', css_class='w-full lg:w-1/2'),
-                    css_class='lg:flex lg:gap-4 mb-4'
-                ),
-                Div(
-                    Field('billing_postcode', css_class='w-full lg:w-1/2'),
-                    Field('billing_country', css_class='w-full lg:w-1/2'),
-                    css_class='lg:flex lg:gap-4 mb-4'
-                ),
-                css_class='billing-group'
-            ),
 
-            Submit(
-                'submit',
-                'Place Your Order',
-                css_class='btn btn-ghost btn-outline btn-md mt-4'
-                )
+                    HTML(
+                        "<div class='form-divider'></div>"
+                        ),
+
+                    HTML("<h3 class='card-title mb-2'>Shipping Address</h3>"),
+                    Div(
+                        Div(
+                            HTML("<p>Enter your shipping details below</p>"),
+                            id="saved-shipping-address-container"
+                            ),
+                        Field(
+                            'shipping_name_addressee',
+                            placeholder="Full Name",
+                            css_class='mb-4 custom-input w-full'
+                        ),
+                        Field(
+                            'shipping_address_line_1',
+                            placeholder="Address Line 1",
+                            css_class='mb-4 custom-input w-full'
+                        ),
+                        Field(
+                            'shipping_address_line_2',
+                            placeholder="Address Line 2 (Optional)",
+                            css_class='mb-4 custom-input w-full'
+                        ),
+                        Div(
+                            Field(
+                                'shipping_city',
+                                placeholder="City/Town",
+                                css_class='w-full lg:w-1/2 custom-input'
+                            ),
+                            Field(
+                                'shipping_county',
+                                placeholder="County (Optional)",
+                                css_class='w-full lg:w-1/2 custom-input'
+                            ),
+                            css_class='lg:flex lg:gap-4 mb-4'
+                        ),
+                        Div(
+                            Field(
+                                'shipping_postcode',
+                                placeholder="Postcode",
+                                css_class='w-full lg:w-1/2 custom-input'
+                            ),
+                            Field(
+                                'shipping_country',
+                                placeholder="Country",
+                                css_class='w-full lg:w-1/2 custom-input'
+                            ),
+                            css_class='lg:flex lg:gap-4 mb-4'
+                        ),
+                        css_class='shipping-group'
+                    ),
+
+                    HTML("<div class='form-divider'></div>"),
+
+                    HTML(
+                        "<h3 class='card-title mb-2'>Billing Address</h3>"
+                        "<p>Enter your billing details below</p>"
+                        ),
+
+                    Field(
+                        'billing_same_as_shipping',
+                        css_class='mr-4'
+                        ),
+
+                    Div(
+                        Div(
+                            HTML(
+                                "<p class='text-sm text-gray-600'>"
+                                "Same as shipping address:"
+                                "</p>"
+                                ),
+                            HTML(
+                                "<p "
+                                "class='font-semibold' "
+                                "id='billing-confirmation-text'>"
+                                "</p>"
+                                ),
+                            css_class=(
+                                'billing-confirmation-container'
+                                'p-3 rounded-lg'
+                                'mb-4'
+                                ),
+                            style="display: none;"
+                        ),
+
+                        Div(
+                            Div(
+                                id="saved-billing-address-container",
+                                css_class="mb-4"
+                                ),
+                            Field(
+                                'billing_name_addressee',
+                                placeholder="Full Name",
+                                css_class='mb-4 custom-input w-full'
+                            ),
+                            Field(
+                                'billing_address_line_1',
+                                placeholder="Address Line 1",
+                                css_class='mb-4 custom-input w-full'
+                            ),
+                            Field(
+                                'billing_address_line_2',
+                                placeholder="Address Line 2 (Optional)",
+                                css_class='mb-4 custom-input w-full'
+                            ),
+                            Div(
+                                Field(
+                                    'billing_city',
+                                    placeholder="City/Town",
+                                    css_class='w-full lg:w-1/2 custom-input'
+                                ),
+                                Field(
+                                    'billing_county',
+                                    placeholder="County (Optional)",
+                                    css_class='w-full lg:w-1/2 custom-input'
+                                ),
+                                css_class='lg:flex lg:gap-4 mb-4'
+                            ),
+                            Div(
+                                Field(
+                                    'billing_postcode',
+                                    placeholder="Postcode",
+                                    css_class='w-full lg:w-1/2 custom-input'
+                                ),
+                                Field(
+                                    'billing_country',
+                                    placeholder="Country",
+                                    css_class='w-full lg:w-1/2 custom-input'
+                                ),
+                                css_class='lg:flex lg:gap-4 mb-4'
+                            ),
+                        ),
+                        css_class='billing-group',
+                        id="billing-fields-container",
+                    ),
+
+                    HTML("<div class='form-divider'></div>"),
+
+                    Submit(
+                        'submit',
+                        'Place Your Order',
+                        css_class='btn btn-primary w-fit mt-4'
+                    ),
+                    css_class="card-body"
+                ),
+                css_class="card checkout-card"
+            ),
         )
 
         if user and user.is_authenticated:

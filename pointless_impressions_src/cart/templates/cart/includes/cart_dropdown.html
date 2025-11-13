@@ -40,7 +40,16 @@
         {% endfor %}
     </ul>
     {% if total_quantity > 0 %}
-        <span class="text-(--pointless-blue) font-bold">Subtotal: £{{ total_price|floatformat:2 }}</span>
+        <span class="text-(--pointless-blue)"><strong>Subtotal:</strong> £{{ total_price|floatformat:2 }}</span>
+        {% if delivery_cost %}
+            <span class="text-(--pointless-blue)"><strong>Delivery:</strong> £{{ delivery_cost|floatformat:2 }}</span>
+        {% else %}
+            <span class="text-(--pointless-blue)"><strong>Delivery:</strong> Free</span>
+        {% endif %}
+        <span class="text-(--pointless-blue) font-extrabold">Total: £{{ grand_total|floatformat:2 }}</span>
+        {% if items_needed_for_free_delivery > 0 %}
+            <span class="text-xs text-(--pointless-blue) ">Add <strong>{{ items_needed_for_free_delivery }}</strong> more item{{ items_needed_for_free_delivery|pluralize }} for free delivery!</span>
+        {% endif %}
         <span class="card-actions">
             <a href="{% url 'cart:checkout' %}" class="btn btn-ghost w-full">
             <i class="fa-solid fa-shopping-bag"></i> View Cart

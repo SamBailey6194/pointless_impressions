@@ -647,7 +647,10 @@ Toast.handleAPIError(error)                // Displays API error messages
 
 ## Lessons Learnt
 
-- For 
+- Always use cookies sessionid for cart persistence rather than localStorage only to avoid sync issues between backend and frontend.
+- For seamless user experience use AJAX for all cart updates on checkout page rather than full page reloads.
+- JS files can be modularised and used as modules with import/export to keep code organised.
+- SSR is always safer and more consistent to start with before adding AJAX enhancements.
 
 ---
 
@@ -658,6 +661,8 @@ The website has been manually and automatically tested.
 You can see the manual testing table [here](docs/markdowns/MANUALTESTING.md).
 
 You can see the automatic testing table [here](docs/markdowns/AUTOMATICTESTING.md).
+
+**Important**: Due to time constraints only US001, US002, US003 and US008 Backend TDD and BDD tests were implemented. The importance of completing the project to a high standard was prioritised over completing all tests.
 
 For TDD I used TestCase for Django and Jest for JavaScript
 

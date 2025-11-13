@@ -152,6 +152,21 @@
     color: var(--pointless-black) !important;
   }
 
+  .checkout-card {
+    background-color: var(--color-gray-300) !important;
+    color: var(--pointless-black) !important;
+  }
+
+  .checkout-card p,
+  .checkout-card small {
+    color: var(--pointless-black) !important;
+  }
+
+  .form-divider {
+    border-top: 1px solid var(--pointless-black);
+    margin: 1.5rem 0;
+  }
+
   /* Dark Mode Overrides */
   @media (prefers-color-scheme: dark) {
     header, footer {
@@ -205,6 +220,20 @@
     .card {
       background-color: var(--pointless-black) !important;
       color: var(--pointless-white) !important;
+    }
+
+    .checkout-card {
+      background-color: var(--color-gray-700) !important;
+      color: var(--pointless-white) !important;
+    }
+
+    .checkout-card p,
+    .checkout-card small {
+      color: var(--pointless-white) !important;
+    }
+
+    .form-divider {
+      border-top: 1px solid var(--pointless-white);
     }
   }
 }

@@ -19,7 +19,7 @@ def create_order_from_cart(cart: Cart, form_data: dict) -> Order:
     new_order = Order.objects.create(
         user=cart.user,
         guest_email=form_data.get('email') if not cart.user else None,
-        total_amount=cart.get_total_price(),
+        total_amount=cart.get_grand_total(),
         shipping_address=form_data.get('shipping_address'),
         billing_address=form_data.get('billing_address'),
         status="Processing",

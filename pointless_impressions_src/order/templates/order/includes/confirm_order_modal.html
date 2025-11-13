@@ -1,0 +1,33 @@
+<dialog id="confirm-order-modal" class="modal">
+  <div class="modal-box">
+    <h3 class="font-bold text-lg">Confirm Your Order</h3>
+    <p class="py-4">
+      You are about to place your order. Are you sure you want to continue?
+    </p>
+    
+    <div id="modal-loading-spinner" style="display: none;" class="text-center">
+        <span class="loading loading-spinner text-primary"></span>
+        <p>Processing your order...</p>
+    </div>
+
+    <div>
+        {% include 'order/includes/order_summary.html' %}
+    </div>
+
+    <div class="modal-action">
+      <button class="btn btn-primary" id="modal-confirm-btn">
+        <i class="fa-solid fa-check"></i> Yes, Confirm Order
+      </button>
+
+      <form method="dialog">
+        <button class="btn btn-ghost">
+          <i class="fa-solid fa-times"></i> Cancel
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <form method="dialog" class="modal-backdrop">
+    <button>close</button>
+  </form>
+</dialog>
