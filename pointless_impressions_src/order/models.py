@@ -1,5 +1,6 @@
 from django.db import models
 import uuid
+import secrets
 from django.conf import settings
 from pointless_impressions_src.artwork.models import Artwork
 
@@ -20,6 +21,15 @@ def generate_order_number():
     last_id_int = int(last_order.order_number.split('-')[1])
     new_id_int = last_id_int + 1
     return f"ORD-{new_id_int}"
+
+
+def generate_guest_access_code():
+    """
+    Generate a secure, random 16 character (could be more)
+    alphanumeric code for guest access.
+    This is unguessable and unique for each order.
+    """
+    return secrets.token_urlsafe(16)
 
 
 # ----------------------------------
@@ -60,10 +70,13 @@ class Order(models.Model):
         null=True,
         help_text="Phone number of guest user (if applicable)"
     )
-    guest_access_code = models.UUIDField(
-        default=uuid.uuid4,
+    guest_access_code = models.CharField(
+        default=generate_guest_access_code,
+        max_length=50,
         editable=False,
         unique=True,
+        blank=True,
+        null=True,
         help_text="Unique access code for guest users to view their order"
     )
     created_at = models.DateTimeField(
