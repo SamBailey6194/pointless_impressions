@@ -435,9 +435,11 @@ class ArtworkDetailView(DetailView):
         Validates the AddToCartForm and updates the cart in the database.
         """
         artwork = self.get_object()
-        form = AddToCartForm(request.POST, artwork_id=artwork.id)
 
+        form = AddToCartForm(request.POST, artwork_id=artwork.id)
         if form.is_valid():
+            framing_option = form.cleaned_data.get('framing_option')
+
             # Retrieve or create the cart for the current session
             session_id = request.session.session_key
             if not session_id:
@@ -447,13 +449,12 @@ class ArtworkDetailView(DetailView):
             cart, created = Cart.get_or_create_from_sessionid(session_id)
 
             quantity = form.cleaned_data.get('quantity')
-            framing_condition = form.cleaned_data.get('framing_option')
             notes = form.cleaned_data.get('notes', '')
 
             cart.add_or_update_item(
                 artwork=artwork,
                 quantity=quantity,
-                framing_condition=framing_condition,
+                framing_condition=framing_option,
                 notes=notes
             )
 

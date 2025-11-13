@@ -101,7 +101,7 @@ class CartDropdownView(View):
 
         if cart:
             cart_items = cart.items.select_related(
-                'artwork', 'framing_condition'
+                'artwork', 'framing_condition', 'artwork__main_photo'
             ).all()
 
             for item in cart_items:
@@ -110,10 +110,15 @@ class CartDropdownView(View):
                     'quantity': item.quantity,
                     'notes': item.notes,
                     'price': item.artwork.price,
+                    'framing_condition': (
+                        item.framing_condition.condition_friendly_name if
+                        item.framing_condition
+                        else None
+                    ),
                 })
 
-                total_quantity = cart.get_total_quantity()
-                total_price = cart.get_total_price()
+            total_quantity = cart.get_total_quantity()
+            total_price = cart.get_total_price()
 
         html = render_to_string(
             'cart/includes/cart_dropdown.html',
