@@ -78,8 +78,8 @@ def create_order_from_cart(cart: Cart, form_data: dict) -> Order:
             price_at_purchase=items.artwork.price if
             items.artwork
             else 0,
-            framing_condition=items.framing_condition.condition_name if
-            items.framing_condition else "N/A",
+            framing_condition=items.framing_condition.condition_friendly_name
+            if items.framing_condition else "N/A",
             image_url_at_purchase=image_url,
             quantity=items.quantity,
             notes=items.notes,

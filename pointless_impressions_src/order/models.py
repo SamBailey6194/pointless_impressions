@@ -224,34 +224,6 @@ class Order(models.Model):
         null=True
     )
 
-    def get_shipping_address(self):
-        """Return formatted shipping address."""
-        lines = (
-            f"{self.shipping_first_name} {self.shipping_last_name}, "
-            f"{self.shipping_address_line_1}, "
-            f"{self.shipping_address_line_2}, "
-            f"{self.shipping_city}, "
-            f"{self.shipping_county}, "
-            f"{self.shipping_postcode}, "
-            f"{self.shipping_country}"
-        )
-
-        return lines
-
-    def get_billing_address(self):
-        """Return formatted billing address."""
-        lines = (
-            f"{self.billing_first_name} {self.billing_last_name}, "
-            f"{self.billing_address_line_1}, "
-            f"{self.billing_address_line_2}, "
-            f"{self.billing_city}, "
-            f"{self.billing_county}, "
-            f"{self.billing_postcode}, "
-            f"{self.billing_country}"
-        )
-
-        return lines
-
     def __str__(self):
         return f"Order {self.order_number} - {self.status}"
 
