@@ -1,10 +1,12 @@
 from django import forms
-from django.urls import reverse
 from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Layout, Submit, Field, Div, HTML
+from crispy_forms.layout import Layout, Field, Div, HTML
 from phonenumber_field.formfields import SplitPhoneNumberField
 from pointless_impressions_src.home.widgets import CountrySelectFormWidget
 from pointless_impressions_src.home.countries import COUNTRY_CHOICES
+import logging
+
+logger = logging.getLogger("pointless_impressions_src.order")
 
 
 # Write your crispy form here
@@ -24,8 +26,8 @@ class OrderForm(forms.Form):
     Fields:
     - email: Customer's email address.
     - phone: Customer's phone number.
-    - shipping_first_name_addressee: Full name for shipping.
-    - shipping_last_name_addressee: Full name for shipping.
+    - shipping_first_name: Full name for shipping.
+    - shipping_last_name: Full name for shipping.
     - shipping_address_line_1: Shipping address line 1.
     - shipping_address_line_2: Shipping address line 2 (optional).
     - shipping_city: Shipping city/town.
@@ -34,8 +36,8 @@ class OrderForm(forms.Form):
     - shipping_country: Shipping country.
     - billing_same_as_shipping: Checkbox if billing address is same as
       shipping.
-    - billing_first_name_addressee: Full name for billing.
-    - billing_last_name_addressee: Full name for billing.
+    - billing_first_name: Full name for billing.
+    - billing_last_name: Full name for billing.
     - billing_address_line_1: Billing address line 1.
     - billing_address_line_2: Billing address line 2 (optional).
     - billing_city: Billing city/town.
@@ -62,8 +64,8 @@ class OrderForm(forms.Form):
         region='GB',
     )
 
-    shipping_first_name_addressee = forms.CharField(label="First Name")
-    shipping_last_name_addressee = forms.CharField(label="Last Name")
+    shipping_first_name = forms.CharField(label="First Name")
+    shipping_last_name = forms.CharField(label="Last Name")
     shipping_address_line_1 = forms.CharField(label="Address Line 1")
     shipping_address_line_2 = forms.CharField(
         label="Address Line 2 (Optional)",
@@ -92,8 +94,8 @@ class OrderForm(forms.Form):
             )
     )
 
-    billing_first_name_addressee = forms.CharField(label="First Name")
-    billing_last_name_addressee = forms.CharField(label="Last Name")
+    billing_first_name = forms.CharField(label="First Name")
+    billing_last_name = forms.CharField(label="Last Name")
     billing_address_line_1 = forms.CharField(label="Address Line 1")
     billing_address_line_2 = forms.CharField(
         label="Address Line 2 (Optional)",
@@ -120,9 +122,7 @@ class OrderForm(forms.Form):
         super().__init__(*args, **kwargs)
 
         self.helper = FormHelper()
-        self.helper.form_method = 'post'
-        self.helper.form_action = reverse('orders:confirmation')
-        self.helper.form_tag = True
+        self.helper.form_tag = False
 
         self.helper.layout = Layout(
             Div(
@@ -164,12 +164,12 @@ class OrderForm(forms.Form):
                             ),
                         Div(
                             Field(
-                                'shipping_first_name_addressee',
+                                'shipping_first_name',
                                 placeholder="First Name",
                                 css_class='mb-4 custom-input w-full lg:w-66'
                             ),
                             Field(
-                                'shipping_last_name_addressee',
+                                'shipping_last_name',
                                 placeholder="Last Name",
                                 css_class='mb-4 custom-input w-full lg:w-66'
                             ),
@@ -251,14 +251,14 @@ class OrderForm(forms.Form):
                         Div(
                             Div(
                                 Field(
-                                    'billing_first_name_addressee',
+                                    'billing_first_name',
                                     placeholder="First Name",
                                     css_class=(
                                         'mb-4 custom-input w-full lg:w-66'
                                         )
                                 ),
                                 Field(
-                                    'billing_last_name_addressee',
+                                    'billing_last_name',
                                     placeholder="Last Name",
                                     css_class=(
                                         'mb-4 custom-input w-full lg:w-66'
@@ -313,16 +313,9 @@ class OrderForm(forms.Form):
                     ),
 
                     HTML("<div class='form-divider'></div>"),
-
-                    Submit(
-                        'submit',
-                        'Place Your Order',
-                        css_class='btn btn-primary w-fit mt-4'
-                    ),
-                    css_class="card-body"
                 ),
-                css_class="card checkout-card"
-            )
+                css_class='card-body p-6'
+            ),
         )
 
         if user and user.is_authenticated:
@@ -340,15 +333,45 @@ class OrderForm(forms.Form):
         cleaned_data = super().clean()
         billing_same = cleaned_data.get('billing_same_as_shipping')
 
-        if not billing_same:
+        logger.debug(f"Billing same as shipping: {billing_same}")
+
+        if billing_same:
+            cleaned_data['billing_first_name'] = cleaned_data.get(
+                'shipping_first_name'
+                )
+            cleaned_data['billing_last_name'] = cleaned_data.get(
+                'shipping_last_name'
+                )
+            cleaned_data['billing_address_line_1'] = cleaned_data.get(
+                'shipping_address_line_1'
+                )
+            cleaned_data['billing_address_line_2'] = cleaned_data.get(
+                'shipping_address_line_2'
+                )
+            cleaned_data['billing_city'] = cleaned_data.get(
+                'shipping_city'
+                )
+            cleaned_data['billing_county'] = cleaned_data.get(
+                'shipping_county'
+                )
+            cleaned_data['billing_postcode'] = cleaned_data.get(
+                'shipping_postcode'
+                )
+            cleaned_data['billing_country'] = cleaned_data.get(
+                'shipping_country'
+                )
+            logger.debug("Billing fields copied from shipping address.")
+        else:
             required_billing_fields = [
-                'billing_first_name_addressee',
-                'billing_last_name_addressee',
+                'billing_first_name',
+                'billing_last_name',
                 'billing_address_line_1',
                 'billing_city',
                 'billing_postcode',
                 'billing_country'
             ]
+
+            logger.debug(f"Billing fields required: {required_billing_fields}")
 
             for field_name in required_billing_fields:
                 if not cleaned_data.get(field_name):

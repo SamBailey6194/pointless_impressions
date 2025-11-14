@@ -14,4 +14,14 @@ urlpatterns = [
         views.CartDropdownView.as_view(),
         name='cart_dropdown'
     ),
+    path(
+        'update/',
+        views.UpdateCartView.as_view(),
+        name='update_cart'
+    ),
+    path(
+        'remove-item/',
+        views.RemoveCartItemView.as_view(),
+        name='remove_cart_item'
+    ),
 ]

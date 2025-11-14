@@ -75,7 +75,8 @@ class Address(models.Model):
         choices=AddressType.choices,
         default=AddressType.SHIPPING
     )
-    name_addressee = models.CharField(max_length=255)
+    first_name = models.CharField(max_length=255, blank=False, null=False)
+    last_name = models.CharField(max_length=255, blank=False, null=False)
     address_line_1 = models.CharField(max_length=255)
     address_line_2 = models.CharField(max_length=255, blank=True, null=True)
     city = models.CharField(max_length=100)

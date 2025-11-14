@@ -10,17 +10,13 @@ class CartItemUpdateForm(forms.Form):
 
     quantity = forms.IntegerField(
         required=True,
-        min_value=1,
-        max_value=99,
+        min_value=0,
         widget=forms.NumberInput(attrs={
+            'name': 'quantity',
             'class': 'custom-input w-16 text-center',
-            'min': '1',
-            'max': '99',
         }),
         error_messages={
-            'required': 'Quantity is required',
-            'min_value': 'Quantity must be at least 1',
-            'max_value': 'Quantity cannot exceed 99',
+            'max_value': 'Quantity cannot exceed item.quantity',
             'invalid': 'Please enter a valid quantity',
         }
     )
@@ -39,9 +35,14 @@ class CartItemUpdateForm(forms.Form):
 
     def __init__(self, *args, **kwargs):
         artwork = kwargs.pop('artwork', None)
+        max_quantity = kwargs.pop('max_quantity', 99)
         super().__init__(*args, **kwargs)
+
+        if max_quantity:
+            self.fields['quantity'].max_value = max_quantity
+            self.fields['quantity'].widget.attrs['max'] = str(max_quantity)
+
         if artwork is not None:
-            # Get all valid framing options for this artwork
             framing_qs = artwork.selected_conditions.all()
             if framing_qs.exists():
                 choices = [

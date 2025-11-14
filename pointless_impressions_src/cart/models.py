@@ -104,15 +104,17 @@ class Cart(models.Model):
             artwork,
             quantity,
             framing_condition=None,
-            notes=''
+            notes='',
+            replace_quantity=False
             ):
         """
         Add or update an item in the cart.
 
-        :param artwork_id: ID of the artwork to add or update
-        :param quantity: Quantity to add
-        :param framing_option: Framing option for the artwork
+        :param artwork: Artwork object to add or update
+        :param quantity: Quantity to add or replace
+        :param framing_condition: Framing option for the artwork
         :param notes: Additional notes for the item
+        :param replace_quantity: If True, replace the existing quantity
         """
         try:
             quantity = int(quantity)
@@ -134,18 +136,39 @@ class Cart(models.Model):
             }
         )
 
-        item.quantity = F('quantity') + quantity
+        if quantity == 0:
+            print(
+                "Quantity is 0. Deleting item immediately..."
+            )  # Debugging log
+            item.delete()
+            self.save()
+            return None, created
+
+        if replace_quantity:
+            item.quantity = quantity  # Replace the quantity directly
+        else:
+            item.quantity = (
+                F('quantity') + quantity  # Add to the existing quantity
+            )
 
         if created or notes:
             item.notes = notes
 
         item.save()
+        print(
+            f"Item saved. Quantity in memory: {item.quantity}"
+        )
 
         item.refresh_from_db()
+        print(
+            f"Item refreshed. Quantity in database: {item.quantity}"
+        )
 
         if item.quantity <= 0:
+            print(f"Deleting item: {item}")
             item.delete()
             item = None
+            print("Item deleted successfully.")
 
         self.save()
 

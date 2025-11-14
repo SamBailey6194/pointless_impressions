@@ -224,6 +224,15 @@ class Order(models.Model):
         null=True
     )
 
+    def delete(self, using=None, keep_parents=False):
+        """
+        Overrides delete method to handle related cleanup if needed.
+
+        Instead of deleting the row, it sets the status to 'CANCELLED'.
+        """
+        self.status = 'CANCELLED'
+        self.save()
+
     def __str__(self):
         return f"Order {self.order_number} - {self.status}"
 

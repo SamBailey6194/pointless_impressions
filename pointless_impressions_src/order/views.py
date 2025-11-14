@@ -67,12 +67,9 @@ class OrderConfirmationView(View):
                 form_data, "shipping"
                 )
 
-            if form_data.get('billing_same_as_shipping'):
-                billing_address_snapshot = shipping_address_snapshot
-            else:
-                billing_address_snapshot = self.build_address_snapshot(
-                    form_data, "billing"
-                    )
+            billing_address_snapshot = self.build_address_snapshot(
+                form_data, "billing"
+                )
 
             order_data = {
                 'email': form_data.get('email') or (
@@ -114,9 +111,9 @@ class OrderConfirmationView(View):
         """Helper to build the address dictionary from form fields."""
         return {
             f"{prefix}_first_name": form_data[
-                f"{prefix}_first_name_addressee"
+                f"{prefix}_first_name"
                 ],
-            f"{prefix}_last_name": form_data[f"{prefix}_last_name_addressee"],
+            f"{prefix}_last_name": form_data[f"{prefix}_last_name"],
             f"{prefix}_address_line_1": form_data[f"{prefix}_address_line_1"],
             f"{prefix}_address_line_2": form_data.get(
                 f"{prefix}_address_line_2", ""
