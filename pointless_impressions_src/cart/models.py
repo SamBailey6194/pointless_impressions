@@ -1,8 +1,9 @@
 from django.db import models
 from django.conf import settings
 from django.utils import timezone
-from django.db.models import F, Sum, ExpressionWrapper
+from django.db.models import F, Sum, ExpressionWrapper, DecimalField
 from datetime import timedelta
+from decimal import Decimal
 from pointless_impressions_src.artwork.models import (
     Artwork, ArtworkFramingCondition
     )
@@ -157,46 +158,33 @@ class Cart(models.Model):
         )
         return total['cart_quantity'] or 0
 
-    def get_total_price(self):
+    def get_subtotal(self):
         """Get total price of all items in the cart"""
         total = self.items.annotate(
             line_item_total=ExpressionWrapper(
                 F('artwork__price') * F('quantity'),
-                output_field=models.FloatField()
+                output_field=DecimalField(
+                    max_digits=10, decimal_places=2
+                )
                 )
         ).aggregate(
             cart_total=Sum('line_item_total')
         )
-        return total['cart_total'] or 0
+        return total['cart_total'] or Decimal('0.00')
 
     def get_delivery_cost(self):
         """Get delivery cost based on total price and defined tiers"""
+        from .utils import calculate_delivery_cost
         quantity = self.get_total_quantity()
 
-        if quantity == 0:
-            return 0.00
-
-        if quantity >= settings.FREE_DELIVERY_THRESHOLD:
-            return 0.00
-
-        for (min_items, free) in settings.DELIVERY_FEE_TIERS:
-            if quantity >= min_items:
-                return free
-
-        return (
-            settings.DELIVERY_FEE_TIERS[-1][1] if
-            settings.DELIVERY_FEE_TIERS else 0.00
-            )
+        return calculate_delivery_cost(quantity)
 
     def get_grand_total(self):
         """Get grand total including delivery cost"""
-        total_price = self.get_total_price()
-
-        if total_price == 0:
-            return 0.00
-
+        subtotal = self.get_subtotal()
         delivery_cost = self.get_delivery_cost()
-        return total_price + delivery_cost
+
+        return subtotal + delivery_cost
 
 
 class CartItem(models.Model):

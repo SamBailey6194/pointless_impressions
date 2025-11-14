@@ -45,7 +45,6 @@ document.addEventListener('DOMContentLoaded', function () {
   }
   
   async function refreshOrderSummary() {
-    console.log('Refreshing page to update totals...');
     window.location.reload();
   }
   
@@ -55,8 +54,6 @@ document.addEventListener('DOMContentLoaded', function () {
     const artworkId = formData.get('artwork_id');
     const quantity = formData.get('quantity');
     const framing = formData.get('framing_option');
-    
-    console.log(`Updating ${artworkId} to ${quantity}`);
 
     try {
       const response = await fetch('/checkout/update-cart/', {

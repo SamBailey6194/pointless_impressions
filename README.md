@@ -651,6 +651,7 @@ Toast.handleAPIError(error)                // Displays API error messages
 - For seamless user experience use AJAX for all cart updates on checkout page rather than full page reloads.
 - JS files can be modularised and used as modules with import/export to keep code organised.
 - SSR is always safer and more consistent to start with before adding AJAX enhancements.
+- Circular imports can be avoided by importing inside functions rather than at the top of the file.
 
 ---
 
@@ -721,6 +722,7 @@ Please note for the Jest testing there was a need to create html fixture files a
 - **Network Error when updating order in checkout**: The checkout page was throwing a network error when trying to update the order summary due to the `header_footer.js` sending too many requests for the cart uuid. Added a debounce wrapper which fixed the network errors by ensuring only one cart fetch runs within a short time window, preventing multiple overlapping requests that the browser would otherwise abort.
 - **SSR Incorrect Implementation and Frontend not receiving Session ID**: Using local storage for cart and uuid is not a robust solution to use SSR properly. Fixed by using Django Sessions to store cart in session id and synced that with the frontend via AJAX requests to ensure proper cart functionality across SSR. Needed to set `SESSION_COOKIE_SECURE = False` to enable frontend in development to access the session cookie.
 - **Toast Notifications Not Displaying on API Responses**: The toast notifications were not displaying properly due to lack of integration and having multiple toast systems. Therefore, created a unified toast notification system that works using Django messages with AJAX requests.
+- **Circular Imports between utils and models**: Fixed circular imports by having the utils functions imported within the functions that need them rather than at the top of the file and the same for models imported within the utils functions that need them. 
 
 ### Unfixed Bugs
 
@@ -1202,6 +1204,7 @@ Below are my credits for where I got inspiration for some of the code and conten
 - To set up autcomplete search I used tarekraafat/autocomplete.js library from [GitHub - tarekraafat/autocomplete.js: A simple, lightweight, pure vanilla JavaScript autocomplete library.] and followed the instructions there along with the youtube video [Autocomplete.js - Lightweight Vanilla JavaScript Autocomplete Library by Tarek Raafat](https://www.youtube.com/watch?v=1Z3d8h4nWbA)
 - To help with SSR and AJAX for smooth user experience I used [Django AJAX Tutorial by Pretty Printed](https://www.youtube.com/watch?v=2d7s3spWAzo) and [Asynchronous JavaScript: Promises, Async/Await by Academind](https://www.youtube.com/watch?v=PoRJizFvM7s)
 - For using Crispy Forms I followed [Bug Bytes - Django Crispy Forms from Scratch!](https://www.youtube.com/watch?v=Hh6b9X8bG1o) and used the official [Django Crispy Forms Documentation](https://django-crispy-forms.readthedocs.io/en/latest/) to help understand how to use Tailwind CSS with Crispy Forms.
+- To help understand using regional phone numbers I used [Django Phone Number Field](https://github.com/stefanfoulis/django-phonenumber-field) and followed the instructions there along with the youtube video [Django Phone Number Field by Pretty Printed](https://www.youtube.com/watch?v=Z3Z8h6_2b0M)
 
 ### Removed Features Credits as not used anymore
 

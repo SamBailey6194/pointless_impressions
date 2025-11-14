@@ -3,6 +3,7 @@ from django.template.loader import render_to_string
 from django.views import View
 from django.views.generic import TemplateView
 from django.conf import settings
+from decimal import Decimal
 from .utils import get_cart
 from .forms import CartItemUpdateForm
 from pointless_impressions_src.order.forms import OrderForm
@@ -15,15 +16,15 @@ logger = logging.getLogger(__name__)
 # Write your views here.
 class CheckoutView(TemplateView):
     """
-    GET /checkout/
+    GET /checkout/)
     Display main checkout page with cart review and payment form
 
     Context Data:
     - cart_items: List of items in cart with artwork details
-    - total_price: Sum of all item totals (float)
+    - total_price: Sum of all item totals (decimal)
     - total_quantity: Total number of items in cart (int)
-    - delivery_cost: Delivery cost based on total price and tiers (float)
-    - grand_total: Total including delivery cost (float)
+    - delivery_cost: Delivery cost based on total price and tiers (decimal)
+    - grand_total: Total including delivery cost (decimal)
     - items_needed_for_free_delivery: Number of items needed to reach free
       delivery threshold (int)
 
@@ -76,7 +77,7 @@ class CheckoutView(TemplateView):
                 cart_items_list.append(item)
 
         total_quantity = cart.get_total_quantity()
-        total_price = cart.get_total_price()
+        subtotal = cart.get_subtotal()
         delivery_cost = cart.get_delivery_cost()
         grand_total = cart.get_grand_total()
 
@@ -90,7 +91,7 @@ class CheckoutView(TemplateView):
             'cart_empty': False,
             'cart': cart,
             'cart_items': cart_items_list,
-            'total_price': total_price,
+            'subtotal': subtotal,
             'total_quantity': total_quantity,
             'delivery_cost': delivery_cost,
             'grand_total': grand_total,
@@ -99,6 +100,7 @@ class CheckoutView(TemplateView):
         })
 
         context['order_form'] = OrderForm(user=self.request.user)
+
         if self.request.user.is_authenticated:
             try:
                 customer = self.request.user.customer
@@ -122,7 +124,7 @@ class CartDropdownView(View):
 
     Context Data:
     - cart_items: List of items in cart with artwork details
-    - total_price: Sum of all item totals (float)
+    - total_price: Sum of all item totals (decimal)
     - total_quantity: Total number of items in cart (int)
 
     Features:
@@ -137,51 +139,71 @@ class CartDropdownView(View):
 
         cart_items_data = []
         total_quantity = 0
-        total_price = 0
+        subtotal = Decimal('0.00')
+        delivery_cost = Decimal('0.00')
+        grand_total = Decimal('0.00')
+        items_needed_for_free_delivery = 0
 
-        if cart:
-            cart_items = cart.items.select_related(
-                'artwork', 'framing_condition', 'artwork__main_photo'
-            ).all()
+        try:
 
-            for item in cart_items:
-                cart_items_data.append({
-                    'artwork': item.artwork,
-                    'quantity': item.quantity,
-                    'notes': item.notes,
-                    'price': item.artwork.price,
-                    'framing_condition': (
-                        item.framing_condition.condition_friendly_name if
-                        item.framing_condition
-                        else None
-                    ),
-                })
+            if cart:
+                cart_items = cart.items.select_related(
+                    'artwork', 'framing_condition', 'artwork__main_photo'
+                ).all()
 
-            total_quantity = cart.get_total_quantity() if cart else 0
-            total_price = cart.get_total_price() if cart else 0
-            delivery_cost = cart.get_delivery_cost() if cart else 0
-            grand_total = cart.get_grand_total() if cart else 0
+                for item in cart_items:
+                    cart_items_data.append({
+                        'artwork_name': (
+                            item.artwork.name
+                            if item.artwork else "Deleted Artwork"
+                        ),
+                        'artwork_image_url': (
+                            item.artwork.image.url
+                            if item.artwork and item.artwork.image else None
+                        ),
+                        'quantity': item.quantity,
+                        'notes': item.notes,
+                        'price': item.artwork.price if item.artwork else 0,
+                        'framing_condition': (
+                            item.framing_condition.condition_friendly_name
+                            if item.framing_condition else None
+                        ),
+                    })
 
-            if 0 < total_quantity < settings.FREE_DELIVERY_THRESHOLD:
-                items_needed_for_free_delivery = (
-                    settings.FREE_DELIVERY_THRESHOLD - total_quantity
-                )
+                total_quantity = cart.get_total_quantity() if cart else 0
+                subtotal = cart.get_subtotal() if cart else Decimal('0.00')
+                delivery_cost = (
+                    cart.get_delivery_cost() if cart else Decimal('0.00')
+                    )
+                grand_total = (
+                    cart.get_grand_total() if cart else Decimal('0.00')
+                    )
 
-        html = render_to_string(
-            'cart/includes/cart_dropdown.html',
-            {
-                'cart_items': cart_items_data,
-                'total_quantity': total_quantity,
-                'total_price': total_price,
-                'delivery_cost': delivery_cost,
-                'grand_total': grand_total,
-                'items_needed_for_free_delivery': (
-                    items_needed_for_free_delivery
-                    ),
-                'free_delivery_item_threshold': (
-                    settings.FREE_DELIVERY_THRESHOLD
-                    ),
-            }
-        )
+                if 0 < total_quantity < settings.FREE_DELIVERY_THRESHOLD:
+                    items_needed_for_free_delivery = (
+                        settings.FREE_DELIVERY_THRESHOLD - total_quantity
+                    )
 
-        return JsonResponse({'html': html})
+            html = render_to_string(
+                'cart/includes/cart_dropdown.html',
+                {
+                    'cart_items': cart_items_data,
+                    'total_quantity': total_quantity,
+                    'subtotal': subtotal,
+                    'delivery_cost': delivery_cost,
+                    'grand_total': grand_total,
+                    'items_needed_for_free_delivery': (
+                        items_needed_for_free_delivery
+                        ),
+                    'free_delivery_item_threshold': (
+                        settings.FREE_DELIVERY_THRESHOLD
+                        ),
+                }
+            )
+
+            return JsonResponse({'html': html})
+        except Exception:
+            return JsonResponse(
+                {'error': 'Failed to generate cart dropdown.'},
+                status=500
+            )

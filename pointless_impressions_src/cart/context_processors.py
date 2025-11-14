@@ -1,4 +1,5 @@
-from .utils import get_cart
+from decimal import Decimal
+from .utils import get_cart, calculate_delivery_cost
 
 
 # Write your context processors here.
@@ -9,17 +10,19 @@ def cart_context_processor(request):
     - cart: The current user's cart or None
     - cart_total_quantity: Total quantity of items in the cart (int)
     - cart_total_price: Total price of items in the cart (float)
+    - delivery_fee: Calculated delivery fee based on cart contents (float)
     """
     cart = get_cart(request)
     if cart:
         total_quantity = cart.get_total_quantity()
-        total_price = cart.get_total_price()
+        subtotal = cart.get_subtotal()
     else:
         total_quantity = 0
-        total_price = 0
+        subtotal = Decimal('0.00')
 
     return {
         'cart': cart,
         'total_quantity': total_quantity,
-        'total_price': total_price,
+        'subtotal': subtotal,
+        'delivery_fee': calculate_delivery_cost(total_quantity),
     }

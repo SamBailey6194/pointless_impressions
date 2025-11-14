@@ -64,7 +64,6 @@ async function updateCartDropdownHTML() {
     // Our CartDropdownView returns JSON: {'html': '...'}
     const data = await response.json();
     cartDropdown.innerHTML = data.html;
-    console.log('Cart dropdown HTML updated.');
     
   } catch (error) {
     console.error('Error refreshing cart dropdown:', error);
@@ -95,7 +94,6 @@ function openCartDropdown() {
  * Fetches the current cart state and populates the dropdown.
  */
 function initCart() {
-  console.log('Initializing cart on page load...');
   updateCartDropdownHTML();
 }
 

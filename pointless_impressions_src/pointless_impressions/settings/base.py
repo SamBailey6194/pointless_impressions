@@ -43,6 +43,8 @@ THIRD_PARTY_APPS = [
     # Form rendering
     "crispy_forms",
     "crispy_tailwind",
+    # Phone Support
+    "phonenumber_field",
 ]
 
 LOCAL_APPS = [
@@ -130,6 +132,11 @@ CORS_ALLOWED_ORIGINS = [
 ]
 CORS_ALLOW_CREDENTIALS = True
 
+# Phone number field settings
+PHONENUMBER_DEFAULT_REGION = "GB"
+PHONENUMBER_DB_FORMAT = "E164"
+PHONENUMBER_DEFAULT_FORMAT = "E164"
+
 # Templates
 TEMPLATES = [
     {
@@ -216,12 +223,13 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # Free delivery threshold (in GBP)
 DELIVERY_FEE_TIERS = [
-    (4, 12.00),
-    (3, 18.00),
-    (2, 25.00),
-    (1, 30.00),
+    (1, 12.00),
+    (2, 18.00),
+    (3, 25.00),
+    (4, 30.00),
 ]
 FREE_DELIVERY_THRESHOLD = 5
+FEE_MAP = dict(DELIVERY_FEE_TIERS)
 
 STATIC_VERSION = os.getenv("STATIC_VERSION", "1.0.0")
 

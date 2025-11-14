@@ -6,6 +6,7 @@ from .models import Order
 from .utils import create_order_from_cart
 from .forms import OrderForm
 from pointless_impressions_src.cart.utils import get_cart
+from pointless_impressions_src.artwork.models import Artwork
 
 
 # Create your views here.
@@ -100,7 +101,7 @@ class OrderConfirmationView(View):
                 "Your order has been successfully placed!"
                 ))
 
-            request.session['recent_order_id'] = new_order.id
+            request.session['recent_order_id'] = str(new_order.id)
 
             return redirect('orders:order_success', order_id=new_order.id)
 
@@ -110,17 +111,21 @@ class OrderConfirmationView(View):
         return redirect('cart:checkout')
 
     def build_address_snapshot(self, form_data, prefix):
-        """Helper to build the address string from form fields."""
-        parts = [
-            form_data[f'{prefix}_name_addressee'],
-            form_data[f'{prefix}_address_line_1'],
-            form_data.get(f'{prefix}_address_line_2', ''),
-            form_data[f'{prefix}_city'],
-            form_data.get(f'{prefix}_county', ''),
-            form_data[f'{prefix}_postcode'],
-            form_data[f'{prefix}_country']
-        ]
-        return "\n".join(part for part in parts if part)
+        """Helper to build the address dictionary from form fields."""
+        return {
+            f"{prefix}_first_name": form_data[
+                f"{prefix}_first_name_addressee"
+                ],
+            f"{prefix}_last_name": form_data[f"{prefix}_last_name_addressee"],
+            f"{prefix}_address_line_1": form_data[f"{prefix}_address_line_1"],
+            f"{prefix}_address_line_2": form_data.get(
+                f"{prefix}_address_line_2", ""
+            ),
+            f"{prefix}_city": form_data[f"{prefix}_city"],
+            f"{prefix}_county": form_data.get(f"{prefix}_county", ""),
+            f"{prefix}_postcode": form_data[f"{prefix}_postcode"],
+            f"{prefix}_country": form_data[f"{prefix}_country"],
+        }
 
 
 class OrderSuccessView(View):
@@ -140,7 +145,7 @@ class OrderSuccessView(View):
 
     Response: Renders order_confirmation.html template with order context
     """
-    template_name = 'orders/order_confirmation.html'
+    template_name = 'order/order_confirmation.html'
 
     def get(self, request, order_id):
         order = get_object_or_404(
@@ -148,24 +153,39 @@ class OrderSuccessView(View):
             id=order_id
         )
 
-        session_order_id = request.session.get('just_completed_order_id')
+        session_order_id = request.session.get('recent_order_id')
 
-        is_dashbaord_admin = request.user.is_dashboard_admin
-        is_owner = request.user.is_authenticated and order.user == request.user
+        is_dashbaord_admin = False
+        order_owner = False
+        if request.user.is_authenticated:
+            is_dashbaord_admin = getattr(
+                request.user, 'is_dashboard_admin', False
+                )
+            order_owner = (order.user == request.user)
 
         is_in_session = (str(order.id) == session_order_id)
 
-        if not (is_dashbaord_admin or is_owner or is_in_session):
+        if not (is_dashbaord_admin or order_owner or is_in_session):
             messages.error(request, _(
                 "You do not have permission to view this order."
                 ))
             return redirect('home')
 
-        if 'just_completed_order_id' in request.session:
-            del request.session['just_completed_order_id']
+        if 'recent_order_id' in request.session:
+            del request.session['recent_order_id']
 
         context = {
             'order': order
         }
+
+        context['featured_artworks'] = Artwork.objects.filter(
+            is_featured=True
+            ).select_related(
+                'main_photo',
+                'artist__user',
+                'category'
+            ).prefetch_related(
+                'selected_conditions'
+            )[:10]
 
         return render(request, self.template_name, context)

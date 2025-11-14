@@ -32,7 +32,6 @@
       }
       const data = await response.json();
       cartDropdown.innerHTML = data.html;
-      console.log("Cart dropdown HTML updated.");
     } catch (error) {
       console.error("Error refreshing cart dropdown:", error);
       cartDropdown.innerHTML = '<div class="p-4 text-error">Could not load cart.</div>';
@@ -50,7 +49,6 @@
     }
   }
   function initCart() {
-    console.log("Initializing cart on page load...");
     updateCartDropdownHTML();
   }
   if (typeof window !== "undefined") {

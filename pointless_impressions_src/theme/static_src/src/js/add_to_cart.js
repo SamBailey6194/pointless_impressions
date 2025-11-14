@@ -97,7 +97,6 @@ async function submitAddToCartForm(form) {
 // Run on page load
 // -----------------------------------------------------------------------------
 document.addEventListener('DOMContentLoaded', () => {
-  console.log('AddToCart functionality loaded');
 
   handleQuantityButtons();
 
@@ -105,7 +104,6 @@ document.addEventListener('DOMContentLoaded', () => {
   if (addToCartForm) {
     addToCartForm.addEventListener('submit', (event) => {
       event.preventDefault();
-      console.log('AddToCart form submit intercepted by AJAX');
       submitAddToCartForm(addToCartForm);
     });
   }

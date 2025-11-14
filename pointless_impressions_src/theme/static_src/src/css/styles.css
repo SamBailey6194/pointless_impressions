@@ -130,6 +130,12 @@
     color: var(--pointless-black) !important;
   }
 
+  .checkout-card label {
+    color: var(--pointless-black) !important;
+    font-family: var(--font-Poppins);
+    font-weight: 300 !important;
+  }
+
   .select-dropdown {
     background-color: var(--pointless-white) !important;
     border: 1px solid var(--pointless-blue) !important;
@@ -191,6 +197,10 @@
     }
 
     .custom-input::placeholder {
+      color: var(--pointless-white) !important;
+    }
+
+    .checkout-card label {
       color: var(--pointless-white) !important;
     }
 

@@ -1,7 +1,9 @@
-from django.db import models
+from django.db import models, transaction
+from decimal import Decimal
 import uuid
 import secrets
 from django.conf import settings
+from phonenumber_field.modelfields import PhoneNumberField
 from pointless_impressions_src.artwork.models import Artwork
 
 
@@ -14,13 +16,17 @@ def generate_order_number():
     Generate a unique order number using UUID4.
     Format: ORD-XXXX where XXXX is an incrementing integer.
     """
-    last_order = Order.objects.order_by('-created_at').last()
-    if not last_order:
-        return 'ORD-1001'
+    with transaction.atomic():
+        last_order = Order.objects.select_for_update().order_by(
+            '-created_at'
+            ).first()
 
-    last_id_int = int(last_order.order_number.split('-')[1])
-    new_id_int = last_id_int + 1
-    return f"ORD-{new_id_int}"
+        if not last_order:
+            return 'ORD-1001'
+
+        last_id_int = int(last_order.order_number.split('-')[1])
+        new_id_int = last_id_int + 1
+        return f"ORD-{new_id_int}"
 
 
 def generate_guest_access_code():
@@ -64,8 +70,7 @@ class Order(models.Model):
         null=True,
         help_text="Email of guest user (if applicable)"
     )
-    guest_phone = models.CharField(
-        max_length=20,
+    guest_phone = PhoneNumberField(
         blank=True,
         null=True,
         help_text="Phone number of guest user (if applicable)"
@@ -87,11 +92,25 @@ class Order(models.Model):
         auto_now=True,
         help_text="Timestamp when the order was last updated"
     )
-    total_amount = models.DecimalField(
+    delivery_fee = models.DecimalField(
         max_digits=10,
         decimal_places=2,
         null=False,
-        default=0.00,
+        default=Decimal('0.00'),
+        help_text="Delivery fee for the order"
+    )
+    subtotal = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        null=False,
+        default=Decimal('0.00'),
+        help_text="Subtotal amount before delivery and taxes"
+    )
+    grand_total = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        null=False,
+        default=Decimal('0.00'),
         help_text="Total amount for the order"
     )
     STATUS_CHOICES = [
@@ -106,13 +125,85 @@ class Order(models.Model):
         default='PENDING',
         help_text="Current status of the order"
     )
-    shipping_address = models.TextField(
-        help_text="Shipping address for the order",
+    shipping_first_name = models.CharField(
+        max_length=255,
         blank=True,
+        help_text="First name for shipping"
     )
-    billing_address = models.TextField(
-        help_text="Billing address for the order",
+    shipping_last_name = models.CharField(
+        max_length=255,
         blank=True,
+        help_text="Last name for shipping"
+    )
+    shipping_address_line_1 = models.CharField(
+        max_length=255,
+        blank=True,
+        help_text="Address line 1 for shipping"
+    )
+    shipping_address_line_2 = models.CharField(
+        max_length=255,
+        blank=True,
+        help_text="Address line 2 for shipping (optional)"
+    )
+    shipping_city = models.CharField(
+        max_length=255,
+        blank=True,
+        help_text="City for shipping"
+    )
+    shipping_county = models.CharField(
+        max_length=255,
+        blank=True,
+        help_text="County for shipping (optional)"
+    )
+    shipping_postcode = models.CharField(
+        max_length=20,
+        blank=True,
+        help_text="Postcode for shipping"
+    )
+    shipping_country = models.CharField(
+        max_length=255,
+        blank=True,
+        help_text="Country for shipping"
+    )
+    billing_first_name = models.CharField(
+        max_length=255,
+        blank=True,
+        help_text="First name for billing"
+    )
+    billing_last_name = models.CharField(
+        max_length=255,
+        blank=True,
+        help_text="Last name for billing"
+    )
+    billing_address_line_1 = models.CharField(
+        max_length=255,
+        blank=True,
+        help_text="Address line 1 for billing"
+    )
+    billing_address_line_2 = models.CharField(
+        max_length=255,
+        blank=True,
+        help_text="Address line 2 for billing (optional)"
+    )
+    billing_city = models.CharField(
+        max_length=255,
+        blank=True,
+        help_text="City for billing"
+    )
+    billing_county = models.CharField(
+        max_length=255,
+        blank=True,
+        help_text="County for billing (optional)"
+    )
+    billing_postcode = models.CharField(
+        max_length=20,
+        blank=True,
+        help_text="Postcode for billing"
+    )
+    billing_country = models.CharField(
+        max_length=255,
+        blank=True,
+        help_text="Country for billing"
     )
     staff_updated = models.BooleanField(
         default=False,
@@ -133,11 +224,33 @@ class Order(models.Model):
         null=True
     )
 
-    def save(self, *args, **kwargs):
-        """Override save to ensure order number is set."""
-        if not self.order_number:
-            self.order_number = generate_order_number()
-        super().save(*args, **kwargs)
+    def get_shipping_address(self):
+        """Return formatted shipping address."""
+        lines = (
+            f"{self.shipping_first_name} {self.shipping_last_name}, "
+            f"{self.shipping_address_line_1}, "
+            f"{self.shipping_address_line_2}, "
+            f"{self.shipping_city}, "
+            f"{self.shipping_county}, "
+            f"{self.shipping_postcode}, "
+            f"{self.shipping_country}"
+        )
+
+        return lines
+
+    def get_billing_address(self):
+        """Return formatted billing address."""
+        lines = (
+            f"{self.billing_first_name} {self.billing_last_name}, "
+            f"{self.billing_address_line_1}, "
+            f"{self.billing_address_line_2}, "
+            f"{self.billing_city}, "
+            f"{self.billing_county}, "
+            f"{self.billing_postcode}, "
+            f"{self.billing_country}"
+        )
+
+        return lines
 
     def __str__(self):
         return f"Order {self.order_number} - {self.status}"

@@ -2,12 +2,50 @@ from django import forms
 from django.urls import reverse
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Submit, Field, Div, HTML
+from phonenumber_field.formfields import SplitPhoneNumberField
+from pointless_impressions_src.home.widgets import CountrySelectFormWidget
+from pointless_impressions_src.home.countries import COUNTRY_CHOICES
 
 
 # Write your crispy form here
 class OrderForm(forms.Form):
     """
     Form for collecting customer details during checkout.
+
+    Authenticated users:
+    - Email and phone fields are hidden.
+    - Addresses are a dropdown of saved addressed in DB.
+    - Shipping and billing addresses can be the same or different.
+
+    Guest Users:
+    - Must fill in all fields manually.
+    - Shipping and billing addresses can be the same or different.
+
+    Fields:
+    - email: Customer's email address.
+    - phone: Customer's phone number.
+    - shipping_first_name_addressee: Full name for shipping.
+    - shipping_last_name_addressee: Full name for shipping.
+    - shipping_address_line_1: Shipping address line 1.
+    - shipping_address_line_2: Shipping address line 2 (optional).
+    - shipping_city: Shipping city/town.
+    - shipping_county: Shipping county (optional).
+    - shipping_postcode: Shipping postcode.
+    - shipping_country: Shipping country.
+    - billing_same_as_shipping: Checkbox if billing address is same as
+      shipping.
+    - billing_first_name_addressee: Full name for billing.
+    - billing_last_name_addressee: Full name for billing.
+    - billing_address_line_1: Billing address line 1.
+    - billing_address_line_2: Billing address line 2 (optional).
+    - billing_city: Billing city/town.
+    - billing_county: Billing county (optional).
+    - billing_postcode: Billing postcode.
+    - billing_country: Billing country.
+
+    If the user address is outside UK, they will be asked to email the order
+    number to our support team for manual processing, as payments on the
+    website are not supported for international addresses at this time.
     """
     email = forms.EmailField(
         required=True,
@@ -18,28 +56,31 @@ class OrderForm(forms.Form):
             })
     )
 
-    phone = forms.CharField(
+    phone = SplitPhoneNumberField(
         required=True,
         label="Phone Number",
-        help_text="Enter your contact phone number.",
-        widget=forms.TextInput(attrs={
-            'placeholder': '+1234567890',
-            })
+        region='GB',
     )
 
-    shipping_name_addressee = forms.CharField(label="Full Name")
+    shipping_first_name_addressee = forms.CharField(label="First Name")
+    shipping_last_name_addressee = forms.CharField(label="Last Name")
     shipping_address_line_1 = forms.CharField(label="Address Line 1")
     shipping_address_line_2 = forms.CharField(
         label="Address Line 2 (Optional)",
         required=False
-        )
+    )
     shipping_city = forms.CharField(label="City/Town")
     shipping_county = forms.CharField(
         label="County (Optional)",
         required=False
-        )
+    )
     shipping_postcode = forms.CharField(label="Postcode")
-    shipping_country = forms.CharField(label="Country")
+    shipping_country = forms.ChoiceField(
+        choices=COUNTRY_CHOICES,
+        initial='GB',
+        label="Country",
+        widget=CountrySelectFormWidget()
+    )
 
     billing_same_as_shipping = forms.BooleanField(
         required=False,
@@ -51,7 +92,8 @@ class OrderForm(forms.Form):
             )
     )
 
-    billing_name_addressee = forms.CharField(label="Full Name")
+    billing_first_name_addressee = forms.CharField(label="First Name")
+    billing_last_name_addressee = forms.CharField(label="Last Name")
     billing_address_line_1 = forms.CharField(label="Address Line 1")
     billing_address_line_2 = forms.CharField(
         label="Address Line 2 (Optional)",
@@ -63,7 +105,12 @@ class OrderForm(forms.Form):
         required=False
         )
     billing_postcode = forms.CharField(label="Postcode")
-    billing_country = forms.CharField(label="Country")
+    billing_country = forms.ChoiceField(
+        choices=COUNTRY_CHOICES,
+        initial='GB',
+        label="Country",
+        widget=CountrySelectFormWidget()
+    )
 
     def __init__(self, *args, **kwargs):
         """
@@ -82,54 +129,75 @@ class OrderForm(forms.Form):
                 Div(
                     HTML(
                         "<h3 class='card-title mb-2'>Contact Information</h3>"
-                        ),
+                    ),
                     Div(
                         Field(
                             'email',
                             css_class='custom-input w-full lg:w-66'
-                            ),
+                        ),
                         Field(
                             'phone',
-                            css_class='custom-input w-full lg:w-66'
-                            ),
+                            css_class=(
+                                'custom-input '
+                                'h-10 '
+                                'w-full '
+                                'lg:w-66 '
+                                'mx-2 '
+                                'rounded-lg'
+                            )
+                        ),
                         css_class='lg:flex lg:gap-4 mb-2'
                     ),
 
                     HTML(
                         "<div class='form-divider'></div>"
-                        ),
+                    ),
 
-                    HTML("<h3 class='card-title mb-2'>Shipping Address</h3>"),
                     Div(
-                        Div(
-                            HTML("<p>Enter your shipping details below</p>"),
-                            id="saved-shipping-address-container"
+                        HTML(
+                            "<h3 class='card-title mb-2'>"
+                            "Shipping Address</h3>"
+                        ),
+                        HTML(
+                            "<p class='mb-4'>"
+                            "Enter your shipping details below</p>"
                             ),
-                        Field(
-                            'shipping_name_addressee',
-                            placeholder="Full Name",
-                            css_class='mb-4 custom-input w-full'
+                        Div(
+                            Field(
+                                'shipping_first_name_addressee',
+                                placeholder="First Name",
+                                css_class='mb-4 custom-input w-full lg:w-66'
+                            ),
+                            Field(
+                                'shipping_last_name_addressee',
+                                placeholder="Last Name",
+                                css_class='mb-4 custom-input w-full lg:w-66'
+                            ),
+                            css_class='lg:flex lg:gap-4 mb-4'
                         ),
-                        Field(
-                            'shipping_address_line_1',
-                            placeholder="Address Line 1",
-                            css_class='mb-4 custom-input w-full'
-                        ),
-                        Field(
-                            'shipping_address_line_2',
-                            placeholder="Address Line 2 (Optional)",
-                            css_class='mb-4 custom-input w-full'
+                        Div(
+                            Field(
+                                'shipping_address_line_1',
+                                placeholder="Address Line 1",
+                                css_class='mb-4 custom-input w-full lg:w-96'
+                            ),
+                            Field(
+                                'shipping_address_line_2',
+                                placeholder="Address Line 2 (Optional)",
+                                css_class='mb-4 custom-input w-full lg:w-96'
+                            ),
+                            css_class='mb-4 lg:flex lg:gap-4'
                         ),
                         Div(
                             Field(
                                 'shipping_city',
                                 placeholder="City/Town",
-                                css_class='w-full lg:w-1/2 custom-input'
+                                css_class='w-full lg:w-64 custom-input'
                             ),
                             Field(
                                 'shipping_county',
                                 placeholder="County (Optional)",
-                                css_class='w-full lg:w-1/2 custom-input'
+                                css_class='w-full lg:w-64 custom-input'
                             ),
                             css_class='lg:flex lg:gap-4 mb-4'
                         ),
@@ -137,81 +205,94 @@ class OrderForm(forms.Form):
                             Field(
                                 'shipping_postcode',
                                 placeholder="Postcode",
-                                css_class='w-full lg:w-1/2 custom-input'
+                                css_class='w-full lg:w-40 custom-input'
                             ),
                             Field(
-                                'shipping_country',
-                                placeholder="Country",
-                                css_class='w-full lg:w-1/2 custom-input'
+                                'shipping_country'
                             ),
                             css_class='lg:flex lg:gap-4 mb-4'
                         ),
-                        css_class='shipping-group'
+                        Field(
+                            'billing_same_as_shipping',
+                            css_class='mr-4'
+                        ),
+                        css_class='shipping-group',
+                        id="shipping-fields-container",
                     ),
 
                     HTML("<div class='form-divider'></div>"),
 
-                    HTML(
-                        "<h3 class='card-title mb-2'>Billing Address</h3>"
-                        "<p>Enter your billing details below</p>"
-                        ),
-
-                    Field(
-                        'billing_same_as_shipping',
-                        css_class='mr-4'
-                        ),
-
                     Div(
+                        HTML(
+                            "<h3 class='card-title mb-2'>Billing Address</h3>"
+                            "<p class='mb-4'>"
+                            "Enter your billing details below"
+                            "</p>"
+                        ),
                         Div(
                             HTML(
                                 "<p class='text-sm text-gray-600'>"
                                 "Same as shipping address:"
                                 "</p>"
-                                ),
+                            ),
                             HTML(
                                 "<p "
                                 "class='font-semibold' "
                                 "id='billing-confirmation-text'>"
                                 "</p>"
-                                ),
+                            ),
                             css_class=(
-                                'billing-confirmation-container'
-                                'p-3 rounded-lg'
+                                'billing-confirmation-container '
+                                'p-3 rounded-lg '
                                 'mb-4'
-                                ),
+                            ),
                             style="display: none;"
                         ),
-
                         Div(
                             Div(
-                                id="saved-billing-address-container",
-                                css_class="mb-4"
+                                Field(
+                                    'billing_first_name_addressee',
+                                    placeholder="First Name",
+                                    css_class=(
+                                        'mb-4 custom-input w-full lg:w-66'
+                                        )
                                 ),
-                            Field(
-                                'billing_name_addressee',
-                                placeholder="Full Name",
-                                css_class='mb-4 custom-input w-full'
+                                Field(
+                                    'billing_last_name_addressee',
+                                    placeholder="Last Name",
+                                    css_class=(
+                                        'mb-4 custom-input w-full lg:w-66'
+                                        )
+                                ),
+                                css_class='lg:flex lg:gap-4 mb-4'
                             ),
-                            Field(
-                                'billing_address_line_1',
-                                placeholder="Address Line 1",
-                                css_class='mb-4 custom-input w-full'
-                            ),
-                            Field(
-                                'billing_address_line_2',
-                                placeholder="Address Line 2 (Optional)",
-                                css_class='mb-4 custom-input w-full'
+                            Div(
+                                Field(
+                                    'billing_address_line_1',
+                                    placeholder="Address Line 1",
+                                    css_class=(
+                                        'mb-4 custom-input w-full lg:w-96'
+                                        )
+                                ),
+                                Field(
+                                    'billing_address_line_2',
+                                    placeholder="Address Line 2 (Optional)",
+                                    css_class=(
+                                        'mb-4 custom-input w-full lg:w-96'
+                                        )
+                                ),
+                                css_class='mb-4 lg:flex lg:gap-4'
                             ),
                             Div(
                                 Field(
                                     'billing_city',
                                     placeholder="City/Town",
-                                    css_class='w-full lg:w-1/2 custom-input'
+                                    css_class='w-full lg:w-64 custom-input'
                                 ),
                                 Field(
                                     'billing_county',
                                     placeholder="County (Optional)",
-                                    css_class='w-full lg:w-1/2 custom-input'
+                                    css_class='w-full lg:w-64 custom-input'
                                 ),
                                 css_class='lg:flex lg:gap-4 mb-4'
                             ),
@@ -219,12 +300,10 @@ class OrderForm(forms.Form):
                                 Field(
                                     'billing_postcode',
                                     placeholder="Postcode",
-                                    css_class='w-full lg:w-1/2 custom-input'
+                                    css_class='w-full lg:w-40 custom-input'
                                 ),
                                 Field(
-                                    'billing_country',
-                                    placeholder="Country",
-                                    css_class='w-full lg:w-1/2 custom-input'
+                                    'billing_country'
                                 ),
                                 css_class='lg:flex lg:gap-4 mb-4'
                             ),
@@ -243,7 +322,7 @@ class OrderForm(forms.Form):
                     css_class="card-body"
                 ),
                 css_class="card checkout-card"
-            ),
+            )
         )
 
         if user and user.is_authenticated:
@@ -263,7 +342,8 @@ class OrderForm(forms.Form):
 
         if not billing_same:
             required_billing_fields = [
-                'billing_name_addressee',
+                'billing_first_name_addressee',
+                'billing_last_name_addressee',
                 'billing_address_line_1',
                 'billing_city',
                 'billing_postcode',

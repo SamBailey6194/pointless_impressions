@@ -10,37 +10,33 @@
     </span>
     <ul id="cart-items-list">
         {% for item in cart_items %}
-            {% if item.artwork %} 
-                <li class="flex items-center gap-4 py-2">
-                {% with image_to_render=item.artwork.main_photo %}
-                    {% if image_to_render %}
-                        {% if production %}
-                            {% cloudinary image_to_render.image height=48 crop='fit' format='auto' quality='auto' alt=image_to_render.alt_text_or_default class="w-12 h-12 object-cover rounded" %}
-                        {% else %}
-                            <img src="{{ image_to_render.get_image_url }}" alt="{{ image_to_render.alt_text_or_default }}" class="w-12 h-12 object-cover rounded" />
-                        {% endif %}
+            <li class="flex items-center gap-4 py-2">
+                {% if item.artwork_image_url %}
+                    {% if production %}
+                        {% cloudinary item.artwork_image_url height=48 crop='fit' format='auto' quality='auto' alt=item.artwork_name class="w-12 h-12 object-cover rounded" %}
                     {% else %}
-                        <div class="w-12 h-12 rounded bg-gray-200 flex items-center justify-center">
-                            <i class="fa-solid fa-image text-gray-400"></i>
-                        </div>
+                        <img src="{{ item.artwork_image_url }}" alt="{{ item.artwork_name }}" class="w-12 h-12 object-cover rounded" />
                     {% endif %}
-                {% endwith %}
+                {% else %}
+                    <div class="w-12 h-12 rounded bg-gray-200 flex items-center justify-center">
+                        <i class="fa-solid fa-image text-gray-400"></i>
+                    </div>
+                {% endif %}
                 <div class="flex-1">
-                    <span class="block font-medium">{{ item.artwork.name }}</span>
+                    <span class="block font-medium">{{ item.artwork_name }}</span>
                     <span class="block text-sm">Framing: {{ item.framing_condition }}</span>
                     <span class="block text-sm">Quantity: {{ item.quantity }}</span>
-                    <span class="block text-sm">Price: £{{ item.artwork.price|floatformat:2 }}</span>
+                    <span class="block text-sm">Price: £{{ item.price|floatformat:2 }}</span>
                 </div>
-                </li>
-            {% endif %}
+            </li>
         {% empty %}
-            <li classs="py-2">
+            <li class="py-2">
                 <span class="block font-medium">Cart is empty.</span>
             </li>
         {% endfor %}
     </ul>
     {% if total_quantity > 0 %}
-        <span class="text-(--pointless-blue)"><strong>Subtotal:</strong> £{{ total_price|floatformat:2 }}</span>
+        <span class="text-(--pointless-blue)"><strong>Subtotal:</strong> £{{ subtotal|floatformat:2 }}</span>
         {% if delivery_cost %}
             <span class="text-(--pointless-blue)"><strong>Delivery:</strong> £{{ delivery_cost|floatformat:2 }}</span>
         {% else %}
@@ -64,7 +60,7 @@
 
 <script>
   (function() {
-    const badge = document.getElementById('cart-count-badge');
+    const badge = document.getElementById('cart-items-text');
     if (badge) {
       badge.textContent = '{{ total_quantity|default:0 }}';
     }
