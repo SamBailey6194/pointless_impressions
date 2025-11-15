@@ -72,13 +72,14 @@ export function renderArtworkList(artworks) {
                     
                     <div class="card-actions justify-between items-center mt-4">
                         ${artwork.is_in_stock ? `
-                            <button class="add-to-cart btn btn-primary btn-sm">
-                                <i class="fa-solid fa-cart-plus"></i> Add to Cart
-                            </button>
-                            <a href="${detailUrl}" class="btn btn-outline btn-sm"><i class="fa-solid fa-eye"></i> Details</a>
+                            <a href="${detailUrl}" class="btn btn-outline btn-sm ml-auto">
+                                <i class="fa-solid fa-eye"></i> Details
+                            </a>
                         ` : `
                             <span class="sold-out badge badge-error">Sold Out</span>
-                            <a href="${detailUrl}" class="btn btn-outline btn-sm"><i class="fa-solid fa-eye"></i> Details</a>
+                            <a href="${detailUrl}" class="btn btn-outline btn-sm">
+                                <i class="fa-solid fa-eye"></i> Details
+                            </a>
                         `}
                     </div>
                 </div>`;
@@ -222,14 +223,10 @@ function initArtworkListEnhancements() {
 
     updateSortButtonStates();
 
-    // Only enhance with JSON data if we have it AND the user is interacting with sorting/filtering
-    // This allows server-side rendered images to be visible by default
     if (typeof window.ARTWORKS_JSON_DATA !== 'undefined' && window.ARTWORKS_JSON_DATA.length > 0) {
         masterArtworkList = window.ARTWORKS_JSON_DATA;
         isEnhanced = true;
 
-        // Only render if we have SORT parameters (not filter parameters)
-        // Filter parameters cause a page reload, so server-side rendering handles them
         const params = new URLSearchParams(window.location.search);
         const hasActiveSorting = params.has('sort') || params.has('direction');
         
@@ -293,6 +290,9 @@ function initPriceFilterValidation() {
     validatePrices();
 }
 
+// -------------------------------------------------------------------
+// DOMContentLoaded Initialization
+// -------------------------------------------------------------------
 document.addEventListener("DOMContentLoaded", function() {
     initArtworkListEnhancements();
     initPriceFilterValidation();

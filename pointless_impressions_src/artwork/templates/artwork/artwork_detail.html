@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% load static cloudinary tailwind_tags %}
+{% load static cloudinary tailwind_tags crispy_forms_tags %}
 
 {% block content %}
   {% comment %} Section 1 - Artwork Details with Carousel {% endcomment %}
@@ -65,7 +65,9 @@
       <div class="space-y-6">
         <div>
           <h1 class="text-4xl font-bold mb-2">{{ artwork_data.name }}</h1>
-          <div class="badge badge-primary badge-lg" data-testid="artwork-category">{{ artwork.category.friendly_name }}</div>
+          <div class="badge badge-primary badge-lg" data-testid="artwork-category">
+            <a href="{% url 'artwork:list' %}?category={{ artwork.category.slug }}" class="badge badge-primary badge-lg link link-hover">{{ artwork.category.friendly_name }}</a>
+          </div>
         </div>
 
         {% if not artwork_data.is_in_stock %}
@@ -89,7 +91,7 @@
         <div class="card">
           <div class="card-body">
             <div class="flex gap-2">
-              <span class="text-5xl font-bold text-primary" data-testid="artwork-price">£{{ artwork_data.price }}</span>
+              <span class="text-5xl font-bold text-primary" data-testid="artwork-price">£{{ artwork_data.price|floatformat:2 }}</span>
             </div>
           </div>
         </div>
@@ -113,8 +115,8 @@
             <div class="space-y-2">
               <div class="flex justify-between">
                 <span class="font-semibold">Artist:</span>
-                <a href="{% url 'artwork:list' %}?artist={{ artwork.artist.user.username }}" class="font-mono link link-primary" data-testid="artist-profile-link">
-                  <span data-testid="artist-name">{{ artwork.artist.user.username }}</span>
+                <a href="{% url 'artwork:list' %}?artist={{ artwork.artist.user.username }}" class="font-mono" data-testid="artist-profile-link">
+                  <span data-testid="artist-name" class="badge badge-outline link link-hover">{{ artwork.artist.user.username }}</span>
                 </a>
               </div>
               <div class="divider my-1"></div>
@@ -124,14 +126,14 @@
               <div class="divider my-1"></div>
               <div class="flex justify-between">
                 <span class="font-semibold">Category:</span>
-                <a href="{% url 'artwork:list' %}?category={{ artwork.category.slug }}" class="badge badge-outline link link-primary" data-testid="category-link">{{ artwork.category.friendly_name }}</a>
+                <a href="{% url 'artwork:list' %}?category={{ artwork.category.slug }}" class="badge badge-outline link link-hover" data-testid="category-link">{{ artwork.category.friendly_name }}</a>
               </div>
               <div class="divider my-1"></div>
               <div class="flex justify-between">
                 <span class="font-semibold">Framing Options:</span>
                 <div data-testid="framing-options">
                   {% for condition in prefetched_conditions %}
-                  <span class="badge badge-outline">{{ condition.condition_friendly_name }}</span>
+                  <a href="{% url 'artwork:list' %}?selected_conditions={{ condition.slug }}" class="badge badge-outline link link-hover">{{ condition.condition_friendly_name }}</a>
                   {% endfor %}
                 </div>
               </div>
@@ -186,19 +188,28 @@
             </div>
           </div>
         </div>
-        
+
         <div class="space-y-3 md:space-y-0 md:flex md:items-center md:gap-4">
           {% if artwork_data.is_in_stock %}
-            <button class="btn btn-primary btn-lg md:flex-1">
-              <i class="fa-solid fa-cart-plus"></i> Add to Cart
-            </button>
+            <div class="card">
+              <h2 class="card-title">
+                <i class="fa-solid fa-cart-plus"></i> Add to Cart
+              </h2>
+              <div class="card-body bg-gray-300 dark:bg-gray-700 rounded-lg">
+                <form method="post" action="" id="add_to_cart_form">
+                  {% csrf_token %}
+                  {% crispy add_to_cart_form %}
+                </form>
+              </div>
+            </div>
           {% else %}
-            <button class="btn btn-disabled btn-lg md:flex-1" disabled>
+            <button class="btn btn-disabled btn-md md:flex-1" disabled>
               <i class="fa-solid fa-ban"></i> Out of Stock
             </button>
           {% endif %}
-
-          <a href="{% url 'artwork:list' %}" class="btn btn-outline btn-lg md:flex-1">
+        </div>
+        <div class="mt-4">
+          <a href="{% url 'artwork:list' %}" class="btn btn-ghost btn-outline btn-md md:flex-1">
             <i class="fa-solid fa-arrow-left"></i> Back to Browse
           </a>
         </div>
@@ -237,8 +248,8 @@
                     <div class="p-6 flex flex-col h-56">
                       <h3 class="text-xl font-semibold mb-2 card-title">{{ similar_artist.name }}</h3>
                       <p class="text-xs mb-3 opacity-70">By: {{ similar_artist.artist.user.username }} | Category: {{ similar_artist.category.name }}</p>
-                      <p class="text-sm mb-3 card-description flex-grow">{{ similar_artist.description|truncatewords:20 }}</p>
-                      <p class="text-lg font-bold text-[var(--pointless-blue)]">£{{ similar_artist.price }}</p>
+                      <p class="text-sm mb-3 card-description grow">{{ similar_artist.description|truncatewords:20 }}</p>
+                      <p class="text-lg font-bold text-(--pointless-blue)">£{{ similar_artist.price }}</p>
                     </div>
                     <div class="card-actions justify-between items-center m-4">
                       <a href="{% url 'artwork:list' %}?artist={{ similar_artist.artist.user.username }}" class="btn btn-ghost btn-sm">
@@ -272,7 +283,7 @@
           </a>
         </div>
       {% comment %} Yellow line under the search bar {% endcomment %}
-      <div class="border border-[var(--pointless-yellow)]"></div>
+      <div class="border border-(--pointless-yellow)"></div>
     </div>
     <div class="max-w-7xl mx-auto my-8 px-4 sm:px-6 lg:px-8">
         <h2 class="text-3xl font-bold mb-12 text-center">Other {{ artwork.category.name }} Artwork</h2>
@@ -300,8 +311,8 @@
                     <div class="p-6 flex flex-col h-56">
                       <h3 class="text-xl font-semibold mb-2 card-title">{{ similar_artwork.name }}</h3>
                       <p class="text-xs mb-3 opacity-70">By: {{ similar_artwork.artist.user.username }} | Category: {{ similar_artwork.category.name }}</p>
-                      <p class="text-sm mb-3 card-description flex-grow">{{ similar_artwork.description|truncatewords:20 }}</p>
-                      <p class="text-lg font-bold text-[var(--pointless-blue)]">£{{ similar_artwork.price }}</p>
+                      <p class="text-sm mb-3 card-description grow">{{ similar_artwork.description|truncatewords:20 }}</p>
+                      <p class="text-lg font-bold text-(--pointless-blue)">£{{ similar_artwork.price }}</p>
                     </div>
                     <div class="card-actions justify-between items-center m-4">
                       <a href="{% url 'artwork:list' %}?category={{ similar_artwork.category.slug }}" class="btn btn-ghost btn-sm">
@@ -412,5 +423,12 @@
 {% endblock %}
 
 {% block postloadjs %}
+{{ block.super }}
+<script src="{% static 'js/add_to_cart.js' %}" type="module" defer></script>
 <script src="{% static 'js/artwork_detail.js' %}" defer></script>
+
+<script type="text/javascript">
+  // Store framing options globally so onclick handler can access them
+  window.framingOptionsData = JSON.parse('{{ framing_options_json|safe }}');
+</script>
 {% endblock %}

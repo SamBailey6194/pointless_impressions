@@ -4,6 +4,7 @@ from django.contrib.auth.models import (
     AbstractBaseUser
     )
 from django.db import models
+from phonenumber_field.modelfields import PhoneNumberField
 
 
 # Create your models here.
@@ -64,7 +65,7 @@ class CustomUserManager(BaseUserManager):
 class CustomUser(AbstractBaseUser, PermissionsMixin):
     username = models.CharField(max_length=150, unique=True)
     email = models.EmailField(unique=True)
-    phone = models.CharField(max_length=20, blank=True)
+    phone = PhoneNumberField(blank=False, null=False, unique=True)
     first_name = models.CharField(max_length=30, blank=True)
     last_name = models.CharField(max_length=30, blank=True)
     date_joined = models.DateTimeField(auto_now_add=True)

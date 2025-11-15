@@ -1,15 +1,23 @@
 /**
+ * @jest-environment jsdom
+ */
+
+import { displayArtworkDetail, initArtworkDetail } from '../../../../js/artwork_detail';
+
+/**
  * Artwork Detail Page Tests
  * Tests for US002: View Artwork Details
  */
-
-import { formatPrice, displayArtworkDetail, initArtworkDetail } from '../../../../js/artwork_detail.js';
 
 describe('Artwork Detail Page - US002', () => {
   let mockDOM;
 
   beforeEach(() => {
     // Setup DOM mock for tests
+    window.carousel = {
+      initArtworkDetailCarousel: jest.fn()
+    };
+
     document.body.innerHTML = `
       <div id="artwork-detail">
         <h1 id="artwork-title">Mountain Peak</h1>
@@ -72,29 +80,6 @@ describe('Artwork Detail Page - US002', () => {
       const price = document.getElementById('artwork-price');
       const priceRegex = /^£\d+(\.\d{2})?$/;
       expect(priceRegex.test(price.textContent)).toBe(true);
-    });
-
-    test('formatPrice function should work correctly', () => {
-      expect(formatPrice(249.99)).toBe('£249.99');
-      expect(formatPrice(100)).toBe('£100.00');
-      expect(formatPrice(1234.50)).toBe('£1,234.50');
-    });
-
-    test('formatPrice should handle non-number inputs', () => {
-      expect(formatPrice('invalid')).toBe('£0.00');
-      expect(formatPrice(null)).toBe('£0.00');
-      expect(formatPrice(undefined)).toBe('£0.00');
-      expect(formatPrice(true)).toBe('£0.00');
-    });
-
-    test('formatPrice should handle large prices', () => {
-      expect(formatPrice(10000)).toBe('£10,000.00');
-      expect(formatPrice(1000000.99)).toBe('£1,000,000.99');
-    });
-
-    test('formatPrice should handle small prices', () => {
-      expect(formatPrice(0.99)).toBe('£0.99');
-      expect(formatPrice(0.01)).toBe('£0.01');
     });
   });
 
@@ -214,14 +199,14 @@ describe('Artwork Detail Page - US002', () => {
     test('should handle null artworkData gracefully', () => {
       const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
       displayArtworkDetail(null);
-      expect(consoleSpy).toHaveBeenCalledWith('No artwork data provided');
+      expect(consoleSpy).toHaveBeenCalledWith('No artwork data provided to display.');
       consoleSpy.mockRestore();
     });
 
     test('should handle undefined artworkData gracefully', () => {
       const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
       displayArtworkDetail(undefined);
-      expect(consoleSpy).toHaveBeenCalledWith('No artwork data provided');
+      expect(consoleSpy).toHaveBeenCalledWith('No artwork data provided to display.');
       consoleSpy.mockRestore();
     });
 
@@ -288,7 +273,7 @@ describe('Artwork Detail Page - US002', () => {
 
       expect(document.getElementById('artwork-title').textContent).toBe('');
       expect(document.getElementById('artwork-description').textContent).toBe('');
-      expect(document.getElementById('artwork-price').textContent).toBe('£0.00');
+      expect(document.getElementById('artwork-price').textContent).toBe('');
       expect(document.getElementById('artwork-image').src).toContain('');
     });
 

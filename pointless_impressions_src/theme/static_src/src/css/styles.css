@@ -40,11 +40,11 @@
 @media (prefers-color-scheme: dark) {
   @theme {
     /* Custom Colours */
-    --pointless-white: oklch(0.98 0 0); /* Light text/icons */
-    --pointless-yellow: oklch(0.72 0.18 93); /* Brighter yellow for contrast */
-    --pointless-blue: oklch(0.6 0.2 260); /* Lighter blue for visibility */
-    --pointless-red: oklch(0.65 0.22 22); /* Brighter red for emphasis */
-    --pointless-black: oklch(0.08 0 0); /* Dark background */
+    --pointless-white: oklch(0.98 0 0);
+    --pointless-yellow: oklch(0.72 0.18 93); 
+    --pointless-blue: oklch(0.6 0.2 260);
+    --pointless-red: oklch(0.65 0.22 22);
+    --pointless-black: oklch(0.08 0 0);
   }
 }
 
@@ -91,6 +91,12 @@
     margin-top: auto;
   }
 
+  /* Toast Container - Aligned with header width */
+  #toast-container {
+    max-width: calc(100% - 2rem);
+    right: max(1rem, calc((100% - 80rem) / 2 + 1rem));
+  }
+
   /* Sections */
   .section-blue {
     background-color: var(--pointless-blue);
@@ -124,9 +130,47 @@
     color: var(--pointless-black) !important;
   }
 
+  .checkout-card label {
+    color: var(--pointless-black) !important;
+    font-family: var(--font-Poppins);
+    font-weight: 300 !important;
+  }
+
+  .select-dropdown {
+    background-color: var(--pointless-white) !important;
+    border: 1px solid var(--pointless-blue) !important;
+    color: var(--pointless-black) !important;
+    font-family: var(--font-Poppins);
+    padding: 0.5rem;
+    border-radius: 0.25rem;
+    box-shadow: none !important;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .select-dropdown:focus {
+    outline: none;
+    border-color: var(--pointless-blue) !important;
+    box-shadow: 0 0 0 3px rgba(5, 81, 135, 0.2) !important;
+  }
+
   .card {
     background-color: var(--pointless-white) !important;
     color: var(--pointless-black) !important;
+  }
+
+  .checkout-card {
+    background-color: var(--color-gray-300) !important;
+    color: var(--pointless-black) !important;
+  }
+
+  .checkout-card p,
+  .checkout-card small {
+    color: var(--pointless-black) !important;
+  }
+
+  .form-divider {
+    border-top: 1px solid var(--pointless-black);
+    margin: 1.5rem 0;
   }
 
   /* Dark Mode Overrides */
@@ -156,6 +200,16 @@
       color: var(--pointless-white) !important;
     }
 
+    .checkout-card label {
+      color: var(--pointless-white) !important;
+    }
+
+    .select-dropdown {
+      background-color: var(--pointless-black) !important;
+      border-color: var(--pointless-blue) !important;
+      color: var(--pointless-white) !important;
+    }
+
     /* Dropdown backgrounds in dark mode */
     .dropdown-content,
     .menu {
@@ -176,6 +230,20 @@
     .card {
       background-color: var(--pointless-black) !important;
       color: var(--pointless-white) !important;
+    }
+
+    .checkout-card {
+      background-color: var(--color-gray-700) !important;
+      color: var(--pointless-white) !important;
+    }
+
+    .checkout-card p,
+    .checkout-card small {
+      color: var(--pointless-white) !important;
+    }
+
+    .form-divider {
+      border-top: 1px solid var(--pointless-white);
     }
   }
 }
@@ -758,5 +826,38 @@
   .card-adaptive .card-meta {
     color: inherit;
     opacity: 0.6;
+  }
+}
+
+/* Toast Notification Animations */
+@layer utilities {
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+      transform: translateY(1rem);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes fade-out {
+    from {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    to {
+      opacity: 0;
+      transform: translateY(1rem);
+    }
+  }
+
+  .animate-fade-in {
+    animation: fade-in 0.3s ease-out;
+  }
+
+  .animate-fade-out {
+    animation: fade-out 0.3s ease-out;
   }
 }

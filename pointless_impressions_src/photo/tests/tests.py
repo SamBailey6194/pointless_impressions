@@ -32,14 +32,14 @@ class PhotoFormTest(TestCase):
             username='user',
             email='user@test.com',
             password='pass123',
-            phone='1234567890'
+            phone='+441234567989'
         )
 
         artist_user = User.objects.create_user(
             username='artist',
             email='artist@test.com',
             password='pass123',
-            phone='1234567890'
+            phone='+441234567990'
         )
         self.artist = Artist.objects.create(
             user=artist_user,
