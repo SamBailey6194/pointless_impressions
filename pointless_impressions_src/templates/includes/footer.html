@@ -23,7 +23,7 @@
         {% with image_to_render=site_logo_white_bg %}
           {% if image_to_render %}
             {% if production %}
-              {% cloudinary image_to_render.image.name height=48 crop='fit' format='auto' quality='auto' alt=image_to_render.alt_text_or_default class="h-28 w-auto mb-4" %}
+              {% cloudinary image_to_render.image height=48 crop='fit' format='auto' quality='auto' alt=image_to_render.alt_text_or_default class="h-28 w-auto mb-4" %}
             {% else %}
               <img src="{{ image_to_render.image.url }}" 
                   alt="{{ image_to_render.alt_text_or_default }}" 
