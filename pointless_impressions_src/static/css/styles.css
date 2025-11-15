@@ -3458,9 +3458,6 @@
   .table {
     display: table;
   }
-  .aspect-\[4\/3\] {
-    aspect-ratio: 4/3;
-  }
   .btn-circle {
     @layer daisyui.modifier {
       border-radius: calc(infinity * 1px);
@@ -3939,10 +3936,6 @@
     font-size: var(--text-6xl);
     line-height: var(--tw-leading, var(--text-6xl--line-height));
   }
-  .text-8xl {
-    font-size: var(--text-8xl);
-    line-height: var(--tw-leading, var(--text-8xl--line-height));
-  }
   .text-lg {
     font-size: var(--text-lg);
     line-height: var(--tw-leading, var(--text-lg--line-height));
@@ -4046,6 +4039,9 @@
     @supports (color: color-mix(in lab, red, red)) {
       color: color-mix(in oklab, var(--color-base-content) 70%, transparent);
     }
+  }
+  .text-error {
+    color: var(--color-error);
   }
   .text-gray-700 {
     color: var(--color-gray-700);
