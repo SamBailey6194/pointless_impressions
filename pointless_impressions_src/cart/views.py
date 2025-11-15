@@ -11,10 +11,7 @@ from pointless_impressions_src.artwork.models import (
     Artwork, ArtworkFramingCondition
     )
 from pointless_impressions_src.profiles.models import Customer, Address
-import logging
 import json
-
-logger = logging.getLogger('pointless_impressions_src.cart')
 
 
 # Write your views here.
@@ -48,7 +45,6 @@ class CheckoutView(TemplateView):
         return response
 
     def get_context_data(self, **kwargs):
-        logger.debug("Executing get_context_data in CheckoutView")
 
         context = super().get_context_data(**kwargs)
 
@@ -58,7 +54,6 @@ class CheckoutView(TemplateView):
 
         if cart_is_empty:
             context['cart_empty'] = True
-            logger.debug("Cart is empty, fetching featured artwork")
 
             featured_artworks = Artwork.objects.filter(
                 is_featured=True,
@@ -71,9 +66,6 @@ class CheckoutView(TemplateView):
                     'selected_conditions'
                 )[:10]
 
-            logger.debug(
-                f"Featured artworks fetched: {featured_artworks.count()} items"
-                )
             context['featured_artworks'] = featured_artworks
             return context
 
@@ -100,12 +92,7 @@ class CheckoutView(TemplateView):
                     )
                     item.form = item_form
                     cart_items_data.append(item)
-                else:
-                    logger.warning(
-                        f"Cart Item ID {item.id} references deleted artwork."
-                    )
-        except Exception as e:
-            logger.error(f"Error retrieving cart items: {e}", exc_info=True)
+        except Exception:
             context['cart_error'] = (
                 "Could not load cart items. Due to an error."
                 )
@@ -237,7 +224,11 @@ class CartDropdownView(View):
                 }
             )
 
-            return JsonResponse({'html': html})
+            return JsonResponse({
+                'html': html,
+                'cart_count': total_quantity,
+                'total_quantity': total_quantity
+                })
         except Exception:
             return JsonResponse(
                 {'error': 'Failed to generate cart dropdown.'},
@@ -318,11 +309,6 @@ class UpdateCartView(View):
                         id=framing_option
                     )
                 except ArtworkFramingCondition.DoesNotExist:
-                    logger.warning(
-                        f"Framing condition ID {framing_option} "
-                        "does not exist for artwork "
-                        f"{artwork.id}"
-                    )
                     pass
 
             if quantity == 0:
@@ -390,8 +376,7 @@ class UpdateCartView(View):
                 )
             })
 
-        except Exception as e:
-            logger.error(f"Error updating cart: {e}", exc_info=True)
+        except Exception:
             return JsonResponse({
                 'success': False,
                 'error': 'An error occurred while updating the cart.'

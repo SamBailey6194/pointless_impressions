@@ -16,7 +16,7 @@ def step_create_artworks(context):
     artist_names = set()
     for row in context.table:
         artist_names.add(row['artist'])
-    
+
     # Create artists
     artists = {}
     for artist_name in artist_names:

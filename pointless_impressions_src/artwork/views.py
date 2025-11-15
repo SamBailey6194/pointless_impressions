@@ -458,8 +458,15 @@ class ArtworkDetailView(DetailView):
                 notes=notes
             )
 
+            total_quantity = cart.get_total_quantity()
+
             return JsonResponse(
-                {'success': True, 'message': ' Artwork added to cart.'}
+                {
+                    'success': True,
+                    'message': ' Artwork added to cart.',
+                    'cart_count': total_quantity,
+                    'total_quantity': total_quantity
+                    }
                 )
 
         return JsonResponse(

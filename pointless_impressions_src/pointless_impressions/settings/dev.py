@@ -75,6 +75,4 @@ DEFAULT_FILE_STORAGE = "django.core.files.storage.FileSystemStorage"
 SESSION_COOKIE_SECURE = False
 
 # Adjust logging for development
-LOGGING['handlers']['file']['level'] = 'DEBUG'
-LOGGING['handlers']['console']['level'] = 'DEBUG'
-LOGGING['loggers']['django']['level'] = 'DEBUG'
+# LOGGING['handlers']['file']['level'] = 'DEBUG'

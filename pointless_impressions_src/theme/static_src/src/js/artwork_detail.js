@@ -12,6 +12,7 @@ import { getCsrfToken } from "./cart";
  */
 export function displayArtworkDetail(artworkData) {
   if (!artworkData) {
+    console.error('No artwork data provided to display.');
     return;
   }
 
@@ -144,8 +145,4 @@ function initializeReviewFunctionality() {
 window.submitReview = submitReview;
 
 // Initialize on page load
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', initArtworkDetail);
-} else {
-  initArtworkDetail();
-}
+document.addEventListener('DOMContentLoaded', initArtworkDetail);

@@ -128,4 +128,4 @@ CSP_CONNECT_SRC = (
 )
 
 # Adjust logging for production
-LOGGING['handlers']['file']['level'] = 'WARNING'
+# LOGGING['handlers']['file']['level'] = 'WARNING'

@@ -4,9 +4,6 @@ from crispy_forms.layout import Layout, Field, Div, HTML
 from phonenumber_field.formfields import SplitPhoneNumberField
 from pointless_impressions_src.home.widgets import CountrySelectFormWidget
 from pointless_impressions_src.home.countries import COUNTRY_CHOICES
-import logging
-
-logger = logging.getLogger("pointless_impressions_src.order")
 
 
 # Write your crispy form here
@@ -333,8 +330,6 @@ class OrderForm(forms.Form):
         cleaned_data = super().clean()
         billing_same = cleaned_data.get('billing_same_as_shipping')
 
-        logger.debug(f"Billing same as shipping: {billing_same}")
-
         if billing_same:
             cleaned_data['billing_first_name'] = cleaned_data.get(
                 'shipping_first_name'
@@ -360,7 +355,6 @@ class OrderForm(forms.Form):
             cleaned_data['billing_country'] = cleaned_data.get(
                 'shipping_country'
                 )
-            logger.debug("Billing fields copied from shipping address.")
         else:
             required_billing_fields = [
                 'billing_first_name',
@@ -370,8 +364,6 @@ class OrderForm(forms.Form):
                 'billing_postcode',
                 'billing_country'
             ]
-
-            logger.debug(f"Billing fields required: {required_billing_fields}")
 
             for field_name in required_billing_fields:
                 if not cleaned_data.get(field_name):

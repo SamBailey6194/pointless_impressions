@@ -4,12 +4,12 @@
  */
 
 // Import the one function we need from the global cart script
-import { getCsrfToken } from './cart.js';
+import { getCsrfToken, updateCartBadge } from './cart.js';
 
 /**
  * Handles increment and decrement functionality for the quantity input field.
  */
-function handleQuantityButtons() {
+export function handleQuantityButtons() {
   const decrementButton = document.getElementById('decrement-quantity');
   const incrementButton = document.getElementById('increment-quantity');
   const quantityInput = document.getElementById('id_quantity');
@@ -48,7 +48,7 @@ function handleQuantityButtons() {
 /**
  * Submit the AddToCart form via AJAX.
  */
-async function submitAddToCartForm(form) {
+export async function submitAddToCartForm(form) {
   const formData = new FormData(form);
 
   try {
@@ -69,8 +69,21 @@ async function submitAddToCartForm(form) {
         window.Toast.show(data.message, 'success');
       }
 
+      if (data.cart_count !== undefined) {
+        updateCartBadge(data.cart_count);
+      } else if (data.total_quantity !== undefined) {
+        updateCartBadge(data.total_quantity);
+      }
+
       if (window.cart) {
         await window.cart.updateCartDropdownHTML();
+
+        const cartItemsText = document.getElementById('cart-items-text');
+        if (cartItemsText && !data.cart_count && !data.total_quantity) {
+          const itemCount = parseInt(cartItemsText.textContent, 10) || 0;
+          updateCartBadge(itemCount);
+        }
+
         window.scrollTo({ top: 0, behavior: 'smooth' });
         window.cart.openCartDropdown();
       }
@@ -96,7 +109,7 @@ async function submitAddToCartForm(form) {
 // -----------------------------------------------------------------------------
 // Run on page load
 // -----------------------------------------------------------------------------
-document.addEventListener('DOMContentLoaded', () => {
+export function initAddToCartPage() {
 
   handleQuantityButtons();
 
@@ -107,4 +120,20 @@ document.addEventListener('DOMContentLoaded', () => {
       submitAddToCartForm(addToCartForm);
     });
   }
-});
+};
+
+// -----------------------------------------------------------------------------
+// Make functions globally available
+// -----------------------------------------------------------------------------
+if (typeof window !== 'undefined') {
+  window.addToCartModal = {
+    initAddToCartPage: initAddToCartPage,
+    submitAddToCartForm: submitAddToCartForm,
+    handleQuantityButtons: handleQuantityButtons,
+  };
+}
+
+// -----------------------------------------------------------------------------
+// Run on page load
+// -----------------------------------------------------------------------------
+document.addEventListener('DOMContentLoaded', initAddToCartPage);

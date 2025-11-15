@@ -114,4 +114,4 @@ CSP_CONNECT_SRC = (
 )
 
 # Adjust logging for staging
-LOGGING['handlers']['file']['level'] = 'INFO'
+# LOGGING['handlers']['file']['level'] = 'INFO'

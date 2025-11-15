@@ -36,14 +36,14 @@ class ArtworkListViewsTest(TestCase):
             username='blake',
             password='testpassword',
             email='blake@example.com',
-            phone='0987654321'
+            phone='+440987654321'
         )
 
         self.artist2 = User.objects.create_user(
             username='alice',
             password='testpassword',
             email='alice@example.com',
-            phone='1234567890'
+            phone='+441234567894'
         )
 
         self.artist1_profile = Artist.objects.create(
@@ -241,7 +241,7 @@ class ArtworkDetailViewTest(TestCase):
             username='michael',
             password='testpassword',
             email='michael@example.com',
-            phone='0987654321'
+            phone='+440987654325'
         )
 
         self.artist = Artist.objects.create(

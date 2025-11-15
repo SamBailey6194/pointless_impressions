@@ -652,7 +652,7 @@ Toast.handleAPIError(error)                // Displays API error messages
 - JS files can be modularised and used as modules with import/export to keep code organised.
 - SSR is always safer and more consistent to start with before adding AJAX enhancements.
 - Circular imports can be avoided by importing inside functions rather than at the top of the file.
-- For anything you may use across multiple apps create a `utils.py` or `context_processors.py` file to hold the functions depending on the use case. Alongside this create a template that is reuseable either as a includes or template tag. If needed create a core or common app to hold these files.
+- For anything you may use across multiple apps create a `utils.py` or `context_processors.py` file to hold the functions depending on the use case. Alongside this create a template that is reuseable either as a includes or template tag. If needed create a core or common app to hold these files. For example, the featured artworks section is across multiple pages and multiple CBVs so next time I would create a core app to hold the logic and template tag for this.
 
 ---
 

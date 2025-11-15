@@ -75,9 +75,11 @@ MIDDLEWARE = [
 ]
 
 # Ensure DebugSessionMiddleware is added after SessionMiddleware
+session_middleware_index = MIDDLEWARE.index(
+    "django.contrib.sessions.middleware.SessionMiddleware"
+)
 MIDDLEWARE.insert(
-    MIDDLEWARE.index("django.contrib.sessions.middleware.SessionMiddleware")
-    + 1,
+    session_middleware_index + 1,
     "pointless_impressions_src.pointless_impressions.middleware."
     "debug_session_middleware.DebugSessionMiddleware",
 )
@@ -233,62 +235,57 @@ FEE_MAP = dict(DELIVERY_FEE_TIERS)
 
 STATIC_VERSION = os.getenv("STATIC_VERSION", "1.0.0")
 
-# Logging configuration
-APP_LOGGERS = [
-    "pointless_impressions_src.pointless_impressions",
-    "pointless_impressions_src.home",
-    "pointless_impressions_src.theme",
-    "pointless_impressions_src.artwork",
-    "pointless_impressions_src.photo",
-    "pointless_impressions_src.account",
-    "pointless_impressions_src.search",
-    "pointless_impressions_src.profiles",
-    "pointless_impressions_src.dashboard",
-    "pointless_impressions_src.cart",
-    "pointless_impressions_src.order",
-]
+# # Logging configuration
+# APP_LOGGERS = [
+#     "pointless_impressions_src.pointless_impressions",
+#     "pointless_impressions_src.home",
+#     "pointless_impressions_src.theme",
+#     "pointless_impressions_src.artwork",
+#     "pointless_impressions_src.photo",
+#     "pointless_impressions_src.account",
+#     "pointless_impressions_src.search",
+#     "pointless_impressions_src.profiles",
+#     "pointless_impressions_src.dashboard",
+#     "pointless_impressions_src.cart",
+#     "pointless_impressions_src.order",
+# ]
 
-# Generate the common configuration for all app loggers
-APP_LOGGER_CONFIG = {
-    app_name: {
-        'handlers': ['console', 'file'],
-        'level': 'DEBUG',
-        'propagate': False,
-    }
-    for app_name in APP_LOGGERS
-}
+# # Generate the common configuration for all app loggers
+# APP_LOGGER_CONFIG = {
+#     app_name: {
+#         'handlers': ['console', 'file'],
+#         'level': 'DEBUG',
+#         'propagate': False,
+#     }
+#     for app_name in APP_LOGGERS
+# }
 
-# The main LOGGING dictionary
-LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'formatters': {
-        'verbose': {
-            'format': '{levelname} {asctime} {module} {message}',
-            'style': '{',
-        },
-    },
-    'handlers': {
-        'console': {
-            'level': 'DEBUG',
-            'class': 'logging.StreamHandler',
-            'formatter': 'verbose',
-        },
-        'file': {
-            'level': 'DEBUG',
-            'class': 'logging.handlers.RotatingFileHandler',
-            'filename': 'debug.log',
-            'formatter': 'verbose',
-            'maxBytes': 1024 * 1024 * 5,
-            'backupCount': 5,
-        },
-    },
-    'loggers': {
-        **APP_LOGGER_CONFIG,
-        'django': {
-            'handlers': ['console'],
-            'level': 'INFO',
-            'propagate': True,
-        },
-    },
-}
+# # The main LOGGING dictionary
+# LOGGING = {
+#     'version': 1,
+#     'disable_existing_loggers': True,
+#     'formatters': {
+#         'verbose': {
+#             'format': '{levelname} {asctime} {module} {message}',
+#             'style': '{',
+#         },
+#     },
+#     'handlers': {
+#         'file': {
+#             'level': 'DEBUG',
+#             'class': 'logging.handlers.RotatingFileHandler',
+#             'filename': 'debug.log',
+#             'formatter': 'verbose',
+#             'maxBytes': 1024 * 1024 * 5,
+#             'backupCount': 5,
+#         },
+#     },
+#     'loggers': {
+#         **APP_LOGGER_CONFIG,
+#         'django': {
+#             'handlers': ['console'],
+#             'level': 'INFO',
+#             'propagate': True,
+#         },
+#     },
+# }

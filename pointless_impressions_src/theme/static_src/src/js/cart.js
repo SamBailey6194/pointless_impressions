@@ -39,6 +39,20 @@ export function getSessionToken() {
 // -----------------------------------------------------------------------------
 
 /**
+ * Update cart badge in the navbar
+ */
+export function updateCartBadge(count) {
+  const badge = document.getElementById('cart-count-badge');
+  if (badge) {
+    badge.textContent = count;
+    if (count > 0) {
+      badge.style.display = '';
+      badge.classList.remove('hidden');
+    }
+  }
+}
+
+/**
  * Fetches the latest cart HTML from the server and updates the dropdown.
  */
 async function updateCartDropdownHTML() {
@@ -61,7 +75,6 @@ async function updateCartDropdownHTML() {
       throw new Error(`Failed to fetch cart: ${response.status}`);
     }
 
-    // Our CartDropdownView returns JSON: {'html': '...'}
     const data = await response.json();
     cartDropdown.innerHTML = data.html;
     

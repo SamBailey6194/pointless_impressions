@@ -2,7 +2,7 @@
  * @jest-environment jsdom
  */
 
-import { renderArtworkList, filterAvailableArtworks, sortArtworksByPriceAsc, sortArtworksByPriceDesc, sortArtworksByName, sortArtworksByArtist } from '../../../../js/artwork_list.js';
+import { renderArtworkList, filterAvailableArtworks, sortArtworksByPriceAsc, sortArtworksByPriceDesc, sortArtworksByName, sortArtworksByArtist } from '../../../../js/artwork_list';
 
 describe('US001: Browse Pointillism Artwork (Frontend)', () => {
   let artworks;
@@ -77,19 +77,5 @@ describe('US001: Browse Pointillism Artwork (Frontend)', () => {
     const available = filterAvailableArtworks(artworks);
     expect(available.length).toBe(1);
     expect(available[0].name).toBe('Sunset');
-  });
-
-  test('Clicking on artwork shows details (mock)', () => {
-    // Assuming you have a function like showArtworkDetail
-    document.body.innerHTML += `<div id="artwork-detail"></div>`;
-    const artwork = artworks[0];
-    // simulate the function that renders details
-    const detailDiv = document.getElementById('artwork-detail');
-    detailDiv.innerHTML = `<h2>${artwork.name}</h2><p>${artwork.description}</p><span>£${artwork.price}</span><button>Add to Cart</button>`;
-
-    expect(detailDiv.textContent).toContain('Sunset');
-    expect(detailDiv.textContent).toContain('A beautiful sunset over the mountains.');
-    expect(detailDiv.textContent).toContain('£199.99');
-    expect(detailDiv.querySelector('button').textContent).toBe('Add to Cart');
   });
 });

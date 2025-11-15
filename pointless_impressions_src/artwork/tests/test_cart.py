@@ -31,7 +31,7 @@ class ArtworkCartSessionTest(TestCase):
             username='testartist',
             password='testpass123',
             email='artist@example.com',
-            phone='1234567890'
+            phone='+441234567890'
         )
 
         self.artist_profile = Artist.objects.create(

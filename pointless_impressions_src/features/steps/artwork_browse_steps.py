@@ -27,7 +27,9 @@ def _parse_artworks_html(response):
 
         name = name_tag.get_text(strip=True)
         description = desc_tag.get_text(strip=True) if desc_tag else ""
-        price_text = price_tag.get_text(strip=True).replace("£", "").replace(",", "")
+        price_text = price_tag.get_text(strip=True).replace("£", "").replace(
+            ",", ""
+            )
         try:
             price = float(price_text)
         except ValueError:

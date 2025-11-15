@@ -36,7 +36,7 @@ Please copy the example to the relevant part for your tests.
           - [Artwork Admin Permissions Tests](#artwork-admin-permissions-tests)
           - [Artwork Validation Tests](#artwork-validation-tests)
           - [Artwork Form Tests](#artwork-form-tests)
-        - [US003: Add Artwork to Cart - In Artwork App](#us003-add-artwork-to-cart---in-artwork-app)
+        - [US003: Add Artwork to Cart \& US004: Checkout with Address Form - In Artwork App](#us003-add-artwork-to-cart--us004-checkout-with-address-form---in-artwork-app)
           - [Cart Session Management Tests](#cart-session-management-tests)
     - [Photo Form Tests (DRY Approach)](#photo-form-tests-dry-approach)
       - [Photo Form Field Conditioning Tests](#photo-form-field-conditioning-tests)
@@ -53,7 +53,7 @@ Please copy the example to the relevant part for your tests.
         - [Artist Information](#artist-information)
         - [Related Artworks Display](#related-artworks-display)
         - [Framing Conditions Display](#framing-conditions-display)
-      - [US003: Add Artwork to Cart - In Artwork App](#us003-add-artwork-to-cart---in-artwork-app-1)
+      - [US003: Add Artwork to Cart \& US004: Checkout with Address Form - In Artwork App](#us003-add-artwork-to-cart--us004-checkout-with-address-form---in-artwork-app-1)
         - [Add to Cart Features](#add-to-cart-features)
           - [Add Available Artwork to Cart](#add-available-artwork-to-cart)
           - [Prevent Adding Sold-Out Artwork](#prevent-adding-sold-out-artwork)
@@ -72,15 +72,10 @@ Please copy the example to the relevant part for your tests.
           - [Artwork Detail Display Functions](#artwork-detail-display-functions)
           - [Carousel Navigation Functions](#carousel-navigation-functions)
           - [Review Submission Functions](#review-submission-functions)
-        - [US003: Add Artwork to Cart - In Artwork App](#us003-add-artwork-to-cart---in-artwork-app-2)
-          - [Add to Cart Function Tests](#add-to-cart-function-tests)
-          - [Remove from Cart Function Tests](#remove-from-cart-function-tests)
-          - [Update Quantity Function Tests](#update-quantity-function-tests)
-          - [Get Cart Function Tests](#get-cart-function-tests)
-          - [Calculate Total Function Tests](#calculate-total-function-tests)
-          - [Format Price Function Tests](#format-price-function-tests)
-          - [localStorage Integration Tests](#localstorage-integration-tests)
-          - [Edge Cases Tests](#edge-cases-tests)
+        - [US003: Add Artwork to Cart \& US004: Checkout with Address Form - In Artwork App](#us003-add-artwork-to-cart--us004-checkout-with-address-form---in-artwork-app-2)
+    - [Quantity Button Behaviour Tests](#quantity-button-behaviour-tests)
+    - [Network \& Server Error Handling Tests](#network--server-error-handling-tests)
+    - [Add To Cart Page Initialisation Tests](#add-to-cart-page-initialisation-tests)
       - [BDD Testing via Cypress](#bdd-testing-via-cypress)
         - [US001: Browse Available Artworks - In Artwork App](#us001-browse-available-artworks---in-artwork-app-3)
           - [Artwork Browsing Features](#artwork-browsing-features-1)
@@ -97,18 +92,9 @@ Please copy the example to the relevant part for your tests.
           - [Responsive Design](#responsive-design)
           - [Accessibility](#accessibility)
           - [Error Handling](#error-handling)
-        - [US003: Add Artwork to Cart - In Artwork App](#us003-add-artwork-to-cart---in-artwork-app-3)
+        - [US003: Add Artwork to Cart \& US004: Checkout with Address Form - In Artwork App](#us003-add-artwork-to-cart--us004-checkout-with-address-form---in-artwork-app-3)
           - [Add to Cart Button](#add-to-cart-button)
           - [Adding Single Artwork](#adding-single-artwork)
-          - [Adding Multiple Artworks](#adding-multiple-artworks)
-          - [Quantity Increment](#quantity-increment)
-          - [Cart Page Display](#cart-page-display)
-          - [Remove from Cart](#remove-from-cart)
-          - [Update Quantity](#update-quantity)
-          - [Stock Limit Validation](#stock-limit-validation)
-          - [Price Calculations](#price-calculations)
-          - [Cart Persistence](#cart-persistence)
-          - [Error Handling](#error-handling-1)
           - [Accessibility](#accessibility-1)
 
 ---
@@ -534,7 +520,7 @@ Running specific tests can be done following the below:
 
 ---
 
-##### US003: Add Artwork to Cart - In Artwork App
+##### US003: Add Artwork to Cart & US004: Checkout with Address Form - In Artwork App
 
 ###### Cart Session Management Tests
 
@@ -571,10 +557,10 @@ Photo forms use a DRY (Don't Repeat Yourself) approach with conditional field in
 | 8 | Initialize PhotoForm with photo_type='profile' | Form fields 'artwork' and 'asset_identifier' are both excluded from form.fields | Pass |
 | 9 | Submit PhotoForm without title field | Form validation fails with error in `title` field | Pass |
 | 10 | Submit PhotoForm without description field | Form validation fails with error in `description` field | Pass |
-| 11 | Submit PhotoForm with title less than 3 characters | Form validation fails; title must be minimum 3 characters | Pass |
-| 12 | Submit PhotoForm with description less than 5 characters | Form validation fails; description must be minimum 5 characters | Pass |
-| 13 | Submit PhotoForm with alt_text exceeding 255 characters | Form validation fails; alt_text must be 255 characters or less | Pass |
-| 14 | Save valid PhotoForm with user parameter | Photo object saved with uploaded_by field set to provided user | Pass |
+| 11 | Submit PhotoForm with title less than 3 characters | Form validation fails with error in `title` field | Pass |
+| 12 | Submit PhotoForm with description less than 5 characters | Form validation fails with error in `description` field | Pass |
+| 13 | Submit PhotoForm with alt_text exceeding 255 characters | Form validation fails with error in `alt_text` field | Pass |
+| 14 | Save valid PhotoForm with user parameter | Photo object is saved with `uploaded_by` field set to the user | Pass |
 
 ---
 
@@ -664,7 +650,7 @@ Photo forms use a DRY (Don't Repeat Yourself) approach with conditional field in
 
 ---
 
-#### US003: Add Artwork to Cart - In Artwork App
+#### US003: Add Artwork to Cart & US004: Checkout with Address Form - In Artwork App
 
 **Important Note** Image-related steps are omitted as images do not render in Behave test mode. Cart is implemented as session-based (backend) with frontend localStorage integration planned for checkout app.
 
@@ -821,125 +807,39 @@ Photo forms use a DRY (Don't Repeat Yourself) approach with conditional field in
 
 ---
 
-##### US003: Add Artwork to Cart - In Artwork App
+##### US003: Add Artwork to Cart & US004: Checkout with Address Form - In Artwork App
 
-###### Add to Cart Function Tests
-
-| Step | Action | Outcome | Pass / Fail |
-| :--- | :--- | :--- | :--- |
-| 1 | Call `addToCart('artwork-1', 1, 199.99)` | Returns cart item with id, quantity=1, price=199.99 | Pass |
-| 2 | Call `addToCart('artwork-1', 1, 199.99)` twice | Second call increments quantity to 2 | Pass |
-| 3 | Call `addToCart('artwork-2', 1, 249.99)` | Adds new item; cart now contains 2 items | Pass |
-| 4 | Call `addToCart()` with quantity 0 | Item added with quantity=0 | Pass |
-| 5 | Call `addToCart()` with negative price | Item added with price stored as-is | Pass |
-
-###### Remove from Cart Function Tests
+### Quantity Button Behaviour Tests
 
 | Step | Action | Outcome | Pass / Fail |
-| :--- | :--- | :--- | :--- |
-| 1 | Call `removeFromCart('artwork-1')` with item in cart | Item removed from cart | Pass |
-| 2 | Call `removeFromCart('artwork-1')` for non-existent item | Handles gracefully without error | Pass |
-| 3 | Call `removeFromCart()` then verify other items persist | Other items remain in cart unchanged | Pass |
+|------|--------|----------|--------------|
+| 1 | Click increment button | Quantity increases from 1 → 2 | Pass |
+| 2 | Click decrement button | Quantity decreases from 3 → 2 | Pass |
+| 3 | Click decrement at minimum | Quantity stays at 1 (no negative values) | Pass |
+| 4 | Increase quantity at max stock (5) | Quantity remains 5 (cannot exceed stock) | Pass |
+| 5 | Increment reaches stock | Increment button becomes disabled | Pass |
+| 6 | Init with quantity = stock | Increment button disabled on page load | Pass |
+| 7 | Decrease below stock | Increment button becomes enabled again | Pass |
 
-###### Update Quantity Function Tests
-
-| Step | Action | Outcome | Pass / Fail |
-| :--- | :--- | :--- | :--- |
-| 1 | Call `updateQuantity('artwork-1', 3)` on existing item | Item quantity updated to 3 | Pass |
-| 2 | Call `updateQuantity('artwork-1', 1)` | Quantity updated to 1 | Pass |
-| 3 | Call `updateQuantity('artwork-1', 0)` | Quantity set to 0 | Pass |
-| 4 | Call `updateQuantity()` for non-existent item | Handles gracefully without error | Pass |
-
-###### Get Cart Function Tests
+### Network & Server Error Handling Tests
 
 | Step | Action | Outcome | Pass / Fail |
-| :--- | :--- | :--- | :--- |
-| 1 | Call `getCart()` with empty cart | Returns empty object or array | Pass |
-| 2 | Add item and call `getCart()` | Returns cart with added item | Pass |
-| 3 | Call `getCart()` multiple times | Returns same data consistently | Pass |
+|------|--------|----------|--------------|
+| 1 | Server returns `{ success: false, errors }` | Error toast displayed with message | Pass |
+| 2 | Server returns `{ success: false }` | Error logged to console | Pass |
+| 3 | Server error response | Cart does NOT update | Pass |
+| 4 | Network `fetch` failure | Error logged: "Error submitting AddToCart form:" | Pass |
+| 5 | Network `fetch` failure | Toast shows: "An unexpected error occurred." | Pass |
+| 6 | Network failure | Cart dropdown NOT updated | Pass |
 
-###### Calculate Total Function Tests
-
-| Step | Action | Outcome | Pass / Fail |
-| :--- | :--- | :--- | :--- |
-| 1 | Call `calculateTotal()` with empty cart | Returns 0 | Pass |
-| 2 | Call `calculateTotal()` with single item (199.99 × 1) | Returns 199.99 | Pass |
-| 3 | Call `calculateTotal()` with multiple items | Returns sum of (price × quantity) for all items | Pass |
-| 4 | Call `calculateTotal()` with item quantity 3, price 100 | Returns 300 | Pass |
-| 5 | Call `calculateTotal()` with decimal calculations | Returns accurate decimal value (e.g., 399.98 not 399.99) | Pass |
-
-###### Format Price Function Tests
+### Add To Cart Page Initialisation Tests
 
 | Step | Action | Outcome | Pass / Fail |
-| :--- | :--- | :--- | :--- |
-| 1 | Call `formatPrice(199.99)` | Returns "£199.99" | Pass |
-| 2 | Call `formatPrice(100)` | Returns "£100.00" | Pass |
-| 3 | Call `formatPrice(1234.56)` | Returns "£1,234.56" with thousand separator | Pass |
-| 4 | Call `formatPrice('invalid')` | Returns "£0.00" safely | Pass |
-| 5 | Call `formatPrice(0)` | Returns "£0.00" | Pass |
-
-###### localStorage Integration Tests
-
-| Step | Action | Outcome | Pass / Fail |
-| :--- | :--- | :--- | :--- |
-| 1 | Add item to cart | Item persists in localStorage | Pass |
-| 2 | Retrieve cart after page reload simulation | Cart data restored from localStorage | Pass |
-| 3 | Clear localStorage and check cart | Cart becomes empty | Pass |
-| 4 | Add items, close page, reopen | Cart items still present (via localStorage) | Pass |
-
-###### Edge Cases Tests
-
-| Step | Action | Outcome | Pass / Fail |
-| :--- | :--- | :--- | :--- |
-| 1 | Add item with very long ID | Item added and retrieved correctly | Pass |
-| 2 | Add item with special characters in ID | Item handled without errors | Pass |
-| 3 | Add item with extremely large price (999999.99) | Price stored and calculated correctly | Pass |
-| 4 | Calculate total with many items (20+) | Accurate total calculated | Pass |
-
-###### Additional Cart Helper Functions Tests
-
-| Step | Action | Outcome | Pass / Fail |
-| :--- | :--- | :--- | :--- |
-| 1 | Call `getCartItem('artwork-1')` on existing item | Returns cart item object with id, quantity, price | Pass |
-| 2 | Call `getCartItem('non-existent')` | Returns undefined or null safely | Pass |
-| 3 | Call `updateCartItem('artwork-1', {quantity: 5})` | Item properties updated; overwrites existing cart item | Pass |
-| 4 | Call `getCartItemCount()` with empty cart | Returns 0 | Pass |
-| 5 | Call `getCartItemCount()` with 3 items | Returns 3 | Pass |
-| 6 | Call `getTotalQuantity()` with items (qty 2, qty 3, qty 1) | Returns 6 (sum of all quantities) | Pass |
-| 7 | Call `isCartEmpty()` with no items | Returns true | Pass |
-| 8 | Call `isCartEmpty()` with items | Returns false | Pass |
-| 9 | Call `clearCart()` | Clears all items from cart and localStorage | Pass |
-
-###### Add to Cart Modal Component Tests
-
-| Step | Action | Outcome | Pass / Fail |
-| :--- | :--- | :--- | :--- |
-| 1 | Verify modal element exists with id `add_to_cart_modal` | DIALOG element found in DOM | Pass |
-| 2 | Verify modal form element exists with id `add_to_cart_form` | FORM element found in DOM | Pass |
-| 3 | Verify quantity control elements exist | Button ids `qty_increase` and `qty_decrease` found | Pass |
-| 4 | Verify artwork info elements exist | Divs with ids `modal_artwork_name`, `modal_artwork_price`, `modal_artwork_stock` found | Pass |
-| 5 | Verify error/success message elements exist | DIVs with ids `form_error`, `form_success`, `error_message`, `success_message` found | Pass |
-| 6 | Initialize modal with `addToCartModal.init('artwork-1', 'Sunset', 199.99, '/img.jpg', 5, [])` | Modal displays artwork name "Sunset" and price "£199.99" | Pass |
-| 7 | After init, verify quantity set to 1 | Input element with id `quantity` has value "1" | Pass |
-| 8 | After init with 5 stock, verify max quantity | Input max attribute set to "5" | Pass |
-| 9 | Call `addToCartModal.increaseQuantity()` | Quantity increases from 1 to 2 | Pass |
-| 10 | Call `addToCartModal.decreaseQuantity()` on quantity 2 | Quantity decreases to 1 | Pass |
-| 11 | Call `addToCartModal.decreaseQuantity()` on quantity 1 | Quantity remains at 1 (minimum boundary) | Pass |
-| 12 | Call `addToCartModal.increaseQuantity()` at max stock | Quantity capped at stock limit (e.g., 5) | Pass |
-| 13 | Verify framing options display | SELECT element with framing options renders options correctly | Pass |
-| 14 | Verify special notes textarea exists | TEXTAREA with id `special_notes` found | Pass |
-| 15 | Verify notes character counter works | Character count updates as text entered | Pass |
-| 16 | Enter 500 characters in notes with 250 char limit | Character count shows visual feedback of overflow | Pass |
-| 17 | Call `addToCartModal.handleSubmit()` with valid data | Form submission triggered with correct payload | Pass |
-| 18 | Submit form with artwork id, quantity, framing, notes | Item added to cart via API call | Pass |
-| 19 | After successful submission, modal closes | DIALOG element closed or hidden | Pass |
-| 20 | After successful submission, success message displays | Success message shows "Added to cart" | Pass |
-| 21 | Submit form with missing artwork id | Error message displays validation error | Pass |
-| 22 | Submit form with quantity 0 | Error message indicates quantity must be > 0 | Pass |
-| 23 | Submit form with quantity exceeding stock | Error message indicates insufficient stock | Pass |
-| 24 | Verify modal accessibility features | Modal has proper ARIA attributes and keyboard support | Pass |
-| 25 | Tab through modal form elements | All interactive elements keyboard accessible | Pass |
-| 26 | Press Escape key in modal | Modal closes gracefully | Pass |
+|------|--------|----------|--------------|
+| 1 | Call `initAddToCartPage()` | Quantity button handlers registered | Pass |
+| 2 | Init then click increment | Quantity increases from 1 → 2 | Pass |
+| 3 | Init event listeners | Form submit listener attached | Pass |
+| 4 | Submit form after init | Performs POST and shows success toast | Pass |
 
 ---
 
@@ -1055,110 +955,27 @@ Photo forms use a DRY (Don't Repeat Yourself) approach with conditional field in
 
 ---
 
-##### US003: Add Artwork to Cart - In Artwork App
+##### US003: Add Artwork to Cart & US004: Checkout with Address Form - In Artwork App
 
 ###### Add to Cart Button
 
 | Step | Action | Outcome | Pass / Fail |
 | :--- | :--- | :--- | :--- |
-| 1 | Visit `/artworks/` and click first artwork | Detail page loads with Add to Cart button visible | Pass |
-| 2 | Verify Add to Cart button is not disabled | Button is clickable and functional | Pass |
-| 3 | Visit sold-out artwork detail page | Add to Cart button is disabled or not visible | Pass |
+| 1 | Visit `/artworks/sunset/` | Add to Cart button is visible and enabled | Pass |
+| 2 | Visit `/artworks/starry-night/` | Sold-out notice is displayed, Add to Cart button is not visible | Pass |
 
 ###### Adding Single Artwork
 
 | Step | Action | Outcome | Pass / Fail |
 | :--- | :--- | :--- | :--- |
-| 1 | Click Add to Cart button on artwork detail | Success message "Added to cart" displays | Pass |
-| 2 | Check cart count badge | Cart count increases by 1 | Pass |
-| 3 | Add artwork and navigate away, then back to cart | Artwork persists in cart | Pass |
-
-###### Adding Multiple Artworks
-
-| Step | Action | Outcome | Pass / Fail |
-| :--- | :--- | :--- | :--- |
-| 1 | Add first artwork to cart | First artwork added | Pass |
-| 2 | Add second artwork to cart | Second artwork added | Pass |
-| 3 | Check cart count | Cart count shows 2 items | Pass |
-
-###### Quantity Increment
-
-| Step | Action | Outcome | Pass / Fail |
-| :--- | :--- | :--- | :--- |
-| 1 | Add artwork to cart | Quantity is 1 | Pass |
-| 2 | Click Add to Cart button again on same artwork | Quantity increments to 2 | Pass |
-| 3 | Navigate to cart | Item shows quantity 2 | Pass |
-
-###### Cart Page Display
-
-| Step | Action | Outcome | Pass / Fail |
-| :--- | :--- | :--- | :--- |
-| 1 | Add artwork and navigate to `/cart/` | Cart page displays successfully | Pass |
-| 2 | Verify artwork name displays | Item name visible in cart | Pass |
-| 3 | Verify artwork price displays | Item price visible and formatted with £ | Pass |
-| 4 | Verify total price displays | Cart total section visible | Pass |
-
-###### Remove from Cart
-
-| Step | Action | Outcome | Pass / Fail |
-| :--- | :--- | :--- | :--- |
-| 1 | Add two artworks to cart | Both items in cart | Pass |
-| 2 | Navigate to cart page | Cart displays both items | Pass |
-| 3 | Click remove button for first item | First item removed | Pass |
-| 4 | Verify second item remains | Second item still in cart | Pass |
-| 5 | Verify empty state if all removed | Empty cart message displays when no items | Pass |
-
-###### Update Quantity
-
-| Step | Action | Outcome | Pass / Fail |
-| :--- | :--- | :--- | :--- |
-| 1 | Add artwork to cart | Quantity is 1 | Pass |
-| 2 | Navigate to cart page | Cart displays with update form | Pass |
-| 3 | Change quantity to 3 | Quantity input updates | Pass |
-| 4 | Submit update | Quantity updated to 3 | Pass |
-| 5 | Verify total recalculated | Cart total updates based on new quantity | Pass |
-
-###### Stock Limit Validation
-
-| Step | Action | Outcome | Pass / Fail |
-| :--- | :--- | :--- | :--- |
-| 1 | Add limited stock artwork (e.g., 2 available) | Artwork added | Pass |
-| 2 | Navigate to cart page | Cart displays item | Pass |
-| 3 | Try to update quantity to 5 | Quantity capped at available stock (1-2) | Pass |
-| 4 | Verify error message | Error message about insufficient stock displays | Pass |
-
-###### Price Calculations
-
-| Step | Action | Outcome | Pass / Fail |
-| :--- | :--- | :--- | :--- |
-| 1 | Add item with price £199.99 | Cart total shows £199.99 | Pass |
-| 2 | Add second item with price £249.99 | Cart total shows £449.98 | Pass |
-| 3 | Update first item quantity to 3 | Total recalculates to £849.97 (199.99×3 + 249.99) | Pass |
-| 4 | Remove one item | Total updates to £199.99 | Pass |
-
-###### Cart Persistence
-
-| Step | Action | Outcome | Pass / Fail |
-| :--- | :--- | :--- | :--- |
-| 1 | Add artwork to cart | Item in cart | Pass |
-| 2 | Refresh page | Item still in cart after page reload | Pass |
-| 3 | Navigate to different page and back | Cart items persist | Pass |
-| 4 | Click clear cart button if available | Cart becomes empty | Pass |
-
-###### Error Handling
-
-| Step | Action | Outcome | Pass / Fail |
-| :--- | :--- | :--- | :--- |
-| 1 | Add artwork to cart | Success confirmation shown | Pass |
-| 2 | Simulate network error on add | Error message displays | Pass |
-| 3 | Invalid artwork ID submitted | Handles gracefully without breaking | Pass |
+| 1 | Click Add to Cart button on artwork detail page | Success message "Added to cart" displays | Pass |
+| 2 | Verify toast notification | Toast notification is visible and mentions "cart" | Pass |
+| 3 | Verify cart dropdown updates | Cart dropdown updates with the added item | Pass |
 
 ###### Accessibility
 
 | Step | Action | Outcome | Pass / Fail |
 | :--- | :--- | :--- | :--- |
-| 1 | Add to Cart button has accessible label | Button has aria-label or title attribute | Pass |
-| 2 | Cart page is keyboard navigable | Tab through elements and update quantity with Enter | Pass |
-| 3 | Quantity input is accessible | Input field is accessible and can be modified | Pass |
-
-```
+| 1 | Navigate to Add to Cart button using keyboard | Button is focused and can be activated with Enter key | Pass |
+| 2 | Verify toast notification after keyboard interaction | Toast notification is visible and mentions "cart" | Pass |
+| 3 | Verify cart dropdown updates after keyboard interaction | Cart dropdown updates with the added item | Pass |

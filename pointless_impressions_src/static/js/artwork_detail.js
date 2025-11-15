@@ -54,6 +54,7 @@
   // pointless_impressions_src/theme/static_src/src/js/artwork_detail.js
   function displayArtworkDetail(artworkData) {
     if (!artworkData) {
+      console.error("No artwork data provided to display.");
       return;
     }
     const titleElement = document.getElementById("artwork-title");
@@ -148,10 +149,6 @@
     handleViewReviewsScroll();
   }
   window.submitReview = submitReview;
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", initArtworkDetail);
-  } else {
-    initArtworkDetail();
-  }
+  document.addEventListener("DOMContentLoaded", initArtworkDetail);
 })();
 //# sourceMappingURL=artwork_detail.js.map

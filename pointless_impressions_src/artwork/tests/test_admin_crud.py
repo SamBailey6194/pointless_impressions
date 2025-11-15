@@ -26,7 +26,7 @@ class ArtworkAdminCRUDTest(TestCase):
             username='admin',
             email='admin@test.com',
             password='adminpass123',
-            phone='1234567890'
+            phone='+441234567890'
         )
 
         # Create staff user (should have permissions)
@@ -35,7 +35,7 @@ class ArtworkAdminCRUDTest(TestCase):
             email='staff@test.com',
             password='staffpass123',
             is_staff=True,
-            phone='1234567890'
+            phone='+441234567891'
         )
 
         # Create regular user (should NOT have permissions)
@@ -43,7 +43,7 @@ class ArtworkAdminCRUDTest(TestCase):
             username='regularuser',
             email='user@test.com',
             password='userpass123',
-            phone='1234567890'
+            phone='+441234567892'
         )
 
         # Create test artist
@@ -51,7 +51,7 @@ class ArtworkAdminCRUDTest(TestCase):
             username='artist1',
             email='artist@test.com',
             password='artistpass123',
-            phone='1234567890',
+            phone='+441234567893',
         )
         self.artist = Artist.objects.create(
             user=self.artist_user,
@@ -402,7 +402,7 @@ class ArtworkPermissionsTest(TestCase):
             username='superuser',
             email='super@test.com',
             password='superpass123',
-            phone='1234567890'
+            phone='+441234567896'
         )
 
         self.staff_user = User.objects.create_user(
@@ -410,14 +410,14 @@ class ArtworkPermissionsTest(TestCase):
             email='staff@test.com',
             password='staffpass123',
             is_staff=True,
-            phone='1234567890'
+            phone='+441234567897'
         )
 
         self.regular_user = User.objects.create_user(
             username='regular',
             email='regular@test.com',
             password='regularpass123',
-            phone='1234567890'
+            phone='+441234567898'
         )
 
         # Create test artist and artwork
@@ -425,7 +425,7 @@ class ArtworkPermissionsTest(TestCase):
             username='artist',
             email='artist@test.com',
             password='artistpass123',
-            phone='1234567890'
+            phone='+441234567899'
         )
         self.artist = Artist.objects.create(user=artist_user, bio='Test')
 

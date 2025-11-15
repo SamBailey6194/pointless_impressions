@@ -13,6 +13,16 @@
       return null;
     }
   }
+  function updateCartBadge(count) {
+    const badge = document.getElementById("cart-count-badge");
+    if (badge) {
+      badge.textContent = count;
+      if (count > 0) {
+        badge.style.display = "";
+        badge.classList.remove("hidden");
+      }
+    }
+  }
   async function updateCartDropdownHTML() {
     const cartDropdown = document.getElementById("cart-dropdown-content");
     if (!cartDropdown) {

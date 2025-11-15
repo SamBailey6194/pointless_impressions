@@ -4,6 +4,16 @@
     const tokenEl = document.querySelector("[name=csrfmiddlewaretoken]");
     return tokenEl ? tokenEl.value : "";
   }
+  function updateCartBadge(count) {
+    const badge = document.getElementById("cart-count-badge");
+    if (badge) {
+      badge.textContent = count;
+      if (count > 0) {
+        badge.style.display = "";
+        badge.classList.remove("hidden");
+      }
+    }
+  }
   async function updateCartDropdownHTML() {
     const cartDropdown = document.getElementById("cart-dropdown-content");
     if (!cartDropdown) {
@@ -102,8 +112,18 @@
         if (window.Toast) {
           window.Toast.show(data.message, "success");
         }
+        if (data.cart_count !== void 0) {
+          updateCartBadge(data.cart_count);
+        } else if (data.total_quantity !== void 0) {
+          updateCartBadge(data.total_quantity);
+        }
         if (window.cart) {
           await window.cart.updateCartDropdownHTML();
+          const cartItemsText = document.getElementById("cart-items-text");
+          if (cartItemsText && !data.cart_count && !data.total_quantity) {
+            const itemCount = parseInt(cartItemsText.textContent, 10) || 0;
+            updateCartBadge(itemCount);
+          }
           window.scrollTo({ top: 0, behavior: "smooth" });
           window.cart.openCartDropdown();
         }
@@ -124,7 +144,7 @@
       }
     }
   }
-  document.addEventListener("DOMContentLoaded", () => {
+  function initAddToCartPage() {
     handleQuantityButtons();
     const addToCartForm = document.getElementById("add_to_cart_form");
     if (addToCartForm) {
@@ -133,6 +153,14 @@
         submitAddToCartForm(addToCartForm);
       });
     }
-  });
+  }
+  if (typeof window !== "undefined") {
+    window.addToCartModal = {
+      initAddToCartPage,
+      submitAddToCartForm,
+      handleQuantityButtons
+    };
+  }
+  document.addEventListener("DOMContentLoaded", initAddToCartPage);
 })();
 //# sourceMappingURL=add_to_cart.js.map
