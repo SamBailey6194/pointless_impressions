@@ -4,16 +4,6 @@ from django.conf import settings
 from cloudinary.models import CloudinaryField
 
 
-# Conditionally use CloudinaryField for staging/production,
-# ImageField for local
-if settings.DEBUG:
-    # Local development: use standard ImageField
-    PhotoField = models.ImageField
-else:
-    # Staging/Production: use CloudinaryField
-    PhotoField = CloudinaryField
-
-
 # Create your models here.
 def artwork_image_path(instance, filename):
     """Determine upload path based on associated model."""
@@ -77,8 +67,7 @@ class Photo(models.Model):
     image = CloudinaryField(
         'image',
         blank=False,
-        null=False,
-        upload_to=""
+        null=False
     )
 
     alt_text = models.CharField(max_length=255, blank=True)
