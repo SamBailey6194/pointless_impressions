@@ -241,7 +241,7 @@
                               alt="{{ image_to_render.alt_text_or_default }}" 
                               class="w-full h-64 object-cover">
                         {% else %}
-                          {% cloudinary image_to_render.image format="auto" quality="auto" width=400 height=300 crop="fill" class="w-full h-64 object-cover" alt=image_to_render.alt_text_or_default %}
+                          {% cloudinary image_to_render.image.name format="auto" quality="auto" width=400 height=300 crop="fill" class="w-full h-64 object-cover" alt=image_to_render.alt_text_or_default %}
                         {% endif %}
                       {% endif %}
                     </figure>
@@ -304,7 +304,7 @@
                               alt="{{ image_to_render.alt_text_or_default }}" 
                               class="w-full h-64 object-cover">
                         {% else %}
-                          {% cloudinary image_to_render.image format="auto" quality="auto" width=400 height=300 crop="fill" class="w-full h-64 object-cover" alt=image_to_render.alt_text_or_default %}
+                          {% cloudinary image_to_render.image.name format="auto" quality="auto" width=400 height=300 crop="fill" class="w-full h-64 object-cover" alt=image_to_render.alt_text_or_default %}
                         {% endif %}
                       {% endif %}
                     </figure>

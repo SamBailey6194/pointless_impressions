@@ -35,7 +35,7 @@
                                     {% with image_to_render=item.main_photo|default:placeholder_image %}
                                         {% if image_to_render %}
                                             {% if production %}
-                                                {% cloudinary image_to_render.image format="auto" quality="auto" width=400 height=300 crop="fill" class="w-full h-64 object-cover" alt=image_to_render.alt_text_or_default %}
+                                                {% cloudinary image_to_render.image.name format="auto" quality="auto" width=400 height=300 crop="fill" class="w-full h-64 object-cover" alt=image_to_render.alt_text_or_default %}
                                             {% else %}
                                                 <img src="{{ image_to_render.image.url }}" alt="{{ image_to_render.alt_text_or_default }}" class="w-full h-64 object-cover">
                                             {% endif %}
@@ -50,7 +50,7 @@
                                     {% with image_to_render=item.featured_image|default:placeholder_image %}
                                         {% if image_to_render %}
                                             {% if production %}
-                                                {% cloudinary image_to_render.image format="auto" quality="auto" width=400 height=300 crop="fill" class="w-full h-64 object-cover" alt=image_to_render.alt_text_or_default %}
+                                                {% cloudinary image_to_render.image.name format="auto" quality="auto" width=400 height=300 crop="fill" class="w-full h-64 object-cover" alt=image_to_render.alt_text_or_default %}
                                             {% else %}
                                                 <img src="{{ image_to_render.image.url }}" alt="{{ item.title }}" class="w-full h-64 object-cover">
                                             {% endif %}
@@ -66,7 +66,7 @@
                                     {% with image_to_render=item.user.userprofile.profile_picture|default:placeholder_image %}
                                         {% if image_to_render %}
                                             {% if production %}
-                                                {% cloudinary image_to_render.image format="auto" quality="auto" width=400 height=300 crop="fill" class="w-full h-64 object-cover" alt=image_to_render.alt_text_or_default %}
+                                                {% cloudinary image_to_render.image.name format="auto" quality="auto" width=400 height=300 crop="fill" class="w-full h-64 object-cover" alt=image_to_render.alt_text_or_default %}
                                             {% else %}
                                                 <img src="{{ image_to_render.image.url }}" alt="{{ item.name }}" class="w-full h-64 object-cover">
                                             {% endif %}
