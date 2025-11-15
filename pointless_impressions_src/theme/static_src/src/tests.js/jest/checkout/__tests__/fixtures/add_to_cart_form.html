@@ -1,0 +1,56 @@
+<form id="add_to_cart_form" method="post">
+  <input type="hidden" name="csrfmiddlewaretoken" value="test-csrf-token" />
+  
+  <input type="hidden" id="modal_artwork_id" name="artwork_id" value="artwork-1" />
+
+  <label for="id_quantity" class="font-bold text-lg">Quantity</label>
+  <div class="mb-4">
+    <div class="flex items-center space-x-2">
+      <button type="button" class="btn btn-outline" id="decrement-quantity">-</button>
+      <input 
+        type="number" 
+        name="quantity" 
+        id="id_quantity" 
+        class="text-center custom-input w-24!" 
+        value="1" 
+        min="1"
+      >
+      <button type="button" class="btn btn-outline" id="increment-quantity">+</button>
+    </div>
+  </div>
+
+  <div>
+    <label for="id_framing_option" class="font-bold text-lg">Framing Options</label>
+  </div>
+  <div>
+    <select class="select-dropdown w-full" name="framing_option" id="id_framing_option">
+      <option value="1" selected>Framed</option>
+      <option value="2">Unframed</option>
+    </select>
+  </div>
+
+  <label for="id_notes" class="font-bold text-lg">Notes</label>
+  <div class="mb-4">
+    <textarea 
+      name="notes" 
+      id="id_notes" 
+      rows="3" 
+      class="custom-input"
+    ></textarea>
+  </div>
+
+  <button type="submit" name="submit" class="mb-4 btn btn-ghost btn-outline">
+    <i class="fa-solid fa-cart-plus"></i> Add to Cart
+  </button>
+
+  <input type="hidden" id="stock_quantity" value="5">
+
+  <div id="form_error" class="alert alert-error gap-2 hidden">
+    <i class="fa-solid fa-circle-exclamation"></i>
+    <span id="error_message"></span>
+  </div>
+  <div id="form_success" class="alert alert-success gap-2 hidden">
+    <i class="fa-solid fa-circle-check"></i>
+    <span id="success_message">Added to cart successfully!</span>
+  </div>
+</form>

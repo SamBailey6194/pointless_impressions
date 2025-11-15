@@ -17,9 +17,16 @@
       - [Fonts](#fonts)
   - [Features](#features)
     - [SEO Features](#seo-features)
-    - [Server Side Rendering (SSR) and API for fetching artwork, blog and profile information quickly and efficiently.](#server-side-rendering-ssr-and-api-for-fetching-artwork-blog-and-profile-information-quickly-and-efficiently)
     - [Existing Features](#existing-features)
-      - [Navbar](#navbar)
+      - [Header \& Navigation (Responsive Navbar)](#header--navigation-responsive-navbar)
+      - [Footer](#footer)
+      - [Homepage](#homepage)
+      - [Artwork List Page](#artwork-list-page)
+      - [Artwork Detail Page](#artwork-detail-page)
+      - [Add to Cart Modal](#add-to-cart-modal)
+      - [Checkout Page](#checkout-page)
+      - [Toast Notification System](#toast-notification-system)
+      - [Integration Features](#integration-features)
     - [Features Left to Implement](#features-left-to-implement)
   - [Lessons Learnt](#lessons-learnt)
   - [Testing](#testing)
@@ -35,6 +42,8 @@
     - [Staging Files](#staging-files)
   - [Cloning](#cloning)
   - [Credits](#credits)
+    - [Existing Features Credits](#existing-features-credits)
+    - [Removed Features Credits as not used anymore](#removed-features-credits-as-not-used-anymore)
 
 ---
 
@@ -238,20 +247,397 @@ I implemented a comprehensive SEO strategy directly within the Django `base.html
 
 **Result:** Every page of Pointless Impressions is optimised for search engines, social media sharing, and user experience, while sensitive pages are protected from indexing. This setup reduces maintenance overhead by centralising SEO logic in a single template.
 
-### Server Side Rendering (SSR) and API for fetching artwork, blog and profile information quickly and efficiently.
-
-- To better enable SEO and improve initial page load times, I implemented server-side rendering (SSR) for key pages such as artwork listings, blog posts, and user profiles. This ensures that search engine crawlers can easily index the content, and users experience faster load times.
-- I also created a RESTful API using Django REST Framework to serve artwork, blog, and user profile data. This API is consumed by the frontend to dynamically render content without requiring full page reloads.
-- Additionally, I employed caching strategies to further enhance performance, reducing the load on the server and speeding up response times for users.
-- All of this also helps with AJAX functionality for filtering and searching artworks without full page reloads on searching, filtering and pagination.
-
 ### Existing Features
 
-#### Navbar
+#### Header & Navigation (Responsive Navbar)
 
-  - The navbar is dynamic for mobile and non mobile views.
-  - The navbar is also dynamic depending on if a user is authenticated or not.
+**Desktop View:**
+- **Logo**: Clickable Pointless Impressions logo (top-left) with fallback text branding
+- **Primary Navigation Menu** (visible on md+ screens):
+  - Home, Shop (with dropdown: Categories, Framing Options, Artists), Blog, About, Contact
+  - Each link styled with hover states (yellow background, black text)
+- **Search Button**: Top-right icon button with "Search" label (visible on desktop)
+- **Account Dropdown**: Profile picture if authenticated, user icon if guest; expandable menu showing profile options
+- **Cart Dropdown**: Shows item count badge and subtotal (expandable)
+- **Responsive Grid Layout**: Items evenly distributed with navbar-start/center/end sections
 
+**Mobile View:**
+- **Hamburger Menu**: Collapsible navigation drawer revealing Shop, Blog, About, Contact
+- **Logo**: Scaled appropriately for smaller screens
+- **Search Icon**: Visible in mobile menu, integrated with search functionality
+- **Account/Cart Buttons**: Positioned in navbar-end, accessible without hamburger
+- **Touch-Friendly**: Larger tap targets, stacked layout for readability
+
+**Authentication States:**
+- **Logged In**: Shows user profile picture, username in dropdown, "Profile" and "Logout" options
+- **Guest**: Shows generic user icon, "Login" and "Signup" options in dropdown
+- **Authenticated Features Unlock**: Account menu expands with order history, saved addresses, preferences
+
+**User Interactions:**
+- Hover effects on navigation items (yellow highlight with smooth transitions)
+- Dropdown menus expand/collapse on click
+- Search button triggers search modal/page
+- Cart button shows mini-cart preview with quick access to checkout
+- Account menu shows recent orders and quick links
+
+**Cart Dropdown in Header:**
+- The cart icon in the header displays a badge with the current item count and subtotal.
+- Clicking the cart icon reveals a dropdown showing all cart items in a table with image, name, quantity, and price.
+- Users can quickly review their cart contents and subtotal without leaving the current page.
+- The dropdown updates instantly after any cart change (add, update, remove) via AJAX.
+- Clicking "View Cart" in the dropdown takes the user directly to the checkout page.
+
+**Real-Time Updates & Persistence:**
+- Cart state is persisted using localStorage and synchronized with the backend session.
+- All cart actions (add, update, remove) trigger real-time UI updates in the header dropdown and badge.
+- Cart remains consistent across page reloads and navigation.
+
+---
+
+#### Footer
+
+**Content Sections (Responsive Grid):**
+- **Newsletter Signup**: Email subscription form with validation, success confirmation via toast
+- **Company Info**: Logo, brand description ("Discover unique Pointillism artwork..."), social links placeholder
+- **Quick Links**: Home, Shop, Blog, About, Contact, Privacy Policy (all clickable)
+- **Branding**: Uses --pointless-blue, --pointless-yellow brand colors
+
+**Features:**
+- **Responsive Layout**: Stacks vertically on mobile (md:grid-cols-3 on tablet+)
+- **Dark Mode Support**: Adapts colors for light/dark themes
+- **Newsletter Integration**: Email validation, success toasts on subscription
+- **Accessibility**: Semantic HTML, proper link structure
+
+---
+
+#### Homepage
+
+**Hero Section:**
+- **Headline**: "Welcome to Pointless Impressions" (responsive font sizes: md:text-5xl)
+- **Subheading**: "Discover unique Pointillism artwork from talented artists..."
+- **CTA Button**: "Browse Art" linking to artwork list page
+- **Background**: Section-alt styling with custom brand colors
+
+**Featured Artwork Carousel:**
+- **Horizontal Scrolling**: Snap-scroll carousel with 6-8 featured artworks
+- **Card Design**: 
+  - Artwork image (400x300px with Cloudinary optimization for production)
+  - Title, artist name, category, description (truncated)
+  - Price displayed prominently
+  - Action buttons: "View More Category", "View More by Artist", "Details"
+- **Navigation**: Previous/Next buttons (❮ ❯) for manual carousel control
+- **Responsive Sizing**: w-72 (mobile), md:w-80, lg:w-96 for adaptive card widths
+- **Hover Effects**: Shadow transitions on card hover
+
+**Latest Blog Posts Section:**
+- Similar carousel structure to Featured Artwork
+- Shows latest blog posts with title, author, date, excerpt
+- Links to full blog post pages
+
+**Interaction Features:**
+- Carousel auto-scrolls smoothly
+- Click artwork card → Details page
+- Click "View More Category" → Artwork list pre-filtered by category
+- Click "View More by Artist" → Artwork list pre-filtered by artist
+- Mobile: Swipe/scroll to navigate carousel
+- Desktop: Use arrow buttons or scroll with mouse
+
+---
+
+#### Artwork List Page
+
+**Filter Panel (Collapsible on Mobile):**
+- **Category Filter**: Dropdown with all artwork categories
+- **Framing Condition Filter**: Dropdown for framing options
+- **Artist Filter**: Dropdown listing all artists
+- **Price Range**: Min and Max price number inputs with validation
+- **Availability**: "Available Only" checkbox to filter out sold-out items
+- **Apply/Clear Buttons**: Submit filters or reset to defaults
+- **Active Indicators**: Selected filters highlight for visibility
+
+**Sort Controls:**
+- **Sort by Lowest Price**: Ascending price order
+- **Sort by Highest Price**: Descending price order
+- **Sort Alphabetically by Name**: A-Z artwork names
+- **Sort by Artist**: A-Z artist names
+- **Active Sort Display**: Current sort button highlighted in primary color
+
+**Artwork Grid:**
+- **Layout**: 1 column (mobile), 2 columns (md), 3 columns (lg)
+- **Cards Display**: 
+  - Artwork image (optimized, lazy-loaded)
+  - Title, artist link, description (15-word truncation)
+  - Price in bold
+  - "Add to Cart" button (if in stock)
+  - "Details" link
+  - Stock status (green "Available" or red "Sold Out" badge)
+- **Hover Effects**: Shadow lift, slight scale on card hover
+- **Click Handlers**: Add to cart triggers modal, details opens artwork detail page
+
+**Pagination:**
+- Page numbers with current page highlighted
+- Previous/Next navigation
+- Responsive pagination controls (stacked on mobile)
+
+**Empty State:**
+- Large icon, "No artworks found" message
+- Helper text: "Try adjusting your filters..."
+- "Clear Filters" button for quick reset
+
+**SSR + AJAX Integration:**
+- Initial page load uses server-side rendering (full HTML)
+- Filters/sorts trigger AJAX requests to API endpoint
+- JavaScript dynamically updates artwork grid without page reload
+- Maintains URL query parameters for bookmarking
+
+---
+
+#### Artwork Detail Page
+
+**Breadcrumb Navigation:**
+- Home > Artworks > [Artwork Name]
+- Helps users understand page hierarchy and navigate back
+
+**Image Carousel:**
+- **Main Display**: Large image (400px+ height) with Cloudinary optimization
+- **Thumbnail Navigation**: Row of small preview images (w-16 h-16)
+- **Navigation Controls**: Previous/Next arrow buttons on carousel
+- **Click Thumbnail**: Jumps to that image in main carousel
+- **Arrow Navigation**: Cycle through images sequentially
+- **Mobile Responsive**: Maintains aspect ratio, scrollable thumbnails
+
+**Product Information Section:**
+- **Title & Category**: Large heading with category badge (linked to filtered list)
+- **Stock Status**: 
+  - Green alert: "Available" with check icon
+  - Red alert: "Sold Out" with warning icon
+- **Price Display**: Large bold £ amount
+- **Description Card**: Full product description in prose format
+- **Details Card**:
+  - Artist name (clickable link to artist's other artworks)
+  - Artist info snippet
+  - Category (clickable filter link)
+  - Framing options (linked to pre-filtered list)
+  - Rating display (star visualization, average rating, review count)
+- **Review Section**:
+  - "Write Review" button (if authenticated) → opens review modal
+  - "Login to Review" link (if guest)
+  - "View Reviews" button (if reviews exist) → scrolls to reviews section
+  - Reviews list below with rating, title, author, date, comment
+
+**Action Buttons:**
+- **Add to Cart** (if in stock): Primary button, opens add-to-cart modal
+- **Out of Stock**: Disabled button (if sold out)
+- **Back to Browse**: Secondary button returning to artwork list with previous filters
+
+**Related Artworks Section:**
+- **Title**: "Other Artwork by [Artist Name]"
+- **Carousel**: Same structure as homepage carousel
+- Shows 4-6 similar artworks from same artist
+- Clickable cards linking to their detail pages
+- Button that links to full artist's artwork list
+- **Title**: "Other [Category Name] Artwork"
+- **Carousel**: Same structure as above
+- Shows 4-6 similar artworks from same category
+- Clickable cards linking to their detail pages
+- Button that links to full category artwork list
+
+**Desktop View:**
+- Two-column layout: Images (left 50%), Details (right 50%)
+- Sticky details sidebar (doesn't scroll out of view)
+- All sections visible without scrolling
+
+**Mobile View:**
+- Single-column stack: Images (top), then details (bottom)
+- Details scroll naturally
+- Buttons full-width for easy tapping
+
+---
+
+#### Add to Cart Modal
+
+**Modal Structure:**
+- **Overlay**: Semi-transparent backdrop (closes on outside click)
+- **Modal Box**: Centered dialog with max-width container
+
+**Product Summary Card:**
+- **Image Thumbnail**: Small (80x80px) preview of artwork
+- **Product Info**: 
+  - "Adding to cart:" label
+  - Artwork name (line-clamped to 2 lines)
+  - Price (£ format, bold)
+  - Stock status ("2 items available" etc.)
+
+**Quantity Selection:**
+- **Input Field**: Number input with min=1, max=max_stock
+- **Decrement Button**: "-" button reduces quantity by 1
+- **Increment Button**: "+" button increases quantity by 1
+- **Error Display**: Shows validation errors if quantity invalid (red text below field)
+- **Max Quantity Info**: Shows "Max: X items" label
+- **Validation**: 
+  - Prevents quantity < 1 (client-side)
+  - Prevents quantity > stock (client-side)
+  - Server-side protection prevents manipulation
+
+**Framing Options:**
+- **Dropdown Select**: Lists available framing conditions
+  - Example options: "Unframed", "Wood Frame", "Canvas Only", "Metal Frame"
+  - Placeholder: "Select framing option..."
+- **Conditional Display**: Only shows if artwork has framing options
+- **Required Field**: Must select before adding if section visible
+
+**Special Requests (Optional):**
+- **Textarea**: Max 500 characters for gift messages, special instructions
+- **Character Counter**: Shows "0/500" live counter
+
+**Error & Success Messages:**
+- **Error Alert**: Red background with icon, displays validation errors
+- **Success Alert**: Green background with checkmark, "Added to cart successfully!"
+
+**Form Actions:**
+- **Cancel Button**: Closes modal without changes (ghost style)
+- **Add to Cart Button**: Submits form, triggers add-to-cart logic
+- **Button States**: Disabled during submission, shows loading state
+
+**User Flows:**
+- **Flow 1 (SSR)**: User submits form → POST request to server → Django message → Toast success → Cart updated → Modal closes
+- **Flow 2 (API)**: User submits form → AJAX to API endpoint → JSON response with message → Toast display → Modal closes
+- **Flow 3 (Validation Error)**: Invalid quantity → Error toast/inline message → User can correct and resubmit
+
+**Toast Notifications Integration:**
+- **Success Toast**: "Item added to cart! (top-right, 3-second duration, green)"
+- **Error Toast**: "Invalid quantity. Please select 1-X items. (top-right, 4-second duration, red)"
+- **Info Toast**: "Please select a framing option. (top-right, 3-second duration, blue)"
+
+---
+
+#### Checkout Page
+
+**Order Summary Panel:**
+- Displays all cart items in a table with image, name, quantity, framing option, and price.
+- Subtotal, delivery info, and total are clearly shown and update dynamically.
+- Delivery information is stacked vertically and offset to the right for clarity.
+
+**Editable Cart Items:**
+- Users can update quantity and framing option directly in the order summary.
+- Quantity input is validated: cannot exceed available stock, cannot go below 1, and setting to 0 removes the item.
+- Framing option is a dropdown populated with available choices for each artwork.
+- "Update" button triggers AJAX update; changes are reflected immediately without page reload.
+- "Remove" button allows users to delete items from the cart instantly.
+
+**Cart Synchronization:**
+- Cart UUID is synced between localStorage and cookies to ensure backend and frontend are always in sync.
+- All cart data is fetched from the backend to prevent stale or out-of-sync UI.
+
+**AJAX Integration:**
+- All cart updates (quantity, framing, removal) use AJAX for a seamless user experience.
+- Order summary and cart dropdown update in real time after any change.
+
+**Validation & Error Handling:**
+- Quantity and framing option are validated both client-side and server-side.
+- Error messages are displayed via toast notifications for invalid actions (e.g., exceeding stock).
+
+**Checkout Actions:**
+- "Proceed to Payment" button is enabled only if the cart is valid and not empty.
+- Delivery address and payment method sections are shown after order summary (if user is authenticated).
+- Guest checkout prompts for login or registration before payment.
+
+**Security & SEO:**
+- Checkout page uses `<meta name="robots" content="noindex, nofollow" />` to prevent indexing.
+- All sensitive actions are protected by CSRF tokens and session validation.
+
+**Accessibility & Responsiveness:**
+- Fully responsive layout for mobile and desktop.
+- All form controls are accessible via keyboard and screen readers.
+- Clear focus states and error indicators for all inputs.
+
+---
+
+#### Toast Notification System
+
+**Architecture:**
+- **Frontend Module**: `toasts.js` - Unified Toast class with all display logic
+- **Backend Integration**: `toast.html` - Pure Django template passing SSR messages to Toast module
+- **Load Order**: toasts.js loads first in `<head>` (defer), then toast.html included in body
+- **Global Access**: `window.Toast` object provides methods for any JavaScript to trigger notifications
+
+**Toast Methods:**
+
+```javascript
+// Basic display (type: 'success', 'error', 'info', 'warning')
+Toast.show(message, type, duration)
+
+// Convenience methods
+Toast.success(message, duration = 3000)    // Green toast
+Toast.error(message, duration = 4000)      // Red toast
+Toast.info(message, duration = 3000)       // Blue toast
+Toast.warning(message, duration = 3500)    // Yellow toast
+
+// Framework integration
+Toast.displayDjangoMessages(messages)      // Auto-converts SSR messages
+Toast.handleAPIResponse(response)          // Extracts message from JSON
+Toast.handleAPIError(error)                // Displays API error messages
+```
+
+**Toast Display Characteristics:**
+- **Position**: Fixed top-right corner (top-4 right-4 z-50)
+- **Stack**: Multiple toasts stack vertically with gap-2 spacing
+- **Auto-Remove**: Toasts auto-dismiss after duration (success: 3s, error: 4s, info: 3s, warning: 3.5s)
+- **Pointer Events**: Container has pointer-events-none, individual toasts pointer-events-auto for clickability
+- **Styling**: DaisyUI alert components with Pointless brand colors
+
+**Integration Points:**
+
+1. **Django Messages (SSR):**
+   ```python
+   messages.success(request, 'Item added to cart!')
+   # Auto-converts to Toast.success() on page load
+   ```
+
+2. **API Responses:**
+   ```javascript
+   fetch('/api/add-to-cart', {method: 'POST', body: formData})
+     .then(response => Toast.handleAPIResponse(response))
+   ```
+
+3. **Manual Triggers:**
+   ```javascript
+   Toast.warning('This is a warning!');
+   Toast.error('Something went wrong!');
+   ```
+
+**Message Types & Styling:**
+- **Success** (Green): "Item added to cart!", "Order placed!", confirmations
+- **Error** (Red): "Validation failed!", "Out of stock!", errors
+- **Info** (Blue): "Loading...", informational messages
+- **Warning** (Yellow): "Low stock available!", cautions
+
+---
+
+#### Integration Features
+
+**SSR + API Hybrid Approach:**
+- **Server-Side Rendering**: Initial page load renders full HTML for SEO and performance
+- **AJAX Enhancements**: Filtering, sorting, pagination via API without full page reloads
+- **Progressive Enhancement**: Works with JavaScript disabled (SSR fallback) or fully enhanced (API)
+
+**Image Optimization:**
+- **Development**: Local image URLs via Django media storage
+- **Production**: Cloudinary with auto-formatting (format="auto"), quality optimization (quality="auto")
+- **Responsive Images**: Width/height specifications for each context
+- **Fallback Handling**: Placeholder icons for missing images
+
+**Cart Persistence:**
+- **Session/LocalStorage**: Cart persists across page navigations
+- **Server Sync**: AJAX requests sync cart with server session
+- **Real-time Updates**: Quantity changes reflected immediately in dropdown
+
+**Search Functionality:**
+- **Global Search**: Unified search across artworks, blog posts, artists, categories
+- **Autocomplete**: Tarekraafat autocomplete library provides suggestions as user types
+- **Quick Navigation**: Click suggestion → Detail page or filtered list
+
+---
 
 ### Features Left to Implement
 
@@ -261,7 +647,12 @@ I implemented a comprehensive SEO strategy directly within the Django `base.html
 
 ## Lessons Learnt
 
-- For 
+- Always use cookies sessionid for cart persistence rather than localStorage only to avoid sync issues between backend and frontend.
+- For seamless user experience use AJAX for all cart updates on checkout page rather than full page reloads.
+- JS files can be modularised and used as modules with import/export to keep code organised.
+- SSR is always safer and more consistent to start with before adding AJAX enhancements.
+- Circular imports can be avoided by importing inside functions rather than at the top of the file.
+- For anything you may use across multiple apps create a `utils.py` or `context_processors.py` file to hold the functions depending on the use case. Alongside this create a template that is reuseable either as a includes or template tag. If needed create a core or common app to hold these files. For example, the featured artworks section is across multiple pages and multiple CBVs so next time I would create a core app to hold the logic and template tag for this.
 
 ---
 
@@ -272,6 +663,8 @@ The website has been manually and automatically tested.
 You can see the manual testing table [here](docs/markdowns/MANUALTESTING.md).
 
 You can see the automatic testing table [here](docs/markdowns/AUTOMATICTESTING.md).
+
+**Important**: Due to time constraints only US001, US002, US003 and US008 Backend TDD and BDD tests were implemented. The importance of completing the project to a high standard was prioritised over completing all tests.
 
 For TDD I used TestCase for Django and Jest for JavaScript
 
@@ -323,6 +716,14 @@ Please note for the Jest testing there was a need to create html fixture files a
 - **Carousel Accessibility**: Added ARIA labels and keyboard navigation support to the carousel for better accessibility.
 - **Behave Tests Not Passing Images**: Behave tests automatically set Debug to false which caused issues with image fetching due to using cloudinary tags. Therefore, removed image checks from behave tests to avoid failures.
 - **Cypress Tests not running due to lack of data-testids**: Cypress tests were not able to find elements due to missing data-testids. Added data-testids to relevant elements in the artwork detail template.
+- **Framing Option Selection in Cart**: The add to cart modal was not showing a dropdown selection for the framing options due to lack of JSON being passed to the template. Added a function to the Artwork model to return framing options as a list of tuples for the template to render the dropdown. Added the JSON dump to ArtworkListView and ArtworkDetailView CBVs. Then ensured the data was being fetched properly in the relevant html and js files.
+- **Add to Cart Submission**: The add to cart modal was not submitting the form properly due to handling of JSON responses for framing conditions. Updated the `artwork_detail.html` to have the postloadjs hold the framing conditions JSON data for the modal to fetch and render the dropdown properly.
+- **Toasts Were Displayed Outside the Header Container**: The toasts were being displayed outside the header container due to styling issues. Added a custom `#toast-container` styling to the source CSS file to ensure proper positioning.
+- **Local Storage and SSR**: The cookie and local storage uuid's for the cart were not syncing, meaning the django session was not receiving the cart data properly and the order summary on the checkout page was not receiving the information. Fixed by sending the cart uuid from local storage to the server via a cookie on each request.
+- **Network Error when updating order in checkout**: The checkout page was throwing a network error when trying to update the order summary due to the `header_footer.js` sending too many requests for the cart uuid. Added a debounce wrapper which fixed the network errors by ensuring only one cart fetch runs within a short time window, preventing multiple overlapping requests that the browser would otherwise abort.
+- **SSR Incorrect Implementation and Frontend not receiving Session ID**: Using local storage for cart and uuid is not a robust solution to use SSR properly. Fixed by using Django Sessions to store cart in session id and synced that with the frontend via AJAX requests to ensure proper cart functionality across SSR. Needed to set `SESSION_COOKIE_SECURE = False` to enable frontend in development to access the session cookie.
+- **Toast Notifications Not Displaying on API Responses**: The toast notifications were not displaying properly due to lack of integration and having multiple toast systems. Therefore, created a unified toast notification system that works using Django messages with AJAX requests.
+- **Circular Imports between utils and models**: Fixed circular imports by having the utils functions imported within the functions that need them rather than at the top of the file and the same for models imported within the utils functions that need them. 
 
 ### Unfixed Bugs
 
@@ -755,6 +1156,8 @@ Please follow this [Cloning and Development](docs/markdowns/DEVELOPMENT.md)
 
 Below are my credits for where I got inspiration for some of the code and content. Please note a lot of this is just inspiration and not copied code.
 
+### Existing Features Credits
+
 - To help me understand how to implement Docker with Django I used [Docker - Django and PostgreSQL setup (with uv) from scratch! by BugBytes](https://www.youtube.com/watch?v=37aNpE-9dD4&t=524s)
 - To understand uv package manager and modern Python dependency management I used [uv: Python's New Package Manager by BugBytes](https://www.youtube.com/watch?v=_FdjW47Au30)
 - To help improve my understanding of meta tage I looked at [Meta Tags Google Support](https://www.semrush.com/blog/meta-tag/?g_acctid=152-012-3634&g_adid=767193674768&g_adgroupid=149553965890&g_network=g&g_adtype=search&g_keyword=&g_keywordid=dsa-2185834090056&g_campaignid=18352326857&g_campaign=UK_SRCH_DSA_Blog_EN&kw=&cmp=UK_SRCH_DSA_Blog_EN&label=dsa_pagefeed&Network=g&Device=c&utm_content=767193674768&kwid=dsa-2185834090056&cmpid=18352326857&agpid=149553965890&BU=Core&extid=279889846583&adpos=&matchtype=&gad_source=1&gad_campaignid=18352326857&gclid=CjwKCAjwu9fHBhAWEiwAzGRC_-teJyIG_ANaSCkqwUocd1HZOJeb2tReI3nyEP6C-cOVMI71hg0U6BoCHtYQAvD_BwE)
@@ -785,7 +1188,7 @@ Below are my credits for where I got inspiration for some of the code and conten
 - To implement proper button component styling I used [DaisyUI Button Component](https://daisyui.com/components/button/)
 - For dropdown and menu component implementation I referenced [DaisyUI Dropdown](https://daisyui.com/components/dropdown/) and [DaisyUI Menu](https://daisyui.com/components/menu/)
 - To understand CSS framework override strategies I referenced [CSS-Tricks: Working with CSS Frameworks](https://css-tricks.com/considerations-for-styling-a-modal/)
-- For responsive navbar patterns and mobile-first design I used [A Complete Guide to Flexbox by CSS-Tricks](https://css-tricks.com/snippets/css/a-guide-to-flexbox/)
+- For responsive navbar patterns and mobile-first design I used [A Complete Guide to Flexbox by CSS-Tricks](https://css-tricks.com/snippets/css/a-guide-to-flexbox/) and [DaisyUI Navbar documentation](https://daisyui.com/components/navbar/)
 - For .slugignore best practices I referenced [Heroku Slugignore Documentation](https://devcenter.heroku.com/articles/slug-compiler#slugignore)
 - For setting up AWS S3 buckets and IAM policies I referenced [AWS S3 Getting Started Guide](https://docs.aws.amazon.com/AmazonS3/latest/userguide/Welcome.html) and [AWS IAM User Guide](https://docs.aws.amazon.com/IAM/latest/UserGuide/introduction.html)
 - For Cloudinary integration I used [Cloudinary Django Documentation](https://cloudinary.com/documentation/django_integration)
@@ -800,3 +1203,10 @@ Below are my credits for where I got inspiration for some of the code and conten
 - For writing CBVs I followed [Bug Bytes - Django Class Based Views from Scratch!](https://www.youtube.com/watch?v=Z3Z8h6_2b0M) and used the official [Django Class Based Views Documentation](https://docs.djangoproject.com/en/5.2/topics/class-based-views/)
 - To help with sorting via SSR and AJAX via API I used [Django AJAX Tutorial by Pretty Printed](https://www.youtube.com/watch?v=2d7s3spWAzo) and [Django Sorting and Filtering with AJAX by JustDjango](https://www.youtube.com/watch?v=5hY6b6rX9mA)
 - To set up autcomplete search I used tarekraafat/autocomplete.js library from [GitHub - tarekraafat/autocomplete.js: A simple, lightweight, pure vanilla JavaScript autocomplete library.] and followed the instructions there along with the youtube video [Autocomplete.js - Lightweight Vanilla JavaScript Autocomplete Library by Tarek Raafat](https://www.youtube.com/watch?v=1Z3d8h4nWbA)
+- To help with SSR and AJAX for smooth user experience I used [Django AJAX Tutorial by Pretty Printed](https://www.youtube.com/watch?v=2d7s3spWAzo) and [Asynchronous JavaScript: Promises, Async/Await by Academind](https://www.youtube.com/watch?v=PoRJizFvM7s)
+- For using Crispy Forms I followed [Bug Bytes - Django Crispy Forms from Scratch!](https://www.youtube.com/watch?v=Hh6b9X8bG1o) and used the official [Django Crispy Forms Documentation](https://django-crispy-forms.readthedocs.io/en/latest/) to help understand how to use Tailwind CSS with Crispy Forms.
+- To help understand using regional phone numbers I used [Django Phone Number Field](https://github.com/stefanfoulis/django-phonenumber-field) and followed the instructions there along with the youtube video [Django Phone Number Field by Pretty Printed](https://www.youtube.com/watch?v=Z3Z8h6_2b0M)
+
+### Removed Features Credits as not used anymore
+
+- To understand local storage and cookie storage for SSR and passing information betweeen them I used [MDN Web Docs - Window.localStorage](https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage) and [MDN Web Docs - Document.cookie](https://developer.mozilla.org/en-US/docs/Web/API/Document/cookie) along with the video by [Web Storage API Tutorial by Traversy Media](https://www.youtube.com/watch?v=H7Dt6Y6n0nA) and Django session management video by [Django Sessions Explained by Pretty Printed](https://www.youtube.com/watch?v=3b8j4KXU6jY). This helped me write the APIs to sync JavaScript local storage cart uuid with Django session cookie for proper order management.

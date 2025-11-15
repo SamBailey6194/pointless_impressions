@@ -50,8 +50,8 @@
                   <div class="p-6 flex flex-col h-56">
                     <h3 class="text-xl font-semibold mb-2 card-title">{{ artwork.name }}</h3>
                     <p class="text-xs mb-3 opacity-70">By: {{ artwork.artist.user.username }} | Category: {{ artwork.category }}</p>
-                    <p class="text-sm mb-3 card-description flex-grow">{{ artwork.description }}</p>
-                    <p class="text-lg font-bold text-[var(--pointless-blue)]">£{{ artwork.price }}</p>
+                    <p class="text-sm mb-3 card-description grow">{{ artwork.description }}</p>
+                    <p class="text-lg font-bold text-(--pointless-blue)">£{{ artwork.price }}</p>
                   </div>
                   <div class="card-actions justify-between items-center m-4">
                     <a href="{% url 'artwork:list' %}?category={{ artwork.category.slug }}" class="btn btn-ghost btn-sm">
