@@ -20,18 +20,8 @@
       
       {% comment %} Company Info {% endcomment %}
       <div>
-        {% with image_to_render=site_logo_white_bg %}
-          {% if image_to_render %}
-            {% if production %}
-              {% cloudinary image_to_render.image height=48 crop='fit' format='auto' quality='auto' alt=image_to_render.alt_text_or_default class="h-28 w-auto mb-4" %}
-            {% else %}
-              <img src="{{ image_to_render.image.url }}" 
-                  alt="{{ image_to_render.alt_text_or_default }}" 
-                  class="h-28 w-auto mb-4" />
-            {% endif %}
-          {% else %}
-            <h3 class="font-bold text-lg mb-4 text-(--pointless-white)">Pointless Impressions</h3>
-          {% endif %}
+        {% with image_to_render=site_logo_white_bg|default:placeholder_image %}
+          {% cloudinary image_to_render.image format="auto" quality="auto" width=400 height=300 crop="fill" class="w-full h-64 object-cover" alt=image_to_render.alt_text_or_default %}
         {% endwith %}
         <p class="text-sm opacity-90 text-(--pointless-white)">
           Discover and buy unique Pointillism art online. Explore curated pieces, artist stories, and art education.

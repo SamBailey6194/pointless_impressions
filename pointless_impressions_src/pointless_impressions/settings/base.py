@@ -8,6 +8,7 @@ Environment-specific settings should be in dev.py, staging.py, or production.py
 from pathlib import Path
 import os
 from dotenv import load_dotenv
+import cloudinary
 
 # Build paths inside the project
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
@@ -38,6 +39,7 @@ THIRD_PARTY_APPS = [
     # Storage backends
     "cloudinary",
     "storages",
+    "cloudinary_storage",
     # Testing tools
     "behave_django",
     # Form rendering
@@ -219,6 +221,14 @@ STATICFILES_DIRS = [
 # Media files
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
+
+# Cloudinary storage settings
+cloudinary.config(
+    cloud_name=os.getenv("CLOUDINARY_CLOUD_NAME"),
+    api_key=os.getenv("CLOUDINARY_API_KEY"),
+    api_secret=os.getenv("CLOUDINARY_API_SECRET"),
+    secure=True,
+)
 
 # Default primary key field type
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"

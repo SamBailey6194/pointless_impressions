@@ -294,35 +294,25 @@
             {% for similar_artwork in similar_artworks %}
               <div class="shrink-0 w-72 md:w-80 lg:w-96 snap-start h-full">
                 <div class="rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-shadow duration-200 cursor-pointer card-adaptive h-full flex flex-col">
-                  {% with image_to_render=similar_artwork.main_photo %}
-                    <figure>
-                      {% if image_to_render %}
-                        {% comment %} An image exists for this artwork {% endcomment %}
-                        {% if not production %}
-                          {% comment %} LOCAL: Use the artwork's local image URL {% endcomment %}
-                          <img src="{{ image_to_render.get_image_url }}" 
-                              alt="{{ image_to_render.alt_text_or_default }}" 
-                              class="w-full h-64 object-cover">
-                        {% else %}
-                          {% cloudinary image_to_render.image format="auto" quality="auto" width=400 height=300 crop="fill" class="w-full h-64 object-cover" alt=image_to_render.alt_text_or_default %}
-                        {% endif %}
-                      {% endif %}
-                    </figure>
-                    <div class="p-6 flex flex-col h-56">
-                      <h3 class="text-xl font-semibold mb-2 card-title">{{ similar_artwork.name }}</h3>
-                      <p class="text-xs mb-3 opacity-70">By: {{ similar_artwork.artist.user.username }} | Category: {{ similar_artwork.category.name }}</p>
-                      <p class="text-sm mb-3 card-description grow">{{ similar_artwork.description|truncatewords:20 }}</p>
-                      <p class="text-lg font-bold text-(--pointless-blue)">£{{ similar_artwork.price }}</p>
-                    </div>
-                    <div class="card-actions justify-between items-center m-4">
-                      <a href="{% url 'artwork:list' %}?category={{ similar_artwork.category.slug }}" class="btn btn-ghost btn-sm">
-                        <i class="fa-solid fa-palette"></i> View More {{ similar_artwork.category.name }}
-                      </a>
-                      <a href="{% url 'artwork:detail' similar_artwork.slug %}" class="btn btn-ghost btn-sm">
-                        <i class="fa-solid fa-eye"></i> Details
-                      </a>
-                    </div>
-                  {% endwith %}
+                  <figure>
+                    {% with image_to_render=similar_artwork.main_photo|default:placeholder_image %}
+                        {% cloudinary image_to_render.image format="auto" quality="auto" width=400 height=300 crop="fill" class="w-full h-64 object-cover" alt=image_to_render.alt_text_or_default %}
+                    {% endwith %}
+                  </figure>
+                  <div class="p-6 flex flex-col h-56">
+                    <h3 class="text-xl font-semibold mb-2 card-title">{{ similar_artwork.name }}</h3>
+                    <p class="text-xs mb-3 opacity-70">By: {{ similar_artwork.artist.user.username }} | Category: {{ similar_artwork.category.name }}</p>
+                    <p class="text-sm mb-3 card-description grow">{{ similar_artwork.description|truncatewords:20 }}</p>
+                    <p class="text-lg font-bold text-(--pointless-blue)">£{{ similar_artwork.price }}</p>
+                  </div>
+                  <div class="card-actions justify-between items-center m-4">
+                    <a href="{% url 'artwork:list' %}?category={{ similar_artwork.category.slug }}" class="btn btn-ghost btn-sm">
+                      <i class="fa-solid fa-palette"></i> View More {{ similar_artwork.category.name }}
+                    </a>
+                    <a href="{% url 'artwork:detail' similar_artwork.slug %}" class="btn btn-ghost btn-sm">
+                      <i class="fa-solid fa-eye"></i> Details
+                    </a>
+                  </div>
                 </div>
               </div>
             {% empty %}

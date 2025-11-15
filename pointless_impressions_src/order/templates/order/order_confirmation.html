@@ -49,41 +49,30 @@
                 <div class="flex overflow-x-auto gap-6 pb-4 pr-6 snap-x snap-mandatory artwork-scrollbar" id="featured-art-carousel">
                 {% for artwork in featured_artworks %}
                     <div class="shrink-0 w-72 md:w-80 lg:w-96 snap-start h-full">
-                    <div class="rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-shadow duration-200 cursor-pointer card-adaptive h-full flex flex-col">
-                        {% with image_to_render=artwork.main_photo %}
-                        <figure>
-                            {% if image_to_render %}
-                            {% comment %} An image exists for this artwork {% endcomment %}
-                            {% if production %}
-                                {% comment %} Production: Use Cloudinary transformation tags {% endcomment %}
-                                {% cloudinary image_to_render.image format="auto" quality="auto" width=400 height=300 crop="fill" class="w-full h-64 object-cover" alt=image_to_render.alt_text_or_default %}
-                            {% else %}
-                                {% comment %} LOCAL: Use the artwork's local image URL {% endcomment %}
-                                <img src="{{ image_to_render.get_image_url }}" 
-                                    alt="{{ image_to_render.alt_text_or_default }}" 
-                                    class="w-full h-64 object-cover">
-                            {% endif %}
-                            {% endif %}
-                        </figure>
-                        <div class="p-6 flex flex-col h-56">
-                            <h3 class="text-xl font-semibold mb-2 card-title">{{ artwork.name }}</h3>
-                            <p class="text-xs mb-3 opacity-70">By: {{ artwork.artist.user.username }} | Category: {{ artwork.category }}</p>
-                            <p class="text-sm mb-3 card-description grow">{{ artwork.description }}</p>
-                            <p class="text-lg font-bold text-(--pointless-blue)">£{{ artwork.price }}</p>
+                        <div class="rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-shadow duration-200 cursor-pointer card-adaptive h-full flex flex-col">
+                            <figure>
+                            {% with image_to_render=artwork.main_photo|default:placeholder_image %}
+                                {% cloudinary image_to_render.image format="auto" quality="auto" width=80 height=80 crop="fill" class="w-10 rounded-full" alt=image_to_render.alt_text_or_default %}
+                            {% endwith %}
+                            </figure>
+                            <div class="p-6 flex flex-col h-56">
+                                <h3 class="text-xl font-semibold mb-2 card-title">{{ artwork.name }}</h3>
+                                <p class="text-xs mb-3 opacity-70">By: {{ artwork.artist.user.username }} | Category: {{ artwork.category }}</p>
+                                <p class="text-sm mb-3 card-description grow">{{ artwork.description }}</p>
+                                <p class="text-lg font-bold text-(--pointless-blue)">£{{ artwork.price }}</p>
+                            </div>
+                            <div class="card-actions justify-between items-center m-4">
+                                <a href="{% url 'artwork:list' %}?category={{ artwork.category.slug }}" class="btn btn-ghost btn-sm">
+                                <i class="fa-solid fa-palette"></i> View More {{ artwork.category.name }} 
+                                </a>
+                                <a href="{% url 'artwork:list' %}?artist={{ artwork.artist.user.username }}" class="btn btn-ghost btn-sm">
+                                <i class="fa-solid fa-brush"></i> View More By {{ artwork.artist.user.username }} 
+                                </a>
+                                <a href="{% url 'artwork:detail' artwork.slug %}" class="btn btn-ghost btn-sm">
+                                <i class="fa-solid fa-eye"></i> Details
+                                </a>
+                            </div>
                         </div>
-                        <div class="card-actions justify-between items-center m-4">
-                            <a href="{% url 'artwork:list' %}?category={{ artwork.category.slug }}" class="btn btn-ghost btn-sm">
-                            <i class="fa-solid fa-palette"></i> View More {{ artwork.category.name }} 
-                            </a>
-                            <a href="{% url 'artwork:list' %}?artist={{ artwork.artist.user.username }}" class="btn btn-ghost btn-sm">
-                            <i class="fa-solid fa-brush"></i> View More By {{ artwork.artist.user.username }} 
-                            </a>
-                            <a href="{% url 'artwork:detail' artwork.slug %}" class="btn btn-ghost btn-sm">
-                            <i class="fa-solid fa-eye"></i> Details
-                            </a>
-                        </div>
-                        {% endwith %}
-                    </div>
                     </div>
                 {% empty %}
                     <p class="text-center w-full">No featured artwork available.</p>

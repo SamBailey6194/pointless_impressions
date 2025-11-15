@@ -127,12 +127,8 @@
                 {% comment %} 
                   Display user's profile picture if logged in and has one 
                 {% endcomment %}
-                {% with image_to_render=request.user.userprofile.profile_picture %}
-                  {% if production %}
-                    {% cloudinary image_to_render.image format="auto" quality="auto" width=80 height=80 crop="fill" class="w-10 rounded-full" alt=image_to_render.alt_text_or_default %}
-                  {% else %}
-                    <img src="{{ image_to_render.image.url }}" alt="{{ image_to_render.alt_text_or_default }}" class="w-10 rounded-full" />
-                  {% endif %}
+                {% with image_to_render=request.user.userprofile.profile_picture|default:placeholder_image %}
+                  {% cloudinary image_to_render.image format="auto" quality="auto" width=80 height=80 crop="fill" class="w-10 rounded-full" alt=image_to_render.alt_text_or_default %}
                 {% endwith %}
 
               {% else %}
