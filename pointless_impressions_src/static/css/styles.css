@@ -4149,6 +4149,9 @@
   .text-\(--pointless-blue\) {
     color: var(--pointless-blue);
   }
+  .text-\(--pointless-white\) {
+    color: var(--pointless-white);
+  }
   .text-\[var\(--pointless-black\)\] {
     color: var(--pointless-black);
   }
@@ -4381,6 +4384,13 @@
     &:hover {
       @media (hover: hover) {
         background-color: var(--pointless-yellow);
+      }
+    }
+  }
+  .hover\:text-\(--pointless-yellow\) {
+    &:hover {
+      @media (hover: hover) {
+        color: var(--pointless-yellow);
       }
     }
   }

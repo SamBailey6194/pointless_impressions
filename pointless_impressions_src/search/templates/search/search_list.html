@@ -91,7 +91,7 @@
                                     <h3 class="card-title text-xl font-semibold mb-2">{{ item.name }}</h3>
                                     <span class="badge badge-lg badge-info">Artwork</span>
                                     <p class="text-sm mb-1">By {{ item.category }}</p>
-                                    <p class="text-lg font-bold text-[var(--pointless-blue)]">£{{ item.price }}</p>
+                                    <p class="text-lg font-bold text-(--pointless-blue)">£{{ item.price }}</p>
 
                                     {% comment %} Slug if available or ID if not {% endcomment %}
                                     <div class="card-actions justify-end mt-4">
@@ -102,7 +102,7 @@
                                     <h3 class="card-title text-xl font-semibold mb-2">{{ item.name }}</h3>
                                     <span class="badge badge-lg badge-info">Artist</span>
                                     <p class="text-sm mb-1">{{ item.bio|truncatewords:15 }}</p>
-                                    <p class="text-lg font-bold text-[var(--pointless-blue)]">Joined {{ item.created_at|date:"F j, Y" }}</p>
+                                    <p class="text-lg font-bold text-(--pointless-blue)">Joined {{ item.created_at|date:"F j, Y" }}</p>
 
                                     {% comment %} Slug if available or ID if not {% endcomment %}
                                     <div class="card-actions justify-end mt-4">
@@ -114,7 +114,7 @@
                                     <span class="badge badge-lg badge-info">Blog</span>
                                     <p class="text-sm mb-1">{{ item.excerpt }}</p>
                                     <p class="text-sm mb-1">By {{ item.author }}</p>
-                                    <p class="text-lg font-bold text-[var(--pointless-blue)]">{{ item.published_date|date:"F j, Y" }}</p>
+                                    <p class="text-lg font-bold text-(--pointless-blue)">{{ item.published_date|date:"F j, Y" }}</p>
 
                                     {% comment %} Slug if available or ID if not {% endcomment %}
                                     <div class="card-actions justify-end mt-4">

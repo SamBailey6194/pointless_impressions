@@ -5,7 +5,6 @@ Django settings for staging environment.
 from .base import *
 import os
 import dj_database_url
-from datetime import datetime
 import cloudinary
 
 # Environment settings
@@ -69,18 +68,17 @@ AWS_S3_FILE_OVERWRITE = False
 AWS_IS_GZIPPED = True
 
 # Public URL for S3 bucket
-AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.{AWS_S3_REGION_NAME}.amazonaws.com'
+AWS_S3_CUSTOM_DOMAIN = (
+    f'{AWS_STORAGE_BUCKET_NAME}.s3.{AWS_S3_REGION_NAME}.amazonaws.com'
+    )
 STATIC_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/static/'
 
 # Storage backends
 STORAGES = {
-    # Media Files
-    "default": {
-        "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
-    },
     # Static Files
     "staticfiles": {
-        "BACKEND": "pointless_impressions.storage_backends.ManifestStaticS3Storage",
+        "BACKEND": "pointless_impressions.storage_backends."
+        "ManifestStaticS3Storage",
     },
 }
 

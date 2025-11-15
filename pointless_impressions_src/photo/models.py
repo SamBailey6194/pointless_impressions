@@ -77,7 +77,8 @@ class Photo(models.Model):
     image = CloudinaryField(
         'image',
         blank=False,
-        null=False
+        null=False,
+        upload_to=""
     )
 
     alt_text = models.CharField(max_length=255, blank=True)
