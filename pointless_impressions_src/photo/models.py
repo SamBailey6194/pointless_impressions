@@ -74,19 +74,11 @@ class Photo(models.Model):
     title = models.CharField(max_length=255, blank=False)
     description = models.TextField(blank=False)
 
-    # Use ImageField for local, CloudinaryField for staging/production
-    if settings.DEBUG:
-        image = models.ImageField(
-            upload_to=artwork_image_path,
-            blank=False,
-            null=False
-        )
-    else:
-        image = CloudinaryField(
-            'image',
-            blank=False,
-            null=False
-        )
+    image = CloudinaryField(
+        'image',
+        blank=False,
+        null=False
+    )
 
     alt_text = models.CharField(max_length=255, blank=True)
     uploaded_at = models.DateTimeField(auto_now_add=True)
