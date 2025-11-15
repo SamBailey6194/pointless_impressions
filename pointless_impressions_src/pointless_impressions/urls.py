@@ -26,7 +26,11 @@ urlpatterns = [
     path('artworks/', include(
         'pointless_impressions_src.artwork.urls', namespace='artwork'),
         ),
+    path('checkout/', include(
+        'pointless_impressions_src.cart.urls', namespace='checkout'),
+        ),
     path('health/', health_check, name='health'),
+    path('order/', include('pointless_impressions_src.order.urls')),
     path('photos/', include('pointless_impressions_src.photo.urls')),
     path('search/', include('pointless_impressions_src.search.urls')),
 ]

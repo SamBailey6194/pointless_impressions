@@ -15,8 +15,9 @@ if not SECRET_KEY:
     raise ValueError("DJANGO_SECRET_KEY environment variable is required")
 
 DEBUG = os.getenv("DEBUG", "False") == "True"
-ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "localhost").split(",")
 PRODUCTION = True
+SESSION_COOKIE_SECURE = True
+SESSION_COOKIE_SAMESITE = "Lax"
 
 # Database configuration (using course database maker)
 DATABASES = {
@@ -111,3 +112,6 @@ CSP_CONNECT_SRC = (
     S3_DOMAIN,
     'https://res.cloudinary.com',
 )
+
+# Adjust logging for staging
+# LOGGING['handlers']['file']['level'] = 'INFO'

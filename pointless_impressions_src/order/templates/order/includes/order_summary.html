@@ -1,0 +1,127 @@
+{% load static tailwind_tags cloudinary crispy_forms_tags %}
+
+{# Order Summary Section #}
+<div class="card shadow-md">
+  <div class="card-body">
+    <h2 class="card-title text-3xl font-bold mb-2">
+      <i class="fa-solid fa-receipt mr-2"></i> Order Number: {{ order.order_number }}
+    </h2>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+      <div class="min-w-0">
+          <h4 class="text-lg font-semibold mb-2">
+              <i class="fa-solid fa-truck-fast mr-1"></i> Shipping Address
+          </h4>
+          <div class="p-3 bg-gray-300 dark:bg-gray-700 rounded-md text-sm">
+              <p><strong>First Name:</strong> {{ order.shipping_first_name }}</p>
+              <p><strong>Last Name:</strong> {{ order.shipping_last_name }}</p>
+              <p><strong>Address Line 1:</strong> {{ order.shipping_address_line_1 }}</p>
+              {% if order.shipping_address_line_2 %}
+                  <p><strong>Address Line 2:</strong> {{ order.shipping_address_line_2 }}</p>
+              {% endif %}
+              <p><strong>City:</strong> {{ order.shipping_city }}</p>
+              {% if order.shipping_county %}
+                  <p><strong>County:</strong> {{ order.shipping_county }}</p>
+              {% endif %}
+              <p><strong>Postal Code:</strong> {{ order.shipping_postcode }}</p>
+              <p><strong>Country:</strong> {{ order.shipping_country }}</p>
+          </div>
+      </div>
+      <div class="min-w-0">
+          <h4 class="text-lg font-semibold mb-2">
+              <i class="fa-solid fa-file-invoice-dollar mr-1"></i> Billing Address
+          </h4>
+          <div class="p-3 bg-gray-300 dark:bg-gray-700 rounded-md text-sm">
+              <p><strong>First Name:</strong> {{ order.billing_first_name }}</p>
+              <p><strong>Last Name:</strong> {{ order.billing_last_name }}</p>
+              <p><strong>Address Line 1:</strong> {{ order.billing_address_line_1 }}</p>
+              {% if order.billing_address_line_2 %}
+                  <p><strong>Address Line 2:</strong> {{ order.billing_address_line_2 }}</p>
+              {% endif %}
+              <p><strong>City:</strong> {{ order.billing_city }}</p>
+              {% if order.billing_county %}
+                  <p><strong>County:</strong> {{ order.billing_county }}</p>
+              {% endif %}
+              <p><strong>Postal Code:</strong> {{ order.billing_postcode }}</p>
+              <p><strong>Country:</strong> {{ order.billing_country }}</p>
+          </div>
+        </div>
+    </div>
+    <hr class="my-2">
+
+    <h3 class="text-2xl font-bold mb-4">Items Ordered</h3>
+
+    {% if order.items.all %}
+      <div class="block space-y-4">
+        
+        {% for item in order.items.all %}
+          <div class="border rounded-lg p-4">
+            <div class="flex gap-4 mb-3">
+              <div class="flex-1">
+                <h3 class="font-semibold mb-1 md:text-lg lg:text-xl">{{ item.item_name }}</h3>
+                {% if item.notes %}
+                  <p class="text-xs md:text-sm lg:text-md mb-2">Notes: {{ item.notes }}</p>
+                {% endif %}
+              </div>
+              <figure class="w-32 md:w-52 lg:w-64 xl:w-72 shrink-0">
+                {% if item.image_url_at_purchase %}
+                  {% if production %}
+                    {% cloudinary item.image_url_at_purchase format="auto" quality="auto" width=112 height=112 crop="fill" class="w-full h-full object-cover rounded-md" alt=item.item_name %}
+                  {% else %}
+                    <img src="{{ item.image_url_at_purchase }}" alt="{{ item.item_name }}" class="w-full h-full object-cover rounded-md" />
+                  {% endif %}
+                {% elif item.artwork and item.artwork.main_photo %}
+                  {% with image_to_render=item.artwork.main_photo %}
+                    {% if production %}
+                      {% cloudinary image_to_render.image format="auto" quality="auto" width=112 height=112 crop="fill" class="w-full h-full object-cover rounded-md" alt=image_to_render.alt_text_or_default %}
+                    {% else %}
+                      <img src="{{ image_to_render.get_image_url }}" alt="{{ image_to_render.alt_text_or_default }}" class="w-full h-full object-cover rounded-md" />
+                    {% endif %}
+                  {% endwith %}
+                {% endif %}
+              </figure>
+            </div>
+              <div class="flex justify-between">
+                <span class="md:text-xl lg:text-2xl">Framing:</span>
+                <span class="font-medium md:text-lg lg:text-xl">{{ item.framing_condition }}</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="md:text-xl lg:text-2xl">Price:</span>
+                <span class="font-medium md:text-lg lg:text-xl">£{{ item.price_at_purchase|floatformat:2 }}</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="md:text-xl lg:text-2xl">Quantity:</span>
+                <span class="font-medium md:text-lg lg:text-xl">{{ item.quantity }}</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="font-semibold md:text-xl lg:text-2xl">Subtotal:</span>
+                <span class="font-bold md:text-lg lg:text-xl">£{{ item.get_total_price|floatformat:2 }}</span>
+              </div>
+          </div>
+        {% endfor %}
+      </div>
+
+      {# Totals Section #}
+      <div class="flex flex-row justify-end border-t pt-4 gap-4 mt-4">
+        {% with total_quantity=order.get_total_quantity %}
+        <div class="flex flex-col text-right text-base-content/90">
+          <span class="my-2 md:text-xl lg:text-2xl">Subtotal <span class="text-sm py-2">({{ total_quantity }} item{{ total_quantity|pluralize }})</span></span>
+          <span class="my-2 md:text-xl lg:text-2xl">Delivery:</span>
+          <span class="my-2 font-extrabold md:text-xl lg:text-2xl">Grand Total:</span>
+        </div>
+        <div class="flex flex-col text-right min-w-[90px]">
+          <span class="my-2 md:text-xl lg:text-2xl">£{{ order.subtotal|floatformat:2 }}</span>
+          <span class="my-2 md:text-xl lg:text-2xl">
+            {% if order.delivery_fee > 0 %} 
+              £{{ order.delivery_fee|floatformat:2 }}
+            {% else %}
+              Free
+            {% endif %}
+          </span>
+          <span class="my-2 font-extrabold text-lg md:text-xl lg:text-2xl">£{{ order.grand_total|floatformat:2 }}</span>
+        </div>
+        {% endwith %}
+      </div>
+    {% endif %}
+  </div>
+</div>

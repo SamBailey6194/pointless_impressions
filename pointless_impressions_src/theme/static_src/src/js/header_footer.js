@@ -2,11 +2,11 @@ document.addEventListener("DOMContentLoaded", () => {
   // Elements
   const header = document.querySelector("header");
   const footer = document.querySelector("footer");
-  
+
   // DaisyUI-specific elements
   const mobileSearchBar = document.getElementById("mobile-search-bar");
   const dropdowns = document.querySelectorAll('.dropdown');
-  
+
   let lastScroll = 0;
   let ticking = false;
 
@@ -101,7 +101,7 @@ document.addEventListener("DOMContentLoaded", () => {
       console.error("Failed to initialize autoComplete:", error);
     }
   }
-  
+
   // Initialise search inputs and Autocomplete
   const searchInputs = document.querySelectorAll('input[type="text"][name="q"]');
   searchInputs.forEach(input => {
@@ -204,15 +204,28 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // Cart functionality placeholders
-  const cartButtons = document.querySelectorAll('[class*="cart"]');
-  cartButtons.forEach(button => {
-    button.addEventListener('click', (e) => {
-      if (button.textContent.includes('View Cart')) {
-        e.preventDefault();
-        // TODO: Implement cart navigation
-        // window.location.href = '/cart/';
-      }
-    });
-  });
+// ----------------------------------------------
+// Handle cart dropdown refresh
+// ----------------------------------------------
+  if (window.cart && window.cart.refreshAndOpenDropdown) {
+    window.refreshAndOpenDropdown = window.cart.refreshAndOpenDropdown;
+  }
+
+// ----------------------------------------------
+// Display toast messages from data attributes
+// ----------------------------------------------
+  const successMessage = document.body.dataset.toastSuccess;
+  const errorMessage = document.body.dataset.toastError;
+
+  if (window.Toast) {
+    if (successMessage) {
+      window.Toast.show(successMessage, 'success');
+    }
+
+    if (errorMessage) {
+      window.Toast.show(errorMessage, 'error');
+    }
+  } else {
+    console.warn('Toast system not loaded, messages will not appear.');
+  }
 });

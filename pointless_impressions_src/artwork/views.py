@@ -3,7 +3,6 @@ from django.db.models import Prefetch, Avg, Count
 from django.conf import settings
 import json
 from django.http import JsonResponse, Http404
-from django.core.serializers.json import DjangoJSONEncoder
 from django.utils.translation import gettext as _
 from django.template.defaultfilters import truncatewords
 from django.views.decorators.http import require_http_methods
@@ -12,10 +11,11 @@ from django.contrib.auth import get_user_model
 from django.utils.decorators import method_decorator
 from .models import (
     Artwork, ArtworkCategory, ArtworkFramingCondition, ArtworkReview
-    )
-from .forms import ArtworkReviewForm
+)
+from .forms import ArtworkReviewForm, AddToCartForm
 from pointless_impressions_src.photo.models import Photo
 from pointless_impressions_src.profiles.models import Artist
+from pointless_impressions_src.cart.models import Cart
 from pointless_impressions_src.profiles.mixins import CustomerRequiredMixin
 
 
@@ -125,7 +125,12 @@ def _serialize_artwork_data(artwork_queryset, placeholder_image):
 
         # Framing Condition Data
         conditions = [
-            {'name': cond.condition_name, 'slug': cond.slug}
+            {
+                'id': cond.id,
+                'name': cond.condition_name,
+                'friendly_name': cond.condition_friendly_name,
+                'slug': cond.slug
+            }
             for cond in getattr(artwork, 'prefetched_conditions', [])
         ]
 
@@ -136,7 +141,7 @@ def _serialize_artwork_data(artwork_queryset, placeholder_image):
             'artist': artist_data,
             'full_description': full_desc,
             'description': truncated_desc,
-            'price': float(artwork.price),
+            'price': round(float(artwork.price), 2),
             'category': artwork.category.name if artwork.category else None,
             'selected_conditions': conditions,
             'is_available': artwork.is_available,
@@ -193,7 +198,7 @@ class ArtworkListView(ListView):
         A JSON string containing artwork data for use in frontend scripts.
 
     **Template:**
-    :template:`artwork/artwork.html`
+    :template:`artwork/artwork_list.html`
     """
 
     model = Artwork
@@ -270,44 +275,25 @@ class ArtworkListView(ListView):
         context['placeholder_image'] = get_placeholder_image()
         context['artwork_categories'] = (
             ArtworkCategory.objects.all()
-            )
+        )
         context['framing_conditions'] = (
             ArtworkFramingCondition.objects.all()
-            )
+        )
         context['all_artists'] = Artist.objects.select_related(
             'user').filter(user__is_active=True).order_by('user__username')
-        # Prepare JSON data for artworks on the current page
-        artworks_on_page = context['artworks']
-        placeholder = context['placeholder_image']
 
+        # Prepare AddToCartForm for each artwork
+        artworks_on_page = context['artworks']
+        for artwork in artworks_on_page:
+            artwork.add_to_cart_form = AddToCartForm(artwork_id=artwork.id)
+
+        # Prepare JSON data for artworks on the current page
+        placeholder = context['placeholder_image']
         raw_artwork_data = _serialize_artwork_data(
             artworks_on_page, placeholder
-            )
+        )
+        context['artworks_json_data'] = json.dumps(raw_artwork_data)
 
-        cleaned_artwork_data = []
-        for artwork in raw_artwork_data:
-            cleaned_artwork_data.append({
-                'id': artwork['id'],
-                'name': artwork['name'],
-                'description': artwork['description'],
-                'full_description': artwork['full_description'],
-                'price': float(artwork['price']),
-                'category': artwork['category'],
-                'selected_conditions': [
-                    cond['name'] for cond in artwork['selected_conditions']
-                ],
-                'is_available': artwork['is_available'],
-                'is_in_stock': artwork['is_in_stock'],
-                'is_featured': artwork['is_featured'],
-                'sku': artwork['sku'],
-                'slug': artwork['slug'],
-                'image_url': artwork['image_url'],
-                'image_public_id': artwork['image_public_id'],
-                'image_alt_text': artwork['image_alt_text'],
-            })
-        context['artworks_json_data'] = json.dumps(
-            cleaned_artwork_data, cls=DjangoJSONEncoder
-            )
         return context
 
 
@@ -324,6 +310,10 @@ class ArtworkDetailView(DetailView):
     **Context**
     ``artwork``
         An instance of the Artwork model.
+
+    Add to Cart Form:
+        An instance of the AddToCartForm for adding the artwork to cart.
+        Uses AJAX submission for the frontend to make UX seamless.
 
     **Template:**
     :template:`artwork/artwork_detail.html`
@@ -343,7 +333,7 @@ class ArtworkDetailView(DetailView):
             Prefetch(
                 'selected_conditions',
                 queryset=ArtworkFramingCondition.objects.only(
-                    'condition_name', 'id', 'slug'
+                    'condition_name', 'id', 'slug', 'condition_friendly_name'
                     ), to_attr='prefetched_conditions'
             )
         ).order_by('id')
@@ -374,10 +364,9 @@ class ArtworkDetailView(DetailView):
 
         serialized_data_list = _serialize_artwork_data(
             [artwork], placeholder
-            )
+        )
 
         artwork_data = serialized_data_list[0]
-
         context['artwork_data'] = artwork_data
 
         all_photos = artwork.photos.all()
@@ -385,6 +374,18 @@ class ArtworkDetailView(DetailView):
 
         context['prefetched_conditions'] = artwork.prefetched_conditions
         context['reviews'] = artwork.reviews.all().order_by('-created_at')
+
+        framing_options = []
+        for condition in artwork.prefetched_conditions:
+            framing_options.append({
+                'id': condition.id,
+                'name': (
+                    condition.condition_friendly_name or
+                    condition.condition_name
+                ),
+                'slug': condition.slug
+            })
+        context['framing_options_json'] = json.dumps(framing_options)
 
         if artwork.artist:
             similar_artists = Artwork.objects.filter(
@@ -407,10 +408,70 @@ class ArtworkDetailView(DetailView):
             context['similar_artworks'] = similar_artworks
 
         context['review_form'] = ArtworkReviewForm()
+        context['add_to_cart_form'] = AddToCartForm(artwork_id=artwork.id)
         context['production'] = not settings.DEBUG
         context['debug'] = settings.DEBUG
 
+        # Pass the stock quantity to the context
+        context['stock'] = artwork.stock
+
+        # Set the form action to the current page URL
+        context['form_action'] = self.request.path
+
+        # Include session ID in the context for the frontend
+        context['sessionid'] = self.request.session.session_key
+
+        # Ensuring session ID exists
+        session_id = self.request.session.session_key
+        if not session_id:
+            self.request.session.create()
+            session_id = self.request.session.session_key
+
         return context
+
+    def post(self, request, *args, **kwargs):
+        """
+        Handles the Add to Cart functionality.
+        Validates the AddToCartForm and updates the cart in the database.
+        """
+        artwork = self.get_object()
+
+        form = AddToCartForm(request.POST, artwork_id=artwork.id)
+        if form.is_valid():
+            framing_option = form.cleaned_data.get('framing_option')
+
+            # Retrieve or create the cart for the current session
+            session_id = request.session.session_key
+            if not session_id:
+                request.session.create()
+                session_id = request.session.session_key
+
+            cart, created = Cart.get_or_create_from_sessionid(session_id)
+
+            quantity = form.cleaned_data.get('quantity')
+            notes = form.cleaned_data.get('notes', '')
+
+            cart.add_or_update_item(
+                artwork=artwork,
+                quantity=quantity,
+                framing_condition=framing_option,
+                notes=notes
+            )
+
+            total_quantity = cart.get_total_quantity()
+
+            return JsonResponse(
+                {
+                    'success': True,
+                    'message': ' Artwork added to cart.',
+                    'cart_count': total_quantity,
+                    'total_quantity': total_quantity
+                    }
+                )
+
+        return JsonResponse(
+            {'success': False, 'errors': form.errors}, status=400
+        )
 
 
 # ---------------------------

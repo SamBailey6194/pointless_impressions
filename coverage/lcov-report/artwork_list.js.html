@@ -445,6 +445,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">4x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -585,13 +586,9 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -654,6 +651,9 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
@@ -733,13 +733,14 @@ export function renderArtworkList(artworks) {
                     
                     &lt;div class="card-actions justify-between items-center mt-4"&gt;
                         ${artwork.is_in_stock ? `
-                            &lt;button class="add-to-cart btn btn-primary btn-sm"&gt;
-                                &lt;i class="fa-solid fa-cart-plus"&gt;&lt;/i&gt; Add to Cart
-                            &lt;/button&gt;
-                            &lt;a href="${detailUrl}" class="btn btn-outline btn-sm"&gt;&lt;i class="fa-solid fa-eye"&gt;&lt;/i&gt; Details&lt;/a&gt;
+                            &lt;a href="${detailUrl}" class="btn btn-outline btn-sm ml-auto"&gt;
+                                &lt;i class="fa-solid fa-eye"&gt;&lt;/i&gt; Details
+                            &lt;/a&gt;
                         ` : `
                             &lt;span class="sold-out badge badge-error"&gt;Sold Out&lt;/span&gt;
-                            &lt;a href="${detailUrl}" class="btn btn-outline btn-sm"&gt;&lt;i class="fa-solid fa-eye"&gt;&lt;/i&gt; Details&lt;/a&gt;
+                            &lt;a href="${detailUrl}" class="btn btn-outline btn-sm"&gt;
+                                &lt;i class="fa-solid fa-eye"&gt;&lt;/i&gt; Details
+                            &lt;/a&gt;
                         `}
                     &lt;/div&gt;
                 &lt;/div&gt;`;
@@ -883,14 +884,10 @@ function <span class="fstat-no" title="function not covered" >initArtworkListEnh
 &nbsp;
 <span class="cstat-no" title="statement not covered" >    updateSortButtonStates();</span>
 &nbsp;
-    // Only enhance with JSON data if we have it AND the user is interacting with sorting/filtering
-    // This allows server-side rendered images to be visible by default
 <span class="cstat-no" title="statement not covered" >    if (typeof window.ARTWORKS_JSON_DATA !== 'undefined' &amp;&amp; window.ARTWORKS_JSON_DATA.length &gt; 0) {</span>
 <span class="cstat-no" title="statement not covered" >        masterArtworkList = window.ARTWORKS_JSON_DATA;</span>
 <span class="cstat-no" title="statement not covered" >        isEnhanced = true;</span>
 &nbsp;
-        // Only render if we have SORT parameters (not filter parameters)
-        // Filter parameters cause a page reload, so server-side rendering handles them
         const params = <span class="cstat-no" title="statement not covered" >new URLSearchParams(window.location.search);</span>
         const hasActiveSorting = <span class="cstat-no" title="statement not covered" >params.has('sort') || params.has('direction');</span>
         
@@ -954,6 +951,9 @@ function <span class="fstat-no" title="function not covered" >initPriceFilterVal
 <span class="cstat-no" title="statement not covered" >    validatePrices();</span>
 }
 &nbsp;
+// -------------------------------------------------------------------
+// DOMContentLoaded Initialization
+// -------------------------------------------------------------------
 document.addEventListener("DOMContentLoaded", <span class="fstat-no" title="function not covered" >fu</span>nction() {
 <span class="cstat-no" title="statement not covered" >    initArtworkListEnhancements();</span>
 <span class="cstat-no" title="statement not covered" >    initPriceFilterValidation();</span>
@@ -964,7 +964,7 @@ document.addEventListener("DOMContentLoaded", <span class="fstat-no" title="func
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-11-08T11:16:34.834Z
+                at 2025-11-15T15:26:46.538Z
             </div>
         <script src="prettify.js"></script>
         <script>

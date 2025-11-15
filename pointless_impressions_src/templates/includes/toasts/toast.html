@@ -1,0 +1,38 @@
+{% comment %}
+Toast Notification Container & Django Message Bridge
+====================================================
+
+This template provides:
+1. Toast container (DOM element where toasts appear)
+2. Django messages data (passes messages to JavaScript)
+
+The Toast JS logic is in: toasts.js
+
+Include in base.html:
+  {% include 'includes/toasts/toast.html' %}
+
+Usage:
+  - JavaScript: window.Toast.success('Done!');
+  - Django view: messages.success(request, 'Done!');
+{% endcomment %}
+<div id="toast-container" class="fixed top-4 z-9999 space-y-2 max-w-sm pointer-events-none"></div>
+
+{% if messages %}
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const djangoMessages = [
+        {% for message in messages %}
+          {
+            text: "{{ message|escapejs }}",
+            level: "{{ message.level_tag }}",
+          },
+        {% endfor %}
+      ];
+      if (window.Toast && typeof window.Toast.displayDjangoMessages === 'function') {
+        window.Toast.displayDjangoMessages(djangoMessages);
+      } else {
+        console.warn('Toast system not loaded. Ensure toasts.js is loaded in base.html');
+      }
+    });
+  </script>
+{% endif %}

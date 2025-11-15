@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% load static cloudinary tailwind_tags %}
+{% load static cloudinary tailwind_tags crispy_forms_tags %}
 {% load artwork_filters %}
 
 {% block content %}
@@ -208,10 +208,7 @@
                 
                 <div class="card-actions justify-between items-center mt-4">
                   {% if artwork.is_in_stock %}
-                    <button class="add-to-cart btn btn-primary btn-sm">
-                      <i class="fa-solid fa-cart-plus"></i> Add to Cart
-                    </button>
-                    <a href="{% url 'artwork:detail' artwork.slug %}" class="btn btn-outline btn-sm">
+                    <a href="{% url 'artwork:detail' artwork.slug %}" class="btn btn-outline btn-sm ml-auto">
                       <i class="fa-solid fa-eye"></i> Details
                     </a>
                   {% else %}

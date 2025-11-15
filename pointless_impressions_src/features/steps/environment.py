@@ -27,6 +27,14 @@ def before_scenario(context, scenario):
 
     if not hasattr(context, 'test_client'):
         context.test_client = Client()
+    
+    # Create alias context.client for convenience
+    # behave_django provides context.test.client, but we also support context.client
+    if hasattr(context, 'test') and hasattr(context.test, 'client'):
+        context.client = context.test.client
+    else:
+        context.client = context.test_client
+    
     # Ensure we're in the test database
     from django.db import connections
     for conn in connections.all():

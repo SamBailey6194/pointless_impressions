@@ -27,7 +27,9 @@ def _parse_artworks_html(response):
 
         name = name_tag.get_text(strip=True)
         description = desc_tag.get_text(strip=True) if desc_tag else ""
-        price_text = price_tag.get_text(strip=True).replace("£", "").replace(",", "")
+        price_text = price_tag.get_text(strip=True).replace("£", "").replace(
+            ",", ""
+            )
         try:
             price = float(price_text)
         except ValueError:
@@ -82,6 +84,9 @@ def step_create_artworks(context):
         condition_description="Artwork is unframed."
     )
 
+    # Store created artworks in context for later access in steps
+    context.artworks = {}
+
     for row in context.table:
         is_in_stock = row['is_in_stock'].lower() == 'true'
         quantity_value = 1 if is_in_stock else 0
@@ -100,6 +105,8 @@ def step_create_artworks(context):
             updated_at=timezone.now(),
         )
         art.selected_conditions.add(default_framing_condition)
+        # Store artwork by name for access in other steps
+        context.artworks[row['name']] = art
 
 
 # --------------------------
