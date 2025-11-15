@@ -16,6 +16,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent.parent
 ENV_PATH = BASE_DIR
 load_dotenv(os.path.join(ENV_PATH, ".env"))
 
+# Pull from environment (works with .env.dev locally or Heroku config vars)
+_raw_hosts = os.getenv("ALLOWED_HOSTS", "localhost")
+ALLOWED_HOSTS = [h.strip() for h in _raw_hosts.split(",") if h.strip()]
+
 # Application definition
 DJANGO_APPS = [
     "django.contrib.admin",
@@ -39,6 +43,8 @@ THIRD_PARTY_APPS = [
     # Form rendering
     "crispy_forms",
     "crispy_tailwind",
+    # Phone Support
+    "phonenumber_field",
 ]
 
 LOCAL_APPS = [
@@ -51,6 +57,8 @@ LOCAL_APPS = [
     "pointless_impressions_src.search",
     "pointless_impressions_src.profiles",
     "pointless_impressions_src.dashboard",
+    "pointless_impressions_src.cart",
+    "pointless_impressions_src.order",
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -65,6 +73,16 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
+
+# Ensure DebugSessionMiddleware is added after SessionMiddleware
+session_middleware_index = MIDDLEWARE.index(
+    "django.contrib.sessions.middleware.SessionMiddleware"
+)
+MIDDLEWARE.insert(
+    session_middleware_index + 1,
+    "pointless_impressions_src.pointless_impressions.middleware."
+    "debug_session_middleware.DebugSessionMiddleware",
+)
 
 # Cache configuration (Redis)
 CACHES = {
@@ -89,10 +107,37 @@ ROOT_URLCONF = "pointless_impressions_src.pointless_impressions.urls"
 TAILWIND_APP_NAME = "pointless_impressions_src.theme"
 TAILWIND_CSS_PATH = "css/styles.css"
 
+CRISPY_ALLOWED_TEMPLATE_PACKS = "tailwind"
+CRISPY_TEMPLATE_PACK = "tailwind"
+
 # Session configuration
 SESSION_COOKIE_AGE = 1209600  # 2 weeks
 SESSION_SAVE_EVERY_REQUEST = True
 SESSION_EXPIRE_AT_BROWSER_CLOSE = False
+SESSION_COOKIE_NAME = "sessionid"
+
+# Session cookie settings
+SESSION_COOKIE_HTTPONLY = False
+SESSION_COOKIE_SECURE = False
+SESSION_COOKIE_SAMESITE = "Lax"
+
+# CSRF configuration
+CSRF_TRUSTED_ORIGINS = [
+    h if "://" in h else f"https://{h}"
+    for h in ALLOWED_HOSTS
+]
+
+# CORS configuration
+CORS_ALLOWED_ORIGINS = [
+    h if "://" in h else f"https://{h}"
+    for h in ALLOWED_HOSTS
+]
+CORS_ALLOW_CREDENTIALS = True
+
+# Phone number field settings
+PHONENUMBER_DEFAULT_REGION = "GB"
+PHONENUMBER_DB_FORMAT = "E164"
+PHONENUMBER_DEFAULT_FORMAT = "E164"
 
 # Templates
 TEMPLATES = [
@@ -110,14 +155,19 @@ TEMPLATES = [
                 "django.template.context_processors.tz",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
-                "pointless_impressions_src.pointless_impressions.context_processors.global_context",
+                "pointless_impressions_src.pointless_impressions."
+                "context_processors.global_context",
+                "pointless_impressions_src.cart.context_processors."
+                "cart_context_processor",
             ],
         },
     },
 ]
 
 # WSGI application
-WSGI_APPLICATION = "pointless_impressions_src.pointless_impressions.wsgi.application"
+WSGI_APPLICATION = (
+    "pointless_impressions_src.pointless_impressions.wsgi.application"
+    )
 
 # Custom user model
 AUTH_USER_MODEL = "account.CustomUser"
@@ -173,5 +223,69 @@ MEDIA_ROOT = BASE_DIR / "media"
 # Default primary key field type
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-# Default static version for cache busting
+# Free delivery threshold (in GBP)
+DELIVERY_FEE_TIERS = [
+    (1, 12.00),
+    (2, 18.00),
+    (3, 25.00),
+    (4, 30.00),
+]
+FREE_DELIVERY_THRESHOLD = 5
+FEE_MAP = dict(DELIVERY_FEE_TIERS)
+
 STATIC_VERSION = os.getenv("STATIC_VERSION", "1.0.0")
+
+# # Logging configuration
+# APP_LOGGERS = [
+#     "pointless_impressions_src.pointless_impressions",
+#     "pointless_impressions_src.home",
+#     "pointless_impressions_src.theme",
+#     "pointless_impressions_src.artwork",
+#     "pointless_impressions_src.photo",
+#     "pointless_impressions_src.account",
+#     "pointless_impressions_src.search",
+#     "pointless_impressions_src.profiles",
+#     "pointless_impressions_src.dashboard",
+#     "pointless_impressions_src.cart",
+#     "pointless_impressions_src.order",
+# ]
+
+# # Generate the common configuration for all app loggers
+# APP_LOGGER_CONFIG = {
+#     app_name: {
+#         'handlers': ['console', 'file'],
+#         'level': 'DEBUG',
+#         'propagate': False,
+#     }
+#     for app_name in APP_LOGGERS
+# }
+
+# # The main LOGGING dictionary
+# LOGGING = {
+#     'version': 1,
+#     'disable_existing_loggers': True,
+#     'formatters': {
+#         'verbose': {
+#             'format': '{levelname} {asctime} {module} {message}',
+#             'style': '{',
+#         },
+#     },
+#     'handlers': {
+#         'file': {
+#             'level': 'DEBUG',
+#             'class': 'logging.handlers.RotatingFileHandler',
+#             'filename': 'debug.log',
+#             'formatter': 'verbose',
+#             'maxBytes': 1024 * 1024 * 5,
+#             'backupCount': 5,
+#         },
+#     },
+#     'loggers': {
+#         **APP_LOGGER_CONFIG,
+#         'django': {
+#             'handlers': ['console'],
+#             'level': 'INFO',
+#             'propagate': True,
+#         },
+#     },
+# }

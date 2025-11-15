@@ -36,8 +36,10 @@ Please copy the example to the relevant part for your tests.
           - [Artwork Admin Permissions Tests](#artwork-admin-permissions-tests)
           - [Artwork Validation Tests](#artwork-validation-tests)
           - [Artwork Form Tests](#artwork-form-tests)
-        - [Photo Form Tests](#photo-form-tests)
-          - [Photo Form Field Conditioning Tests](#photo-form-field-conditioning-tests)
+        - [US003: Add Artwork to Cart \& US004: Checkout with Address Form - In Artwork App](#us003-add-artwork-to-cart--us004-checkout-with-address-form---in-artwork-app)
+          - [Cart Session Management Tests](#cart-session-management-tests)
+    - [Photo Form Tests (DRY Approach)](#photo-form-tests-dry-approach)
+      - [Photo Form Field Conditioning Tests](#photo-form-field-conditioning-tests)
     - [BDD Testing via Behave](#bdd-testing-via-behave)
       - [US001: Browse Available Artworks - In Artwork App](#us001-browse-available-artworks---in-artwork-app-1)
         - [Artwork Browsing Features](#artwork-browsing-features)
@@ -47,12 +49,21 @@ Please copy the example to the relevant part for your tests.
           - [Filter Artworks by Availability](#filter-artworks-by-availability)
           - [View Artwork Details](#view-artwork-details)
       - [US002: View Artwork Details - In Artwork App](#us002-view-artwork-details---in-artwork-app-1)
-        - [Artwork Detail Display](#artwork-detail-display)
         - [Availability Status](#availability-status)
-        - [Artist and Category Information](#artist-and-category-information)
-        - [Framing Conditions Display](#framing-conditions-display)
+        - [Artist Information](#artist-information)
         - [Related Artworks Display](#related-artworks-display)
-        - [Reviews Section Display](#reviews-section-display)
+        - [Framing Conditions Display](#framing-conditions-display)
+      - [US003: Add Artwork to Cart \& US004: Checkout with Address Form - In Artwork App](#us003-add-artwork-to-cart--us004-checkout-with-address-form---in-artwork-app-1)
+        - [Add to Cart Features](#add-to-cart-features)
+          - [Add Available Artwork to Cart](#add-available-artwork-to-cart)
+          - [Prevent Adding Sold-Out Artwork](#prevent-adding-sold-out-artwork)
+          - [Add Multiple Different Artworks](#add-multiple-different-artworks)
+          - [Increment Quantity When Adding Same Artwork Twice](#increment-quantity-when-adding-same-artwork-twice)
+          - [Cart Display Information](#cart-display-information)
+          - [Remove Artwork from Cart](#remove-artwork-from-cart)
+          - [Update Cart Quantity](#update-cart-quantity)
+          - [Prevent Quantity Exceeding Available Stock](#prevent-quantity-exceeding-available-stock)
+          - [Scenario 9: Session-Based Cart Persistence (Implementation Detail)](#scenario-9-session-based-cart-persistence-implementation-detail)
     - [JavaScript Tests](#javascript-tests)
       - [TDD Testing via Jest](#tdd-testing-via-jest)
         - [US001: Browse Available Artworks - In Artwork App](#us001-browse-available-artworks---in-artwork-app-2)
@@ -61,22 +72,30 @@ Please copy the example to the relevant part for your tests.
           - [Artwork Detail Display Functions](#artwork-detail-display-functions)
           - [Carousel Navigation Functions](#carousel-navigation-functions)
           - [Review Submission Functions](#review-submission-functions)
+        - [US003: Add Artwork to Cart \& US004: Checkout with Address Form - In Artwork App](#us003-add-artwork-to-cart--us004-checkout-with-address-form---in-artwork-app-2)
+    - [Quantity Button Behaviour Tests](#quantity-button-behaviour-tests)
+    - [Network \& Server Error Handling Tests](#network--server-error-handling-tests)
+    - [Add To Cart Page Initialisation Tests](#add-to-cart-page-initialisation-tests)
       - [BDD Testing via Cypress](#bdd-testing-via-cypress)
         - [US001: Browse Available Artworks - In Artwork App](#us001-browse-available-artworks---in-artwork-app-3)
           - [Artwork Browsing Features](#artwork-browsing-features-1)
         - [US002: View Artwork Details - In Artwork App](#us002-view-artwork-details---in-artwork-app-3)
           - [Artwork Detail Page Access](#artwork-detail-page-access)
-          - [Artwork Information Display](#artwork-information-display)
-        - [Availability Status](#availability-status-1)
-          - [Artist Information](#artist-information)
-          - [Category Information](#category-information)
+          - [Artwork Title Display](#artwork-title-display)
+          - [Artwork Description Display](#artwork-description-display)
+          - [Price Display](#price-display)
+          - [Image Display](#image-display)
+          - [Availability Status](#availability-status-1)
+          - [Related Artworks Section](#related-artworks-section)
           - [Framing Conditions](#framing-conditions)
-          - [Carousel Navigation](#carousel-navigation)
-          - [Similar Artworks Display](#similar-artworks-display)
-          - [Reviews Section](#reviews-section)
+          - [Category Information](#category-information)
           - [Responsive Design](#responsive-design)
           - [Accessibility](#accessibility)
           - [Error Handling](#error-handling)
+        - [US003: Add Artwork to Cart \& US004: Checkout with Address Form - In Artwork App](#us003-add-artwork-to-cart--us004-checkout-with-address-form---in-artwork-app-3)
+          - [Add to Cart Button](#add-to-cart-button)
+          - [Adding Single Artwork](#adding-single-artwork)
+          - [Accessibility](#accessibility-1)
 
 ---
 
@@ -501,6 +520,25 @@ Running specific tests can be done following the below:
 
 ---
 
+##### US003: Add Artwork to Cart & US004: Checkout with Address Form - In Artwork App
+
+###### Cart Session Management Tests
+
+| Step | Action | Outcome | Pass / Fail |
+| :--- | :--- | :--- | :--- |
+| 1 | Add available artwork to session cart | Artwork successfully added with id, name, price, quantity, and sku | Pass |
+| 2 | Add multiple different artworks to cart | Both artworks present in session with correct data | Pass |
+| 3 | Add same artwork to cart twice | Quantity increments from 1 to 2 for existing item | Pass |
+| 4 | Prevent adding sold-out artwork | Sold-out artwork not added; is_available=False and quantity=0 verified | Pass |
+| 5 | Calculate cart total with single item | Total = item price × quantity (e.g., 199.99 × 1 = 199.99) | Pass |
+| 6 | Calculate cart total with multiple items | Total = sum of (price × quantity) for all items (e.g., 649.97 for mixed items) | Pass |
+| 7 | Remove artwork from cart | Item deleted from session; other items remain | Pass |
+| 8 | Update quantity in cart | Item quantity updated to new value and persists | Pass |
+| 9 | Verify empty cart | Cart session exists but contains no items | Pass |
+| 10 | Cart persistence across requests | Item added in first request still present in second request | Pass |
+
+---
+
 ### Photo Form Tests (DRY Approach)
 
 #### Photo Form Field Conditioning Tests
@@ -519,10 +557,10 @@ Photo forms use a DRY (Don't Repeat Yourself) approach with conditional field in
 | 8 | Initialize PhotoForm with photo_type='profile' | Form fields 'artwork' and 'asset_identifier' are both excluded from form.fields | Pass |
 | 9 | Submit PhotoForm without title field | Form validation fails with error in `title` field | Pass |
 | 10 | Submit PhotoForm without description field | Form validation fails with error in `description` field | Pass |
-| 11 | Submit PhotoForm with title less than 3 characters | Form validation fails; title must be minimum 3 characters | Pass |
-| 12 | Submit PhotoForm with description less than 5 characters | Form validation fails; description must be minimum 5 characters | Pass |
-| 13 | Submit PhotoForm with alt_text exceeding 255 characters | Form validation fails; alt_text must be 255 characters or less | Pass |
-| 14 | Save valid PhotoForm with user parameter | Photo object saved with uploaded_by field set to provided user | Pass |
+| 11 | Submit PhotoForm with title less than 3 characters | Form validation fails with error in `title` field | Pass |
+| 12 | Submit PhotoForm with description less than 5 characters | Form validation fails with error in `description` field | Pass |
+| 13 | Submit PhotoForm with alt_text exceeding 255 characters | Form validation fails with error in `alt_text` field | Pass |
+| 14 | Save valid PhotoForm with user parameter | Photo object is saved with `uploaded_by` field set to the user | Pass |
 
 ---
 
@@ -612,6 +650,102 @@ Photo forms use a DRY (Don't Repeat Yourself) approach with conditional field in
 
 ---
 
+#### US003: Add Artwork to Cart & US004: Checkout with Address Form - In Artwork App
+
+**Important Note** Image-related steps are omitted as images do not render in Behave test mode. Cart is implemented as session-based (backend) with frontend localStorage integration planned for checkout app.
+
+##### Add to Cart Features
+
+###### Add Available Artwork to Cart
+
+| Step | Action | Outcome | Pass / Fail |
+| :--- | :--- | :--- | :--- |
+| 1 | Create test artwork "Sunset Pointilism" (£199.99, qty 5, available) | Artwork created successfully | Pass |
+| 2 | Navigate to artwork detail page | Detail page loads successfully | Pass |
+| 3 | Click "Add to Cart" button | Artwork added to session cart | Pass |
+| 4 | Verify artwork in cart | Cart session contains 1 item | Pass |
+| 5 | Verify cart total | Cart total calculation shows "£199.99" | Pass |
+
+###### Prevent Adding Sold-Out Artwork
+
+| Step | Action | Outcome | Pass / Fail |
+| :--- | :--- | :--- | :--- |
+| 1 | Create sold-out artwork "Sold Out Artwork" (£299.99, qty 0, unavailable) | Artwork created with is_available=False | Pass |
+| 2 | Navigate to artwork detail page | Detail page loads successfully | Pass |
+| 3 | Check "Add to Cart" button visibility | Button is not visible or disabled (is_available=False check) | Pass |
+
+###### Add Multiple Different Artworks
+
+| Step | Action | Outcome | Pass / Fail |
+| :--- | :--- | :--- | :--- |
+| 1 | Create "Sunset Pointilism" (£199.99, qty 5) and "Ocean Waves" (£249.99, qty 3) | Both artworks created successfully | Pass |
+| 2 | Navigate to "Sunset Pointilism" and click "Add to Cart" | First artwork added to session cart | Pass |
+| 3 | Navigate to "Ocean Waves" and click "Add to Cart" | Second artwork added to session cart | Pass |
+| 4 | Verify cart item count | Session cart contains 2 items | Pass |
+| 5 | Verify cart total | Total calculation shows "£449.98" (199.99 + 249.99) | Pass |
+
+###### Increment Quantity When Adding Same Artwork Twice
+
+| Step | Action | Outcome | Pass / Fail |
+| :--- | :--- | :--- | :--- |
+| 1 | Create "Sunset Pointilism" (£199.99, qty 5) | Artwork created successfully | Pass |
+| 2 | Navigate to artwork and click "Add to Cart" | Artwork added with quantity 1 | Pass |
+| 3 | Click "Add to Cart" button again | Quantity incremented to 2 | Pass |
+| 4 | Verify cart item count | Cart shows 1 item with quantity=2 | Pass |
+| 5 | Verify cart total | Total shows "£399.98" (199.99 × 2) | Pass |
+
+###### Cart Display Information
+
+| Step | Action | Outcome | Pass / Fail |
+| :--- | :--- | :--- | :--- |
+| 1 | Create "Mountain Peak" artwork (£179.99, qty 4, available) | Artwork created successfully | Pass |
+| 2 | Navigate to detail page and add to cart | Item added to session cart | Pass |
+| 3 | Verify item name in session | Session cart contains item with name "Mountain Peak" | Pass |
+| 4 | Verify item price in session | Item stored with price £179.99 | Pass |
+| 5 | Verify cart total calculated | Session total shows "£179.99" | Pass |
+
+###### Remove Artwork from Cart
+
+| Step | Action | Outcome | Pass / Fail |
+| :--- | :--- | :--- | :--- |
+| 1 | Create "Sunset Pointilism" (£199.99) and "Ocean Waves" (£249.99) | Both artworks created successfully | Pass |
+| 2 | Add both artworks to cart | Session cart contains 2 items | Pass |
+| 3 | Remove "Ocean Waves" from cart | Item removed from session | Pass |
+| 4 | Verify remaining item | Only "Sunset Pointilism" remains (£199.99) | Pass |
+| 5 | Verify removed item gone | "Ocean Waves" not in session cart | Pass |
+| 6 | Verify updated total | Total recalculates to "£199.99" | Pass |
+
+###### Update Cart Quantity
+
+| Step | Action | Outcome | Pass / Fail |
+| :--- | :--- | :--- | :--- |
+| 1 | Create "Sunset Pointilism" (£199.99, qty 5, available) | Artwork created successfully | Pass |
+| 2 | Add artwork to cart | Item added with quantity 1 | Pass |
+| 3 | Update quantity to 3 (no stock capping) | Quantity updated to 3 in session | Pass |
+| 4 | Verify quantity updated | Item quantity shows 3 | Pass |
+| 5 | Verify total recalculated | Total shows "£599.97" (199.99 × 3) | Pass |
+
+###### Prevent Quantity Exceeding Available Stock
+
+| Step | Action | Outcome | Pass / Fail |
+| :--- | :--- | :--- | :--- |
+| 1 | Create "Limited Artwork" (£149.99, qty 2, available) | Artwork created with only 2 in stock | Pass |
+| 2 | Add artwork to cart | Item added with quantity 1 | Pass |
+| 3 | Try to update quantity to 5 (with stock capping) | Quantity update attempted with max stock validation | Pass |
+| 4 | Verify quantity capped at stock limit | Quantity remains at 1 (or max allowed ≤ 2) | Pass |
+| 5 | Verify error message | Error message shown about insufficient stock | Pass |
+
+###### Scenario 9: Session-Based Cart Persistence (Implementation Detail)
+
+| Step | Action | Outcome | Pass / Fail |
+| :--- | :--- | :--- | :--- |
+| 1 | Add artwork to session cart | Item stored in Django session dict | Pass |
+| 2 | Verify session key structure | Session cart contains entries keyed by artwork id | Pass |
+| 3 | Verify session item structure | Each item contains: id, name, price, quantity, sku | Pass |
+| 4 | Verify calculation logic | Total = sum(item['price'] × item['quantity']) for all items | Pass |
+
+---
+
 ### JavaScript Tests
 
 #### TDD Testing via Jest
@@ -670,6 +804,42 @@ Photo forms use a DRY (Don't Repeat Yourself) approach with conditional field in
 | 7 | Call `showNotification('Test', 'success')` | Toast appears with success styling and disappears after 5s | Pass |
 | 8 | Call `showNotification('Error', 'error')` | Toast appears with error styling and disappears after 5s | Pass |
 | 9 | Click "View Reviews" button | Smooth scrolls to reviews section | Pass |
+
+---
+
+##### US003: Add Artwork to Cart & US004: Checkout with Address Form - In Artwork App
+
+### Quantity Button Behaviour Tests
+
+| Step | Action | Outcome | Pass / Fail |
+|------|--------|----------|--------------|
+| 1 | Click increment button | Quantity increases from 1 → 2 | Pass |
+| 2 | Click decrement button | Quantity decreases from 3 → 2 | Pass |
+| 3 | Click decrement at minimum | Quantity stays at 1 (no negative values) | Pass |
+| 4 | Increase quantity at max stock (5) | Quantity remains 5 (cannot exceed stock) | Pass |
+| 5 | Increment reaches stock | Increment button becomes disabled | Pass |
+| 6 | Init with quantity = stock | Increment button disabled on page load | Pass |
+| 7 | Decrease below stock | Increment button becomes enabled again | Pass |
+
+### Network & Server Error Handling Tests
+
+| Step | Action | Outcome | Pass / Fail |
+|------|--------|----------|--------------|
+| 1 | Server returns `{ success: false, errors }` | Error toast displayed with message | Pass |
+| 2 | Server returns `{ success: false }` | Error logged to console | Pass |
+| 3 | Server error response | Cart does NOT update | Pass |
+| 4 | Network `fetch` failure | Error logged: "Error submitting AddToCart form:" | Pass |
+| 5 | Network `fetch` failure | Toast shows: "An unexpected error occurred." | Pass |
+| 6 | Network failure | Cart dropdown NOT updated | Pass |
+
+### Add To Cart Page Initialisation Tests
+
+| Step | Action | Outcome | Pass / Fail |
+|------|--------|----------|--------------|
+| 1 | Call `initAddToCartPage()` | Quantity button handlers registered | Pass |
+| 2 | Init then click increment | Quantity increases from 1 → 2 | Pass |
+| 3 | Init event listeners | Form submit listener attached | Pass |
+| 4 | Submit form after init | Performs POST and shows success toast | Pass |
 
 ---
 
@@ -782,3 +952,30 @@ Photo forms use a DRY (Don't Repeat Yourself) approach with conditional field in
 | :--- | :--- | :--- | :--- |
 | 1 | Load detail page for "Sunset" | Image element exists and handles missing images gracefully | Pass |
 | 2 | Visit `/artworks/invalid-slug/` | 404 error page displays with "404" text | Pass |
+
+---
+
+##### US003: Add Artwork to Cart & US004: Checkout with Address Form - In Artwork App
+
+###### Add to Cart Button
+
+| Step | Action | Outcome | Pass / Fail |
+| :--- | :--- | :--- | :--- |
+| 1 | Visit `/artworks/sunset/` | Add to Cart button is visible and enabled | Pass |
+| 2 | Visit `/artworks/starry-night/` | Sold-out notice is displayed, Add to Cart button is not visible | Pass |
+
+###### Adding Single Artwork
+
+| Step | Action | Outcome | Pass / Fail |
+| :--- | :--- | :--- | :--- |
+| 1 | Click Add to Cart button on artwork detail page | Success message "Added to cart" displays | Pass |
+| 2 | Verify toast notification | Toast notification is visible and mentions "cart" | Pass |
+| 3 | Verify cart dropdown updates | Cart dropdown updates with the added item | Pass |
+
+###### Accessibility
+
+| Step | Action | Outcome | Pass / Fail |
+| :--- | :--- | :--- | :--- |
+| 1 | Navigate to Add to Cart button using keyboard | Button is focused and can be activated with Enter key | Pass |
+| 2 | Verify toast notification after keyboard interaction | Toast notification is visible and mentions "cart" | Pass |
+| 3 | Verify cart dropdown updates after keyboard interaction | Cart dropdown updates with the added item | Pass |

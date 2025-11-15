@@ -35,7 +35,7 @@ db.sqlite3
 # -----------------------------
 # Docker
 # -----------------------------
-*.dockerfile              # Optional: ignore local Dockerfile variants if you want
+*.dockerfile
 docker-compose.override.yml
 docker-compose.override.*.yml
 docker-compose.override.yml.bak
@@ -72,6 +72,7 @@ Thumbs.db
 # -----------------------------
 # Coverage / testing
 # -----------------------------
+coverage/
 htmlcov/
 .coverage
 .tox/

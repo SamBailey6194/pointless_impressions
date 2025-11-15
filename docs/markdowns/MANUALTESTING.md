@@ -21,6 +21,10 @@ This document outlines the manual tests to be carried out for each feature. Use 
       - [Test Artwork Form Submissions](#test-artwork-form-submissions)
     - [Photo Form Tests](#photo-form-tests)
       - [Test Photo Form DRY Approach](#test-photo-form-dry-approach)
+    - [US003: Add Artwork to Cart - Backend](#us003-add-artwork-to-cart---backend)
+      - [Test Add to Cart Functionality (Backend)](#test-add-to-cart-functionality-backend)
+    - [US004: Checkout with Address Form](#us004-checkout-with-address-form)
+      - [Test Checkout Functionality](#test-checkout-functionality)
   - [Frontend Testing](#frontend-testing)
     - [US001: Browse Available Artworks - In Artwork App](#us001-browse-available-artworks---in-artwork-app-1)
       - [Test the Artwork Listing Page](#test-the-artwork-listing-page)
@@ -41,6 +45,10 @@ This document outlines the manual tests to be carried out for each feature. Use 
       - [Test Responsive Design](#test-responsive-design-1)
       - [Test Accessibility](#test-accessibility)
       - [Test Error Handling](#test-error-handling-1)
+    - [US003: Add Artwork to Cart](#us003-add-artwork-to-cart)
+      - [Test Add to Cart Functionality](#test-add-to-cart-functionality)
+    - [US004: Checkout with Address Form](#us004-checkout-with-address-form-1)
+      - [Test Checkout Functionality](#test-checkout-functionality-1)
 
 ---
 
@@ -169,6 +177,33 @@ Use `./dev.sh shell` to test photo form behavior with conditional fields.
 | 12 | Submit PhotoForm with alt_text exceeding 255 characters | Form validation fails: "Alt text must be 255 characters or less" | Pass |
 | 13 | Save valid PhotoForm with user parameter | Photo saves with uploaded_by field set to provided user; user relationship persists | Pass |
 | 14 | Verify field exclusion logic at form level | Accessing form.fields['artwork'] raises KeyError for profile/site_asset types; no field pollution | Pass |
+
+---
+
+### US003: Add Artwork to Cart - Backend
+
+#### Test Add to Cart Functionality (Backend)
+
+| Step | Action | Expected Outcome | Pass / Fail |
+| :--- | :--- | :--- | :--- |
+| 1 | Add an artwork to the cart via API | API returns success response, and cart updates in the database | Pass |
+| 2 | Add the same artwork again via API | API increments the quantity in the database | Pass |
+| 3 | Remove an artwork from the cart via API | API returns success response, and the item is removed from the database | Pass |
+| 4 | Update the quantity of an artwork via API | API updates the quantity in the database | Pass |
+| 5 | Attempt to add more than available stock via API | API returns error response, and quantity does not exceed stock | Pass |
+
+---
+
+### US004: Checkout with Address Form
+
+#### Test Checkout Functionality
+
+| Step | Action | Expected Outcome | Pass / Fail |
+| :--- | :--- | :--- | :--- |
+| 1 | Submit checkout form via API with valid data | API returns success response, and order is created in the database | Pass |
+| 2 | Submit checkout form via API with missing fields | API returns error response with validation messages | Pass |
+| 3 | Submit checkout form via API with invalid address | API returns error response with validation messages | Pass |
+| 4 | Submit checkout form via API with valid address | API returns success response, and address is saved in the database | Pass |
 
 ---
 
@@ -329,3 +364,34 @@ Use `./dev.sh shell` to test photo form behavior with conditional fields.
 | :--- | :--- | :--- | :--- |
 | 1 | Load detail page for "City Icons 01" | Even if image fails to load from server, page displays gracefully with no JavaScript console errors | Pass |
 | 2 | Navigate to `/artworks/invalid-slug-12345/` | 404 error page displays with "404" or "Not Found" message; no blank page or server error | Pass |
+
+---
+
+### US003: Add Artwork to Cart
+
+#### Test Add to Cart Functionality
+
+| Step | Action | Expected Outcome | Pass / Fail |
+| :--- | :--- | :--- | :--- |
+| 1 | Open the cart page | Cart page loads successfully with all elements visible | Pass |
+| 2 | Add an artwork to the cart | Artwork is added to the cart, and the cart updates correctly | Pass |
+| 3 | Add the same artwork again | Quantity of the artwork in the cart increments | Pass |
+| 4 | Add multiple different artworks | All artworks are added to the cart with correct quantities | Pass |
+| 5 | Remove an artwork from the cart | Artwork is removed, and the cart updates correctly | Pass |
+| 6 | Update the quantity of an artwork | Quantity updates correctly, and total price recalculates | Pass |
+| 7 | Attempt to add more than available stock | Error message displays, and quantity does not exceed stock | Pass |
+| 8 | Verify cart persistence after page reload | Cart retains all items and quantities after reload | Pass |
+
+---
+
+### US004: Checkout with Address Form
+
+#### Test Checkout Functionality
+
+| Step | Action | Expected Outcome | Pass / Fail |
+| :--- | :--- | :--- | :--- |
+| 1 | Open the checkout page | Checkout page loads successfully with all elements visible | Pass |
+| 2 | Fill in the address form with valid data | Form validates successfully, and the next step is enabled | Pass |
+| 3 | Submit the form with missing fields | Form displays validation errors for required fields | Pass |
+| 4 | Submit the form with invalid address | Form displays validation errors for address fields | Pass |
+| 5 | Submit the form with valid address | Form submits successfully, and confirmation page is displayed | Pass |

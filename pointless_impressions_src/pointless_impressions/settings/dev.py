@@ -12,13 +12,9 @@ SECRET_KEY = os.getenv(
     "dev-secret-key-change-in-production"
 )
 DEBUG = True
-ALLOWED_HOSTS = [
-    "localhost",
-    "127.0.0.1",
-    "0.0.0.0",
-    "web",
-]
 PRODUCTION = False
+SESSION_COOKIE_SECURE = False
+CSRF_COOKIE_SECURE = False
 
 # Development-specific apps
 INSTALLED_APPS += [
@@ -74,3 +70,9 @@ else:
 
 # File storage (local filesystem for development)
 DEFAULT_FILE_STORAGE = "django.core.files.storage.FileSystemStorage"
+
+# Development-specific session cookie settings
+SESSION_COOKIE_SECURE = False
+
+# Adjust logging for development
+# LOGGING['handlers']['file']['level'] = 'DEBUG'
