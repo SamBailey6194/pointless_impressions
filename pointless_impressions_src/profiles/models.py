@@ -11,7 +11,7 @@ class UserProfile(models.Model):
     user = models.OneToOneField(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
-        related_name='userprofile'
+        related_name='user_profile'
     )
 
     profile_picture = models.OneToOneField(
@@ -19,7 +19,7 @@ class UserProfile(models.Model):
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
-        related_name='user_profile'
+        related_name='user_profile_picture'
     )
 
     def __str__(self):
@@ -27,28 +27,53 @@ class UserProfile(models.Model):
 
 
 class Customer(models.Model):
-    user = models.OneToOneField(
-        settings.AUTH_USER_MODEL,
+    user_profile = models.OneToOneField(
+        UserProfile,
         on_delete=models.CASCADE,
-        related_name='customer_profile'
+        related_name='customer'
     )
 
     def __str__(self):
-        return f"Customer: {self.user.username}"
+        return f"Customer: {self.user_profile.user.username}"
 
 
 class Artist(models.Model):
-    user = models.OneToOneField(
-        settings.AUTH_USER_MODEL,
+    user_profile = models.OneToOneField(
+        UserProfile,
         on_delete=models.CASCADE,
-        related_name='artist_profile'
+        related_name='artist'
     )
     bio = models.TextField(blank=True)
     portfolio_url = models.URLField(blank=True)
     social_links = models.JSONField(blank=True, default=dict)
 
     def __str__(self):
-        return f"Artist: {self.user.username}"
+        return f"Artist: {self.user_profile.user.username}"
+
+
+class StaffRole(models.Model):
+    """
+    Represents a staff role assigned to a user.
+    They curate the artwork and blogs on the platform.
+    """
+    class RoleChoices(models.TextChoices):
+        OWNER = 'OWNER', 'Owner'
+        MANAGER = 'MANAGER', 'Manager'
+        EMPLOYEE = 'EMPLOYEE', 'Employee'
+
+    user_profile = models.OneToOneField(
+        UserProfile,
+        on_delete=models.CASCADE,
+        related_name='staff_role'
+    )
+    role = models.CharField(
+        max_length=20,
+        choices=RoleChoices.choices
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.user_profile.user.username} - {self.role}"
 
 
 class Address(models.Model):
@@ -60,16 +85,16 @@ class Address(models.Model):
         SHIPPING = 'SHIPPING', 'Shipping'
         BILLING = 'BILLING', 'Billing'
 
+    user_profile = models.ForeignKey(
+        UserProfile,
+        on_delete=models.CASCADE,
+        related_name='addresses'
+    )
     label = models.CharField(
         max_length=50,
         blank=True,
         help_text="Label for the address (e.g., Home, Work)"
         )
-    customer = models.ForeignKey(
-        'Customer',
-        on_delete=models.CASCADE,
-        related_name='addresses'
-    )
     address_type = models.CharField(
         max_length=10,
         choices=AddressType.choices,
@@ -86,7 +111,10 @@ class Address(models.Model):
     is_default = models.BooleanField(default=False)
 
     def __str__(self):
-        return f"{self.customer.user.username} - {self.label} Address"
+        return (
+            f"{self.customer.user_profile.user.username} - "
+            f"{self.label} Address"
+            )
 
 
 class PaymentInfo(models.Model):
@@ -106,6 +134,13 @@ class PaymentInfo(models.Model):
     expiry_month = models.PositiveSmallIntegerField()
     expiry_year = models.PositiveSmallIntegerField()
     is_default = models.BooleanField(default=False)
+    address = models.ForeignKey(
+        Address,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='billing_payment_addresses'
+    )
 
     def __str__(self):
         return (
@@ -119,7 +154,7 @@ class BankDetails(models.Model):
     Stores the bank account information for an Artist to receive payouts.
     """
     artist = models.OneToOneField(
-        'Artist',
+        Artist,
         on_delete=models.CASCADE,
         related_name='bank_details'
     )

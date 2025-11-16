@@ -1,1 +1,154 @@
-(()=>{async function s(){let e=document.getElementById("cart-dropdown-content");if(!e){console.warn("Cart dropdown element not found. Cannot update.");return}try{let t=await fetch("/checkout/cart-dropdown/",{method:"GET",headers:{"X-Requested-With":"XMLHttpRequest"},credentials:"include"});if(!t.ok)throw new Error(`Failed to fetch cart: ${t.status}`);let r=await t.json();e.innerHTML=r.html}catch(t){console.error("Error refreshing cart dropdown:",t),e.innerHTML='<div class="p-4 text-error">Could not load cart.</div>'}}function c(){let e=document.getElementById("cart-dropdown-content");if(!e)return;let t=e.closest(".dropdown");t&&(t.classList.add("dropdown-open"),setTimeout(()=>{t.classList.remove("dropdown-open")},3e3))}function a(){s()}typeof window<"u"&&(window.cart={init:a,updateCartDropdownHTML:s,openCartDropdown:c});document.addEventListener("DOMContentLoaded",()=>{window.cart&&window.cart.init()});function y(e){if(!e){console.error("No artwork data provided to display.");return}let t=document.getElementById("artwork-title"),r=document.getElementById("artwork-description"),n=document.getElementById("artwork-price"),o=document.getElementById("artwork-image"),i=document.getElementById("availability-status");t&&(t.textContent=e.name||""),r&&(r.textContent=e.description||""),n&&(n.textContent=e.price||""),o&&(o.src=e.image||"",o.alt=e.alt_text||e.name||""),i&&(i.textContent=e.availability||"Unknown")}function l(){window.carousel&&window.carousel.initArtworkDetailCarousel?window.carousel.initArtworkDetailCarousel():console.error("Carousel script not loaded."),m()}async function d(){let e=document.getElementById("review_form"),t=document.getElementById("review_modal"),r=new FormData(e);try{let n=await fetch(e.action,{method:"POST",body:r,headers:{"X-Requested-With":"XMLHttpRequest","X-CSRFToken":getCCsrfToken()}}),o=await n.json();if(n.ok)window.Toast&&window.Toast.show(o.message,"success"),e.reset(),t&&t.close(),setTimeout(()=>{window.location.reload()},1e3);else{let i=o.error||(o.errors?Object.values(o.errors).join(" "):"An error occurred.");window.Toast&&window.Toast.show(i,"error"),console.error("Form errors:",o.errors)}}catch(n){console.error("Error submitting review:",n),window.Toast&&window.Toast.show("Failed to submit review. Please try again.","error")}}function w(){let e=document.querySelector("[data-scroll-to-reviews]");e&&e.addEventListener("click",function(){let t=document.getElementById("reviews_section");t&&t.scrollIntoView({behavior:"smooth"})})}function u(){let e=document.getElementById("review_form");e&&e.addEventListener("submit",function(t){t.preventDefault(),d()})}function m(){u(),w()}window.submitReview=d;document.addEventListener("DOMContentLoaded",l);})();
+(() => {
+  // pointless_impressions_src/theme/static_src/src/js/cart.js
+  async function updateCartDropdownHTML() {
+    const cartDropdown = document.getElementById("cart-dropdown-content");
+    if (!cartDropdown) {
+      console.warn("Cart dropdown element not found. Cannot update.");
+      return;
+    }
+    try {
+      const response = await fetch("/checkout/cart-dropdown/", {
+        method: "GET",
+        headers: {
+          "X-Requested-With": "XMLHttpRequest"
+        },
+        credentials: "include"
+      });
+      if (!response.ok) {
+        throw new Error(`Failed to fetch cart: ${response.status}`);
+      }
+      const data = await response.json();
+      cartDropdown.innerHTML = data.html;
+    } catch (error) {
+      console.error("Error refreshing cart dropdown:", error);
+      cartDropdown.innerHTML = '<div class="p-4 text-error">Could not load cart.</div>';
+    }
+  }
+  function openCartDropdown() {
+    const cartDropdown = document.getElementById("cart-dropdown-content");
+    if (!cartDropdown) return;
+    const dropdownContainer = cartDropdown.closest(".dropdown");
+    if (dropdownContainer) {
+      dropdownContainer.classList.add("dropdown-open");
+      setTimeout(() => {
+        dropdownContainer.classList.remove("dropdown-open");
+      }, 3e3);
+    }
+  }
+  function initCart() {
+    updateCartDropdownHTML();
+  }
+  if (typeof window !== "undefined") {
+    window.cart = {
+      init: initCart,
+      updateCartDropdownHTML,
+      openCartDropdown
+    };
+  }
+  document.addEventListener("DOMContentLoaded", () => {
+    if (window.cart) {
+      window.cart.init();
+    }
+  });
+
+  // pointless_impressions_src/theme/static_src/src/js/artwork_detail.js
+  function displayArtworkDetail(artworkData) {
+    if (!artworkData) {
+      console.error("No artwork data provided to display.");
+      return;
+    }
+    const titleElement = document.getElementById("artwork-title");
+    const descriptionElement = document.getElementById("artwork-description");
+    const priceElement = document.getElementById("artwork-price");
+    const imageElement = document.getElementById("artwork-image");
+    const statusElement = document.getElementById("availability-status");
+    if (titleElement) {
+      titleElement.textContent = artworkData.name || "";
+    }
+    if (descriptionElement) {
+      descriptionElement.textContent = artworkData.description || "";
+    }
+    if (priceElement) {
+      priceElement.textContent = artworkData.price || "";
+    }
+    if (imageElement) {
+      imageElement.src = artworkData.image || "";
+      imageElement.alt = artworkData.alt_text || artworkData.name || "";
+    }
+    if (statusElement) {
+      statusElement.textContent = artworkData.availability || "Unknown";
+    }
+  }
+  function initArtworkDetail() {
+    if (window.carousel && window.carousel.initArtworkDetailCarousel) {
+      window.carousel.initArtworkDetailCarousel();
+    } else {
+      console.error("Carousel script not loaded.");
+    }
+    initializeReviewFunctionality();
+  }
+  async function submitReview() {
+    const form = document.getElementById("review_form");
+    const modal = document.getElementById("review_modal");
+    const formData = new FormData(form);
+    try {
+      const response = await fetch(form.action, {
+        method: "POST",
+        body: formData,
+        headers: {
+          "X-Requested-With": "XMLHttpRequest",
+          "X-CSRFToken": getCCsrfToken()
+        }
+      });
+      const data = await response.json();
+      if (response.ok) {
+        if (window.Toast) {
+          window.Toast.show(data.message, "success");
+        }
+        form.reset();
+        if (modal) modal.close();
+        setTimeout(() => {
+          window.location.reload();
+        }, 1e3);
+      } else {
+        const errorMsg = data.error || (data.errors ? Object.values(data.errors).join(" ") : "An error occurred.");
+        if (window.Toast) {
+          window.Toast.show(errorMsg, "error");
+        }
+        console.error("Form errors:", data.errors);
+      }
+    } catch (error) {
+      console.error("Error submitting review:", error);
+      if (window.Toast) {
+        window.Toast.show("Failed to submit review. Please try again.", "error");
+      }
+    }
+  }
+  function handleViewReviewsScroll() {
+    const viewReviewsBtn = document.querySelector("[data-scroll-to-reviews]");
+    if (viewReviewsBtn) {
+      viewReviewsBtn.addEventListener("click", function() {
+        const reviewsSection = document.getElementById("reviews_section");
+        if (reviewsSection) {
+          reviewsSection.scrollIntoView({ behavior: "smooth" });
+        }
+      });
+    }
+  }
+  function initializeReviewForm() {
+    const reviewForm = document.getElementById("review_form");
+    if (reviewForm) {
+      reviewForm.addEventListener("submit", function(e) {
+        e.preventDefault();
+        submitReview();
+      });
+    }
+  }
+  function initializeReviewFunctionality() {
+    initializeReviewForm();
+    handleViewReviewsScroll();
+  }
+  window.submitReview = submitReview;
+  document.addEventListener("DOMContentLoaded", initArtworkDetail);
+})();
+//# sourceMappingURL=artwork_detail.js.map

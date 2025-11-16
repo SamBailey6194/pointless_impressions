@@ -115,13 +115,13 @@
             <div class="space-y-2">
               <div class="flex justify-between">
                 <span class="font-semibold">Artist:</span>
-                <a href="{% url 'artwork:list' %}?artist={{ artwork.artist.user.username }}" class="font-mono" data-testid="artist-profile-link">
-                  <span data-testid="artist-name" class="badge badge-outline link link-hover">{{ artwork.artist.user.username }}</span>
+                <a href="{% url 'artwork:list' %}?artist={{ artwork.artist.user_profile.user.username }}" class="font-mono" data-testid="artist-profile-link">
+                  <span data-testid="artist-name" class="badge badge-outline link link-hover">{{ artwork.artist.user_profile.user.username }}</span>
                 </a>
               </div>
               <div class="divider my-1"></div>
               <div data-testid="artist-info" class="text-sm opacity-75">
-                <p>{{ artwork.artist.user.username }} is a featured artist on Pointless Impressions.</p>
+                <p>{{ artwork.artist.user_profile.user.username }} is a featured artist on Pointless Impressions.</p>
               </div>
               <div class="divider my-1"></div>
               <div class="flex justify-between">
@@ -278,8 +278,8 @@
           {% endif %}
         </div>
         <div class="text-center m-8">
-          <a href="{% url 'artwork:list' %}?artist={{ artwork.artist.user.username }}" class="btn btn-ghost btn-sm">
-            <i class="fa-solid fa-brush"></i> View More {{ artwork.artist.user.username }}
+          <a href="{% url 'artwork:list' %}?artist={{ artwork.artist.user_profile.user.username }}" class="btn btn-ghost btn-sm">
+            <i class="fa-solid fa-brush"></i> View More {{ artwork.artist.user_profile.user.username }}
           </a>
         </div>
       {% comment %} Yellow line under the search bar {% endcomment %}
@@ -301,7 +301,7 @@
                   </figure>
                   <div class="p-6 flex flex-col h-56">
                     <h3 class="text-xl font-semibold mb-2 card-title">{{ similar_artwork.name }}</h3>
-                    <p class="text-xs mb-3 opacity-70">By: {{ similar_artwork.artist.user.username }} | Category: {{ similar_artwork.category.name }}</p>
+                    <p class="text-xs mb-3 opacity-70">By: {{ similar_artwork.artist.user_profile.user.username }} | Category: {{ similar_artwork.category.name }}</p>
                     <p class="text-sm mb-3 card-description grow">{{ similar_artwork.description|truncatewords:20 }}</p>
                     <p class="text-lg font-bold text-(--pointless-blue)">£{{ similar_artwork.price }}</p>
                   </div>

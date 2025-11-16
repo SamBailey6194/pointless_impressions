@@ -161,6 +161,8 @@ TEMPLATES = [
                 "context_processors.global_context",
                 "pointless_impressions_src.cart.context_processors."
                 "cart_context_processor",
+                "pointless_impressions_src.profiles.context_processors."
+                "global_profiles_context",
             ],
         },
     },
@@ -171,36 +173,26 @@ WSGI_APPLICATION = (
     "pointless_impressions_src.pointless_impressions.wsgi.application"
     )
 
+
+# Authentication Settings
 # Custom user model
 AUTH_USER_MODEL = "account.CustomUser"
 
+# Login and logout settings
+LOGIN_URL = "/profiles/login/"
+LOGIN_REDIRECT_URL = "/dashboard/"
+LOGOUT_REDIRECT_URL = "/"
+
+# Verification token expiry time
+VERIFICATION_TOKEN_EXPIRY = 604800
+
 # Password validation
+PASSWORD_RESET_TIMEOUT = 3600
 AUTH_PASSWORD_VALIDATORS = [
     {
         "NAME": (
-            "django.contrib.auth.password_validation."
-            "UserAttributeSimilarityValidator"
-        ),
-    },
-    {
-        "NAME": (
-            "django.contrib.auth.password_validation."
-            "MinimumLengthValidator"
-        ),
-        "OPTIONS": {
-            "min_length": 8,
-        }
-    },
-    {
-        "NAME": (
-            "django.contrib.auth.password_validation."
-            "CommonPasswordValidator"
-        ),
-    },
-    {
-        "NAME": (
-            "django.contrib.auth.password_validation."
-            "NumericPasswordValidator"
+            "pointless_impressions_src.account.validators."
+            "CustomPasswordValidator"
         ),
     },
 ]

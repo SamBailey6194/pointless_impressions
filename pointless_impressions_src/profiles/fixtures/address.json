@@ -1,0 +1,86 @@
+[
+    {
+        "model": "profiles.Address",
+        "fields": {
+            "user_profile": 1,
+            "label": "Home",
+            "address_line_1": "12 Baker Street",
+            "city": "London",
+            "postcode": "NW1 6XE",
+            "country": "United Kingdom",
+            "is_default": true
+        }
+    },
+    {
+        "model": "profiles.Address",
+        "fields": {
+            "user_profile": 2,
+            "label": "Work",
+            "address_line_1": "221B Baker Street",
+            "city": "London",
+            "postcode": "NW1 6XE",
+            "country": "United Kingdom",
+            "is_default": true
+        }
+    },
+    {
+        "model": "profiles.Address",
+        "fields": {
+            "user_profile": 3,
+            "label": "Home",
+            "address_line_1": "10 Downing Street",
+            "city": "London",
+            "postcode": "SW1A 2AA",
+            "country": "United Kingdom",
+            "is_default": true
+        }
+    },
+    {
+        "model": "profiles.Address",
+        "fields": {
+            "user_profile": 4,
+            "label": "Work",
+            "address_line_1": "1 Infinite Loop",
+            "city": "Cambridge",
+            "postcode": "CB2 1TN",
+            "country": "United Kingdom",
+            "is_default": true
+        }
+    },
+    {
+        "model": "profiles.Address",
+        "fields": {
+            "user_profile": 5,
+            "label": "Home",
+            "address_line_1": "1600 Amphitheatre Parkway",
+            "city": "Oxford",
+            "postcode": "OX1 1PT",
+            "country": "United Kingdom",
+            "is_default": true
+        }
+    },
+    {
+        "model": "profiles.Address",
+        "fields": {
+            "user_profile": 6,
+            "label": "Work",
+            "address_line_1": "30 St Mary Axe",
+            "city": "London",
+            "postcode": "EC3A 8BF",
+            "country": "United Kingdom",
+            "is_default": true
+        }
+    },
+    {
+        "model": "profiles.Address",
+        "fields": {
+            "user_profile": 7,
+            "label": "Home",
+            "address_line_1": "742 Evergreen Terrace",
+            "city": "Manchester",
+            "postcode": "M1 1AE",
+            "country": "United Kingdom",
+            "is_default": true
+        }
+    }
+]

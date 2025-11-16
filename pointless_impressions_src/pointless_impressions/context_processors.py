@@ -1,11 +1,9 @@
-from django.conf import settings
 from django.utils.functional import lazy
 from pointless_impressions_src.artwork.models import (
-    ArtworkCategory, ArtworkFramingCondition
+    ArtworkCategory, ArtworkFramingCondition, Artwork
     )
 # from pointless_impressions_src.blog.models import BlogCategory
 from pointless_impressions_src.photo.models import Photo
-from pointless_impressions_src.profiles.models import Artist
 
 
 # Context processors to add global template variables
@@ -52,18 +50,25 @@ def global_context(request):
 
     image_to_render = lazy(resolve_image_to_render, Photo)()
 
+    # --- Featured artworks logic ---
+    featured_artworks = Artwork.objects.filter(
+        is_featured=True,
+        main_photo__isnull=False
+    ).select_related(
+        'main_photo',
+        'artist__user_profile__user',
+        'category'
+    ).prefetch_related(
+        'selected_conditions'
+    )[:10]
+
     # --- Return one single context dictionary ---
     return {
-        # Production flag
-        'production': settings.PRODUCTION,
-
         # navbar categories
         'artwork_categories': ArtworkCategory.objects.all(),
         'framing_options': ArtworkFramingCondition.objects.all(),
         # 'blog_categories': BlogCategory.objects.all(),
-        'artists': Artist.objects.select_related('user').filter(
-            user__is_active=True
-        ).order_by('user__username'),
+        'featured_artworks': featured_artworks,
 
         # --- NEWLY ADDED ---
         'site_logo': site_logo,

@@ -50,12 +50,12 @@ export function renderArtworkList(artworks) {
             // Handle artist info (may be undefined)
             let artistUrl = '#';
             let artistName = 'Unknown Artist';
-            if (artwork.artist && artwork.artist.username) {
+            if (artwork.artist && artwork.artist.user_profile && artwork.artist.user_profile.user && artwork.artist.user_profile.user.username) {
                 const baseUrl = typeof ARTWORK_LIST_URL !== 'undefined' ? ARTWORK_LIST_URL : '/artworks/';
-                artistUrl = `${baseUrl}?artist=${artwork.artist.username}`;
-                artistName = artwork.artist.username;
+                artistUrl = `${baseUrl}?artist=${artwork.artist.user_profile.user.username}`;
+                artistName = artwork.artist.user_profile.user.username;
             }
-            const artistLine = artwork.artist && artwork.artist.username
+            const artistLine = artwork.artist && artwork.artist.user_profile && artwork.artist.user_profile.user && artwork.artist.user_profile.user.username
                          ? `<p class="text-sm -mt-2 mb-2">
                              <a href="${artistUrl}" class="link link-hover">${artistName}</a>
                             </p>`

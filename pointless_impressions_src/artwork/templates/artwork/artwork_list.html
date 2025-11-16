@@ -192,7 +192,7 @@
             <div class="card-body">
               <h2 class="artwork-name card-title">{{ artwork.name }}</h2>
               <p class="text-sm -mt-2 mb-2">
-                <a href="{% url 'artwork:list' %}?artist={{ artwork.artist.user.username }}" class="link link-hover">{{ artwork.artist }}</a>
+                <a href="{% url 'artwork:list' %}?artist={{ artwork.artist.user_profile.user.username }}" class="link link-hover">{{ artwork.artist }}</a>
               </p>
               <p class="artwork-description">{{ artwork.description|truncatewords:15 }}</p>
               <div class="divider my-2"></div>

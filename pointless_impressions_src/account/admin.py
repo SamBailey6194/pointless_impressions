@@ -1,9 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from .models import CustomUser
-from pointless_impressions_src.profiles.admin import (
-    CustomerInline, ArtistInline
-    )
 
 
 # Register your models here.
@@ -11,8 +8,6 @@ from pointless_impressions_src.profiles.admin import (
 class CustomUserAdmin(UserAdmin):
     """Admin panel configuration for CustomUser model."""
     model = CustomUser
-
-    inlines = (CustomerInline, ArtistInline)
 
     list_display = (
         "username",
@@ -33,7 +28,11 @@ class CustomUserAdmin(UserAdmin):
     fieldsets = (
         (None, {'fields': ('username', 'email', 'password')}),
         ('Personal Info', {'fields': ('first_name', 'last_name')}),
-        ('Permissions', {'fields': ('is_superuser', 'is_staff', 'is_active', 'groups', 'user_permissions')}),
+        ('Permissions', {'fields': (
+            'is_superuser',
+            'is_staff',
+            'is_active',
+            )}),
         ('Important dates', {'fields': ('last_login', 'date_joined')}),
     )
 
@@ -44,6 +43,7 @@ class CustomUserAdmin(UserAdmin):
             'fields': (
                 'username',
                 'email',
+                'phone',
                 'password1',
                 'password2',
             )
