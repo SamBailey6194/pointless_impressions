@@ -24,6 +24,16 @@ class AddressInline(admin.StackedInline):
     extra = 0
 
 
+class PaymentInfoInline(admin.StackedInline):
+    model = PaymentInfo
+    extra = 0
+
+
+class BankInfoInline(admin.StackedInline):
+    model = BankDetails
+    extra = 0
+
+
 class IsCustomerFilter(admin.SimpleListFilter):
     title = 'Customer'
     parameter_name = 'is_customer'
@@ -82,7 +92,7 @@ class IsStaffFilter(admin.SimpleListFilter):
 class UserProfileAdmin(admin.ModelAdmin):
     """Admin panel configuration for UserProfile model."""
     list_display = ('user', 'profile_picture')
-    inlines = [CustomerInline, ArtistInline, StaffRoleInline, AddressInline]
+    inlines = [CustomerInline, ArtistInline, StaffRoleInline]
     list_filter = (IsCustomerFilter, IsArtistFilter, IsStaffFilter)
     search_fields = ('user__username', 'user__email')
 
@@ -90,7 +100,11 @@ class UserProfileAdmin(admin.ModelAdmin):
 @admin.register(Customer)
 class CustomerAdmin(admin.ModelAdmin):
     """Admin panel configuration for Customer model."""
-    list_display = ('get_username',)
+    list_display = (
+        'get_username',
+        'receive_newsletter',
+    )
+    inlines = [AddressInline, PaymentInfoInline]
     search_fields = (
         'user_profile__user__username',
         'user_profile__user__email',
@@ -124,6 +138,7 @@ class ArtistAdmin(admin.ModelAdmin):
         'user_profile__user__username',
         'user_profile__user__email',
     )
+    inlines = [BankInfoInline]
     actions = [approve_artists]
 
     def get_username(self, obj):

@@ -15,6 +15,13 @@ from pointless_impressions_src.account.validators import (
 # Write your forms here.
 class SignupForm(UserCreationForm):
     """Form for user signup."""
+    subscribe_to_newsletter = forms.BooleanField(
+        required=False,
+        label="Subscribe to Newsletter",
+        help_text="Check this box to receive our newsletter.",
+        initial=False
+    )
+
     class Meta:
         model = CustomUser
         fields = [
@@ -47,6 +54,12 @@ class SignupForm(UserCreationForm):
             label="Confirm Your Password",
             widget=forms.PasswordInput,
             validators=[CustomPasswordValidator]
+        )
+        self.fields['subscribe_to_newsletter'] = forms.BooleanField(
+            required=False,
+            label="Subscribe to Newsletter",
+            help_text="Check this box to receive our newsletter.",
+            initial=False
         )
         self.helper = FormHelper()
         self.helper.form_method = 'post'
@@ -88,6 +101,14 @@ class SignupForm(UserCreationForm):
                             'email',
                             placeholder="Email",
                             css_class='mb-4 custom-input w-full lg:w-1/2'
+                        ),
+                        Field(
+                            'subscribe_to_newsletter',
+                            css_class='mb-4 custom-checkbox'
+                        ),
+                        HTML(
+                            "<p class='text-sm'>"
+                            "Subscribe to our newsletter for updates.</p>"
                         ),
                         css_class='lg:flex lg:gap-4 mb-4'
                     ),

@@ -211,7 +211,7 @@ class OrderForm(forms.Form):
                         ),
                         Field(
                             'billing_same_as_shipping',
-                            css_class='mr-4'
+                            css_class='mr-4 custom-checkbox'
                         ),
                         css_class='shipping-group',
                         id="shipping-fields-container",

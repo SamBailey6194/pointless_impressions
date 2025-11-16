@@ -2,7 +2,7 @@
     {
         "model": "profiles.Address",
         "fields": {
-            "user_profile": 1,
+            "customer": 1,
             "label": "Home",
             "address_line_1": "12 Baker Street",
             "city": "London",
@@ -14,7 +14,7 @@
     {
         "model": "profiles.Address",
         "fields": {
-            "user_profile": 2,
+            "customer": 2,
             "label": "Work",
             "address_line_1": "221B Baker Street",
             "city": "London",
@@ -26,7 +26,7 @@
     {
         "model": "profiles.Address",
         "fields": {
-            "user_profile": 3,
+            "customer": 3,
             "label": "Home",
             "address_line_1": "10 Downing Street",
             "city": "London",
@@ -38,7 +38,7 @@
     {
         "model": "profiles.Address",
         "fields": {
-            "user_profile": 4,
+            "customer": 4,
             "label": "Work",
             "address_line_1": "1 Infinite Loop",
             "city": "Cambridge",
@@ -50,7 +50,7 @@
     {
         "model": "profiles.Address",
         "fields": {
-            "user_profile": 5,
+            "customer": 5,
             "label": "Home",
             "address_line_1": "1600 Amphitheatre Parkway",
             "city": "Oxford",
@@ -62,7 +62,7 @@
     {
         "model": "profiles.Address",
         "fields": {
-            "user_profile": 6,
+            "customer": 6,
             "label": "Work",
             "address_line_1": "30 St Mary Axe",
             "city": "London",
@@ -74,7 +74,7 @@
     {
         "model": "profiles.Address",
         "fields": {
-            "user_profile": 7,
+            "customer": 7,
             "label": "Home",
             "address_line_1": "742 Evergreen Terrace",
             "city": "Manchester",

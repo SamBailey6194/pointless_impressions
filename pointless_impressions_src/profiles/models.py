@@ -33,6 +33,12 @@ class Customer(models.Model):
         on_delete=models.CASCADE,
         related_name='customer'
     )
+    receive_newsletter = models.BooleanField(
+        default=False,
+        help_text=(
+            "Indicates whether the customer wants to receive the newsletter."
+            )
+    )
 
     def __str__(self):
         return f"Customer: {self.user_profile.user.username}"
@@ -118,8 +124,8 @@ class Address(models.Model):
         SHIPPING = 'SHIPPING', 'Shipping'
         BILLING = 'BILLING', 'Billing'
 
-    user_profile = models.ForeignKey(
-        UserProfile,
+    customer = models.ForeignKey(
+        Customer,
         on_delete=models.CASCADE,
         related_name='addresses'
     )

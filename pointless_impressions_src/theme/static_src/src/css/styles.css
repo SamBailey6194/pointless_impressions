@@ -173,6 +173,37 @@
     margin: 1.5rem 0;
   }
 
+  .custom-checkbox {
+    border: 1px solid var(--pointless-blue) !important;
+    background-color: var(--pointless-white) !important;
+    padding: 0.5rem;
+    border-radius: 0.25rem;
+    box-shadow: none !important;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    appearance: none;
+    --webkit-appearance: none;
+  }
+
+  .custom-checkbox:hover {
+    border-color: var(--pointless-yellow);
+    box-shadow: 0 0 5px var(--pointless-yellow);
+    cursor: pointer;
+  }
+
+  .custom-checkbox:hover::before {
+    opacity: 0.5;
+    transition: opacity 0.2s ease;
+  }
+
+  .custom-checkbox:checked::before {
+    font-family: "Font Awesome 6 Free";
+    content: "\f14a";
+    font-weight: 900;
+    text-align: center;
+    color: var(--pointless-yellow);
+    font-size: 1rem;
+  }
+
   /* Dark Mode Overrides */
   @media (prefers-color-scheme: dark) {
     header, footer {
@@ -244,6 +275,31 @@
 
     .form-divider {
       border-top: 1px solid var(--pointless-white);
+    }
+
+    .custom-checkbox {
+      background-color: var(--pointless-black) !important;
+      border-color: var(--pointless-blue) !important;
+    }
+
+    .custom-checkbox:hover {
+      border-color: var(--pointless-yellow);
+      box-shadow: 0 0 5px var(--pointless-yellow);
+      cursor: pointer;
+    }
+
+    .custom-checkbox:hover::before {
+      opacity: 0.5;
+      transition: opacity 0.2s ease;
+    }
+
+    .custom-checkbox:checked::before {
+      font-family: "Font Awesome 6 Free";
+      content: "\f14a";
+      font-weight: 900;
+      text-align: center;
+      color: var(--pointless-yellow);
+      font-size: 1rem;
     }
   }
 }
