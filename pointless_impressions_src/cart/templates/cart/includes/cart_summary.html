@@ -25,40 +25,53 @@
                 {% endwith %}
               </figure>
             </div>
-            <form class="space-y-2 text-sm js-cart-item-form" data-artwork-id="{{ item.artwork.id }}">
-              {% csrf_token %}
-              <input type="hidden" name="artwork_id" value="{{ item.artwork.id }}">
-              <div class="flex justify-between items-center">
-                <span class="md:text-xl lg:text-2xl">Framing:</span>
-                {% if item.form %}
-                  {{ item.form.framing_option }}
-                {% else %}
-                  <select name="framing_option" class="custom-input w-32" aria-label="Framing option">
-                    <option value="">—</option>
-                  </select>
-                {% endif %}
-              </div>
-              <div class="flex justify-between">
-                <span class="md:text-xl lg:text-2xl">Price:</span>
-                <span class="font-medium md:text-lg lg:text-xl">£{{ item.artwork.price|floatformat:2 }}</span>
-              </div>
-              <div class="flex justify-between items-center gap-2">
-                <span class="md:text-xl lg:text-2xl">Quantity:</span>
-                <div class="flex items-center gap-1">
-                  <button type="button" class="btn btn-xs btn-outline js-qty-minus" aria-label="Decrease quantity">-</button>
-                    {{ item.form.quantity }}
-                  <button type="button" class="btn btn-xs btn-outline js-qty-plus" aria-label="Increase quantity">+</button>
+            {% if show_forms %}
+              <form class="space-y-2 text-sm js-cart-item-form" data-artwork-id="{{ item.artwork.id }}">
+                {% csrf_token %}
+                <input type="hidden" name="artwork_id" value="{{ item.artwork.id }}">
+                <div class="flex justify-between items-center">
+                  <span class="md:text-xl lg:text-2xl">Framing:</span>
+                  {% if item.form %}
+                    {{ item.form.framing_option }}
+                  {% else %}
+                    <select name="framing_option" class="custom-input w-32" aria-label="Framing option">
+                      <option value="">—</option>
+                    </select>
+                  {% endif %}
+                </div>
+                <div class="flex justify-between">
+                  <span class="md:text-xl lg:text-2xl">Price:</span>
+                  <span class="font-medium md:text-lg lg:text-xl">£{{ item.artwork.price|floatformat:2 }}</span>
+                </div>
+                <div class="flex justify-between items-center gap-2">
+                  <span class="md:text-xl lg:text-2xl">Quantity:</span>
+                  <div class="flex items-center gap-1">
+                    <button type="button" class="btn btn-xs btn-outline js-qty-minus" aria-label="Decrease quantity">-</button>
+                      {{ item.form.quantity }}
+                    <button type="button" class="btn btn-xs btn-outline js-qty-plus" aria-label="Increase quantity">+</button>
+                  </div>
+                </div>
+                <div class="flex justify-between pt-2 border-t">
+                  <span class="font-semibold md:text-xl lg:text-2xl">Subtotal:</span>
+                  <span class="font-bold md:text-lg lg:text-xl">£{{ item.get_total|floatformat:2 }}</span>
+                </div>
+                <div class="flex justify-end mt-2">
+                  <button type="submit" class="btn btn-xs md:btn-sm lg:btn-md ml-2 mx-4">Update</button>
+                  <button type="button" class="btn btn-xs md:btn-sm lg:btn-md js-remove-item" data-artwork-id="{{ item.artwork.id }}">Remove</button>
+                </div>
+              </form>
+            {% elif show_info %}
+              <div class="space-y-2 text-sm">
+                <div class="flex justify-between items-center">
+                  <span class="md:text-xl lg:text-2xl">Framing:</span>
+                  <span>{{ item.framing_option|default:"—" }}</span>
+                </div>
+                <div class="flex justify-between items-center gap-2">
+                  <span class="md:text-xl lg:text-2xl">Quantity:</span>
+                  <span>{{ item.quantity }}</span>
                 </div>
               </div>
-              <div class="flex justify-between pt-2 border-t">
-                <span class="font-semibold md:text-xl lg:text-2xl">Subtotal:</span>
-                <span class="font-bold md:text-lg lg:text-xl">£{{ item.get_total|floatformat:2 }}</span>
-              </div>
-              <div class="flex justify-end mt-2">
-                <button type="submit" class="btn btn-xs md:btn-sm lg:btn-md ml-2 mx-4">Update</button>
-                <button type="button" class="btn btn-xs md:btn-sm lg:btn-md js-remove-item" data-artwork-id="{{ item.artwork.id }}">Remove</button>
-             </div>
-            </form>
+            {% endif %}
           </div>
         {% endfor %}
       </div>

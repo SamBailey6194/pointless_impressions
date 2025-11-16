@@ -172,24 +172,34 @@
                     <i class="fa-solid fa-box"></i> My Orders
                   </a>
                 </li>
+                <li>
+                  <a href="{% url 'profiles:artist_application' %}" class="hover:bg-(--pointless-yellow)">
+                    <i class="fa-solid fa-user-plus"></i> Artists: Apply Here
+                  </a>
+                </li>
                 <div class="divider my-1"></div>
                 <li>
-                  <a href="#" class="hover:bg-(--pointless-red) hover:text-white">
+                  <button class="hover:bg-(--pointless-red) hover:text-white" onclick="logout-modal.showModal()">
                     <i class="fa-solid fa-sign-out-alt"></i> Logout
-                  </a>
+                  </button>
                 </li>
               {% else %}
                 <li class="menu-title text-(--pointless-blue) md:hidden">
                   <span>Welcome, Guest</span>
                 </li>
                 <li>
-                  <a href="#" class="hover:bg-(--pointless-yellow)">
+                  <button class="hover:bg-(--pointless-yellow)" onclick="login-modal.showModal()">
                     <i class="fa-solid fa-sign-in-alt"></i> Login
-                  </a>
+                  </button>
                 </li>
                 <li>
-                  <a href="#" class="hover:bg-(--pointless-yellow)">
+                  <button class="hover:bg-(--pointless-yellow)" onclick="signup-modal.showModal()">
                     <i class="fa-solid fa-user-plus"></i> Sign Up
+                  </button>
+                </li>
+                <li>
+                  <a href="{% url 'profiles:artist_application' %}" class="hover:bg-(--pointless-yellow)">
+                    <i class="fa-solid fa-user-plus"></i> Artists: Apply Here
                   </a>
                 </li>
               {% endif %}

@@ -1,6 +1,6 @@
 from django import forms
 from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Layout, Field, Submit, HTML, Div
+from crispy_forms.layout import Layout, Field, Submit, HTML, Div, Button
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 from phonenumber_field.formfields import SplitPhoneNumberField
 from .models import Artist, Address, UserProfile
@@ -62,8 +62,6 @@ class SignupForm(UserCreationForm):
             initial=False
         )
         self.helper = FormHelper()
-        self.helper.form_method = 'post'
-        self.helper.form_tag = True
         self.helper.layout = Layout(
             Div(
                 HTML("<h2 class='card-title text-center'>Sign Up</h2>"),
@@ -139,12 +137,14 @@ class SignupForm(UserCreationForm):
                     HTML(
                         "<div class='form-divider'></div>"
                     ),
-                    Submit(
-                        'submit',
-                        'Sign Up',
-                        css_class='btn btn-ghost btn-outline w-fit'
-                        ),
-                    css_class='flex flex-col card-body gap-4'
+                    css_class=(
+                        'flex'
+                        'flex-col'
+                        'card-body'
+                        'gap-4'
+                        'bg-gray-300'
+                        'dark:bg-gray-700'
+                        )
                 ),
                 css_class='card p-6 mb-6'
             )
@@ -188,7 +188,14 @@ class LoginForm(AuthenticationForm):
                         'Log In',
                         css_class='btn btn-ghost btn-outline w-fit'
                         ),
-                    css_class='flex flex-col card-body gap-4'
+                    css_class=(
+                        'flex'
+                        'flex-col'
+                        'card-body'
+                        'gap-4'
+                        'bg-gray-300'
+                        'dark:bg-gray-700'
+                        )
                 ),
                 css_class='card p-6 mb-6'
             )
@@ -215,7 +222,14 @@ class LogoutForm(forms.Form):
                         'Log Out',
                         css_class='btn btn-ghost btn-outline w-fit'
                     ),
-                    css_class='flex flex-col card-body gap-4'
+                    css_class=(
+                        'flex'
+                        'flex-col'
+                        'card-body'
+                        'gap-4'
+                        'bg-gray-300'
+                        'dark:bg-gray-700'
+                        )
                 ),
                 css_class='card p-6 mb-6'
             )
@@ -235,8 +249,6 @@ class ArtistApplicationForm(forms.ModelForm):
         self.fields['portfolio_url'].label = "Portfolio URL"
         self.fields['social_links'].label = "Social Media Links"
         self.helper = FormHelper()
-        self.helper.form_method = 'post'
-        self.helper.form_tag = True
         self.helper.layout = Layout(
             Div(
                 HTML(
@@ -262,12 +274,14 @@ class ArtistApplicationForm(forms.ModelForm):
                         ),
                         css_class='social-links-container'
                     ),
-                    Submit(
-                        'submit',
-                        'Apply',
-                        css_class='btn btn-primary w-fit'
-                        ),
-                    css_class='flex flex-col card-body gap-4'
+                    css_class=(
+                        'flex'
+                        'flex-col'
+                        'card-body'
+                        'gap-4'
+                        'bg-gray-300'
+                        'dark:bg-gray-700'
+                        )
                 ),
                 css_class='flex flex-col card gap-4'
             )
@@ -304,11 +318,11 @@ class AddressForm(forms.ModelForm):
             'address_type',
             'first_name',
             'last_name',
-            'address_line1',
-            'address_line2',
+            'address_line_1',
+            'address_line_2',
             'city',
-            'state',
-            'zip_code',
+            'county',
+            'postcode',
             'country',
             'is_default'
         ]
@@ -327,8 +341,6 @@ class AddressForm(forms.ModelForm):
             widget=CountrySelectFormWidget()
         )
         self.helper = FormHelper()
-        self.helper.form_method = 'post'
-        self.helper.form_tag = True
         self.helper.layout = Layout(
             Div(
                 HTML(
@@ -368,12 +380,12 @@ class AddressForm(forms.ModelForm):
                     ),
                     Div(
                         Field(
-                            'address_line1',
+                            'address_line_1',
                             placeholder="Address Line 1",
                             css_class='mb-4 custom-input w-full lg:w-96'
                         ),
                         Field(
-                            'address_line2',
+                            'address_line_2',
                             placeholder="Address Line 2 (Optional)",
                             css_class='mb-4 custom-input w-full lg:w-96'
                         ),
@@ -394,7 +406,7 @@ class AddressForm(forms.ModelForm):
                     ),
                     Div(
                         Field(
-                            'post_code',
+                            'postcode',
                             placeholder="Postcode",
                             css_class='w-full lg:w-40 custom-input'
                         ),
@@ -407,12 +419,74 @@ class AddressForm(forms.ModelForm):
                         'is_default',
                         css_class='mb-4'
                     ),
-                    Submit(
-                        'submit',
-                        'Save Address',
-                        css_class='btn btn-ghost btn-outline w-fit'
+                    css_class=(
+                        'flex'
+                        'flex-col'
+                        'card-body'
+                        'gap-4'
+                        'bg-gray-300'
+                        'dark:bg-gray-700'
+                        )
+                ),
+                css_class='card p-6 mb-6'
+            )
+        )
+
+
+class EmailVerificationForm(forms.Form):
+    """Form for email verification code input."""
+    verification_code = forms.CharField(
+        max_length=6,
+        label="Verification Code",
+        widget=forms.TextInput(
+            attrs={
+                'placeholder': 'Enter the 6-digit code',
+                'class': 'custom-input w-full lg:w-40'
+            }
+        )
+    )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.helper = FormHelper()
+        self.helper.form_method = 'post'
+        self.helper.form_tag = True
+        self.helper.layout = Layout(
+            Div(
+                HTML(
+                    "<h2 class='card-title text-center'>"
+                    "Email Verification</h2>"
                     ),
-                    css_class='flex flex-col card-body gap-4'
+                Div(
+                    HTML(
+                        "<p class='mb-4'>"
+                        "Please enter the 6-digit verification code "
+                        "sent to your email.</p>"
+                    ),
+                    Field(
+                        'verification_code'
+                    ),
+                    Div(
+                        Submit(
+                            'submit',
+                            'Verify Email',
+                            css_class='btn btn-ghost btn-outline w-fit'
+                        ),
+                        Button(
+                            'resend',
+                            'Resend Code',
+                            css_class='btn btn-ghost btn-outline w-fit ml-2'
+                        ),
+                        css_class='flex items-center gap-2'
+                    ),
+                    css_class=(
+                        'flex'
+                        'flex-col'
+                        'card-body'
+                        'gap-4'
+                        'bg-gray-300'
+                        'dark:bg-gray-700'
+                        )
                 ),
                 css_class='card p-6 mb-6'
             )

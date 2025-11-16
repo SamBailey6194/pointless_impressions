@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% load static tailwind_tags cloudinary crispy_forms_tags %}
+
+{% block content %}
+    <section class="section-alt py-16 w-full">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h1 class="text-4xl font-bold mb-4">Artist Application</h1>
+            <p class="mb-6">Thank you for your interest in becoming an artist on our platform! Please fill out the application form below to get started.</p>
+
+            {% if not is_registered %}
+                <form action="{% url 'profiles:artist_application' %}" method="post" enctype="multipart/form-data" class="card max-w-3xl">
+                    {% csrf_token %}
+
+                    {% crispy signup_form %}
+
+                    {% crispy photo_form %}
+
+                    {% crispy address_form %}
+
+                    {% crispy artist_application_form %}
+
+                    <div class="card-actions justify-end mt-2">
+                        <button type="submit" class="btn btn-ghost btn-outline mr-6 mb-6" id="submit-application-button">
+                            <i class="fa-solid fa-paper-plane mr-2"></i> Submit Application
+                        </button>
+                    </div>
+                </form>
+            {% else %}
+                <form action="{% url 'profiles:artist_application' %}" method="post" class="card max-w-3xl">
+                    {% csrf_token %}
+                    {% crispy artist_application_form %}
+                    <div class="card-actions justify-end mt-2">
+                        <button type="submit" class="btn btn-ghost btn-outline mr-6 mb-6" id="submit-application-button">
+                            <i class="fa-solid fa-paper-plane mr-2"></i> Submit Application
+                        </button>
+                    </div>
+                </form>
+            {% endif %}
+        </div>
+    </section>
+
+{% endblock %}

@@ -1,5 +1,7 @@
 from django.forms import ModelForm
 from django import forms
+from crispy_forms.helper import FormHelper
+from crispy_forms.layout import Layout, Field, Div, HTML
 from .models import Photo
 
 
@@ -96,6 +98,54 @@ class PhotoForm(ModelForm):
             self.fields['artwork'].required = True
         elif self.photo_type == 'site_asset':
             self.fields['asset_identifier'].required = True
+
+        # Initialize Crispy FormHelper
+        self.helper = FormHelper()
+        self.helper.layout = Layout(
+            Div(
+                HTML("<h2 class='card-title text-center'>Upload Photo</h2>"),
+                Div(
+                    Field(
+                        'photo_type',
+                        css_class='custom-input'
+                        ),
+                    Field(
+                        'title',
+                        css_class='custom-input'
+                        ),
+                    Field(
+                        'description',
+                        css_class='custom-input'
+                        ),
+                    Field(
+                        'image',
+                        css_class='custom-input'
+                        ),
+                    Field(
+                        'alt_text',
+                        css_class='custom-input'
+                        ),
+                    Field(
+                        'overwrite',
+                        css_class='custom-checkbox'
+                        ),
+                    Field(
+                        'artwork',
+                        css_class='custom-input'
+                        ) if 'artwork' in allowed_fields else None,
+                    Field(
+                        'asset_identifier',
+                        css_class='custom-input'
+                        ) if 'asset_identifier' in allowed_fields else None,
+                    css_class=(
+                        'bg-gray-300'
+                        'dark:bg-gray-700'
+                        'card-body'
+                    ),
+                ),
+                css_class='card p-4'
+            )
+        )
 
     def clean_title(self):
         """Validate title is not blank."""

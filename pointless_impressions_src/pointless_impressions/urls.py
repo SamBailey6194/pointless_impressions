@@ -31,8 +31,7 @@ urlpatterns = [
         ),
     path('health/', health_check, name='health'),
     path('order/', include('pointless_impressions_src.order.urls')),
-    path('photos/', include('pointless_impressions_src.photo.urls')),
-    # path('profiles/', include('pointless_impressions_src.profiles.urls')),
+    path('profiles/', include('pointless_impressions_src.profiles.urls')),
     path('search/', include('pointless_impressions_src.search.urls')),
 ]
 

@@ -3,7 +3,9 @@ from django.contrib.auth.models import (
     PermissionsMixin,
     AbstractBaseUser
     )
+from django.conf import settings
 from django.db import models
+from django.utils import timezone
 from phonenumber_field.modelfields import PhoneNumberField
 
 
@@ -117,3 +119,30 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
         allowed_groups = ['Employee', 'Manager', 'Owner']
 
         return self.groups.filter(name__in=allowed_groups).exists()
+
+
+class EmailVerificationCode(models.Model):
+    """
+    Stores email verification codes for users.
+    """
+    user = models.ForeignKey(
+        CustomUser,
+        on_delete=models.CASCADE,
+        related_name='email_verification_codes'
+    )
+    code = models.CharField(max_length=6, unique=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    is_used = models.BooleanField(default=False)
+
+    def is_expired(self):
+        """
+        Check if the verification code has expired.
+        Codes are valid for 15 minutes.
+        """
+        expiration_time = self.created_at + timezone.timedelta(
+            seconds=settings.VERIFICATION_TOKEN_EXPIRY
+            )
+        return timezone.now() > expiration_time
+
+    def __str__(self):
+        return f"Verification code for {self.user.username}: {self.code}"

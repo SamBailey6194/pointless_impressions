@@ -154,9 +154,9 @@
                       <i class="fa-solid fa-pen-to-square"></i> Write Review
                     </button>
                   {% else %}
-                    <a href="" class="btn btn-outline btn-lg flex-1">
+                    <button class="btn btn-outline btn-lg flex-1" onclick="login-modal.showModal()">
                       <i class="fa-solid fa-pen-to-square"></i> Login to Review
-                    </a>
+                    </button>
                   {% endif %}
                   {% if artwork_data.review_count > 0 %}
                     <button class="btn btn-outline btn-lg flex-1" data-scroll-to-reviews onclick="document.getElementById('reviews_section').scrollIntoView({behavior: 'smooth'})">

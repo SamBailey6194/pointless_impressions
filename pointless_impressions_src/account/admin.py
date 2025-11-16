@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from .models import CustomUser
+from .models import CustomUser, EmailVerificationCode
 
 
 # Register your models here.
@@ -52,3 +52,11 @@ class CustomUserAdmin(UserAdmin):
 
     search_fields = ('username', 'email')
     ordering = ('username',)
+
+
+@admin.register(EmailVerificationCode)
+class EmailVerificationCodeAdmin(admin.ModelAdmin):
+    list_display = ('user', 'code', 'created_at', 'is_used')
+    list_filter = ('is_used', 'created_at')
+    search_fields = ('user__username', 'code')
+    readonly_fields = ('user', 'code', 'created_at', 'is_used')

@@ -31,6 +31,19 @@ class ArtistRequiredMixin(UserPassesTestMixin):
         raise PermissionDenied("This view is for artists only.")
 
 
+class StaffRequiredMixin(UserPassesTestMixin):
+    """
+    Checks if the user is authenticated and has a staff role.
+    """
+    def test_func(self):
+        if not self.request.user.is_authenticated:
+            return False
+        return hasattr(self.request.user, 'staff_role')
+
+    def handle_no_permission(self):
+        raise PermissionDenied("This view is for staff members only.")
+
+
 class BankDetailsRequiredMixin(ArtistRequiredMixin):
     """
     Checks that an Artist has provided their bank details.
