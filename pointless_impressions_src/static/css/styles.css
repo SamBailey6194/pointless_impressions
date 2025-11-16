@@ -3865,6 +3865,9 @@
   .border-\(--pointless-yellow\) {
     border-color: var(--pointless-yellow);
   }
+  .border-\[var\(--pointless-yellow\)\] {
+    border-color: var(--pointless-yellow);
+  }
   .border-gray-300 {
     border-color: var(--color-gray-300);
   }
@@ -4152,6 +4155,12 @@
   .text-\[var\(--pointless-black\)\] {
     color: var(--pointless-black);
   }
+  .text-\[var\(--pointless-blue\)\] {
+    color: var(--pointless-blue);
+  }
+  .text-\[var\(--pointless-white\)\] {
+    color: var(--pointless-white);
+  }
   .text-base-content {
     color: var(--color-base-content);
   }
@@ -4379,6 +4388,13 @@
     }
   }
   .hover\:text-\(--pointless-yellow\) {
+    &:hover {
+      @media (hover: hover) {
+        color: var(--pointless-yellow);
+      }
+    }
+  }
+  .hover\:text-\[var\(--pointless-yellow\)\] {
     &:hover {
       @media (hover: hover) {
         color: var(--pointless-yellow);
