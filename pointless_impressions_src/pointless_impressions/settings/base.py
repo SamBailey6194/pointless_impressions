@@ -183,6 +183,9 @@ LOGIN_URL = "/profiles/login/"
 LOGIN_REDIRECT_URL = "/dashboard/"
 LOGOUT_REDIRECT_URL = "/"
 
+# Signup settings
+SIGNUP_REDIRECT_URL = "/profiles/verify-email/"
+
 # Verification token expiry time
 VERIFICATION_TOKEN_EXPIRY = 604800
 

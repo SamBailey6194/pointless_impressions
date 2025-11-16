@@ -101,14 +101,30 @@ class CustomerAdmin(admin.ModelAdmin):
     get_username.short_description = 'Username'
 
 
+@admin.action(description="Approve selected artists")
+def approve_artists(modeladmin, request, queryset):
+    for artist in queryset:
+        if not artist.is_approved:
+            artist.is_approved = True
+            artist.save()
+
+
 @admin.register(Artist)
 class ArtistAdmin(admin.ModelAdmin):
     """Admin panel configuration for Artist model."""
-    list_display = ('get_username', 'bio', 'portfolio_url', 'social_links')
+    list_display = (
+        'get_username',
+        'bio',
+        'portfolio_url',
+        'social_links',
+        'is_approved',
+        'approved_by',
+        )
     search_fields = (
         'user_profile__user__username',
         'user_profile__user__email',
     )
+    actions = [approve_artists]
 
     def get_username(self, obj):
         return obj.user_profile.user.username
