@@ -21,6 +21,7 @@ cucumber-tag-expressions==8.0.0
 dj-database-url==3.0.1
 Django==5.2.7
 django-browser-reload==1.21.0
+django-cloudinary-storage==0.3.0
 django-crispy-forms==2.4
 django-csp==4.0
 django-phonenumber-field==8.3.0

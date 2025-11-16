@@ -20,42 +20,32 @@
       
       {% comment %} Company Info {% endcomment %}
       <div>
-        {% with image_to_render=site_logo_white_bg %}
-          {% if image_to_render %}
-            {% if production %}
-              {% cloudinary image_to_render.image height=48 crop='fit' format='auto' quality='auto' alt=image_to_render.alt_text_or_default class="h-28 w-auto mb-4" %}
-            {% else %}
-              <img src="{{ image_to_render.image.url }}" 
-                  alt="{{ image_to_render.alt_text_or_default }}" 
-                  class="h-28 w-auto mb-4" />
-            {% endif %}
-          {% else %}
-            <h3 class="font-bold text-lg mb-4 text-[var(--pointless-white)]">Pointless Impressions</h3>
-          {% endif %}
+        {% with image_to_render=site_logo_white_bg|default:placeholder_image %}
+          {% cloudinary image_to_render.image height=48 crop='fit' format='auto' quality='auto' alt=image_to_render.alt_text_or_default class="h-28 w-auto mb-4" %}
         {% endwith %}
-        <p class="text-sm opacity-90 text-[var(--pointless-white)]">
+        <p class="text-sm opacity-90 text-(--pointless-white)">
           Discover and buy unique Pointillism art online. Explore curated pieces, artist stories, and art education.
         </p>
       </div>
       
       {% comment %} Quick Links {% endcomment %}
       <div>
-        <h4 class="font-semibold mb-4 text-[var(--pointless-white)]">Quick Links</h4>
+        <h4 class="font-semibold mb-4 text-(--pointless-white)">Quick Links</h4>
         <ul class="space-y-2 text-sm">
-          <li><a href="{% url 'home' %}" class="text-[var(--pointless-white)] hover:text-[var(--pointless-yellow)] transition-colors">Home</a></li>
-          <li><a href="{% url 'artwork:list' %}" class="text-[var(--pointless-white)] hover:text-[var(--pointless-yellow)] transition-colors">Shop</a></li>
-          <li><a href="/blog/" class="text-[var(--pointless-white)] hover:text-[var(--pointless-yellow)] transition-colors">Blog</a></li>
-          <li><a href="/about/" class="text-[var(--pointless-white)] hover:text-[var(--pointless-yellow)] transition-colors">About</a></li>
-          <li><a href="/contact/" class="text-[var(--pointless-white)] hover:text-[var(--pointless-yellow)] transition-colors">Contact</a></li>
-          <li><a href="/privacy/" class="text-[var(--pointless-white)] hover:text-[var(--pointless-yellow)] transition-colors">Privacy Policy</a></li>
+          <li><a href="{% url 'home' %}" class="text-(--pointless-white) hover:text-(--pointless-yellow) transition-colors">Home</a></li>
+          <li><a href="{% url 'artwork:list' %}" class="text-(--pointless-white) hover:text-(--pointless-yellow) transition-colors">Shop</a></li>
+          <li><a href="/blog/" class="text-(--pointless-white) hover:text-(--pointless-yellow) transition-colors">Blog</a></li>
+          <li><a href="/about/" class="text-(--pointless-white) hover:text-(--pointless-yellow) transition-colors">About</a></li>
+          <li><a href="/contact/" class="text-(--pointless-white) hover:text-(--pointless-yellow) transition-colors">Contact</a></li>
+          <li><a href="/privacy/" class="text-(--pointless-white) hover:text-(--pointless-yellow) transition-colors">Privacy Policy</a></li>
         </ul>
       </div>
       
       {% comment %} Contact Info & Social {% endcomment %}
       <div>
-        <h4 class="font-semibold mb-4 text-[var(--pointless-white)]">Contact</h4>
+        <h4 class="font-semibold mb-4 text-(--pointless-white)">Contact</h4>
         <div class="space-y-2 text-sm">
-          <p class="opacity-90 text-[var(--pointless-white)]">Email: info@pointlessimpressions.com</p>
+          <p class="opacity-90 text-(--pointless-white)">Email: info@pointlessimpressions.com</p>
           <div class="flex justify-start mt-4">
             <a href="#" class="btn btn-circle btn-ghost transition-colors">
               <i class="fa-brands fa-facebook-f"></i>
@@ -66,8 +56,8 @@
     </div>
     
     {% comment %} Copyright {% endcomment %}
-    <div class="border-t border-[var(--pointless-yellow)] border-opacity-20 mt-8 pt-6 text-center">
-      <p class="text-sm opacity-90 text-[var(--pointless-white)]">
+    <div class="border-t border-(--pointless-yellow) border-opacity-20 mt-8 pt-6 text-center">
+      <p class="text-sm opacity-90 text-(--pointless-white)">
         &copy; {% now "Y" %} Pointless Impressions. All rights reserved.
       </p>
     </div>

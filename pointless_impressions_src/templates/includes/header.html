@@ -9,16 +9,7 @@
     <div class="navbar-start">
       <a href="{% url 'home' %}" class="btn btn-ghost normal-case text-xl h-auto p-2">
         {% with image_to_render=site_logo %}
-          {% if image_to_render %}
-            {% if production %}
-              {% cloudinary image_to_render.image height=60 crop='fit' format='auto' quality='auto' alt=image_to_render.alt_text_or_default class="h-8 sm:h-10 md:h-12 w-auto" %}
-            {% else %}
-              <img src="{{ image_to_render.get_image_url }}" alt="{{ image_to_render.alt_text_or_default }}" class="h-8 sm:h-10 md:h-12 w-auto" />
-            {% endif %}
-          {% else %}
-            {% comment %} Fallback if no logo is set {% endcomment %}
-            <span class="font-bold">Pointless Impressions</span>
-          {% endif %}
+          {% cloudinary image_to_render.image height=60 crop='fit' format='auto' quality='auto' alt=image_to_render.alt_text_or_default class="h-8 sm:h-10 md:h-12 w-auto" %}
         {% endwith %}
       </a>
     </div>
@@ -127,12 +118,8 @@
                 {% comment %} 
                   Display user's profile picture if logged in and has one 
                 {% endcomment %}
-                {% with image_to_render=request.user.userprofile.profile_picture %}
-                  {% if production %}
-                    {% cloudinary image_to_render.image format="auto" quality="auto" width=80 height=80 crop="fill" class="w-10 rounded-full" alt=image_to_render.alt_text_or_default %}
-                  {% else %}
-                    <img src="{{ image_to_render.image.url }}" alt="{{ image_to_render.alt_text_or_default }}" class="w-10 rounded-full" />
-                  {% endif %}
+                {% with image_to_render=request.user.userprofile.profile_picture|default:placeholder_image %}
+                  {% cloudinary image_to_render.image format="auto" quality="auto" width=80 height=80 crop="fill" class="w-10 rounded-full" alt=image_to_render.alt_text_or_default %}
                 {% endwith %}
 
               {% else %}

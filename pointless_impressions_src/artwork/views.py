@@ -186,8 +186,6 @@ class ArtworkListView(ListView):
         A queryset of available Artwork objects, filtered and paginated.
     ``production``
         Boolean indicating if the site is in production mode.
-    ``placeholder_image``
-        A Photo object used as a placeholder for artworks without images.
     ``artwork_categories``
         A queryset of all ArtworkCategory objects for filtering.
     ``framing_conditions``
@@ -271,8 +269,6 @@ class ArtworkListView(ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['production'] = not settings.DEBUG
-        context['placeholder_image'] = get_placeholder_image()
         context['artwork_categories'] = (
             ArtworkCategory.objects.all()
         )
@@ -288,7 +284,7 @@ class ArtworkListView(ListView):
             artwork.add_to_cart_form = AddToCartForm(artwork_id=artwork.id)
 
         # Prepare JSON data for artworks on the current page
-        placeholder = context['placeholder_image']
+        placeholder = get_placeholder_image()
         raw_artwork_data = _serialize_artwork_data(
             artworks_on_page, placeholder
         )
@@ -409,8 +405,6 @@ class ArtworkDetailView(DetailView):
 
         context['review_form'] = ArtworkReviewForm()
         context['add_to_cart_form'] = AddToCartForm(artwork_id=artwork.id)
-        context['production'] = not settings.DEBUG
-        context['debug'] = settings.DEBUG
 
         # Pass the stock quantity to the context
         context['stock'] = artwork.stock

@@ -5,7 +5,6 @@ Django settings for production environment.
 from .base import *
 import os
 import dj_database_url
-import cloudinary
 
 # Environment settings
 ENVIRONMENT = "production"
@@ -48,14 +47,6 @@ if EMAIL_BACKEND == "django.core.mail.backends.smtp.EmailBackend":
         # Fall back to console backend for development
         EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 
-# Cloudinary storage settings
-cloudinary.config(
-    cloud_name=os.getenv("CLOUDINARY_CLOUD_NAME"),
-    api_key=os.getenv("CLOUDINARY_API_KEY"),
-    api_secret=os.getenv("CLOUDINARY_API_SECRET"),
-    secure=True,
-)
-
 # AWS S3 Settings
 # AWS Bucket configuration
 AWS_REGION = os.getenv('AWS_S3_REGION_NAME')
@@ -82,11 +73,13 @@ AWS_S3_OBJECT_PARAMETERS = {
 }
 
 # Public URL for S3 bucket
-AWS_S3_CUSTOM_DOMAIN = f'{AWS_S3_BUCKET_NAME_STATIC}.s3.{AWS_REGION}.amazonaws.com'
+AWS_S3_CUSTOM_DOMAIN = (
+    f'{AWS_S3_BUCKET_NAME_STATIC}.s3.{AWS_REGION}.amazonaws.com'
+    )
 
 # Storage backends
 STORAGES = {
-    # Media Files (Replaces DEFAULT_FILE_STORAGE)
+    # Cloudinary Media Files
     "default": {
         "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
     },

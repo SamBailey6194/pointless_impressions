@@ -82,6 +82,11 @@ class Artwork(models.Model):
             else:
                 self._cached_photo = Photo.objects.filter(artwork=self).first()
         return self._cached_photo
+    
+    @property
+    def get_primary_image(self):
+        """Get the primary photo object for this artwork."""
+        return self._get_primary_photo()
 
     @property
     def image(self):

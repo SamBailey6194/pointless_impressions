@@ -724,6 +724,7 @@ Please note for the Jest testing there was a need to create html fixture files a
 - **SSR Incorrect Implementation and Frontend not receiving Session ID**: Using local storage for cart and uuid is not a robust solution to use SSR properly. Fixed by using Django Sessions to store cart in session id and synced that with the frontend via AJAX requests to ensure proper cart functionality across SSR. Needed to set `SESSION_COOKIE_SECURE = False` to enable frontend in development to access the session cookie.
 - **Toast Notifications Not Displaying on API Responses**: The toast notifications were not displaying properly due to lack of integration and having multiple toast systems. Therefore, created a unified toast notification system that works using Django messages with AJAX requests.
 - **Circular Imports between utils and models**: Fixed circular imports by having the utils functions imported within the functions that need them rather than at the top of the file and the same for models imported within the utils functions that need them. 
+- **Cloudinary Images Not Working**: Fixed various issues with Cloudinary image fetching by ensuring proper configuration of Cloudinary settings, using correct tags in templates, and handling both development and production image URLs in views. Used a context processor to handle placeholder image and the image to render function as well. Ensured the DB image path matched the public id as well. Once set up use Cloudinary in local development as well to avoid issues.
 
 ### Unfixed Bugs
 
