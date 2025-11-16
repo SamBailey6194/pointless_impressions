@@ -76,8 +76,8 @@
                   <ul tabindex="0" class="menu menu-sm dropdown-content z-10 p-2 shadow-lg rounded-box w-52 ml-14">
                       {% for artist in artists %}
                           <li>
-                              <a href="{% url 'artwork:list' %}?artist={{ artist.user.username }}" class="hover:bg-(--pointless-yellow)">
-                                  {{ artist.user.username|title }}
+                              <a href="{% url 'artwork:list' %}?artist={{ artist.user_profile.user.username }}" class="hover:bg-(--pointless-yellow)">
+                                  {{ artist.user_profile.user.username|title }}
                               </a>
                           </li>
                       {% endfor %}
@@ -118,7 +118,7 @@
                 {% comment %} 
                   Display user's profile picture if logged in and has one 
                 {% endcomment %}
-                {% with image_to_render=request.user.userprofile.profile_picture|default:placeholder_image %}
+                {% with image_to_render=request.user.user_profile.profile_picture|default:placeholder_image %}
                   {% cloudinary image_to_render.image format="auto" quality="auto" width=80 height=80 crop="fill" class="w-10 rounded-full" alt=image_to_render.alt_text_or_default %}
                 {% endwith %}
 

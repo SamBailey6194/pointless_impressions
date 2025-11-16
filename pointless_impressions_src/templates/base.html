@@ -21,10 +21,10 @@
       <meta property="og:type" content="website" />
       <meta property="og:site_name" content="Pointless Impressions" />
 
-      {% comment %} Open Graph Image Block: Dev uses local files, Prod uses Cloudinary {% endcomment %}
+      {% comment %} Open Graph Image Block uses Cloudinary {% endcomment %}
       {% comment %}
-      {% if artwork.image %}
-          <meta property="og:image" content="{% cloudinary_url artwork.image width=1200 height=630 crop='fill' format='auto' quality='auto' %}">
+      {% if artwork.main_photo %}
+          <meta property="og:image" content="{% cloudinary_url artwork.main_photo width=1200 height=630 crop='fill' format='auto' quality='auto' %}">
       {% elif post.featured_image %}
           <meta property="og:image" content="{% cloudinary_url post.featured_image width=1200 height=630 crop='fill' format='auto' quality='auto' %}">
       {% elif site_logo %}
@@ -49,7 +49,7 @@
       {% cloudinary_url site_logo_white_bg.image width=32 height=32 crop='fit' format='auto' quality='auto' as favicon_32 %}
       <link rel="icon" type="image/png" sizes="32x32" href="{{ favicon_32 }}">
       
-      {% cloudinary_url site_logo_white_bg.image.name width=16 height=16 crop='fit' format='auto' quality='auto' as favicon_16 %}
+      {% cloudinary_url site_logo_white_bg.image width=16 height=16 crop='fit' format='auto' quality='auto' as favicon_16 %}
       <link rel="icon" type="image/png" sizes="16x16" href="{{ favicon_16 }}">
       
       {# Apple Touch Icon #}

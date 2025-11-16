@@ -1,5 +1,9 @@
 (() => {
   // pointless_impressions_src/theme/static_src/src/js/cart.js
+  function getCsrfToken() {
+    const tokenEl = document.querySelector("[name=csrfmiddlewaretoken]");
+    return tokenEl ? tokenEl.value : "";
+  }
   async function updateCartDropdownHTML() {
     const cartDropdown = document.getElementById("cart-dropdown-content");
     if (!cartDropdown) {
@@ -72,8 +76,8 @@
       priceElement.textContent = artworkData.price || "";
     }
     if (imageElement) {
-      imageElement.src = artworkData.image || "";
-      imageElement.alt = artworkData.alt_text || artworkData.name || "";
+      imageElement.src = artworkData.image_url || "";
+      imageElement.alt = artworkData.image_alt_text || artworkData.name || "";
     }
     if (statusElement) {
       statusElement.textContent = artworkData.availability || "Unknown";
@@ -97,7 +101,7 @@
         body: formData,
         headers: {
           "X-Requested-With": "XMLHttpRequest",
-          "X-CSRFToken": getCCsrfToken()
+          "X-CSRFToken": getCsrfToken()
         }
       });
       const data = await response.json();

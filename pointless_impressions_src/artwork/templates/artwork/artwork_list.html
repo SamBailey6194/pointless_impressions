@@ -62,9 +62,9 @@
                   <select name="artist" class="select select-bordered w-full">
                     <option value="">All Artists</option>
                     {% for artist in all_artists %}
-                        <option value="{{ artist.user.username }}"
-                          {% if request.GET.artist == artist.user.username %}selected{% endif %}>
-                            {{ artist.user.username }}
+                        <option value="{{ artist.user_profile.user.username }}"
+                          {% if request.GET.artist == artist.user_profile.user.username %}selected{% endif %}>
+                            {{ artist.user_profile.user.username }}
                         </option>
                     {% endfor %}
                   </select>

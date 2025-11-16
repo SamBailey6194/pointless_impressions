@@ -120,87 +120,133 @@ class CartDropdownView(View):
     Response: JSON with rendered HTML for cart dropdown
     """
     def get(self, request, *args, **kwargs):
-        cart = get_cart(request)
-
-        cart_items_data = []
-        total_quantity = 0
-        subtotal = Decimal('0.00')
-        delivery_cost = Decimal('0.00')
-        grand_total = Decimal('0.00')
-        items_needed_for_free_delivery = settings.FREE_DELIVERY_THRESHOLD
-
         try:
+            cart = get_cart(request)
+            cart_items_data = []
+            total_quantity = 0
+            subtotal = Decimal('0.00')
+            delivery_cost = Decimal('0.00')
+            grand_total = Decimal('0.00')
+            items_needed_for_free_delivery = settings.FREE_DELIVERY_THRESHOLD
+
             if cart:
-                cart_items = cart.items.select_related(
-                    'artwork', 'framing_condition', 'artwork__main_photo'
-                ).all()
+                try:
+                    cart_items = cart.items.select_related(
+                        'artwork',
+                        'artwork__artist',
+                        'artwork__artist__user_profile',
+                        'artwork__artist__user_profile__user',
+                        'framing_condition',
+                        'artwork__main_photo'
+                    ).all()
 
-                for item in cart_items:
-                    artwork_image_url = None
-                    if item.artwork and item.artwork.main_photo:
-                        if hasattr(item.artwork.main_photo, 'get_image_url'):
-                            artwork_image_url = (
-                                item.artwork.main_photo.get_image_url()
+                    for item in cart_items:
+                        try:
+                            artwork_image_url = None
+
+                            if item.artwork and item.artwork.main_photo:
+                                photo = item.artwork.main_photo
+
+                                if (
+                                    hasattr(photo, 'get_image_url') and
+                                    callable(photo.get_image_url)
+                                ):
+                                    try:
+                                        artwork_image_url = (
+                                            photo.get_image_url()
+                                            )
+                                    except Exception:
+                                        pass
+
+                                if not artwork_image_url and hasattr(
+                                    photo, 'image'
+                                ):
+                                    try:
+                                        if photo.image:
+                                            artwork_image_url = photo.image.url
+                                    except (AttributeError, ValueError):
+                                        pass
+
+                            framing_name = None
+                            if item.framing_condition:
+                                framing_name = (
+                                    item.framing_condition.
+                                    condition_friendly_name or
+                                    item.framing_condition.condition_name or
+                                    "Standard"
                                 )
-                        elif hasattr(item.artwork.main_photo, 'image'):
-                            try:
-                                artwork_image_url = (
-                                    item.artwork.main_photo.image.url
-                                    )
-                            except (AttributeError, ValueError):
-                                pass
 
-                    cart_items_data.append({
-                        'artwork_name': (
-                            item.artwork.name
-                            if item.artwork else "Deleted Artwork"
-                        ),
-                        'artwork_image_url': artwork_image_url,
-                        'quantity': item.quantity,
-                        'notes': item.notes,
-                        'price': item.artwork.price if item.artwork else 0,
-                        'framing_condition': (
-                            item.framing_condition.condition_friendly_name
-                            if item.framing_condition else None
-                        ),
-                    })
+                            cart_item = {
+                                'artwork_name': (
+                                    item.artwork.name if item.artwork
+                                    else "Deleted Artwork"
+                                ),
+                                'artwork_image_url': artwork_image_url,
+                                'quantity': item.quantity,
+                                'notes': item.notes or '',
+                                'price': (
+                                    item.artwork.price if item.artwork
+                                    else Decimal('0.00')
+                                ),
+                                'framing_condition': framing_name,
+                            }
 
-                total_quantity = cart.get_total_quantity()
-                subtotal = cart.get_subtotal()
-                delivery_cost = cart.get_delivery_cost()
-                grand_total = cart.get_grand_total()
+                            cart_items_data.append(cart_item)
 
-                if 0 < total_quantity < settings.FREE_DELIVERY_THRESHOLD:
-                    items_needed_for_free_delivery = (
-                        settings.FREE_DELIVERY_THRESHOLD - total_quantity
-                    )
+                        except Exception:
+                            continue
 
-            html = render_to_string(
-                'cart/includes/cart_dropdown.html',
-                {
-                    'cart_items': cart_items_data,
-                    'total_quantity': total_quantity,
-                    'subtotal': subtotal,
-                    'delivery_cost': delivery_cost,
-                    'grand_total': grand_total,
-                    'items_needed_for_free_delivery': (
-                        items_needed_for_free_delivery
-                        ),
-                    'free_delivery_item_threshold': (
-                        settings.FREE_DELIVERY_THRESHOLD
-                        ),
-                },
-                request=request
-            )
+                    total_quantity = cart.get_total_quantity()
+                    subtotal = cart.get_subtotal()
+                    delivery_cost = cart.get_delivery_cost()
+                    grand_total = cart.get_grand_total()
+
+                    if 0 < total_quantity < settings.FREE_DELIVERY_THRESHOLD:
+                        items_needed_for_free_delivery = (
+                            settings.FREE_DELIVERY_THRESHOLD - total_quantity
+                        )
+                    else:
+                        items_needed_for_free_delivery = 0
+
+                except Exception:
+                    raise
+
+            try:
+                html = render_to_string(
+                    'cart/includes/cart_dropdown.html',
+                    {
+                        'cart_items': cart_items_data,
+                        'total_quantity': total_quantity,
+                        'subtotal': subtotal,
+                        'delivery_cost': delivery_cost,
+                        'grand_total': grand_total,
+                        'items_needed_for_free_delivery': (
+                            items_needed_for_free_delivery
+                            ),
+                        'free_delivery_item_threshold': (
+                            settings.FREE_DELIVERY_THRESHOLD
+                            ),
+                    },
+                    request=request
+                )
+
+            except Exception:
+                raise
 
             return JsonResponse({
                 'html': html,
                 'cart_count': total_quantity,
                 'total_quantity': total_quantity
             })
-        except Exception:
+
+        except Exception as e:
             return JsonResponse(
-                {'error': 'Failed to generate cart dropdown.'},
+                {
+                    'error': 'Failed to generate cart dropdown.',
+                    'details': (
+                        str(e) if settings.DEBUG else 'An error occurred'
+                        )
+                },
                 status=500
             )
 

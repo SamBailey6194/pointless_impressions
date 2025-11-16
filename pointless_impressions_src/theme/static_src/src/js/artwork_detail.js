@@ -35,8 +35,8 @@ export function displayArtworkDetail(artworkData) {
   }
 
   if (imageElement) {
-    imageElement.src = artworkData.image || '';
-    imageElement.alt = artworkData.alt_text || artworkData.name || '';
+    imageElement.src = artworkData.image_url || '';
+    imageElement.alt = artworkData.image_alt_text || artworkData.name || '';
   }
 
   if (statusElement) {
@@ -74,7 +74,7 @@ async function submitReview() {
       body: formData,
       headers: {
         'X-Requested-With': 'XMLHttpRequest',
-        'X-CSRFToken': getCCsrfToken()
+        'X-CSRFToken': getCsrfToken()
       }
     });
 
