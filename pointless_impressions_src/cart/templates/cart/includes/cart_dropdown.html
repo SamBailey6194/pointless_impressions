@@ -12,11 +12,7 @@
         {% for item in cart_items %}
             <li class="flex items-center gap-4 py-2">
                 {% if item.artwork_image_url %}
-                    {% if production %}
-                        {% cloudinary item.artwork_image_url height=48 crop='fit' format='auto' quality='auto' alt=item.artwork_name class="w-12 h-12 object-cover rounded" %}
-                    {% else %}
-                        <img src="{{ item.artwork_image_url }}" alt="{{ item.artwork_name }}" class="w-12 h-12 object-cover rounded" />
-                    {% endif %}
+                    {% cloudinary item.artwork_image_url height=48 crop='fit' format='auto' quality='auto' alt=item.artwork_name class="w-12 h-12 object-cover rounded" %}
                 {% else %}
                     <div class="w-12 h-12 rounded bg-gray-200 flex items-center justify-center">
                         <i class="fa-solid fa-image text-gray-400"></i>

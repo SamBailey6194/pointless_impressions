@@ -5,8 +5,6 @@ Django settings for staging environment.
 from .base import *
 import os
 import dj_database_url
-from datetime import datetime
-import cloudinary
 
 # Environment settings
 ENVIRONMENT = "staging"
@@ -42,14 +40,6 @@ DEFAULT_FROM_EMAIL = os.getenv(
     "staging@example.com"
 )
 
-# Cloudinary storage settings
-cloudinary.config(
-    cloud_name=os.getenv("CLOUDINARY_CLOUD_NAME"),
-    api_key=os.getenv("CLOUDINARY_API_KEY"),
-    api_secret=os.getenv("CLOUDINARY_API_SECRET"),
-    secure=True,
-)
-
 # AWS S3 Settings
 # AWS Bucket configuration
 AWS_ACCESS_KEY_ID = os.getenv('AWS_ACCESS_KEY_ID')
@@ -69,18 +59,21 @@ AWS_S3_FILE_OVERWRITE = False
 AWS_IS_GZIPPED = True
 
 # Public URL for S3 bucket
-AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.{AWS_S3_REGION_NAME}.amazonaws.com'
+AWS_S3_CUSTOM_DOMAIN = (
+    f'{AWS_STORAGE_BUCKET_NAME}.s3.{AWS_S3_REGION_NAME}.amazonaws.com'
+    )
 STATIC_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/static/'
 
 # Storage backends
 STORAGES = {
-    # Media Files
+    # Cloudinary Media Files
     "default": {
         "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
     },
     # Static Files
     "staticfiles": {
-        "BACKEND": "pointless_impressions.storage_backends.ManifestStaticS3Storage",
+        "BACKEND": "pointless_impressions.storage_backends."
+        "ManifestStaticS3Storage",
     },
 }
 

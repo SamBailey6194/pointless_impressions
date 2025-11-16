@@ -33,53 +33,23 @@
                                 {% if result.model_name == 'artwork' %}
                                     {% comment %} Handle Artwork Images {% endcomment %}
                                     {% with image_to_render=item.main_photo|default:placeholder_image %}
-                                        {% if image_to_render %}
-                                            {% if production %}
-                                                {% cloudinary image_to_render.image format="auto" quality="auto" width=400 height=300 crop="fill" class="w-full h-64 object-cover" alt=image_to_render.alt_text_or_default %}
-                                            {% else %}
-                                                <img src="{{ image_to_render.image.url }}" alt="{{ image_to_render.alt_text_or_default }}" class="w-full h-64 object-cover">
-                                            {% endif %}
-                                        {% else %}
-                                            <div class="bg-base-300 h-64 w-full flex items-center justify-center">
-                                                <i class="fa-solid fa-image text-base-content/20 text-5xl"></i>
-                                            </div>
-                                        {% endif %}
+                                        {% cloudinary image_to_render.image format="auto" quality="auto" width=400 height=300 crop="fill" class="w-full h-64 object-cover" alt=image_to_render.alt_text_or_default %}
                                     {% endwith %}
                                 {% elif result.model_name == 'blog' %}
                                     {% comment %} Handle Blog Images {% endcomment %}
-                                    {% with image_to_render=item.featured_image|default:placeholder_image %}
-                                        {% if image_to_render %}
-                                            {% if production %}
-                                                {% cloudinary image_to_render.image format="auto" quality="auto" width=400 height=300 crop="fill" class="w-full h-64 object-cover" alt=image_to_render.alt_text_or_default %}
-                                            {% else %}
-                                                <img src="{{ image_to_render.image.url }}" alt="{{ item.title }}" class="w-full h-64 object-cover">
-                                            {% endif %}
-                                        {% else %}
-                                            <div class="bg-base-300 h-64 w-full flex items-center justify-center">
-                                                <i class="fa-solid fa-blog text-base-content/20 text-5xl"></i>
-                                            </div>
-                                        {% endif %}
+                                    {% with image_to_render=item.main_photo|default:placeholder_image %}
+                                        {% cloudinary image_to_render.image format="auto" quality="auto" width=400 height=300 crop="fill" class="w-full h-64 object-cover" alt=image_to_render.alt_text_or_default %}
                                     {% endwith %}
 
                                 {% elif result.model_name == 'artist' %}
                                     {% comment %} Handle Artist Profile Images {% endcomment %}
-                                    {% with image_to_render=item.user.userprofile.profile_picture|default:placeholder_image %}
-                                        {% if image_to_render %}
-                                            {% if production %}
-                                                {% cloudinary image_to_render.image format="auto" quality="auto" width=400 height=300 crop="fill" class="w-full h-64 object-cover" alt=image_to_render.alt_text_or_default %}
-                                            {% else %}
-                                                <img src="{{ image_to_render.image.url }}" alt="{{ item.name }}" class="w-full h-64 object-cover">
-                                            {% endif %}
-                                        {% else %}
-                                            <div class="bg-base-300 h-64 w-full flex items-center justify-center">
-                                                <i class="fa-solid fa-user text-base-content/20 text-5xl"></i>
-                                            </div>
-                                        {% endif %}
+                                    {% with image_to_render=item.main_photo|default:placeholder_image %}
+                                        {% cloudinary image_to_render.image format="auto" quality="auto" width=400 height=300 crop="fill" class="w-full h-64 object-cover" alt=image_to_render.alt_text_or_default %}
                                     {% endwith %}
 
                                 {% else %}
                                     {% comment %} Fallback for other models {% endcomment %}
-                                    <div class="bg-base-300 h-64 w-full flex items-center justify-center">
+                                    <div class="bg-base-300 w-full h-64 object-cover">
                                         <i class="fa-solid fa-image text-base-content/20 text-5xl"></i>
                                     </div>
                                 {% endif %}
@@ -91,7 +61,7 @@
                                     <h3 class="card-title text-xl font-semibold mb-2">{{ item.name }}</h3>
                                     <span class="badge badge-lg badge-info">Artwork</span>
                                     <p class="text-sm mb-1">By {{ item.category }}</p>
-                                    <p class="text-lg font-bold text-[var(--pointless-blue)]">£{{ item.price }}</p>
+                                    <p class="text-lg font-bold text-(--pointless-blue)">£{{ item.price }}</p>
 
                                     {% comment %} Slug if available or ID if not {% endcomment %}
                                     <div class="card-actions justify-end mt-4">
@@ -102,7 +72,7 @@
                                     <h3 class="card-title text-xl font-semibold mb-2">{{ item.name }}</h3>
                                     <span class="badge badge-lg badge-info">Artist</span>
                                     <p class="text-sm mb-1">{{ item.bio|truncatewords:15 }}</p>
-                                    <p class="text-lg font-bold text-[var(--pointless-blue)]">Joined {{ item.created_at|date:"F j, Y" }}</p>
+                                    <p class="text-lg font-bold text-(--pointless-blue)">Joined {{ item.created_at|date:"F j, Y" }}</p>
 
                                     {% comment %} Slug if available or ID if not {% endcomment %}
                                     <div class="card-actions justify-end mt-4">
@@ -114,7 +84,7 @@
                                     <span class="badge badge-lg badge-info">Blog</span>
                                     <p class="text-sm mb-1">{{ item.excerpt }}</p>
                                     <p class="text-sm mb-1">By {{ item.author }}</p>
-                                    <p class="text-lg font-bold text-[var(--pointless-blue)]">{{ item.published_date|date:"F j, Y" }}</p>
+                                    <p class="text-lg font-bold text-(--pointless-blue)">{{ item.published_date|date:"F j, Y" }}</p>
 
                                     {% comment %} Slug if available or ID if not {% endcomment %}
                                     <div class="card-actions justify-end mt-4">

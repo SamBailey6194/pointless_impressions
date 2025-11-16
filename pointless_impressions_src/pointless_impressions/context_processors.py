@@ -1,4 +1,5 @@
 from django.conf import settings
+from django.utils.functional import lazy
 from pointless_impressions_src.artwork.models import (
     ArtworkCategory, ArtworkFramingCondition
     )
@@ -29,6 +30,28 @@ def global_context(request):
     except Photo.DoesNotExist:
         site_logo_white_bg = None
 
+    # --- Placeholder image logic ---
+    try:
+        placeholder_image = Photo.objects.get(
+            asset_identifier='placeholder_image'
+        )
+    except Photo.DoesNotExist:
+        placeholder_image = None
+
+    # --- Dynamic image_to_render logic ---
+    def resolve_image_to_render():
+        if hasattr(request, 'resolver_match'):
+            view_name = request.resolver_match.view_name
+            if view_name.startswith('artwork:'):
+                return site_logo_white_bg or placeholder_image
+            elif view_name.startswith('blog:'):
+                return site_logo or placeholder_image
+            elif view_name.startswith('profiles:'):
+                return placeholder_image
+        return placeholder_image
+
+    image_to_render = lazy(resolve_image_to_render, Photo)()
+
     # --- Return one single context dictionary ---
     return {
         # Production flag
@@ -45,4 +68,6 @@ def global_context(request):
         # --- NEWLY ADDED ---
         'site_logo': site_logo,
         'site_logo_white_bg': site_logo_white_bg,
+        'placeholder_image': placeholder_image,
+        'image_to_render': image_to_render,
     }

@@ -1,6 +1,5 @@
 from django.views.generic import TemplateView, View
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-from django.conf import settings
 from django.db.models import Q
 from django.http import JsonResponse
 from django.db.models import Prefetch
@@ -140,8 +139,7 @@ class SearchView(TemplateView):
         context['is_paginated'] = (
             paginator.num_pages >= 1 if paginator else False
         )
-        context['production'] = not settings.DEBUG
-        context['placeholder_image'] = get_placeholder_image()
+
         return context
 
 
