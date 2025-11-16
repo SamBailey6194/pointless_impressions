@@ -264,7 +264,7 @@ case "${1:-help}" in
         print_status "Flushing existing data..."
         docker compose -f docker-compose.dev.yml exec web python /app/manage.py flush --noinput
         print_status "Loading initial data fixtures into the database..."
-        docker compose -f docker-compose.dev.yml exec web python /app/manage.py loaddata account_group.json account.json profiles.json artwork_categories.json artwork_framing_options.json photo_cloudinary.json artwork.json
+        docker compose -f docker-compose.dev.yml exec web python /app/manage.py loaddata account_group.json account.json profiles.json artwork_categories.json artwork_framing_options.json photo_cloudinary_local.json artwork.json
         print_success "Fixtures loaded successfully!"
         ;;
     status)
