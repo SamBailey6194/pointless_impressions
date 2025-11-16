@@ -1,7 +1,7 @@
 from django.db.models.signals import post_save, m2m_changed
 from django.dispatch import receiver
 from pointless_impressions_src.account.models import CustomUser
-from .models import UserProfile, Customer, StaffRole, Artist
+from .models import UserProfile, Customer, StaffRole
 
 
 @receiver(post_save, sender=CustomUser)
@@ -38,21 +38,4 @@ def ensure_user_profile_and_customer_on_group_change(
     """Ensure UserProfile and Customer exist when user groups change."""
     if action in ["post_add", "post_remove", "post_clear"]:
         user_profile, _ = UserProfile.objects.get_or_create(user=instance)
-        Customer.objects.get_or_create(user_profile=user_profile)
-
-
-@receiver(post_save, sender=Artist)
-def create_user_profile_and_customer_for_artists(
-    sender,
-    instance,
-    created,
-    **kwargs
-):
-    """
-    Ensure UserProfile and Customer exist when Artist application is created.
-    """
-    if created:
-        user_profile, _ = UserProfile.objects.get_or_create(
-            user=instance.user_profile.user
-        )
         Customer.objects.get_or_create(user_profile=user_profile)

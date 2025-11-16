@@ -45,8 +45,8 @@ class Artist(models.Model):
         related_name='artist'
     )
     bio = models.TextField(blank=True)
-    portfolio_url = models.URLField(blank=True)
-    social_links = models.JSONField(blank=True, default=dict)
+    portfolio_url = models.URLField(blank=True, null=True)
+    social_links = models.JSONField(blank=True, null=True, default=dict)
     is_approved = models.BooleanField(default=False)
     approved_by = models.ForeignKey(
         'StaffRole',
@@ -135,12 +135,12 @@ class Address(models.Model):
     )
     first_name = models.CharField(max_length=255, blank=False, null=False)
     last_name = models.CharField(max_length=255, blank=False, null=False)
-    address_line_1 = models.CharField(max_length=255)
+    address_line_1 = models.CharField(max_length=255, blank=False, null=False)
     address_line_2 = models.CharField(max_length=255, blank=True, null=True)
-    city = models.CharField(max_length=100)
-    county = models.CharField(max_length=100)
-    postcode = models.CharField(max_length=20)
-    country = models.CharField(max_length=100)
+    city = models.CharField(max_length=100, blank=False, null=False)
+    county = models.CharField(max_length=100, blank=True, null=True)
+    postcode = models.CharField(max_length=20, blank=False, null=False)
+    country = models.CharField(max_length=100, blank=False, null=False)
     is_default = models.BooleanField(default=False)
 
     def __str__(self):

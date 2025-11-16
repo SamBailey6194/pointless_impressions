@@ -13,6 +13,7 @@
     --color-gray-200: oklch(92.8% 0.006 264.531);
     --color-gray-300: oklch(87.2% 0.01 258.338);
     --color-gray-400: oklch(70.7% 0.022 261.325);
+    --color-gray-500: oklch(55.1% 0.027 264.364);
     --color-gray-600: oklch(44.6% 0.03 256.802);
     --color-gray-700: oklch(37.3% 0.034 259.733);
     --color-black: #000;
@@ -3604,6 +3605,10 @@
   .w-auto {
     width: auto;
   }
+  .w-fit {
+    width: -moz-fit-content;
+    width: fit-content;
+  }
   .w-full {
     width: 100%;
   }
@@ -4179,6 +4184,9 @@
   .text-gray-400 {
     color: var(--color-gray-400);
   }
+  .text-gray-500 {
+    color: var(--color-gray-500);
+  }
   .text-gray-600 {
     color: var(--color-gray-600);
   }
@@ -4358,6 +4366,12 @@
     @layer daisyui.modifier.color {
       --btn-color: var(--color-primary);
       --btn-fg: var(--color-primary-content);
+    }
+  }
+  .btn-secondary {
+    @layer daisyui.modifier.color {
+      --btn-color: var(--color-secondary);
+      --btn-fg: var(--color-secondary-content);
     }
   }
   .hover\:border-primary {
@@ -4584,6 +4598,11 @@
   .lg\:h-9\/12 {
     @media (width >= 64rem) {
       height: calc(9/12 * 100%);
+    }
+  }
+  .lg\:w-1\/2 {
+    @media (width >= 64rem) {
+      width: calc(1/2 * 100%);
     }
   }
   .lg\:w-7\/12 {
