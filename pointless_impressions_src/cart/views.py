@@ -41,10 +41,10 @@ class CheckoutView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        if context.get('cart_is_empty', True):
-            return context
+        cart = get_cart(self.request)
 
-        cart = context.get('cart')
+        if not cart or cart.get_total_quantity() == 0:
+            return context
 
         cart_items_data = []
         try:

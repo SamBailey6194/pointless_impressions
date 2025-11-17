@@ -7,18 +7,30 @@
             <h1 class="text-4xl font-bold mb-4">Artist Application</h1>
             <p class="mb-6">Thank you for your interest in becoming an artist on our platform! Please fill out the application form below to get started.</p>
 
-            {% if not is_registered %}
-                <form action="{% url 'profiles:artist_application' %}" method="post" enctype="multipart/form-data" class="card max-w-3xl">
+            {% if not request.user.is_registered %}
+                <form action="{% url 'profiles:artist_application' %}" method="post" enctype="multipart/form-data" class="max-w-7xl">
                     {% csrf_token %}
-
-                    {% crispy signup_form %}
-
-                    {% crispy photo_form %}
-
-                    {% crispy address_form %}
-
-                    {% crispy artist_application_form %}
-
+                    
+                    {# Signup Form #}
+                    <div class="form-card">
+                        {% crispy signup_form %}
+                    </div>
+                    
+                    {# Profile Photo Section #}
+                    <div class="form-card">
+                        {% crispy profile_pic_form %}
+                    </div>
+                    
+                    {# Address Form #}
+                    <div class="form-card">
+                        {% crispy address_form %}
+                    </div>
+                    
+                    {# Artist Application Form #}
+                    <div class="form-card">
+                        {% crispy artist_application_form %}
+                    </div>
+                    
                     <div class="card-actions justify-end mt-2">
                         <button type="submit" class="btn btn-ghost btn-outline mr-6 mb-6" id="submit-application-button">
                             <i class="fa-solid fa-paper-plane mr-2"></i> Submit Application
@@ -26,7 +38,7 @@
                     </div>
                 </form>
             {% else %}
-                <form action="{% url 'profiles:artist_application' %}" method="post" class="card max-w-3xl">
+                <form action="{% url 'profiles:artist_application' %}" method="post" class="max-w-7xl form-card">
                     {% csrf_token %}
                     {% crispy artist_application_form %}
                     <div class="card-actions justify-end mt-2">
@@ -36,7 +48,13 @@
                     </div>
                 </form>
             {% endif %}
+            </div>
         </div>
     </section>
 
+{% endblock %}
+
+{% block postloadjs %}
+{{ block.super }}
+<script src="{% static 'js/artist_application.js' %}"></script>
 {% endblock %}

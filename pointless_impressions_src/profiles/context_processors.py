@@ -1,6 +1,7 @@
 from .models import (
     Customer, Artist, StaffRole
 )
+from .forms import SignupForm, LoginForm, LogoutForm
 
 
 # Write your context processors here.
@@ -49,3 +50,14 @@ def global_profiles_context(request):
             pass
 
     return context
+
+
+def auth_forms(request):
+    """
+    Adds authentication forms to the context for all templates.
+    """
+    return {
+        'login_form': LoginForm(),
+        'signup_form': SignupForm(),
+        'logout_form': LogoutForm(),
+    }

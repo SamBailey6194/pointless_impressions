@@ -5,226 +5,163 @@ from crispy_forms.layout import Layout, Field, Div, HTML
 from .models import Photo
 
 
-class PhotoForm(ModelForm):
+class BasePhotoForm(ModelForm):
     """
-    Base form for uploading and editing photos.
-    DRY approach: conditionally include fields based on photo_type.
-    Supports artwork, profile, site_asset photos.
+    Base form for photo uploads, providing shared logic and layout.
     """
 
     overwrite = forms.BooleanField(
         required=False,
         initial=False,
-        label="Overwrite existing file with same name?",
-        help_text="If checked, this upload will replace any existing file with"
-        " the same name/public_id."
+        label="",
     )
 
     class Meta:
         model = Photo
+        fields = []
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field_name in self.fields:
+            self.fields[field_name].label = ""
+        self.helper = FormHelper()
+        self.helper.form_tag = False
+        self.helper.layout = Layout(
+            Div(
+                Div(
+                    *self.get_layout_fields(),
+                    css_class='flex flex-col gap-4'
+                ),
+                css_class='p-6 mb-6',
+                id=self.get_form_id()
+            )
+        )
+
+    def get_layout_fields(self):
+        """Define layout fields in subclasses."""
+        return []
+
+    def get_form_id(self):
+        """Define form ID in subclasses."""
+        return 'base-photo-form'
+
+
+class ProfilePhotoForm(BasePhotoForm):
+    """
+    Form for uploading profile photos.
+    """
+
+    class Meta(BasePhotoForm.Meta):
+        fields = ['title', 'description', 'image', 'alt_text']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+    def get_layout_fields(self):
+        return [
+            HTML(
+                "<h3 class='mb-2 text-(--pointless-black) "
+                "dark:text-(--pointless-white)'>Profile Photo</h3>"
+            ),
+            Field(
+                'image',
+                css_class='mb-4 custom-input w-fit btn btn-ghost btn-outline'
+            ),
+            HTML("<div class='form-divider'></div>"),
+        ]
+
+    def get_form_id(self):
+        return 'profile-photo-form'
+
+
+class AssetPhotoForm(BasePhotoForm):
+    """
+    Form for uploading site assets.
+    """
+
+    class Meta(BasePhotoForm.Meta):
         fields = [
-            'photo_type',
             'title',
             'description',
             'image',
             'alt_text',
-            'artwork',
             'asset_identifier'
         ]
-        widgets = {
-            'photo_type': forms.Select(attrs={
-                'class': 'form-control',
-                'id': 'id_photo_type'
-            }),
-            'title': forms.TextInput(attrs={
-                'class': 'form-control',
-                'placeholder': 'Enter title'
-            }),
-            'description': forms.Textarea(attrs={
-                'class': 'form-control',
-                'placeholder': 'Enter description',
-                'rows': 3
-            }),
-            'image': forms.FileInput(attrs={
-                'class': 'form-control',
-                'accept': 'image/*'
-            }),
-            'alt_text': forms.TextInput(attrs={
-                'class': 'form-control',
-                'placeholder': 'Enter alt text for the image'
-            }),
-            'artwork': forms.Select(attrs={
-                'class': 'form-control'
-            }),
-            'asset_identifier': forms.TextInput(attrs={
-                'class': 'form-control',
-                'placeholder': 'e.g., logo_main, banner_home'
-            })
-        }
 
-    def __init__(self, *args, photo_type=None, **kwargs):
-        """
-        Initialize form with conditional fields based on photo_type.
-        This allows different forms to use only needed fields.
-        """
-        super().__init__(*args, **kwargs)
-        self.photo_type = photo_type or self.instance.photo_type
+    def get_layout_fields(self):
+        return [
+            HTML(
+                "<h3 class='mb-2 text-(--pointless-black) "
+                "dark:text-(--pointless-white)'>Asset Photo</h3>"
+            ),
+            Field(
+                'image',
+                css_class='mb-4 custom-input w-full'
+            ),
+            Field(
+                'alt_text',
+                placeholder="Describe the image for accessibility",
+                css_class='mb-4 custom-input w-full'
+            ),
+            HTML("<div class='form-divider'></div>"),
+            Field(
+                'title',
+                placeholder="Enter a descriptive title",
+                css_class='mb-4 custom-input w-full lg:w-66'
+            ),
+            Field(
+                'description',
+                placeholder="Provide a detailed description",
+                css_class='mb-4 custom-input w-full'
+            ),
+            HTML("<div class='form-divider'></div>"),
+            Field(
+                'asset_identifier',
+                placeholder="e.g., logo_main, banner_home",
+                css_class='mb-4 custom-input w-full lg:w-66'
+            ),
+        ]
 
-        # Always include base fields
-        base_fields = {
-            'photo_type', 'title', 'description', 'image', 'alt_text'
-        }
+    def get_form_id(self):
+        return 'asset-photo-form'
 
-        # Define fields per photo type
-        type_fields_map = {
-            'artwork': base_fields | {'artwork'},
-            'profile': base_fields,
-            'site_asset': base_fields | {'asset_identifier'},
-        }
 
-        # Get fields to include for this type
-        allowed_fields = type_fields_map.get(
-            self.photo_type,
-            base_fields
-        )
+class ArtworkPhotoForm(BasePhotoForm):
+    """
+    Form for uploading artwork photos.
+    """
 
-        # Remove fields not needed for this type
-        for field in list(self.fields.keys()):
-            if field not in allowed_fields:
-                del self.fields[field]
+    class Meta(BasePhotoForm.Meta):
+        fields = ['title', 'description', 'image', 'alt_text', 'artwork']
 
-        # Set field requirements based on type
-        if self.photo_type == 'artwork':
-            self.fields['artwork'].required = True
-        elif self.photo_type == 'site_asset':
-            self.fields['asset_identifier'].required = True
+    def get_layout_fields(self):
+        return [
+            HTML(
+                "<h3 class='mb-2 text-(--pointless-black) "
+                "dark:text-(--pointless-white)'>Artwork Photo</h3>"
+            ),
+            Field(
+                'image',
+                css_class='mb-4 custom-input w-full'
+            ),
+            Field(
+                'alt_text',
+                placeholder="Describe the image for accessibility",
+                css_class='mb-4 custom-input w-full'
+            ),
+            HTML("<div class='form-divider'></div>"),
+            Field(
+                'title',
+                placeholder="Enter a descriptive title",
+                css_class='mb-4 custom-input w-full lg:w-66'
+            ),
+            Field(
+                'description',
+                placeholder="Provide a detailed description",
+                css_class='mb-4 custom-input w-full'
+            ),
+            HTML("<div class='form-divider'></div>"),
+        ]
 
-        # Initialize Crispy FormHelper
-        self.helper = FormHelper()
-        self.helper.layout = Layout(
-            Div(
-                HTML("<h2 class='card-title text-center'>Upload Photo</h2>"),
-                Div(
-                    Field(
-                        'photo_type',
-                        css_class='custom-input'
-                        ),
-                    Field(
-                        'title',
-                        css_class='custom-input'
-                        ),
-                    Field(
-                        'description',
-                        css_class='custom-input'
-                        ),
-                    Field(
-                        'image',
-                        css_class='custom-input'
-                        ),
-                    Field(
-                        'alt_text',
-                        css_class='custom-input'
-                        ),
-                    Field(
-                        'overwrite',
-                        css_class='custom-checkbox'
-                        ),
-                    Field(
-                        'artwork',
-                        css_class='custom-input'
-                        ) if 'artwork' in allowed_fields else None,
-                    Field(
-                        'asset_identifier',
-                        css_class='custom-input'
-                        ) if 'asset_identifier' in allowed_fields else None,
-                    css_class=(
-                        'bg-gray-300'
-                        'dark:bg-gray-700'
-                        'card-body'
-                    ),
-                ),
-                css_class='card p-4'
-            )
-        )
-
-    def clean_title(self):
-        """Validate title is not blank."""
-        title = self.cleaned_data.get('title')
-        if not title or not title.strip():
-            raise forms.ValidationError('Title cannot be empty.')
-        if len(title.strip()) < 3:
-            raise forms.ValidationError(
-                'Title must be at least 3 characters long.'
-            )
-        return title
-
-    def clean_description(self):
-        """Validate description."""
-        description = self.cleaned_data.get('description')
-        if not description or not description.strip():
-            raise forms.ValidationError('Description cannot be empty.')
-        if len(description.strip()) < 5:
-            raise forms.ValidationError(
-                'Description must be at least 5 characters long.'
-            )
-        return description
-
-    def clean_alt_text(self):
-        """Validate alt text."""
-        alt_text = self.cleaned_data.get('alt_text')
-        if alt_text and len(alt_text.strip()) > 255:
-            raise forms.ValidationError(
-                'Alt text must be 255 characters or less.'
-            )
-        return alt_text
-
-    def clean_artwork(self):
-        """Validate artwork field for artwork photos."""
-        if self.photo_type == 'artwork':
-            artwork = self.cleaned_data.get('artwork')
-            if not artwork:
-                raise forms.ValidationError(
-                    'Artwork must be selected for artwork photos.'
-                )
-        return self.cleaned_data.get('artwork')
-
-    def clean_asset_identifier(self):
-        """Validate asset identifier for site assets."""
-        if self.photo_type == 'site_asset':
-            asset_identifier = self.cleaned_data.get('asset_identifier')
-            if not asset_identifier or not asset_identifier.strip():
-                raise forms.ValidationError(
-                    'Asset identifier is required for site assets.'
-                )
-        return self.cleaned_data.get('asset_identifier')
-
-    def clean(self):
-        """Overall form validation."""
-        cleaned_data = super().clean()
-        photo_type = cleaned_data.get('photo_type')
-
-        # Validate photo type constraints
-        if photo_type == 'artwork':
-            if not cleaned_data.get('artwork'):
-                self.add_error(
-                    'artwork',
-                    'Artwork must be selected.'
-                )
-
-        elif photo_type == 'site_asset':
-            if not cleaned_data.get('asset_identifier'):
-                self.add_error(
-                    'asset_identifier',
-                    'Asset identifier is required.'
-                )
-
-        return cleaned_data
-
-    def save(self, commit=True, user=None):
-        """Save photo with user assignment if provided."""
-        photo = super().save(commit=False)
-        if user:
-            photo.uploaded_by = user
-        if commit:
-            photo.save()
-        return photo
+    def get_form_id(self):
+        return 'artwork-photo-form'

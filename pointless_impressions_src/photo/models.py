@@ -44,6 +44,14 @@ class Photo(models.Model):
     #     related_name='photos'
     # )
 
+    user_profile = models.ForeignKey(
+        'profiles.UserProfile',
+        null=True,
+        blank=True,
+        on_delete=models.CASCADE,
+        related_name='photos'
+    )
+
     # For site assets (logos, banners, etc.)
     photo_type = models.CharField(
         max_length=20,
@@ -90,6 +98,11 @@ class Photo(models.Model):
         if self.photo_type == 'artwork' and not self.artwork:
             raise ValidationError(
                 "Artwork photos must be linked to an Artwork."
+                )
+
+        if self.photo_type == 'profile' and not self.user_profile:
+            raise ValidationError(
+                "Profile photos must be linked to a UserProfile."
                 )
 
         if self.photo_type == 'site_asset' and not self.asset_identifier:
@@ -147,11 +160,9 @@ class Photo(models.Model):
             return self.artwork.name
         # elif self.photo_type == 'blog' and self.blog:
         #     return self.blog.title
-        elif self.photo_type == 'profile':
-            if hasattr(self, 'user_profile'):
-                username = self.user_profile.user.username
-                return f"{username}'s profile picture"
-            return "Profile picture"
+        elif self.photo_type == 'profile' and self.user_profile:
+            username = self.user_profile.user.username
+            return f"{username}'s profile picture"
         elif self.photo_type == 'site_asset':
             return self.asset_identifier or "Site asset"
 

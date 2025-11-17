@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["../../theme/static_src/src/js/auth.js"],
+  "sourcesContent": ["addEventListener('DOMContentLoaded', () => {\n    function login() {\n        const loginModal = document.getElementById('login-modal');\n        loginModal.showModal();\n    }\n\n    function logout() {\n        const logoutModal = document.getElementById('logout-modal');\n        logoutModal.showModal();\n    }\n\n    document.getElementById('login-button').addEventListener('click', login);\n    document.getElementById('logout-button').addEventListener('click', logout);\n});"],
+  "mappings": ";;AAAA,mBAAiB,oBAAoB,MAAM;AACvC,aAAS,QAAQ;AACb,YAAM,aAAa,SAAS,eAAe,aAAa;AACxD,iBAAW,UAAU;AAAA,IACzB;AAEA,aAAS,SAAS;AACd,YAAM,cAAc,SAAS,eAAe,cAAc;AAC1D,kBAAY,UAAU;AAAA,IAC1B;AAEA,aAAS,eAAe,cAAc,EAAE,iBAAiB,SAAS,KAAK;AACvE,aAAS,eAAe,eAAe,EAAE,iBAAiB,SAAS,MAAM;AAAA,EAC7E,CAAC;",
+  "names": []
+}

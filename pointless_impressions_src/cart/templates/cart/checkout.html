@@ -46,7 +46,7 @@
                 <hr class="mb-4">
                 <p class="text-md">To complete your purchase, please provide your payment details and confirm your shipping and billing information.</p>
                 <hr class="my-4">
-                <form action="{% url 'orders:confirmation' %}" method="post" id="checkout-form" class="card checkout-card">
+                <form action="{% url 'orders:confirmation' %}" method="post" id="checkout-form" class="form-card p-6 mb-6">
                     {% csrf_token %}
                     {% crispy order_form %}
                     <div class="card-actions justify-end mt-2">

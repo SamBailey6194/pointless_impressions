@@ -10,7 +10,7 @@
   - [US002: View Artwork Details](#us002-view-artwork-details)
   - [US003: Add Artwork to Cart](#us003-add-artwork-to-cart)
   - [US004: Checkout with Address Form](#us004-checkout-with-address-form)
-  - [US005: Pay Securely with Stripe](#us005-pay-securely-with-stripe)
+  - [US005: Pay Securely with Square](#us005-pay-securely-with-square)
   - [US006: Track Order via Unique Link](#us006-track-order-via-unique-link)
   - [US007: Register and Manage Account](#us007-register-and-manage-account)
   - [US008: Admin Upload and Manage Artwork](#us008-admin-upload-and-manage-artwork)
@@ -108,10 +108,10 @@ so that I can receive my physical artwork.
 
 ---
 
-## US005: Pay Securely with Stripe
+## US005: Pay Securely with Square
 **Description:**  
 As a customer,  
-I want to pay securely online using Stripe,  
+I want to pay securely online using Square,  
 so that my payment details are protected.  
 
 **Acceptance Criteria:**  

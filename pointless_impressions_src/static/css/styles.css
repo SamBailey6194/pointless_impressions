@@ -13,7 +13,6 @@
     --color-gray-200: oklch(92.8% 0.006 264.531);
     --color-gray-300: oklch(87.2% 0.01 258.338);
     --color-gray-400: oklch(70.7% 0.022 261.325);
-    --color-gray-500: oklch(55.1% 0.027 264.364);
     --color-gray-600: oklch(44.6% 0.03 256.802);
     --color-gray-700: oklch(37.3% 0.034 259.733);
     --color-black: #000;
@@ -2556,9 +2555,6 @@
       }
     }
   }
-  .mx-2 {
-    margin-inline: calc(var(--spacing) * 2);
-  }
   .mx-4 {
     margin-inline: calc(var(--spacing) * 4);
   }
@@ -3573,6 +3569,12 @@
   .w-1\/2 {
     width: calc(1/2 * 100%);
   }
+  .w-1\/3 {
+    width: calc(1/3 * 100%);
+  }
+  .w-2\/3 {
+    width: calc(2/3 * 100%);
+  }
   .w-4 {
     width: calc(var(--spacing) * 4);
   }
@@ -3729,6 +3731,9 @@
   }
   .items-center {
     align-items: center;
+  }
+  .items-end {
+    align-items: flex-end;
   }
   .items-start {
     align-items: flex-start;
@@ -4188,9 +4193,6 @@
   .text-gray-400 {
     color: var(--color-gray-400);
   }
-  .text-gray-500 {
-    color: var(--color-gray-500);
-  }
   .text-gray-600 {
     color: var(--color-gray-600);
   }
@@ -4370,12 +4372,6 @@
     @layer daisyui.modifier.color {
       --btn-color: var(--color-primary);
       --btn-fg: var(--color-primary-content);
-    }
-  }
-  .btn-secondary {
-    @layer daisyui.modifier.color {
-      --btn-color: var(--color-secondary);
-      --btn-fg: var(--color-secondary-content);
     }
   }
   .hover\:border-primary {
@@ -4594,6 +4590,31 @@
       }
     }
   }
+  .lg\:mx-2 {
+    @media (width >= 64rem) {
+      margin-inline: calc(var(--spacing) * 2);
+    }
+  }
+  .lg\:my-0 {
+    @media (width >= 64rem) {
+      margin-block: calc(var(--spacing) * 0);
+    }
+  }
+  .lg\:mt-2 {
+    @media (width >= 64rem) {
+      margin-top: calc(var(--spacing) * 2);
+    }
+  }
+  .lg\:mr-4 {
+    @media (width >= 64rem) {
+      margin-right: calc(var(--spacing) * 4);
+    }
+  }
+  .lg\:mb-4 {
+    @media (width >= 64rem) {
+      margin-bottom: calc(var(--spacing) * 4);
+    }
+  }
   .lg\:flex {
     @media (width >= 64rem) {
       display: flex;
@@ -4602,11 +4623,6 @@
   .lg\:h-9\/12 {
     @media (width >= 64rem) {
       height: calc(9/12 * 100%);
-    }
-  }
-  .lg\:w-1\/2 {
-    @media (width >= 64rem) {
-      width: calc(1/2 * 100%);
     }
   }
   .lg\:w-7\/12 {
@@ -4763,7 +4779,8 @@
     background-color: var(--pointless-white);
     color: var(--pointless-blue);
   }
-  .custom-input {
+  .custom-input,
+  #id_phone_1 {
     background-color: var(--pointless-white) !important;
     border: 1px solid var(--pointless-blue) !important;
     color: var(--pointless-black) !important;
@@ -4773,18 +4790,20 @@
     box-shadow: none !important;
     transition: border-color 0.2s ease, box-shadow 0.2s ease;
   }
-  .custom-input:focus {
+  .custom-input:focus,
+  #id_phone_1:focus {
     outline: none;
     border-color: var(--pointless-blue) !important;
     box-shadow: 0 0 0 3px rgba(5, 81, 135, 0.2) !important;
   }
-  .custom-input::-moz-placeholder {
+  .custom-input::-moz-placeholder, #id_phone_1::-moz-placeholder {
     color: var(--pointless-black) !important;
   }
-  .custom-input::placeholder {
+  .custom-input::placeholder,
+  #id_phone_1::placeholder {
     color: var(--pointless-black) !important;
   }
-  .checkout-card label {
+  .form-card label {
     color: var(--pointless-black) !important;
     font-family: var(--font-Poppins);
     font-weight: 300 !important;
@@ -4808,46 +4827,17 @@
     background-color: var(--pointless-white) !important;
     color: var(--pointless-black) !important;
   }
-  .checkout-card {
+  .form-card {
     background-color: var(--color-gray-300) !important;
-    color: var(--pointless-black) !important;
+    border-radius: 0.5rem;
   }
-  .checkout-card p,
-  .checkout-card small {
+  .form-card p,
+  .form-card small {
     color: var(--pointless-black) !important;
   }
   .form-divider {
     border-top: 1px solid var(--pointless-black);
     margin: 1.5rem 0;
-  }
-  .custom-checkbox {
-    border: 1px solid var(--pointless-blue) !important;
-    background-color: var(--pointless-white) !important;
-    padding: 0.5rem;
-    border-radius: 0.25rem;
-    box-shadow: none !important;
-    transition: border-color 0.2s ease, box-shadow 0.2s ease;
-    -webkit-appearance: none;
-       -moz-appearance: none;
-            appearance: none;
-    --webkit-appearance: none;
-  }
-  .custom-checkbox:hover {
-    border-color: var(--pointless-yellow);
-    box-shadow: 0 0 5px var(--pointless-yellow);
-    cursor: pointer;
-  }
-  .custom-checkbox:hover::before {
-    opacity: 0.5;
-    transition: opacity 0.2s ease;
-  }
-  .custom-checkbox:checked::before {
-    font-family: "Font Awesome 6 Free";
-    content: "\f14a";
-    font-weight: 900;
-    text-align: center;
-    color: var(--pointless-yellow);
-    font-size: 1rem;
   }
   @media (prefers-color-scheme: dark) {
     header, footer {
@@ -4862,18 +4852,22 @@
       background-color: var(--pointless-black);
       color: var(--pointless-blue);
     }
-    .custom-input {
+    .custom-input,
+    #id_phone_1 {
       background-color: var(--pointless-black) !important;
       border-color: var(--pointless-blue) !important;
       color: var(--pointless-white) !important;
     }
-    .custom-input::-moz-placeholder {
+    .custom-input::-moz-placeholder, #id_phone_1::-moz-placeholder {
       color: var(--pointless-white) !important;
     }
-    .custom-input::placeholder {
+    .custom-input::placeholder,
+    #id_phone_1::placeholder {
       color: var(--pointless-white) !important;
     }
-    .checkout-card label {
+    .form-card label,
+    .form-card p,
+    .form-card small {
       color: var(--pointless-white) !important;
     }
     .select-dropdown {
@@ -4898,37 +4892,11 @@
       background-color: var(--pointless-black) !important;
       color: var(--pointless-white) !important;
     }
-    .checkout-card {
+    .form-card {
       background-color: var(--color-gray-700) !important;
-      color: var(--pointless-white) !important;
-    }
-    .checkout-card p,
-    .checkout-card small {
-      color: var(--pointless-white) !important;
     }
     .form-divider {
       border-top: 1px solid var(--pointless-white);
-    }
-    .custom-checkbox {
-      background-color: var(--pointless-black) !important;
-      border-color: var(--pointless-blue) !important;
-    }
-    .custom-checkbox:hover {
-      border-color: var(--pointless-yellow);
-      box-shadow: 0 0 5px var(--pointless-yellow);
-      cursor: pointer;
-    }
-    .custom-checkbox:hover::before {
-      opacity: 0.5;
-      transition: opacity 0.2s ease;
-    }
-    .custom-checkbox:checked::before {
-      font-family: "Font Awesome 6 Free";
-      content: "\f14a";
-      font-weight: 900;
-      text-align: center;
-      color: var(--pointless-yellow);
-      font-size: 1rem;
     }
   }
 }

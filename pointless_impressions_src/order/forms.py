@@ -139,7 +139,9 @@ class OrderForm(forms.Form):
                                 'h-10 '
                                 'w-full '
                                 'lg:w-66 '
-                                'mx-2 '
+                                'my-2 '
+                                'lg:my-0 '
+                                'lg:mx-2 '
                                 'rounded-lg'
                             )
                         ),
@@ -211,7 +213,7 @@ class OrderForm(forms.Form):
                         ),
                         Field(
                             'billing_same_as_shipping',
-                            css_class='mr-4 custom-checkbox'
+                            css_class='mr-4'
                         ),
                         css_class='shipping-group',
                         id="shipping-fields-container",

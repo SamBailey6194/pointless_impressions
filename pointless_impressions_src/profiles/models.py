@@ -52,7 +52,7 @@ class Artist(models.Model):
     )
     bio = models.TextField(blank=True)
     portfolio_url = models.URLField(blank=True, null=True)
-    social_links = models.JSONField(blank=True, null=True, default=dict)
+    social_links = models.JSONField(blank=True, null=True, default=list)
     is_approved = models.BooleanField(default=False)
     approved_by = models.ForeignKey(
         'StaffRole',

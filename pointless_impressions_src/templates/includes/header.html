@@ -179,7 +179,7 @@
                 </li>
                 <div class="divider my-1"></div>
                 <li>
-                  <button class="hover:bg-(--pointless-red) hover:text-white" onclick="logout-modal.showModal()">
+                  <button class="hover:bg-(--pointless-red) hover:text-white" id="logout-button">
                     <i class="fa-solid fa-sign-out-alt"></i> Logout
                   </button>
                 </li>
@@ -188,14 +188,14 @@
                   <span>Welcome, Guest</span>
                 </li>
                 <li>
-                  <button class="hover:bg-(--pointless-yellow)" onclick="login-modal.showModal()">
+                  <button class="hover:bg-(--pointless-yellow)" id="login-button">
                     <i class="fa-solid fa-sign-in-alt"></i> Login
                   </button>
                 </li>
                 <li>
-                  <button class="hover:bg-(--pointless-yellow)" onclick="signup-modal.showModal()">
+                  <a href="{% url 'profiles:signup' %}" class="hover:bg-(--pointless-yellow)">
                     <i class="fa-solid fa-user-plus"></i> Sign Up
-                  </button>
+                  </a>
                 </li>
                 <li>
                   <a href="{% url 'profiles:artist_application' %}" class="hover:bg-(--pointless-yellow)">

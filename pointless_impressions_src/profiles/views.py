@@ -11,7 +11,7 @@ from .forms import (
     AddressForm,
     LogoutForm
 )
-from pointless_impressions_src.photo.forms import PhotoForm
+from pointless_impressions_src.photo.forms import ProfilePhotoForm
 from pointless_impressions_src.account.models import EmailVerificationCode
 from pointless_impressions_src.account.mixins import (
     AnonymousRequiredMixin, EmailNotVerifiedMixin
@@ -38,15 +38,13 @@ class SignupView(FormView, AnonymousRequiredMixin):
     Context:
     - form: Instance of SignupForm for user input.
     """
-    template_name = 'profiles/includes/signup_modal.html'
+    template_name = 'profiles/signup.html'
     form_class = SignupForm
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['photo_form'] = PhotoForm(instance=self.request.user.profile)
-        context['address_form'] = AddressForm(
-            instance=self.request.user.profile
-            )
+        context['profile_pic_form'] = ProfilePhotoForm()
+        context['address_form'] = AddressForm()
         return context
 
     def form_valid(self, form):
@@ -189,7 +187,8 @@ class ArtistApplicationView(FormView):
     - artist_application_form: Instance of ArtistApplicationForm for
       artist-specific details.
     """
-    template_name = 'profiles/templates/profiles/artist_application.html'
+    template_name = 'profiles/artist_application.html'
+    form_class = ArtistApplicationForm
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -197,7 +196,7 @@ class ArtistApplicationView(FormView):
             context['artist_application_form'] = ArtistApplicationForm()
         else:
             context['signup_form'] = SignupForm()
-            context['photo_form'] = PhotoForm()
+            context['profile_pic_form'] = ProfilePhotoForm()
             context['address_form'] = AddressForm()
             context['artist_application_form'] = ArtistApplicationForm()
         return context
@@ -216,7 +215,7 @@ class ArtistApplicationView(FormView):
                 )
                 return render(
                     request, self.template_name, self.get_context_data()
-                    )
+                )
 
             messages.error(request, "Please correct the errors in the form.")
             return render(
@@ -226,19 +225,25 @@ class ArtistApplicationView(FormView):
             )
         else:
             signup_form = SignupForm(request.POST)
-            photo_form = PhotoForm(request.POST, request.FILES)
+            profile_pic_form = ProfilePhotoForm(
+                request.POST, request.FILES
+            )
             address_form = AddressForm(request.POST)
             artist_application_form = ArtistApplicationForm(request.POST)
 
             if (
                 signup_form.is_valid()
-                and photo_form.is_valid()
+                and profile_pic_form.is_valid()
                 and address_form.is_valid()
                 and artist_application_form.is_valid()
             ):
                 user = signup_form.save()
-                photo = photo_form.save(commit=False)
-                photo.user = user
+                user_profile = user.user_profile
+                photo = profile_pic_form.save(
+                    commit=False,
+                    user=user,
+                    user_profile=user_profile
+                )
                 photo.save()
 
                 address = address_form.save(commit=False)
@@ -254,7 +259,7 @@ class ArtistApplicationView(FormView):
                 )
                 return render(
                     request, self.template_name, self.get_context_data()
-                    )
+                )
 
             messages.error(request, "Please correct the errors in the form.")
             return render(
@@ -262,7 +267,7 @@ class ArtistApplicationView(FormView):
                 self.template_name,
                 {
                     'signup_form': signup_form,
-                    'photo_form': photo_form,
+                    'profile_pic_form': profile_pic_form,
                     'address_form': address_form,
                     'artist_application_form': artist_application_form,
                 },

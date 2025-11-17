@@ -163,6 +163,8 @@ TEMPLATES = [
                 "cart_context_processor",
                 "pointless_impressions_src.profiles.context_processors."
                 "global_profiles_context",
+                "pointless_impressions_src.profiles.context_processors."
+                "auth_forms",
             ],
         },
     },

@@ -36,38 +36,41 @@ class SignupForm(UserCreationForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['first_name'].label = "Your First Name"
-        self.fields['last_name'].label = "Your Last Name"
-        self.fields['username'].label = "Choose a Username"
         self.fields['phone'] = SplitPhoneNumberField(
             required=True,
             label="Phone Number",
             region='GB',
         )
-        self.fields['email'].label = "Email Address"
         self.fields['password1'] = forms.CharField(
-            label="Create a Password",
+            label="Password",
             widget=forms.PasswordInput,
             validators=[CustomPasswordValidator]
         )
         self.fields['password2'] = forms.CharField(
-            label="Confirm Your Password",
+            label="Confirm Password",
             widget=forms.PasswordInput,
             validators=[CustomPasswordValidator]
         )
         self.fields['subscribe_to_newsletter'] = forms.BooleanField(
             required=False,
             label="Subscribe to Newsletter",
-            help_text="Check this box to receive our newsletter.",
             initial=False
         )
         self.helper = FormHelper()
         self.helper.layout = Layout(
             Div(
-                HTML("<h2 class='card-title text-center'>Sign Up</h2>"),
+                HTML(
+                    "<h2 class='card-title text-center "
+                    "mb-4 "
+                    "text-(--pointless-black) "
+                    "dark:text-(--pointless-white)'>Sign Up</h2>"
+                ),
                 Div(
+                    HTML(
+                        "<h4 class='mb-2 text-(--pointless-black) "
+                        "dark:text-(--pointless-white)'>Name</h4>"
+                    ),
                     Div(
-                        HTML("<h4 class='mb-2'>Name</h4>"),
                         Field(
                             'first_name',
                             placeholder="First Name",
@@ -83,38 +86,54 @@ class SignupForm(UserCreationForm):
                     HTML(
                         "<div class='form-divider'></div>"
                     ),
+                    HTML(
+                        "<h4 class='mb-2 text-(--pointless-black) "
+                        "dark:text-(--pointless-white)'>"
+                        "User Information</h4>"
+                    ),
                     Div(
-                        HTML("<h4 class='mb-2'>User Information</h4>"),
                         Field(
                             'username',
                             placeholder="Username",
-                            css_class='mb-4 custom-input w-full lg:w-66'
+                            css_class='lg:mb-4 custom-input w-full lg:w-66'
                         ),
                         Field(
                             'phone',
-                            placeholder="Phone Number",
-                            css_class='mb-4 custom-input w-full lg:w-66'
+                            placeholder="0123456789",
+                            css_class=(
+                                'custom-input '
+                                'h-10 '
+                                'w-full '
+                                'lg:w-66 '
+                                'my-2 '
+                                'lg:my-0 '
+                                'lg:mr-4 '
+                                'lg:mt-2'
+                                'rounded-lg'
+                            )
                         ),
+                        css_class='lg:flex lg:gap-4 mb-4'
+                    ),
+                    Div(
                         Field(
                             'email',
                             placeholder="Email",
-                            css_class='mb-4 custom-input w-full lg:w-1/2'
+                            css_class='mb-4 custom-input w-full'
                         ),
                         Field(
                             'subscribe_to_newsletter',
-                            css_class='mb-4 custom-checkbox'
-                        ),
-                        HTML(
-                            "<p class='text-sm'>"
-                            "Subscribe to our newsletter for updates.</p>"
+                            css_class='mb-4'
                         ),
                         css_class='lg:flex lg:gap-4 mb-4'
                     ),
                     HTML(
                         "<div class='form-divider'></div>"
                     ),
+                    HTML(
+                        "<h4 class='mb-2 text-(--pointless-black) "
+                        "dark:text-(--pointless-white)'>Password</h4>"
+                    ),
                     Div(
-                        HTML("<h4 class='mb-2'>Password</h4>"),
                         Field(
                             'password1',
                             placeholder="Password",
@@ -131,22 +150,21 @@ class SignupForm(UserCreationForm):
                         "<div class='form-divider'></div>"
                     ),
                     HTML(
-                            "<p class='text-sm text-gray-500'>"
+                            "<p class='text-sm text-(--pointless-black) "
+                            "dark:text-(--pointless-white)'>"
                             "By signing up, you agree to our terms.</p>"
                     ),
                     HTML(
                         "<div class='form-divider'></div>"
                     ),
                     css_class=(
-                        'flex'
-                        'flex-col'
-                        'card-body'
+                        'flex '
+                        'flex-col '
                         'gap-4'
-                        'bg-gray-300'
-                        'dark:bg-gray-700'
                         )
                 ),
-                css_class='card p-6 mb-6'
+                css_class='px-6 py-2 mb-4',
+                id='signup-form'
             )
         )
 
@@ -171,33 +189,54 @@ class LoginForm(AuthenticationForm):
         self.helper.form_tag = True
         self.helper.layout = Layout(
             Div(
-                HTML("<h2 class='card-title text-center'>Log In</h2>"),
+                HTML(
+                    "<h2 "
+                    "class="
+                    "'card-title "
+                    "text-center "
+                    "text-(--pointless-black) "
+                    "dark:text-(--pointless-white) "
+                    "mb-4'>"
+                    "Log In</h2>"
+                    ),
                 Div(
+                    HTML(
+                        "<label class='text-(--pointless-black) "
+                        "dark:text-(--pointless-white) "
+                        "mb-4'>"
+                        "Username</label>"
+                    ),
                     Field(
                         'username',
                         placeholder="Username",
                         css_class='mb-4 custom-input w-full lg:w-66'
-                        ),
+                    ),
+                    HTML(
+                        "<label class='text-(--pointless-black) "
+                        "dark:text-(--pointless-white) "
+                        "mb-4'>"
+                        "Password</label>"
+                    ),
                     Field(
                         'password',
                         placeholder="Password",
                         css_class='mb-4 custom-input w-full lg:w-66'
-                        ),
+                    ),
                     Submit(
                         'submit',
                         'Log In',
                         css_class='btn btn-ghost btn-outline w-fit'
-                        ),
+                    ),
                     css_class=(
-                        'flex'
-                        'flex-col'
-                        'card-body'
-                        'gap-4'
-                        'bg-gray-300'
-                        'dark:bg-gray-700'
+                        'flex '
+                        'flex-col '
+                        'gap-4 '
+                        'bg-gray-300 '
+                        'dark:bg-gray-700 '
                         )
                 ),
-                css_class='card p-6 mb-6'
+                css_class='p-6 mb-6 form-card',
+                id='login-form'
             )
         )
 
@@ -211,7 +250,16 @@ class LogoutForm(forms.Form):
         self.helper.form_tag = True
         self.helper.layout = Layout(
             Div(
-                HTML("<h2 class='card-title text-center'>Log Out</h2>"),
+                HTML(
+                    "<h2 "
+                    "class="
+                    "'card-title "
+                    "text-center "
+                    "text-(--pointless-black) "
+                    "dark:text-(--pointless-white) "
+                    "mb-4'>"
+                    "Logout</h2>"
+                ),
                 Div(
                     HTML(
                         "<p class='mb-4'>"
@@ -223,86 +271,102 @@ class LogoutForm(forms.Form):
                         css_class='btn btn-ghost btn-outline w-fit'
                     ),
                     css_class=(
-                        'flex'
-                        'flex-col'
-                        'card-body'
-                        'gap-4'
-                        'bg-gray-300'
-                        'dark:bg-gray-700'
+                        'flex '
+                        'flex-col '
+                        'gap-4 '
                         )
                 ),
-                css_class='card p-6 mb-6'
+                css_class='p-6 mb-6 form-card',
+                id='logout-form'
             )
         )
 
 
 class ArtistApplicationForm(forms.ModelForm):
-    """Form for artist application."""
+    """
+    Form for artist application with split social_links field.
+    """
+    social_links = forms.CharField(
+        widget=forms.HiddenInput(),
+        required=False
+    )
+
     class Meta:
         model = Artist
         fields = ['bio', 'portfolio_url', 'social_links']
 
     def __init__(self, *args, **kwargs):
-        self.user = kwargs.pop('user', None)
         super().__init__(*args, **kwargs)
         self.fields['bio'].label = "Artist Biography"
         self.fields['portfolio_url'].label = "Portfolio URL"
-        self.fields['social_links'].label = "Social Media Links"
         self.helper = FormHelper()
         self.helper.layout = Layout(
             Div(
                 HTML(
-                    "<h2 class='card-title text-center'>"
-                    "Artist Application</h2>"
-                    ),
+                    "<h2 class='card-title text-center "
+                    "text-(--pointless-black) dark:text-(--pointless-white) "
+                    "mb-4'>Artist Application</h2>"
+                ),
                 Div(
                     Field(
                         'bio',
+                        css_class='mb-4 custom-input w-full',
                         placeholder="Tell us about yourself as an artist"
-                        ),
+                    ),
                     Field(
                         'portfolio_url',
-                        placeholder="Link to your portfolio"
-                        ),
+                        placeholder="Link to your portfolio",
+                        css_class='mb-4 custom-input w-full'
+                    ),
                     Div(
-                        Field('social_links', css_class='social-links'),
                         HTML(
-                            "<button"
-                            "type='button'"
-                            "class='btn btn-secondary add-social'>"
-                            "Add Social</button>"
+                            "<h4 class='mb-2 text-(--pointless-black) "
+                            "dark:text-(--pointless-white)'>Social Links</h4>"
+                        ),
+                        HTML(
+                            "<div id='social-links-container'>"
+                            "<div class='social-link-row flex gap-4 mb-4'>"
+                            "<input type='text' name='platform' "
+                            "class='custom-input w-1/3 rounded-lg' "
+                            "placeholder='Platform'>"
+                            "<input type='url' name='url' "
+                            "class='custom-input w-2/3 rounded-lg' "
+                            "placeholder='URL'>"
+                            "<button type='button' "
+                            "class='btn btn-ghost btn-outline remove-social'>"
+                            "Remove</button>"
+                            "</div>"
+                            "</div>"
+                        ),
+                        HTML(
+                            "<button type='button' id='add-social-link' "
+                            "class='btn btn-ghost btn-outline'>"
+                            "Add Social Link</button>"
                         ),
                         css_class='social-links-container'
                     ),
-                    css_class=(
-                        'flex'
-                        'flex-col'
-                        'card-body'
-                        'gap-4'
-                        'bg-gray-300'
-                        'dark:bg-gray-700'
-                        )
+                    css_class='flex flex-col'
                 ),
-                css_class='flex flex-col card gap-4'
+                css_class='flex flex-col p-4 mb-4',
+                id='artist-application-form'
             )
         )
 
     def clean_social_links(self):
-        """Validate social links as URLs."""
+        """Validate and parse social links."""
         social_links = self.data.getlist('social_links')
-        for url in social_links:
-            if not url:
-                continue
+        parsed_links = []
+        for link in social_links:
             try:
+                platform, url = link.split('|')
                 forms.URLField().clean(url)
-            except forms.ValidationError:
-                raise forms.ValidationError(f"Invalid URL: {url}")
-        return social_links
+                parsed_links.append({'platform': platform, 'url': url})
+            except (ValueError, forms.ValidationError):
+                raise forms.ValidationError(f"Invalid social link: {link}")
+        return parsed_links
 
     def save(self, commit=True):
         artist = super().save(commit=False)
-        if self.user:
-            artist.user_profile = self.user.user_profile
         artist.social_links = self.cleaned_data['social_links']
         if commit:
             artist.save()
@@ -329,27 +393,40 @@ class AddressForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['address_type'].widget = forms.Select(choices=[
-            ('SHIPPING', 'Shipping'),
-            ('BILLING', 'Billing')
-        ])
+        self.fields['address_type'].widget = forms.CheckboxSelectMultiple(
+            choices=[
+                ('SHIPPING', 'Shipping'),
+                ('BILLING', 'Billing')
+            ]
+        )
+        self.fields['address_type'].help_text = "Select all that apply"
         self.fields['is_default'].widget = forms.CheckboxInput()
+        self.fields['label'].label = "Address Label"
         self.fields['country'] = forms.ChoiceField(
             choices=COUNTRY_CHOICES,
             initial='GB',
             label="Country",
             widget=CountrySelectFormWidget()
         )
+        self.fields['is_default'].label = "Set as Default Address"
         self.helper = FormHelper()
         self.helper.layout = Layout(
             Div(
                 HTML(
-                    "<h3 class='card-title mb-2'>"
-                    "Address</h3>"
+                    "<h2 "
+                    "class="
+                    "'card-title "
+                    "text-center "
+                    "text-(--pointless-black) "
+                    "dark:text-(--pointless-white) "
+                    "mb-4'>"
+                    "Address</h2>"
                 ),
                 Div(
                     HTML(
-                        "<p class='mb-4'>"
+                        "<p class='text-(--pointless-black) "
+                        "dark:text-(--pointless-white) "
+                        "mb-4'>"
                         "Enter your address details below</p>"
                     ),
                     Div(
@@ -360,12 +437,16 @@ class AddressForm(forms.ModelForm):
                         ),
                         Field(
                             'address_type',
-                            css_class='mb-4 custom-input w-full lg:w-66'
+                            css_class='mb-4 w-full lg:w-66'
                         ),
                         css_class='lg:flex lg:gap-4 mb-4'
                     ),
+                    HTML(
+                        "<h4 class='text-(--pointless-black) "
+                        "dark:text-(--pointless-white) "
+                        "mb-4'>Recipient Name</h4>"
+                    ),
                     Div(
-                        HTML("<h4 class='mb-2'>Recipient Name</h4>"),
                         Field(
                             'first_name',
                             placeholder="First Name",
@@ -420,15 +501,13 @@ class AddressForm(forms.ModelForm):
                         css_class='mb-4'
                     ),
                     css_class=(
-                        'flex'
-                        'flex-col'
-                        'card-body'
-                        'gap-4'
-                        'bg-gray-300'
-                        'dark:bg-gray-700'
+                        'flex '
+                        'flex-col '
+                        'gap-4 '
                         )
                 ),
-                css_class='card p-6 mb-6'
+                css_class='p-4 mb-4',
+                id='address-form'
             )
         )
 
@@ -437,7 +516,7 @@ class EmailVerificationForm(forms.Form):
     """Form for email verification code input."""
     verification_code = forms.CharField(
         max_length=6,
-        label="Verification Code",
+        label="",
         widget=forms.TextInput(
             attrs={
                 'placeholder': 'Enter the 6-digit code',
@@ -454,17 +533,37 @@ class EmailVerificationForm(forms.Form):
         self.helper.layout = Layout(
             Div(
                 HTML(
-                    "<h2 class='card-title text-center'>"
+                    "<h2 "
+                    "class="
+                    "'card-title "
+                    "text-center "
+                    "text-(--pointless-black) "
+                    "dark:text-(--pointless-white) "
+                    "mb-4'>"
                     "Email Verification</h2>"
                     ),
                 Div(
                     HTML(
-                        "<p class='mb-4'>"
+                        "<p class='mb-4 text-(--pointless-black) "
+                        "dark:text-(--pointless-white)'>"
                         "Please enter the 6-digit verification code "
                         "sent to your email.</p>"
                     ),
+                    HTML(
+                        "<label class='text-(--pointless-black) "
+                        "dark:text-(--pointless-white) "
+                        "mb-4'>"
+                        "Verification Code</label>"
+                    ),
                     Field(
                         'verification_code'
+                    ),
+                    HTML(
+                        "<p class='text-(--pointless-black) "
+                        "dark:text-(--pointless-white) "
+                        "mb-4'>"
+                        "If you didn't receive the code, click Resend Code."
+                        "</p>"
                     ),
                     Div(
                         Submit(
@@ -480,14 +579,12 @@ class EmailVerificationForm(forms.Form):
                         css_class='flex items-center gap-2'
                     ),
                     css_class=(
-                        'flex'
-                        'flex-col'
-                        'card-body'
-                        'gap-4'
-                        'bg-gray-300'
-                        'dark:bg-gray-700'
+                        'flex '
+                        'flex-col '
+                        'gap-4 '
                         )
                 ),
-                css_class='card p-6 mb-6'
+                css_class='p-6 mb-6',
+                id='email-verification-form'
             )
         )
