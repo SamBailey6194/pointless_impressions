@@ -13,9 +13,9 @@ from .models import (
     Artwork, ArtworkCategory, ArtworkFramingCondition, ArtworkReview
 )
 from .forms import ArtworkReviewForm, AddToCartForm
-from pointless_impressions_src.photo.models import Photo
 from pointless_impressions_src.profiles.models import Artist
 from pointless_impressions_src.cart.models import Cart
+from pointless_impressions_src.photo.models import Photo
 from pointless_impressions_src.profiles.mixins import CustomerRequiredMixin
 
 
@@ -23,14 +23,6 @@ from pointless_impressions_src.profiles.mixins import CustomerRequiredMixin
 # Helper Functions
 # ---------------------------
 PLACEHOLDER_WORDS = 15
-
-
-def get_placeholder_image():
-    """Returns a placeholder image data."""
-    try:
-        return Photo.objects.get(asset_identifier='placeholder_image')
-    except Photo.DoesNotExist:
-        return None
 
 
 def _serialize_artwork_data(artwork_queryset, placeholder_image):
@@ -109,7 +101,7 @@ def _serialize_artwork_data(artwork_queryset, placeholder_image):
         # Artist Data
         artist_data = None
         if hasattr(artwork, 'artist') and artwork.artist:
-            user = artwork.artist.user
+            user = artwork.artist.user_profile.user
             artist_data = {
                 'username': user.username,
                 'first_name': user.first_name,
@@ -166,6 +158,25 @@ def _serialize_artwork_data(artwork_queryset, placeholder_image):
     return cleaned_data
 
 
+def get_placeholder_image_from_context(request):
+    """
+    Helper function to get placeholder image from request context.
+    Falls back to database query if context is not available.
+
+    Args:
+        request: Django request object
+        (may have context from context processor)
+
+    Returns:
+        Photo object or None
+    """
+    # This helper is primarily for API views that don't have template context
+    try:
+        return Photo.objects.get(asset_identifier='placeholder_image')
+    except Photo.DoesNotExist:
+        return None
+
+
 # ---------------------------
 # Artwork list view
 # ---------------------------
@@ -206,7 +217,7 @@ class ArtworkListView(ListView):
 
     def get_queryset(self):
         queryset = Artwork.objects.all().select_related(
-            'category', 'main_photo', 'artist__user'
+            'category', 'main_photo', 'artist__user_profile__user'
         ).prefetch_related(
             'photos',
             Prefetch(
@@ -217,30 +228,27 @@ class ArtworkListView(ListView):
             )
         )
 
-        # Only show available artworks
         general_filter = self.request.GET.get('filter')
         available_only = self.request.GET.get('available_only')
         if general_filter == 'available' or available_only == 'on':
             queryset = queryset.filter(is_available=True)
 
-        # Artist filtering
         artist_username = self.request.GET.get('artist')
         if artist_username:
-            queryset = queryset.filter(artist__user__username=artist_username)
+            queryset = queryset.filter(
+                artist__user_profile__user__username=artist_username
+                )
 
-        # Category filtering
         category_slug = self.request.GET.get('category')
         if category_slug:
             queryset = queryset.filter(category__slug=category_slug)
 
-        # Framing filtering
         framing_slug = self.request.GET.get('selected_conditions')
         if framing_slug:
             queryset = queryset.filter(
                 selected_conditions__slug=framing_slug
             )
 
-        # Price filtering
         min_price = self.request.GET.get('min_price')
         max_price = self.request.GET.get('max_price')
         if min_price and max_price:
@@ -252,13 +260,12 @@ class ArtworkListView(ListView):
         elif max_price:
             queryset = queryset.filter(price__lte=max_price)
 
-        # Sorting
         sort_key = self.request.GET.get('sort', 'price')
         direction = self.request.GET.get('direction', 'asc')
         sort_map = {
             'price': 'price',
             'name': 'name',
-            'artist': 'artist__user__username',
+            'artist': 'artist__user_profile__user__username',
         }
         order_field = sort_map.get(sort_key, 'price')
         if direction == 'desc':
@@ -269,22 +276,13 @@ class ArtworkListView(ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['artwork_categories'] = (
-            ArtworkCategory.objects.all()
-        )
-        context['framing_conditions'] = (
-            ArtworkFramingCondition.objects.all()
-        )
-        context['all_artists'] = Artist.objects.select_related(
-            'user').filter(user__is_active=True).order_by('user__username')
 
-        # Prepare AddToCartForm for each artwork
         artworks_on_page = context['artworks']
         for artwork in artworks_on_page:
             artwork.add_to_cart_form = AddToCartForm(artwork_id=artwork.id)
 
-        # Prepare JSON data for artworks on the current page
-        placeholder = get_placeholder_image()
+        placeholder = context.get('placeholder_image')
+
         raw_artwork_data = _serialize_artwork_data(
             artworks_on_page, placeholder
         )
@@ -323,7 +321,7 @@ class ArtworkDetailView(DetailView):
 
     def get_queryset(self):
         return Artwork.objects.select_related(
-            'category', 'main_photo', 'artist__user'
+            'category', 'main_photo', 'artist__user_profile__user'
         ).prefetch_related(
             'photos',
             Prefetch(
@@ -356,7 +354,8 @@ class ArtworkDetailView(DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         artwork = self.get_object()
-        placeholder = get_placeholder_image()
+
+        placeholder = context.get('placeholder_image')
 
         serialized_data_list = _serialize_artwork_data(
             [artwork], placeholder
@@ -389,7 +388,7 @@ class ArtworkDetailView(DetailView):
             ).exclude(
                 pk=artwork.pk
             ).select_related(
-                'main_photo', 'artist__user'
+                'main_photo', 'artist__user_profile__user'
             )[:10]
             context['similar_artists'] = similar_artists
 
@@ -399,7 +398,7 @@ class ArtworkDetailView(DetailView):
             ).exclude(
                 pk=artwork.pk
             ).select_related(
-                'main_photo', 'artist__user'
+                'main_photo', 'artist__user_profile__user'
             )[:10]
             context['similar_artworks'] = similar_artworks
 
@@ -407,7 +406,7 @@ class ArtworkDetailView(DetailView):
         context['add_to_cart_form'] = AddToCartForm(artwork_id=artwork.id)
 
         # Pass the stock quantity to the context
-        context['stock'] = artwork.stock
+        context['stock'] = artwork.quantity
 
         # Set the form action to the current page URL
         context['form_action'] = self.request.path
@@ -503,7 +502,7 @@ class ArtworkAPIView(View):
         artworks_queryset = Artwork.objects.filter(
             is_available=True
             ).select_related(
-            'main_photo', 'category', 'artist__user'
+            'main_photo', 'category', 'artist__user_profile__user'
             ).prefetch_related(
             Prefetch(
                 'selected_conditions',
@@ -513,7 +512,7 @@ class ArtworkAPIView(View):
                 )
         ).order_by('id')
 
-        placeholder = get_placeholder_image()
+        placeholder = get_placeholder_image_from_context(request)
 
         final_list = _serialize_artwork_data(
             artworks_queryset, placeholder
@@ -572,7 +571,6 @@ def setup_test_data(request):
         403 Forbidden: If not running with test settings
     """
     try:
-        # SECURITY: Only allow in test settings mode
         db_name = settings.DATABASES.get('default', {}).get('NAME', '')
         is_test_mode = 'test' in db_name.lower()
 
@@ -587,14 +585,12 @@ def setup_test_data(request):
 
         User = get_user_model()
 
-        # Check if test data already exists
         if Artwork.objects.filter(name='Sunset').exists():
             return JsonResponse({
                 'message': 'Test data already exists',
                 'artworks_created': False
             })
 
-        # Create default artist
         default_artist_user = User.objects.create(
             username='test_artist',
             email='test_artist@example.com',
@@ -602,25 +598,22 @@ def setup_test_data(request):
         )
 
         default_artist_profile = Artist.objects.create(
-            user=default_artist_user,
+            user_profile=default_artist_user.user_profile,
             bio="Test artist bio",
             portfolio_url="https://testartist.com"
         )
 
-        # Create default category
         default_category = ArtworkCategory.objects.create(
             name="Pointillism",
             friendly_name="Pointillism Art",
             description="Beautiful pointillism artworks."
         )
 
-        # Create default framing condition
         default_framing_condition = ArtworkFramingCondition.objects.create(
             condition_name="unframed",
             condition_description="Artwork is unframed."
         )
 
-        # Create test artworks
         test_artworks = [
             {
                 'name': 'Sunset',
@@ -636,7 +629,7 @@ def setup_test_data(request):
                 'description': 'A night sky full of stars.',
                 'price': 249.99,
                 'sku': 'STARRY001',
-                'is_available': False,  # Sold out
+                'is_available': False,
                 'is_in_stock': False,
                 'quantity': 0,
             }

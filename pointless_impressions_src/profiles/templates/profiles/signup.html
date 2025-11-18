@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% load static tailwind_tags cloudinary crispy_forms_tags %}
+
+{% block content %}
+<section class="section-alt py-16 w-full">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <h1 class="text-4xl font-bold mb-4">Sign Up</h1>
+        <p class="mb-6">Create an account to access exclusive features and content.</p>
+
+        <form method="post" action="{% url 'profiles:signup' %}" enctype="multipart/form-data" class="max-w-7xl">
+            {% csrf_token %}
+
+            <div class="form-card">
+                {% crispy signup_form %}
+            </div>
+
+            <div class="form-card">
+                {% crispy profile_pic_form %}
+            </div>
+
+            <div class="form-card">
+                {% crispy address_form %}
+            </div>
+
+            <div class="card-actions justify-end mt-4">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fa-solid fa-user-plus mr-2"></i> Sign Up
+                </button>
+            </div>
+        </form>
+    </div>
+</section>
+{% endblock %}

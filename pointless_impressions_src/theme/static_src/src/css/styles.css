@@ -109,7 +109,8 @@
   }
 
   /* Form elements */
-  .custom-input {
+  .custom-input,
+  #id_phone_1 {
     background-color: var(--pointless-white) !important;
     border: 1px solid var(--pointless-blue) !important;
     color: var(--pointless-black) !important;
@@ -120,17 +121,20 @@
     transition: border-color 0.2s ease, box-shadow 0.2s ease;
   }
 
-  .custom-input:focus {
+  .custom-input:focus,
+  #id_phone_1:focus {
     outline: none;
     border-color: var(--pointless-blue) !important;
     box-shadow: 0 0 0 3px rgba(5, 81, 135, 0.2) !important;
   }
 
-  .custom-input::placeholder {
+  .custom-input::placeholder,
+  #id_phone_1::placeholder {
     color: var(--pointless-black) !important;
   }
 
-  .checkout-card label {
+  .form-card label,
+  .form-card ul li {
     color: var(--pointless-black) !important;
     font-family: var(--font-Poppins);
     font-weight: 300 !important;
@@ -158,13 +162,13 @@
     color: var(--pointless-black) !important;
   }
 
-  .checkout-card {
+  .form-card {
     background-color: var(--color-gray-300) !important;
-    color: var(--pointless-black) !important;
+    border-radius: 0.5rem;
   }
 
-  .checkout-card p,
-  .checkout-card small {
+  .form-card p,
+  .form-card small {
     color: var(--pointless-black) !important;
   }
 
@@ -190,17 +194,22 @@
       color: var(--pointless-blue);
     }
 
-    .custom-input {
+    .custom-input,
+    #id_phone_1 {
       background-color: var(--pointless-black) !important;
       border-color: var(--pointless-blue) !important;
       color: var(--pointless-white) !important;
     }
 
-    .custom-input::placeholder {
+    .custom-input::placeholder,
+    #id_phone_1::placeholder {
       color: var(--pointless-white) !important;
     }
 
-    .checkout-card label {
+    .form-card label,
+    .form-card p,
+    .form-card small,
+    .form-card ul li {
       color: var(--pointless-white) !important;
     }
 
@@ -226,20 +235,14 @@
       background-color: var(--pointless-yellow) !important;
       color: var(--pointless-black) !important;
     }
-
+    
     .card {
       background-color: var(--pointless-black) !important;
       color: var(--pointless-white) !important;
     }
 
-    .checkout-card {
+    .form-card {
       background-color: var(--color-gray-700) !important;
-      color: var(--pointless-white) !important;
-    }
-
-    .checkout-card p,
-    .checkout-card small {
-      color: var(--pointless-white) !important;
     }
 
     .form-divider {

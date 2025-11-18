@@ -1,0 +1,30 @@
+{% load static tailwind_tags cloudinary crispy_forms_tags %}
+
+<dialog id="order-modal" class="modal">
+    <div class="modal-box lg:w-7/12 lg:max-w-4xl lg:h-9/12">
+        {% include 'order/includes/order_summary.html' %}
+
+        <form id="edit-order-form" class="hidden" method="post" action="{% url 'dashboard:edit_order' order.id %}">
+            {% csrf_token %}
+            {% crispy form %}
+            <div class="modal-action">
+                <button type="submit" class="btn btn-ghost btn-outline">Submit Request</button>
+                <button type="button" class="btn btn-ghost btn-outline js-close-modal-btn" data-modal-id="order-modal">
+                    <i class="fa-solid fa-times"></i> Cancel
+                </button>
+            </div>
+        </form>
+
+        <div id="order-actions">
+            <button id="toggle-edit-mode" class="btn btn-ghost btn-outline mt-4">Request Edit</button>
+            <button class="btn btn-ghost btn-outline mt-4">Delete</button>
+            <button type="button" class="btn btn-ghost btn-outline mt-4 js-close-modal-btn" data-modal-id="order-modal">
+                <i class="fa-solid fa-times"></i> Close
+            </button>
+        </div>
+    </div>
+
+    <form method="dialog" class="modal-backdrop flex items-end justify-end">
+        <button>close</button>
+    </form>
+</dialog>

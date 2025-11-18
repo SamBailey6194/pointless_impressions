@@ -6,7 +6,6 @@ from .models import Order
 from .utils import create_order_from_cart
 from .forms import OrderForm
 from pointless_impressions_src.cart.utils import get_cart
-from pointless_impressions_src.artwork.models import Artwork
 
 
 # Create your views here.
@@ -44,7 +43,7 @@ class OrderConfirmationView(View):
         if not form.is_valid():
             messages.error(request, _(
                 "Please correct the errors in your address form."
-                ))
+            ))
             return redirect('cart:checkout')
 
         try:
@@ -57,7 +56,7 @@ class OrderConfirmationView(View):
         except Exception as e:
             messages.error(request, _(
                 f"Your payment could not be processed: {str(e)}"
-                ))
+            ))
             return redirect('cart:checkout')
 
         if payment_success:
@@ -65,18 +64,18 @@ class OrderConfirmationView(View):
 
             shipping_address_snapshot = self.build_address_snapshot(
                 form_data, "shipping"
-                )
+            )
 
             billing_address_snapshot = self.build_address_snapshot(
                 form_data, "billing"
-                )
+            )
 
             order_data = {
                 'email': form_data.get('email') or (
                     request.user.email if
                     request.user.is_authenticated
                     else None
-                    ),
+                ),
                 'phone': form_data.get('phone'),
                 'shipping_address': shipping_address_snapshot,
                 'billing_address': billing_address_snapshot,
@@ -88,7 +87,7 @@ class OrderConfirmationView(View):
                 messages.error(request, _(
                     f"There was an error creating your order. "
                     f"Please contact support. Error: {str(e)}"
-                    ))
+                ))
                 return redirect('cart:checkout')
 
             if 'cart_id' in request.session:
@@ -96,7 +95,7 @@ class OrderConfirmationView(View):
 
             messages.success(request, _(
                 "Your order has been successfully placed!"
-                ))
+            ))
 
             request.session['recent_order_id'] = str(new_order.id)
 
@@ -104,7 +103,7 @@ class OrderConfirmationView(View):
 
         messages.error(request, _(
             "An unknown error occurred. Please try again."
-            ))
+        ))
         return redirect('cart:checkout')
 
     def build_address_snapshot(self, form_data, prefix):
@@ -112,7 +111,7 @@ class OrderConfirmationView(View):
         return {
             f"{prefix}_first_name": form_data[
                 f"{prefix}_first_name"
-                ],
+            ],
             f"{prefix}_last_name": form_data[f"{prefix}_last_name"],
             f"{prefix}_address_line_1": form_data[f"{prefix}_address_line_1"],
             f"{prefix}_address_line_2": form_data.get(
@@ -152,20 +151,20 @@ class OrderSuccessView(View):
 
         session_order_id = request.session.get('recent_order_id')
 
-        is_dashbaord_admin = False
+        is_dashboard_admin = False
         order_owner = False
         if request.user.is_authenticated:
-            is_dashbaord_admin = getattr(
+            is_dashboard_admin = getattr(
                 request.user, 'is_dashboard_admin', False
-                )
+            )
             order_owner = (order.user == request.user)
 
         is_in_session = (str(order.id) == session_order_id)
 
-        if not (is_dashbaord_admin or order_owner or is_in_session):
+        if not (is_dashboard_admin or order_owner or is_in_session):
             messages.error(request, _(
                 "You do not have permission to view this order."
-                ))
+            ))
             return redirect('home')
 
         if 'recent_order_id' in request.session:
@@ -174,15 +173,5 @@ class OrderSuccessView(View):
         context = {
             'order': order
         }
-
-        context['featured_artworks'] = Artwork.objects.filter(
-            is_featured=True
-            ).select_related(
-                'main_photo',
-                'artist__user',
-                'category'
-            ).prefetch_related(
-                'selected_conditions'
-            )[:10]
 
         return render(request, self.template_name, context)
