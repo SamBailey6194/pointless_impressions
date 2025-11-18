@@ -1,1 +1,77 @@
-(()=>{function i(){let e=document.querySelector("[name=csrfmiddlewaretoken]");return e?e.value:""}function s(){try{return document.cookie.split("; ").find(t=>t.startsWith("sessionid="))?.split("=")[1]||null}catch(e){return console.error("Error retrieving session ID:",e),null}}function c(e){let t=document.getElementById("cart-count-badge");t&&(t.textContent=e,e>0&&(t.style.display="",t.classList.remove("hidden")))}async function o(){let e=document.getElementById("cart-dropdown-content");if(!e){console.warn("Cart dropdown element not found. Cannot update.");return}try{let t=await fetch("/checkout/cart-dropdown/",{method:"GET",headers:{"X-Requested-With":"XMLHttpRequest"},credentials:"include"});if(!t.ok)throw new Error(`Failed to fetch cart: ${t.status}`);let n=await t.json();e.innerHTML=n.html}catch(t){console.error("Error refreshing cart dropdown:",t),e.innerHTML='<div class="p-4 text-error">Could not load cart.</div>'}}function r(){let e=document.getElementById("cart-dropdown-content");if(!e)return;let t=e.closest(".dropdown");t&&(t.classList.add("dropdown-open"),setTimeout(()=>{t.classList.remove("dropdown-open")},3e3))}function d(){o()}typeof window<"u"&&(window.cart={init:d,updateCartDropdownHTML:o,openCartDropdown:r});document.addEventListener("DOMContentLoaded",()=>{window.cart&&window.cart.init()});})();
+(() => {
+  // pointless_impressions_src/theme/static_src/src/js/cart.js
+  function getCsrfToken() {
+    const tokenEl = document.querySelector("[name=csrfmiddlewaretoken]");
+    return tokenEl ? tokenEl.value : "";
+  }
+  function getSessionToken() {
+    try {
+      const sessionid = document.cookie.split("; ").find((row) => row.startsWith("sessionid="))?.split("=")[1];
+      return sessionid || null;
+    } catch (error) {
+      console.error("Error retrieving session ID:", error);
+      return null;
+    }
+  }
+  function updateCartBadge(count) {
+    const badge = document.getElementById("cart-count-badge");
+    if (badge) {
+      badge.textContent = count;
+      if (count > 0) {
+        badge.style.display = "";
+        badge.classList.remove("hidden");
+      }
+    }
+  }
+  async function updateCartDropdownHTML() {
+    const cartDropdown = document.getElementById("cart-dropdown-content");
+    if (!cartDropdown) {
+      console.warn("Cart dropdown element not found. Cannot update.");
+      return;
+    }
+    try {
+      const response = await fetch("/checkout/cart-dropdown/", {
+        method: "GET",
+        headers: {
+          "X-Requested-With": "XMLHttpRequest"
+        },
+        credentials: "include"
+      });
+      if (!response.ok) {
+        throw new Error(`Failed to fetch cart: ${response.status}`);
+      }
+      const data = await response.json();
+      cartDropdown.innerHTML = data.html;
+    } catch (error) {
+      console.error("Error refreshing cart dropdown:", error);
+      cartDropdown.innerHTML = '<div class="p-4 text-error">Could not load cart.</div>';
+    }
+  }
+  function openCartDropdown() {
+    const cartDropdown = document.getElementById("cart-dropdown-content");
+    if (!cartDropdown) return;
+    const dropdownContainer = cartDropdown.closest(".dropdown");
+    if (dropdownContainer) {
+      dropdownContainer.classList.add("dropdown-open");
+      setTimeout(() => {
+        dropdownContainer.classList.remove("dropdown-open");
+      }, 3e3);
+    }
+  }
+  function initCart() {
+    updateCartDropdownHTML();
+  }
+  if (typeof window !== "undefined") {
+    window.cart = {
+      init: initCart,
+      updateCartDropdownHTML,
+      openCartDropdown
+    };
+  }
+  document.addEventListener("DOMContentLoaded", () => {
+    if (window.cart) {
+      window.cart.init();
+    }
+  });
+})();
+//# sourceMappingURL=cart.js.map

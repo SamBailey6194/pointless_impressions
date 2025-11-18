@@ -45,8 +45,6 @@ THIRD_PARTY_APPS = [
     # Form rendering
     "crispy_forms",
     "crispy_tailwind",
-    # Phone Support
-    "phonenumber_field",
 ]
 
 LOCAL_APPS = [
@@ -161,6 +159,10 @@ TEMPLATES = [
                 "context_processors.global_context",
                 "pointless_impressions_src.cart.context_processors."
                 "cart_context_processor",
+                "pointless_impressions_src.profiles.context_processors."
+                "global_profiles_context",
+                "pointless_impressions_src.profiles.context_processors."
+                "auth_forms",
             ],
         },
     },
@@ -171,36 +173,21 @@ WSGI_APPLICATION = (
     "pointless_impressions_src.pointless_impressions.wsgi.application"
     )
 
+
+# Authentication Settings
 # Custom user model
 AUTH_USER_MODEL = "account.CustomUser"
 
+# Verification token expiry time
+VERIFICATION_TOKEN_EXPIRY = 604800
+
 # Password validation
+PASSWORD_RESET_TIMEOUT = 3600
 AUTH_PASSWORD_VALIDATORS = [
     {
         "NAME": (
-            "django.contrib.auth.password_validation."
-            "UserAttributeSimilarityValidator"
-        ),
-    },
-    {
-        "NAME": (
-            "django.contrib.auth.password_validation."
-            "MinimumLengthValidator"
-        ),
-        "OPTIONS": {
-            "min_length": 8,
-        }
-    },
-    {
-        "NAME": (
-            "django.contrib.auth.password_validation."
-            "CommonPasswordValidator"
-        ),
-    },
-    {
-        "NAME": (
-            "django.contrib.auth.password_validation."
-            "NumericPasswordValidator"
+            "pointless_impressions_src.account.validators."
+            "CustomPasswordValidator"
         ),
     },
 ]

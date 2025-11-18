@@ -1126,7 +1126,7 @@ I have also written how to deploy using the Docker files for [Production Deploym
 
 It is important to note to simulate a real world environment I also deployed a staging version of the web app via Heroku [here]() and I followed the steps outlined in [Staging Deploymennt using Docker Container](docs/markdowns/STAGING.md)
 
-As I used a Docker Contianer I set the Python Version and gunicorn in my relevant Docker related files:
+As I used a Docker Container I set the Python Version and gunicorn in my relevant Docker related files:
 
 ### Production Files
 
@@ -1207,6 +1207,8 @@ Below are my credits for where I got inspiration for some of the code and conten
 - To help with SSR and AJAX for smooth user experience I used [Django AJAX Tutorial by Pretty Printed](https://www.youtube.com/watch?v=2d7s3spWAzo) and [Asynchronous JavaScript: Promises, Async/Await by Academind](https://www.youtube.com/watch?v=PoRJizFvM7s)
 - For using Crispy Forms I followed [Bug Bytes - Django Crispy Forms from Scratch!](https://www.youtube.com/watch?v=Hh6b9X8bG1o) and used the official [Django Crispy Forms Documentation](https://django-crispy-forms.readthedocs.io/en/latest/) to help understand how to use Tailwind CSS with Crispy Forms.
 - To help understand using regional phone numbers I used [Django Phone Number Field](https://github.com/stefanfoulis/django-phonenumber-field) and followed the instructions there along with the youtube video [Django Phone Number Field by Pretty Printed](https://www.youtube.com/watch?v=Z3Z8h6_2b0M)
+- Creating your own widgets and fields for forms I used [Django Custom Form Widgets Documentation](https://docs.djangoproject.com/en/5.2/ref/forms/widgets/#custom-widgets) and [Creating Custom Form Widgets in Django by Pretty Printed](https://www.youtube.com/watch?v=Z3Z8h6_2b0M)
+- Using multiple forms in a single view I used [Handling Multiple Forms in a Single Django View by Simple is Better Than Complex](https://simpleisbetterthancomplex.com/tutorial/2016/08/29/how-to-handle-multiple-forms-in-a-single-django-view.html) and [Django Multiple Forms in One View by Pretty Printed](https://www.youtube.com/watch?v=Z3Z8h6_2b0M)
 
 ### Removed Features Credits as not used anymore
 

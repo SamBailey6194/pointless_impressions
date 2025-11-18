@@ -3,7 +3,6 @@ from decimal import Decimal
 import uuid
 import secrets
 from django.conf import settings
-from phonenumber_field.modelfields import PhoneNumberField
 from pointless_impressions_src.artwork.models import Artwork
 
 
@@ -70,7 +69,8 @@ class Order(models.Model):
         null=True,
         help_text="Email of guest user (if applicable)"
     )
-    guest_phone = PhoneNumberField(
+    guest_phone = models.CharField(
+        max_length=20,
         blank=True,
         null=True,
         help_text="Phone number of guest user (if applicable)"

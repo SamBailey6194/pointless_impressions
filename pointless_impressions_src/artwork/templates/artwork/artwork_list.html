@@ -62,9 +62,9 @@
                   <select name="artist" class="select select-bordered w-full">
                     <option value="">All Artists</option>
                     {% for artist in all_artists %}
-                        <option value="{{ artist.user.username }}"
-                          {% if request.GET.artist == artist.user.username %}selected{% endif %}>
-                            {{ artist.user.username }}
+                        <option value="{{ artist.user_profile.user.username }}"
+                          {% if request.GET.artist == artist.user_profile.user.username %}selected{% endif %}>
+                            {{ artist.user_profile.user.username }}
                         </option>
                     {% endfor %}
                   </select>
@@ -192,7 +192,7 @@
             <div class="card-body">
               <h2 class="artwork-name card-title">{{ artwork.name }}</h2>
               <p class="text-sm -mt-2 mb-2">
-                <a href="{% url 'artwork:list' %}?artist={{ artwork.artist.user.username }}" class="link link-hover">{{ artwork.artist }}</a>
+                <a href="{% url 'artwork:list' %}?artist={{ artwork.artist.user_profile.user.username }}" class="link link-hover">{{ artwork.artist }}</a>
               </p>
               <p class="artwork-description">{{ artwork.description|truncatewords:15 }}</p>
               <div class="divider my-2"></div>

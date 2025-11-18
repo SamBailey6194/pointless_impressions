@@ -19,9 +19,4 @@ class Migration(migrations.Migration):
             name='account',
             field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL),
         ),
-        migrations.AlterField(
-            model_name='photo',
-            name='image',
-            field=models.ImageField(upload_to=pointless_impressions_src.photo.models.artwork_image_path),
-        ),
     ]

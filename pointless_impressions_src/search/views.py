@@ -60,9 +60,9 @@ class SearchView(TemplateView):
             # Get artwork results
             artwork_search_q = (
                 Q(name__icontains=query) |
-                Q(artist__user__username__icontains=query) |
-                Q(artist__user__first_name__icontains=query) |
-                Q(artist__user__last_name__icontains=query) |
+                Q(artist__user_profile__user__username__icontains=query) |
+                Q(artist__user_profile__user__first_name__icontains=query) |
+                Q(artist__user_profile__user__last_name__icontains=query) |
                 Q(description__icontains=query) |
                 Q(category__name__icontains=query) |
                 Q(selected_conditions__condition_name__icontains=query)
@@ -73,7 +73,7 @@ class SearchView(TemplateView):
                 'category',
                 'main_photo',
                 'artist',
-                'artist__user'
+                'artist__user_profile__user'
             ).prefetch_related(
                 'photos',
                 Prefetch(
@@ -82,41 +82,24 @@ class SearchView(TemplateView):
                 )
             )
 
-            # Get Blog results
-            # blog_search_q = (
-            #     Q(title__icontains=query) |
-            #     Q(content__icontains=query) |
-            #     Q(author__username__icontains=query) |
-            #     Q(categories__name__icontains=query) |
-            #     Q(excerpt__icontains=query)
-            # )
-            # blog_results = BlogPost.objects.filter(
-            #     is_published=True
-            # ).filter(blog_search_q).distinct().select_related(
-            #     'author', 'featured_image'
-            # )
-
             # Get Artist results
             artist_search_q = (
-                Q(user__first_name__icontains=query) |
-                Q(user__last_name__icontains=query) |
-                Q(user__username__icontains=query) |
+                Q(user_profile__user__first_name__icontains=query) |
+                Q(user_profile__user__last_name__icontains=query) |
+                Q(user_profile__user__username__icontains=query) |
                 Q(bio__icontains=query)
             )
             artist_results = Artist.objects.filter(
-                user__is_active=True
+                user_profile__user__is_active=True
             ).filter(artist_search_q).distinct().select_related(
-                'user',
-                'user__userprofile__profile_picture'
+                'user_profile__user',
+                'user_profile__profile_picture'
             )
 
             # Combine all results
             combined_list = [
                 {'model_name': 'artwork', 'object': item}
                 for item in artwork_results
-            ] + [
-                # {'model_name': 'blogpost', 'object': item}
-                # for item in blog_results]
             ] + [
                 {'model_name': 'artist', 'object': item}
                 for item in artist_results
@@ -189,19 +172,19 @@ class SearchAutocompleteView(View):
         ).values_list('condition_name', flat=True)
 
         artist_matches = Artist.objects.filter(
-            user__is_active=True,
-            user__username__icontains=term
-        ).values_list('user__username', flat=True)
+            user_profile__user__is_active=True,
+            user_profile__user__username__icontains=term
+        ).values_list('user_profile__user__username', flat=True)
 
         artist_first_name_matches = Artist.objects.filter(
-            user__is_active=True,
-            user__first_name__icontains=term
-        ).values_list('user__first_name', flat=True)
+            user_profile__user__is_active=True,
+            user_profile__user__first_name__icontains=term
+        ).values_list('user_profile__user__first_name', flat=True)
 
         artist_last_name_matches = Artist.objects.filter(
-            user__is_active=True,
-            user__last_name__icontains=term
-        ).values_list('user__last_name', flat=True)
+            user_profile__user__is_active=True,
+            user_profile__user__last_name__icontains=term
+        ).values_list('user_profile__user__last_name', flat=True)
 
         combined_results = set(artwork_matches)
         combined_results.update(category_matches)

@@ -30,7 +30,7 @@
     {% block section_2 %}
     <section class="section-blue py-16 w-full">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            {% include 'cart/includes/cart_summary.html' %}
+            {% include 'cart/includes/cart_summary.html' with show_forms=True %}
         </div>
     </section>
     {% endblock %}
@@ -46,7 +46,7 @@
                 <hr class="mb-4">
                 <p class="text-md">To complete your purchase, please provide your payment details and confirm your shipping and billing information.</p>
                 <hr class="my-4">
-                <form action="{% url 'orders:confirmation' %}" method="post" id="checkout-form" class="card checkout-card">
+                <form action="{% url 'orders:confirmation' %}" method="post" id="checkout-form" class="form-card p-6 mb-6">
                     {% csrf_token %}
                     {% crispy order_form %}
                     <div class="card-actions justify-end mt-2">
@@ -79,7 +79,7 @@
                                 </figure>
                                 <div class="p-6 flex flex-col h-56">
                                     <h3 class="text-xl font-semibold mb-2 card-title">{{ artwork.name }}</h3>
-                                    <p class="text-xs mb-3 opacity-70">By: {{ artwork.artist.user.username }} | Category: {{ artwork.category }}</p>
+                                    <p class="text-xs mb-3 opacity-70">By: {{ artwork.artist.user_profile.user.username }} | Category: {{ artwork.category.name }}</p>
                                     <p class="text-sm mb-3 card-description grow">{{ artwork.description }}</p>
                                     <p class="text-lg font-bold text-(--pointless-blue)">£{{ artwork.price }}</p>
                                 </div>
@@ -87,8 +87,8 @@
                                     <a href="{% url 'artwork:list' %}?category={{ artwork.category.slug }}" class="btn btn-ghost btn-sm">
                                     <i class="fa-solid fa-palette"></i> View More {{ artwork.category.name }} 
                                     </a>
-                                    <a href="{% url 'artwork:list' %}?artist={{ artwork.artist.user.username }}" class="btn btn-ghost btn-sm">
-                                    <i class="fa-solid fa-brush"></i> View More By {{ artwork.artist.user.username }} 
+                                    <a href="{% url 'artwork:list' %}?artist={{ artwork.artist.user_profile.user.username }}" class="btn btn-ghost btn-sm">
+                                    <i class="fa-solid fa-brush"></i> View More By {{ artwork.artist.user_profile.user.username }} 
                                     </a>
                                     <a href="{% url 'artwork:detail' artwork.slug %}" class="btn btn-ghost btn-sm">
                                     <i class="fa-solid fa-eye"></i> Details

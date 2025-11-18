@@ -9,11 +9,3 @@ class Migration(migrations.Migration):
     dependencies = [
         ('photo', '0008_alter_photo_image'),
     ]
-
-    operations = [
-        migrations.AlterField(
-            model_name='photo',
-            name='image',
-            field=models.ImageField(upload_to=pointless_impressions_src.photo.models.artwork_image_path),
-        ),
-    ]

@@ -1,0 +1,20 @@
+{% load static tailwind_tags cloudinary crispy_forms_tags %}
+
+<dialog id="change-profile-pic-modal" class="modal">
+    <div class="modal-box w-66 lg:w-1/7">
+        <form method="post" action="{% url 'dashboard:change_password' %}" class="form-card">
+            {% csrf_token %}
+            {% crispy form %}
+            <div class="modal-action">
+                <button type="submit" class="btn btn-ghost btn-outline">Save</button>
+                <button type="button" class="btn btn-ghost btn-outline js-close-modal-btn" data-modal-id="change-profile-pic-modal">
+                    <i class="fa-solid fa-times"></i> Cancel
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <form method="dialog" class="modal-backdrop flex items-end justify-end">
+        <button>close</button>
+    </form>
+</dialog>
