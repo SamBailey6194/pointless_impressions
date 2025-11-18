@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<section class="section-alt py-16 w-full">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <h1 class="text-center">Order Processing</h1>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-4">
+            {% for order in orders %}
+            <div class="card bg-gray-300 dark:bg-gray-700">
+                <div class="card-body">
+                    <h5 class="card-title">Order #{{ order.order_number }}</h5>
+                    <p class="card-text">Customer: {{ order.user.get_full_name }}</p>
+                    <p class="card-text">Status: {{ order.status }}</p>
+                    <a href="{% url 'dashboard:order_detail' order.id %}" class="btn btn-ghost btn-outline">View Details</a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extramodals %}
+    {% include 'dashboard/includes/admin_order_detail_modal.html' %}
+{% endblock %}
+
+{% block postloadjs %}
+{{ block.super }}
+<script src="{% static 'js/order_processing.js' %}"></script>
+{% endblock %}

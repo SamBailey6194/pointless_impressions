@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<section class="section-alt py-16 w-full">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <h1 class="text-center">Admin Dashboard</h1>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-4">
+            {% if access.order_processing %}
+            <div class="card bg-gray-300 dark:bg-gray-700">
+                <div class="card-body">
+                    <h5 class="card-title">Order Processing</h5>
+                    <p class="card-text">Manage and process customer orders.</p>
+                    <a href="{% url 'dashboard:order_processing' %}" class="btn btn-ghost btn-outline">Access</a>
+                </div>
+            </div>
+            {% endif %}
+
+            {% if access.artist_requests %}
+            <div class="card bg-gray-300 dark:bg-gray-700">
+                <div class="card-body">
+                    <h5 class="card-title">Artist Applications</h5>
+                    <p class="card-text">Review and approve artist applications.</p>
+                    <a href="{% url 'dashboard:artist_applications' %}" class="btn btn-primary">Access</a>
+                </div>
+            </div>
+            {% endif %}
+
+            {% if access.artwork_submissions %}
+            <div class="card bg-gray-300 dark:bg-gray-700">
+                <div class="card-body">
+                    <h5 class="card-title">Artwork Submissions</h5>
+                    <p class="card-text">Approve or reject submitted artworks.</p>
+                    <a href="{% url 'dashboard:artwork_submissions' %}" class="btn btn-primary">Access</a>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</section>
+{% endblock %}

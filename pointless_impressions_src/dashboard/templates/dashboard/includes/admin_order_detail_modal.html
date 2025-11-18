@@ -1,0 +1,24 @@
+{% load static tailwind_tags cloudinary crispy_forms_tags %}
+
+<dialog id="admin-order-detail-modal" class="modal">
+    <div class="modal-box">
+        <h3 class="font-bold text-lg">Order Details</h3>
+        <div>
+            {% include 'order/includes/order_summary.html' %}
+        </div>
+
+        <div>
+            {% crispy form %}
+        </div>
+
+        <form method="dialog">
+            <button class="btn btn-ghost">
+            <i class="fa-solid fa-times"></i> Cancel
+            </button>
+        </form>
+    </div>
+
+    <form method="dialog" class="modal-backdrop flex items-end justify-end">
+        <button>close</button>
+    </form>
+</dialog>

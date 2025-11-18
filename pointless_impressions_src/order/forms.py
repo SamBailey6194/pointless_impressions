@@ -4,6 +4,7 @@ from crispy_forms.layout import Layout, Field, Div, HTML
 from pointless_impressions_src.home.widgets import CountrySelectFormWidget
 from pointless_impressions_src.home.countries import COUNTRY_CHOICES
 from pointless_impressions_src.home.fields import CustomPhoneField
+from pointless_impressions_src.order.models import Order
 
 
 # Write your crispy form here
@@ -372,3 +373,15 @@ class OrderForm(forms.Form):
                     self.add_error(field_name, 'This field is required.')
 
         return cleaned_data
+
+
+class ApproveOrderForm(forms.ModelForm):
+    class Meta:
+        model = Order
+        fields = ['status']
+        widgets = {
+            'status': forms.Select(choices=[
+                ('approved', 'Approved'),
+                ('rejected', 'Rejected')
+            ])
+        }

@@ -293,12 +293,22 @@ class ArtworkSubmissionForm(forms.ModelForm):
 class ArtworkApprovalForm(forms.ModelForm):
     """
     Form for admin staff to approve/reject submitted artwork.
-    Limited to approval-related fields.
+    Includes fields for approval status and rejection notes.
     """
+
+    rejection_notes = forms.CharField(
+        required=False,
+        widget=forms.Textarea(attrs={
+            'class': 'form-control',
+            'placeholder': 'Provide rejection notes (if rejecting)',
+            'rows': 3
+        }),
+        label='Rejection Notes'
+    )
 
     class Meta:
         model = Artwork
-        fields = ['is_available']
+        fields = ['is_available', 'rejection_notes']
         widgets = {
             'is_available': forms.CheckboxInput(attrs={
                 'class': 'form-check-input'
@@ -308,10 +318,66 @@ class ArtworkApprovalForm(forms.ModelForm):
             'is_available': 'Approve artwork (make available for sale)'
         }
 
-    def clean_is_available(self):
-        """Validate approval status."""
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.helper = FormHelper()
+        self.helper.form_method = 'post'
+        self.helper.layout = Layout(
+            Div(
+                HTML(
+                    "<h2 class='card-title text-center mb-4 "
+                    "text-(--pointless-black) dark:text-(--pointless-white)'>"
+                    "Approve or Reject Artwork</h2>"
+                ),
+                Div(
+                    HTML(
+                        "<h4 class='mb-2 text-(--pointless-black) "
+                        "dark:text-(--pointless-white)'>"
+                        "Approval Status</h4>"
+                    ),
+                    Div(
+                        Field(
+                            'is_available',
+                            css_class='mb-4 custom-input w-full lg:w-66'
+                        ),
+                        css_class='lg:flex lg:gap-4 mb-4'
+                    ),
+                    HTML(
+                        "<div class='form-divider'></div>"
+                    ),
+                    HTML(
+                        "<h4 class='mb-2 text-(--pointless-black) "
+                        "dark:text-(--pointless-white)'>"
+                        "Rejection Notes</h4>"
+                    ),
+                    Div(
+                        Field(
+                            'rejection_notes',
+                            css_class='mb-4 custom-input w-full lg:w-66'
+                        ),
+                        css_class='lg:flex lg:gap-4 mb-4'
+                    ),
+                    css_class='flex flex-col gap-4'
+                ),
+                css_class='px-6 py-2 mb-4',
+                id='artwork-approval-form'
+            ),
+            HTML(
+                "<button type='submit' class='btn btn-ghost btn-outline "
+                "w-fit'>"
+                "Submit</button>"
+            )
+        )
+
+    def clean_rejection_notes(self):
+        """Ensure rejection notes are provided if rejecting."""
         is_available = self.cleaned_data.get('is_available')
-        return is_available
+        rejection_notes = self.cleaned_data.get('rejection_notes')
+        if not is_available and not rejection_notes:
+            raise forms.ValidationError(
+                'Rejection notes are required when rejecting artwork.'
+            )
+        return rejection_notes
 
 
 class AddToCartForm(forms.Form):

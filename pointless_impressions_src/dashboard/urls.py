@@ -57,4 +57,30 @@ urlpatterns = [
         views.AddArtworkModalView.as_view(),
         name='add_artwork_modal'
     ),
+    path('admin-dashboard/<uuid:public_id>/',
+         views.AdminDashboardView.as_view(),
+         name='admin_dashboard'),
+    path(
+        'admin-dashboard/<uuid:public_id>/order-processing/',
+        views.OrderProcessingView.as_view(),
+        name='order_processing'
+    ),
+    path(
+        (
+            'admin-dashboard/<uuid:public_id>/'
+            'order-processing/<uuid:order_id>/modal/'
+        ),
+        views.OrderProcessingModalView.as_view(),
+        name='order_processing_modal'
+    ),
+    path(
+        'admin-dashboard/<uuid:public_id>/manage-artists/',
+        views.ManageArtistsView.as_view(),
+        name='manage_artists'
+    ),
+    path(
+        'admin-dashboard/<uuid:public_id>/artwork-approval/<int:artwork_id>/',
+        views.ArtworkApprovalView.as_view(),
+        name='approve_artwork'
+    ),
 ]

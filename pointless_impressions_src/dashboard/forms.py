@@ -252,3 +252,79 @@ class EditOrderForm(forms.Form):
         )
 
         order.save()
+
+
+class OrderProcessingForm(forms.ModelForm):
+    """
+    Form for processing orders, allowing staff to update status and add notes.
+    Includes validation for status transitions.
+    """
+    class Meta:
+        model = Order
+        fields = ['status', 'staff_notes']
+        widgets = {
+            'status': forms.Select(attrs={
+                'class': 'form-control'
+            }),
+            'staff_notes': forms.Textarea(attrs={
+                'class': 'form-control',
+                'rows': 4,
+                'placeholder': 'Add notes about the order...'
+            })
+        }
+        labels = {
+            'status': 'Order Status',
+            'staff_notes': 'Staff Notes'
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.helper = FormHelper()
+        self.helper.form_method = 'post'
+        self.helper.form_action = ''
+        self.helper.layout = Layout(
+            Div(
+                HTML(
+                    "<h2 class='card-title text-center mb-4 "
+                    "text-(--pointless-black) dark:text-(--pointless-white)'>"
+                    "Process Order</h2>"
+                ),
+                Div(
+                    Field(
+                        'status',
+                        css_class='mb-4 custom-input w-full lg:w-66'
+                        ),
+                    Field(
+                        'staff_notes',
+                        css_class='mb-4 custom-input w-full lg:w-66'
+                        ),
+                    css_class='flex flex-col gap-4'
+                ),
+                HTML(
+                    "<button type='submit' class='btn btn-ghost btn-outline "
+                    "w-fit'>Submit</button>"
+                ),
+                css_class='form-card px-6 py-2 mb-4',
+                id='order-processing-form'
+            )
+        )
+
+    def clean_status(self):
+        """Validate status transitions."""
+        new_status = self.cleaned_data.get('status')
+        current_status = self.instance.status
+
+        valid_transitions = {
+            'PENDING': ['PROCESSING', 'CANCELLED'],
+            'PROCESSING': ['COMPLETED', 'CANCELLED'],
+            'COMPLETED': [],
+            'CANCELLED': []
+        }
+
+        if new_status not in valid_transitions.get(current_status, []):
+            raise forms.ValidationError(
+                f"Invalid status transition from {current_status} to "
+                f"{new_status}."
+            )
+
+        return new_status

@@ -9,7 +9,7 @@
   - [Sprint 1: Core Setup \& Artwork Display (11 points)](#sprint-1-core-setup--artwork-display-11-points)
   - [Sprint 2: Cart \& Checkout (11 points)](#sprint-2-cart--checkout-11-points)
   - [Sprint 3: Square Payments \& Order Confirmation (11 points)](#sprint-3-square-payments--order-confirmation-11-points)
-  - [Sprint 4: User Accounts \& Order Tracking (11 points)](#sprint-4-user-accounts--order-tracking-11-points)
+  - [Sprint 4: User Accounts \& Order Tracking (16 points)](#sprint-4-user-accounts--order-tracking-16-points)
   - [Sprint 5: Full Order Tracking \& Admin Content Management (11 points)](#sprint-5-full-order-tracking--admin-content-management-11-points)
   - [Sprint 6: Blog \& Marketing Integrations (11 points)](#sprint-6-blog--marketing-integrations-11-points)
   - [Sprint 7: Newsletter \& Accessibility Polish (11 points)](#sprint-7-newsletter--accessibility-polish-11-points)
@@ -66,12 +66,13 @@
 
 ---
 
-## Sprint 4: User Accounts & Order Tracking (11 points)
+## Sprint 4: User Accounts & Order Tracking (16 points)
 **Goal:** Add account management for registered users and order tracking for guests.  
 
 **Included User Stories:**  
 - US007: Register and Manage Account — 8 pts  
-- US006 (partial): Track Order via Unique Link (Backend) — 3 pts  
+- US006 (partial): Track Order via Unique Link (Backend) — 3 pts
+- US008 (partial): Admin Upload (Frontend only) — 5 pts  
 
 **Total:** 11 pts  
 

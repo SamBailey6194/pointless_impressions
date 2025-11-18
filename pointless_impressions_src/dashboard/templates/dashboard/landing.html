@@ -4,36 +4,40 @@
 {% block content %}
 <section class="section-alt">
     <div class="container mx-auto py-8">
-        <h1 class="text-2xl font-bold mb-4">Dashboard</h1>
-        <p class="mb-6">Welcome to your dashboard. Select an option below:</p>
+        <h1 class="text-2xl font-bold mb-4">{{ user.username }}'s Dashboard</h1>
+        <p class="mb-6">Welcome {{ user.username }} to your dashboard. Select an option below:</p>
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {% if access.user_profile %}
-            <a href="{% url 'user_profile_dashboard' %}" class="block p-4 bg-gray-300 dark:bg-gray-700 rounded shadow hover:bg-gray-400">
-                <h2 class="text-xl font-semibold">User Profile</h2>
-                <p>Manage your profile, addresses, and orders.</p>
-            </a>
+            <div class="block p-4 bg-gray-300 dark:bg-gray-700 rounded shadow">
+                <h2 class="text-xl font-semibold mb-2">User Profile</h2>
+                <p class="mb-4">Manage your profile, addresses, and orders.</p>
+                <a href="{% url 'dashboard:user_profile_dashboard' %}" class="px-4 py-2 btn btn-ghost btn-outline w-fit">Go to User Profile</a>
+            </div>
             {% endif %}
 
             {% if access.artist %}
-            <a href="{% url 'artist_dashboard' %}" class="block p-4 bg-gray-300 dark:bg-gray-700 rounded shadow hover:bg-gray-400">
-                <h2 class="text-xl font-semibold">Artist Dashboard</h2>
-                <p>Manage your artwork, sales, and orders.</p>
-            </a>
+            <div class="block p-4 bg-gray-300 dark:bg-gray-700 rounded shadow">
+                <h2 class="text-xl font-semibold mb-2">Artist Dashboard</h2>
+                <p class="mb-4">Manage your artwork, sales, and orders.</p>
+                <a href="{% url 'dashboard:artist_dashboard' %}" class="px-4 py-2 btn btn-ghost btn-outline w-fit">Go to Artist Dashboard</a>
+            </div>
             {% endif %}
 
             {% if access.admin %}
-            <a href="{% url 'admin_dashboard' %}" class="block p-4 bg-gray-300 dark:bg-gray-700 rounded shadow hover:bg-gray-400">
-                <h2 class="text-xl font-semibold">Admin Dashboard</h2>
-                <p>Manage site operations and user activities.</p>
-            </a>
+            <div class="block p-4 bg-gray-300 dark:bg-gray-700 rounded shadow">
+                <h2 class="text-xl font-semibold mb-2">Admin Dashboard</h2>
+                <p class="mb-4">Manage site operations and user activities.</p>
+                <a href="{% url 'dashboard:admin_dashboard' %}" class="px-4 py-2 btn btn-ghost btn-outline w-fit">Go to Admin Dashboard</a>
+            </div>
             {% endif %}
 
             {% if access.django_admin %}
-            <a href="/admin/" class="block p-4 bg-gray-300 dark:bg-gray-700 rounded shadow hover:bg-gray-400">
-                <h2 class="text-xl font-semibold">Django Admin</h2>
-                <p>Access the Django Admin interface.</p>
-            </a>
+            <div class="block p-4 bg-gray-300 dark:bg-gray-700 rounded shadow">
+                <h2 class="text-xl font-semibold mb-2">Django Admin</h2>
+                <p class="mb-4">Access the Django Admin interface.</p>
+                <a href="/admin/" class="px-4 py-2 btn btn-ghost btn-outline w-fit">Go to Django Admin</a>
+            </div>
             {% endif %}
         </div>
     </div>
