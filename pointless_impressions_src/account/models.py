@@ -6,7 +6,6 @@ from django.contrib.auth.models import (
 from django.conf import settings
 from django.db import models
 from django.utils import timezone
-from phonenumber_field.modelfields import PhoneNumberField
 
 
 # Create your models here.
@@ -92,7 +91,12 @@ class CustomUserManager(BaseUserManager):
 class CustomUser(AbstractBaseUser, PermissionsMixin):
     username = models.CharField(max_length=150, unique=True)
     email = models.EmailField(unique=True)
-    phone = PhoneNumberField(blank=False, null=False, unique=True)
+    phone = models.CharField(
+        max_length=20,
+        blank=False,
+        null=False,
+        unique=True
+        )
     first_name = models.CharField(max_length=30, blank=False)
     last_name = models.CharField(max_length=30, blank=False)
     date_joined = models.DateTimeField(auto_now_add=True)

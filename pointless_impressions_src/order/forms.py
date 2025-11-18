@@ -1,9 +1,9 @@
 from django import forms
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Field, Div, HTML
-from phonenumber_field.formfields import SplitPhoneNumberField
 from pointless_impressions_src.home.widgets import CountrySelectFormWidget
 from pointless_impressions_src.home.countries import COUNTRY_CHOICES
+from pointless_impressions_src.home.fields import CustomPhoneField
 
 
 # Write your crispy form here
@@ -55,10 +55,10 @@ class OrderForm(forms.Form):
             })
     )
 
-    phone = SplitPhoneNumberField(
+    phone = CustomPhoneField(
         required=True,
         label="Phone Number",
-        region='GB',
+        initial='GB+44'
     )
 
     shipping_first_name = forms.CharField(label="First Name")

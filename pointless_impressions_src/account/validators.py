@@ -9,36 +9,33 @@ from django.contrib.auth.password_validation import (
 
 # Write your validator here
 class CustomPasswordValidator:
-    def __init__(self):
+    def __init__(self, min_length=6):
+        self.min_length = min_length
         self.user_attribute_validator = UserAttributeSimilarityValidator()
         self.common_password_validator = CommonPasswordValidator()
 
     def validate(self, password, user=None):
-        # Check user attribute similarity
+        errors = []
+
         self.user_attribute_validator.validate(password, user)
 
-        # Check common passwords
         self.common_password_validator.validate(password)
 
-        # Min length
-        if len(password) < 6:
+        if len(password) < self.min_length:
             raise ValidationError(
                 _("This password must be at least 6 characters long."),
                 code="password_too_short",
             )
-        # Uppercase letter
         if not re.search(r"[A-Z]", password):
             raise ValidationError(
                 _("This password must contain at least one uppercase letter."),
                 code="password_no_upper",
             )
-        # Number
         if not re.search(r"[0-9]", password):
             raise ValidationError(
                 _("This password must contain at least one number."),
                 code="password_no_number",
             )
-        # Special character
         if not re.search(r"[!@#$%^&*(),.?\":{}|<>]", password):
             raise ValidationError(
                 _(
@@ -47,6 +44,8 @@ class CustomPasswordValidator:
                 ),
                 code="password_no_special",
             )
+        if errors:
+            raise ValidationError(errors)
 
     def get_help_text(self):
         return _(

@@ -7,7 +7,7 @@
         <h1 class="text-4xl font-bold mb-4">Sign Up</h1>
         <p class="mb-6">Create an account to access exclusive features and content.</p>
 
-        <form method="post" enctype="multipart/form-data" class="max-w-7xl">
+        <form method="post" action="{% url 'profiles:signup' %}" enctype="multipart/form-data" class="max-w-7xl">
             {% csrf_token %}
 
             <div class="form-card">

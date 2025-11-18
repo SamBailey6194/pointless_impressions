@@ -114,12 +114,12 @@
         <div class="flex flex-col items-center">
           <div class="dropdown dropdown-end">
             <label tabindex="0" class="btn btn-ghost btn-circle flex flex-col items-center h-auto px-2 py-1 normal-case">
-              {% if request.user.is_authenticated and request.user.userprofile.profile_picture %}
+              {% if request.user.is_authenticated and request.user.user_profile.profile_picture %}
                 {% comment %} 
                   Display user's profile picture if logged in and has one 
                 {% endcomment %}
-                {% with image_to_render=request.user.user_profile.profile_picture|default:placeholder_image %}
-                  {% cloudinary image_to_render.image format="auto" quality="auto" width=80 height=80 crop="fill" class="w-10 rounded-full" alt=image_to_render.alt_text_or_default %}
+                {% with profile_pic=request.user.user_profile.profile_picture %}
+                  {% cloudinary profile_pic.image format="auto" quality="auto" width=80 height=80 crop="fill" class="w-10 rounded-full" alt=profile_pic.alt_text_or_default %}
                 {% endwith %}
 
               {% else %}

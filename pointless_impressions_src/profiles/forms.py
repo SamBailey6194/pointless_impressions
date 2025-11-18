@@ -2,11 +2,13 @@ from django import forms
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Field, Submit, HTML, Div, Button
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
-from phonenumber_field.formfields import SplitPhoneNumberField
+from django.core.exceptions import ValidationError
+from django.contrib.auth.password_validation import validate_password
 from .models import Artist, Address, UserProfile
 from pointless_impressions_src.account.models import CustomUser
 from pointless_impressions_src.home.widgets import CountrySelectFormWidget
 from pointless_impressions_src.home.countries import COUNTRY_CHOICES
+from pointless_impressions_src.home.fields import CustomPhoneField
 from pointless_impressions_src.account.validators import (
     CustomPasswordValidator
     )
@@ -29,18 +31,12 @@ class SignupForm(UserCreationForm):
             'last_name',
             'username',
             'email',
-            'phone',
             'password1',
             'password2'
-            ]
+        ]
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['phone'] = SplitPhoneNumberField(
-            required=True,
-            label="Phone Number",
-            region='GB',
-        )
         self.fields['password1'] = forms.CharField(
             label="Password",
             widget=forms.PasswordInput,
@@ -56,7 +52,13 @@ class SignupForm(UserCreationForm):
             label="Subscribe to Newsletter",
             initial=False
         )
+        self.fields['phone'] = CustomPhoneField(
+            required=True,
+            label="Phone Number",
+            initial='GB+44'
+        )
         self.helper = FormHelper()
+        self.helper.form_tag = False
         self.helper.layout = Layout(
             Div(
                 HTML(
@@ -99,7 +101,6 @@ class SignupForm(UserCreationForm):
                         ),
                         Field(
                             'phone',
-                            placeholder="0123456789",
                             css_class=(
                                 'custom-input '
                                 'h-10 '
@@ -144,7 +145,21 @@ class SignupForm(UserCreationForm):
                             placeholder="Confirm Password",
                             css_class='mb-4 custom-input w-full lg:w-66'
                         ),
-                        css_class='lg:flex lg:gap-4 mb-4'
+                        css_class='lg:flex lg:gap-4'
+                    ),
+                    Div(
+                        HTML(
+                            "<p class='mb-2'>"
+                            "Password must contain:</p>"
+                        ),
+                        HTML(
+                            "<ul>"
+                            "<li>At least 6 characters long</li>"
+                            "<li>At least one uppercase letter</li>"
+                            "<li>At least one number</li>"
+                            "<li>At least one special character</li>"
+                            "</ul>"
+                        ),
                     ),
                     HTML(
                         "<div class='form-divider'></div>"
@@ -168,6 +183,31 @@ class SignupForm(UserCreationForm):
             )
         )
 
+    def clean_password1(self):
+        """
+        Validate password1 against all configured validators in settings.
+        """
+        password1 = self.cleaned_data.get('password1')
+        if password1:
+            try:
+                validate_password(password1, user=None)
+            except ValidationError as e:
+                raise ValidationError(e.messages)
+        return password1
+
+    def clean_password2(self):
+        """
+        Validate that password1 and password2 match.
+        """
+        password1 = self.cleaned_data.get('password1')
+        password2 = self.cleaned_data.get('password2')
+
+        if password1 and password2:
+            if password1 != password2:
+                raise ValidationError("The two password fields didn't match.")
+
+        return password2
+
     def save(self, commit=True):
         user = super().save(commit=False)
         user.first_name = self.cleaned_data['first_name']
@@ -187,6 +227,7 @@ class LoginForm(AuthenticationForm):
         self.helper = FormHelper()
         self.helper.form_method = 'post'
         self.helper.form_tag = True
+        self.helper.form_action = '/dashboard/'
         self.helper.layout = Layout(
             Div(
                 HTML(
@@ -248,6 +289,7 @@ class LogoutForm(forms.Form):
         self.helper = FormHelper()
         self.helper.form_method = 'post'
         self.helper.form_tag = True
+        self.helper.form_action = '/profiles/logout/'
         self.helper.layout = Layout(
             Div(
                 HTML(
@@ -300,6 +342,7 @@ class ArtistApplicationForm(forms.ModelForm):
         self.fields['bio'].label = "Artist Biography"
         self.fields['portfolio_url'].label = "Portfolio URL"
         self.helper = FormHelper()
+        self.helper.form_tag = False
         self.helper.layout = Layout(
             Div(
                 HTML(
@@ -375,11 +418,21 @@ class ArtistApplicationForm(forms.ModelForm):
 
 class AddressForm(forms.ModelForm):
     """Form for user address."""
+    address_types = forms.MultipleChoiceField(
+        choices=[
+            ('shipping', 'Shipping'),
+            ('billing', 'Billing'),
+        ],
+        widget=forms.CheckboxSelectMultiple,
+        required=False,
+        label="Address Types"
+    )
+
     class Meta:
         model = Address
         fields = [
             'label',
-            'address_type',
+            'address_types',
             'first_name',
             'last_name',
             'address_line_1',
@@ -393,13 +446,6 @@ class AddressForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['address_type'].widget = forms.CheckboxSelectMultiple(
-            choices=[
-                ('SHIPPING', 'Shipping'),
-                ('BILLING', 'Billing')
-            ]
-        )
-        self.fields['address_type'].help_text = "Select all that apply"
         self.fields['is_default'].widget = forms.CheckboxInput()
         self.fields['label'].label = "Address Label"
         self.fields['country'] = forms.ChoiceField(
@@ -410,6 +456,7 @@ class AddressForm(forms.ModelForm):
         )
         self.fields['is_default'].label = "Set as Default Address"
         self.helper = FormHelper()
+        self.helper.form_tag = False
         self.helper.layout = Layout(
             Div(
                 HTML(
@@ -436,7 +483,7 @@ class AddressForm(forms.ModelForm):
                             css_class='mb-4 custom-input w-full lg:w-66'
                         ),
                         Field(
-                            'address_type',
+                            'address_types',
                             css_class='mb-4 w-full lg:w-66'
                         ),
                         css_class='lg:flex lg:gap-4 mb-4'
@@ -511,6 +558,29 @@ class AddressForm(forms.ModelForm):
             )
         )
 
+    def clean_address_types(self):
+        """
+        Validate that at least one address type is selected and that
+        the selected types are valid.
+        """
+        address_types = self.cleaned_data.get('address_types')
+
+        if not address_types:
+            raise ValidationError("Please select at least one address type.")
+
+        return address_types
+
+    def save(self, user=None, commit=True):
+        """
+        Save the address form with the associated user.
+        """
+        address = super().save(commit=False)
+        if user:
+            address.customer_id = user  # Ensure the field matches the model
+        if commit:
+            address.save()
+        return address
+
 
 class EmailVerificationForm(forms.Form):
     """Form for email verification code input."""
@@ -520,7 +590,6 @@ class EmailVerificationForm(forms.Form):
         widget=forms.TextInput(
             attrs={
                 'placeholder': 'Enter the 6-digit code',
-                'class': 'custom-input w-full lg:w-40'
             }
         )
     )
@@ -533,15 +602,11 @@ class EmailVerificationForm(forms.Form):
         self.helper.layout = Layout(
             Div(
                 HTML(
-                    "<h2 "
-                    "class="
-                    "'card-title "
-                    "text-center "
+                    "<h2 class='card-title text-center "
                     "text-(--pointless-black) "
-                    "dark:text-(--pointless-white) "
-                    "mb-4'>"
-                    "Email Verification</h2>"
-                    ),
+                    "dark:text-(--pointless-white) mb-4'>Email Verification"
+                    "</h2>"
+                ),
                 Div(
                     HTML(
                         "<p class='mb-4 text-(--pointless-black) "
@@ -556,7 +621,8 @@ class EmailVerificationForm(forms.Form):
                         "Verification Code</label>"
                     ),
                     Field(
-                        'verification_code'
+                        'verification_code',
+                        css_class='mb-4 custom-input w-40 items-center'
                     ),
                     HTML(
                         "<p class='text-(--pointless-black) "
@@ -574,9 +640,9 @@ class EmailVerificationForm(forms.Form):
                         Button(
                             'resend',
                             'Resend Code',
-                            css_class='btn btn-ghost btn-outline w-fit ml-2'
+                            css_class='btn btn-ghost btn-outline w-fit ml-4',
                         ),
-                        css_class='flex items-center gap-2'
+                        css_class='items-center gap-8'
                     ),
                     css_class=(
                         'flex '
@@ -584,7 +650,8 @@ class EmailVerificationForm(forms.Form):
                         'gap-4 '
                         )
                 ),
-                css_class='p-6 mb-6',
+                css_class='p-6 mb-6 form-card flex flex-col items-center '
+                'justify-center text-center',
                 id='email-verification-form'
             )
         )

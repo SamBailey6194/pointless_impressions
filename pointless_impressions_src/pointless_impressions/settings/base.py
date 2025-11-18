@@ -45,8 +45,6 @@ THIRD_PARTY_APPS = [
     # Form rendering
     "crispy_forms",
     "crispy_tailwind",
-    # Phone Support
-    "phonenumber_field",
 ]
 
 LOCAL_APPS = [

@@ -166,7 +166,8 @@ class AddressAdmin(admin.ModelAdmin):
     list_display = (
         'get_username',
         'label',
-        'address_type',
+        'is_shipping',
+        'is_billing',
         'first_name',
         'last_name',
         'address_line_1',
@@ -176,6 +177,7 @@ class AddressAdmin(admin.ModelAdmin):
         'country',
         'is_default'
     )
+    list_filter = ('country', 'is_default', 'is_shipping', 'is_billing')
     search_fields = (
         'user_profile__user__username', 'city', 'country'
     )

@@ -13,10 +13,15 @@ urlpatterns = [
         'verify-email/',
         views.VerifyEmailView.as_view(),
         name='verify_email'
-        ),
+    ),
     path(
         'artist-application/',
         views.ArtistApplicationView.as_view(),
         name='artist_application'
-        ),
+    ),
+    path(
+        'resend-verification-code/',
+        views.ResendVerificationCodeView.as_view(),
+        name='resend_verification_code'
+    ),
 ]

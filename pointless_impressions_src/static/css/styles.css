@@ -22,7 +22,6 @@
     --container-sm: 24rem;
     --container-md: 28rem;
     --container-2xl: 42rem;
-    --container-3xl: 48rem;
     --container-4xl: 56rem;
     --container-6xl: 72rem;
     --container-7xl: 80rem;
@@ -3158,6 +3157,9 @@
   .ml-2 {
     margin-left: calc(var(--spacing) * 2);
   }
+  .ml-4 {
+    margin-left: calc(var(--spacing) * 4);
+  }
   .ml-14 {
     margin-left: calc(var(--spacing) * 14);
   }
@@ -3593,6 +3595,9 @@
   .w-32 {
     width: calc(var(--spacing) * 32);
   }
+  .w-40 {
+    width: calc(var(--spacing) * 40);
+  }
   .w-48 {
     width: calc(var(--spacing) * 48);
   }
@@ -3617,9 +3622,6 @@
   }
   .max-w-2xl {
     max-width: var(--container-2xl);
-  }
-  .max-w-3xl {
-    max-width: var(--container-3xl);
   }
   .max-w-4xl {
     max-width: var(--container-4xl);
@@ -4630,9 +4632,19 @@
       width: calc(7/12 * 100%);
     }
   }
+  .lg\:w-32 {
+    @media (width >= 64rem) {
+      width: calc(var(--spacing) * 32);
+    }
+  }
   .lg\:w-40 {
     @media (width >= 64rem) {
       width: calc(var(--spacing) * 40);
+    }
+  }
+  .lg\:w-48 {
+    @media (width >= 64rem) {
+      width: calc(var(--spacing) * 48);
     }
   }
   .lg\:w-64 {
@@ -4803,7 +4815,8 @@
   #id_phone_1::placeholder {
     color: var(--pointless-black) !important;
   }
-  .form-card label {
+  .form-card label,
+  .form-card ul li {
     color: var(--pointless-black) !important;
     font-family: var(--font-Poppins);
     font-weight: 300 !important;
@@ -4867,7 +4880,8 @@
     }
     .form-card label,
     .form-card p,
-    .form-card small {
+    .form-card small,
+    .form-card ul li {
       color: var(--pointless-white) !important;
     }
     .select-dropdown {

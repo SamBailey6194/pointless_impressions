@@ -1,17 +1,18 @@
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from .models import EmailVerificationCode, CustomUser
-import random
+from .models import CustomUser
+from .utils import send_verification_email, generate_verification_code
 
 
 # Write your signals here.
 @receiver(post_save, sender=CustomUser)
 def create_verification_code(sender, instance, created, **kwargs):
-    """Create an email verification code when a new user is created."""
+    """
+    Create an email verification code and send it when a new user is created.
+    """
     if created:
-        while True:
-            code = f"{random.randint(0, 999999):06d}"
-            if not EmailVerificationCode.objects.filter(code=code).exists():
-                break
+        # Generate a unique 6-digit code
+        generate_verification_code(instance)
 
-        EmailVerificationCode.objects.create(user=instance, code=code)
+        # Send the verification email
+        send_verification_email(instance)

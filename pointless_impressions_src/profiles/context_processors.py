@@ -1,7 +1,7 @@
 from .models import (
     Customer, Artist, StaffRole
 )
-from .forms import SignupForm, LoginForm, LogoutForm
+from .forms import LoginForm, LogoutForm, EmailVerificationForm
 
 
 # Write your context processors here.
@@ -58,6 +58,6 @@ def auth_forms(request):
     """
     return {
         'login_form': LoginForm(),
-        'signup_form': SignupForm(),
         'logout_form': LogoutForm(),
+        'email_verification_form': EmailVerificationForm(),
     }

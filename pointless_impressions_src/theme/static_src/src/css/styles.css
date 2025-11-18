@@ -133,7 +133,8 @@
     color: var(--pointless-black) !important;
   }
 
-  .form-card label {
+  .form-card label,
+  .form-card ul li {
     color: var(--pointless-black) !important;
     font-family: var(--font-Poppins);
     font-weight: 300 !important;
@@ -207,7 +208,8 @@
 
     .form-card label,
     .form-card p,
-    .form-card small {
+    .form-card small,
+    .form-card ul li {
       color: var(--pointless-white) !important;
     }
 

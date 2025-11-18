@@ -5,19 +5,6 @@ from cloudinary.models import CloudinaryField
 
 
 # Create your models here.
-def artwork_image_path(instance, filename):
-    """Determine upload path based on associated model."""
-    if instance.artwork:
-        return f"artwork/{filename}"
-    # elif instance.blog:
-    #     return f"blog/{filename}"
-    elif instance.account:
-        return f"profiles/{filename}"
-    elif instance.photo_type == 'site_asset':
-        return f"site_assets/{filename}"
-    return f"others/{filename}"
-
-
 class Photo(models.Model):
     """
     Model to store photos linked to Artwork, Blog, Account, or Site Assets.
@@ -95,22 +82,6 @@ class Photo(models.Model):
 
     def clean(self):
         """Validate photo linkage based on type."""
-        if self.photo_type == 'artwork' and not self.artwork:
-            raise ValidationError(
-                "Artwork photos must be linked to an Artwork."
-                )
-
-        if self.photo_type == 'profile' and not self.user_profile:
-            raise ValidationError(
-                "Profile photos must be linked to a UserProfile."
-                )
-
-        if self.photo_type == 'site_asset' and not self.asset_identifier:
-            raise ValidationError(
-                "Site assets must have an asset identifier."
-                )
-
-        # Ensure only one parent for non-site-asset photos
         if self.photo_type not in ['site_asset', 'profile']:
             parents = [
                 bool(self.artwork),
@@ -124,24 +95,32 @@ class Photo(models.Model):
     def get_folder(self):
         """Determine Cloudinary folder based on photo type."""
         folder_map = {
-            'artwork': 'artwork',
-            'profile': 'profiles',
-            'site_asset': 'site_assets',
-            # 'blog': 'blog',
+            'artwork': 'pointless-impressions-local/artwork',
+            'profile': 'pointless-impressions-local/profiles',
+            'site_asset': 'pointless-impressions-local/site_assets',
         }
-        return folder_map.get(self.photo_type, 'others')
+        return folder_map.get(
+            self.photo_type, 'pointless-impressions-local/others'
+            )
 
-    def upload_options(self, overwrite=None):
-        """Generate Cloudinary upload options based on photo type."""
-        options = {
+    def get_upload_options(self):
+        """Get Cloudinary upload options based on photo type."""
+        return {
             'folder': self.get_folder(),
             'use_filename': True,
-            'unique_filename': not (
-                overwrite if overwrite is not None else False
-                ),
+            'unique_filename': False,
             'resource_type': 'image',
         }
-        return options
+
+    def save(self, *args, **kwargs):
+        """Override save to set Cloudinary options before upload."""
+        if self.image:
+            image_field = self._meta.get_field('image')
+
+            if hasattr(image_field, 'options'):
+                image_field.options.update(self.get_upload_options())
+
+        super().save(*args, **kwargs)
 
     @property
     def get_image_url(self):

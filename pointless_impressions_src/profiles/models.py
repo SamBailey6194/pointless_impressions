@@ -120,10 +120,6 @@ class Address(models.Model):
     Stores a shipping or billing address for a Customer.
     A Customer can have multiple addresses.
     """
-    class AddressType(models.TextChoices):
-        SHIPPING = 'SHIPPING', 'Shipping'
-        BILLING = 'BILLING', 'Billing'
-
     customer = models.ForeignKey(
         Customer,
         on_delete=models.CASCADE,
@@ -134,11 +130,8 @@ class Address(models.Model):
         blank=True,
         help_text="Label for the address (e.g., Home, Work)"
         )
-    address_type = models.CharField(
-        max_length=10,
-        choices=AddressType.choices,
-        default=AddressType.SHIPPING
-    )
+    is_shipping = models.BooleanField(default=False)
+    is_billing = models.BooleanField(default=False)
     first_name = models.CharField(max_length=255, blank=False, null=False)
     last_name = models.CharField(max_length=255, blank=False, null=False)
     address_line_1 = models.CharField(max_length=255, blank=False, null=False)

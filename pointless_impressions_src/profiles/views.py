@@ -3,6 +3,8 @@ from django.contrib.auth import login, logout, authenticate
 from django.contrib import messages
 from django.shortcuts import redirect, render
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.http import JsonResponse
+from .models import UserProfile, Customer, Artist
 from .forms import (
     SignupForm,
     LoginForm,
@@ -11,18 +13,26 @@ from .forms import (
     AddressForm,
     LogoutForm
 )
+from .mixins import CustomerRequiredMixin
 from pointless_impressions_src.photo.forms import ProfilePhotoForm
-from pointless_impressions_src.account.models import EmailVerificationCode
+from pointless_impressions_src.account.models import (
+    EmailVerificationCode, CustomUser
+    )
 from pointless_impressions_src.account.mixins import (
     AnonymousRequiredMixin, EmailNotVerifiedMixin
+    )
+from pointless_impressions_src.account.utils import (
+    send_verification_email, generate_verification_code
     )
 
 
 # Create your views here
-class SignupView(FormView, AnonymousRequiredMixin):
+class SignupView(View, AnonymousRequiredMixin):
     """
     User signup view that handles user registration and login upon successful
     signup.
+
+    GET request renders the signup, profile pic, and address forms.
 
     POST request with valid form data creates a new user, logs them in,
     and redirects to email verification page.
@@ -39,21 +49,67 @@ class SignupView(FormView, AnonymousRequiredMixin):
     - form: Instance of SignupForm for user input.
     """
     template_name = 'profiles/signup.html'
-    form_class = SignupForm
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['profile_pic_form'] = ProfilePhotoForm()
-        context['address_form'] = AddressForm()
-        return context
+    def get(self, request, *args, **kwargs):
+        context = {
+            'signup_form': SignupForm(),
+            'profile_pic_form': ProfilePhotoForm(),
+            'address_form': AddressForm(),
+        }
+        return render(request, self.template_name, context)
 
-    def form_valid(self, form):
-        user = form.save()
-        login(self.request, user)
-        messages.success(
-            self.request, "Signup successful! Please verify your email."
+    def post(self, request, *args, **kwargs):
+        signup_form = SignupForm(request.POST)
+        profile_pic_form = ProfilePhotoForm(
+            request.POST, request.FILES
         )
-        return redirect('verify_email')
+        address_form = AddressForm(request.POST)
+
+        if (
+            signup_form.is_valid() and
+            profile_pic_form.is_valid() and
+            address_form.is_valid()
+        ):
+            user = signup_form.save(commit=False)
+            user.is_active = False
+            user.save()
+
+            request.session['pending_verification_user_id'] = user.id
+
+            user_profile = UserProfile.objects.create(user=user)
+            customer = Customer.objects.create(
+                user_profile=user_profile
+            )
+
+            photo = profile_pic_form.save(
+                commit=False,
+                user=user,
+                user_profile=user_profile
+            )
+            if photo:
+                photo.save()
+
+                if user_profile:
+                    user_profile.profile_picture = photo
+                    user_profile.save()
+
+            address = address_form.save(commit=False)
+            address.customer = customer
+            address.save()
+
+            login(request, user)
+            messages.success(
+                request, "Signup successful! Please verify your email."
+            )
+            return redirect('profiles:verify_email')
+        else:
+            messages.error(request, "Please correct the errors below.")
+            context = {
+                'signup_form': signup_form,
+                'profile_pic_form': profile_pic_form,
+                'address_form': address_form,
+            }
+            return render(request, self.template_name, context)
 
 
 class LoginView(FormView, AnonymousRequiredMixin):
@@ -91,7 +147,7 @@ class LoginView(FormView, AnonymousRequiredMixin):
 
 
 class LogoutView(
-    View,
+    FormView,
     LoginRequiredMixin
 ):
     """
@@ -122,7 +178,7 @@ class LogoutView(
         return redirect('home')
 
 
-class VerifyEmailView(FormView, EmailNotVerifiedMixin):
+class VerifyEmailView(FormView, EmailNotVerifiedMixin, CustomerRequiredMixin):
     """
     Email verification view that handles user email verification.
 
@@ -143,9 +199,20 @@ class VerifyEmailView(FormView, EmailNotVerifiedMixin):
     template_name = 'profiles/verify_email.html'
     form_class = EmailVerificationForm
 
+    def dispatch(self, request, *args, **kwargs):
+        user_id = request.session.get('pending_verification_user_id')
+        if not user_id:
+            messages.error(
+                request, "No pending verification found. Please sign up."
+            )
+            return redirect('profiles:signup')
+        return super().dispatch(request, *args, **kwargs)
+
     def form_valid(self, form):
         code = form.cleaned_data['verification_code']
+        user_id = self.request.session.get('pending_verification_user_id')
         try:
+            user = CustomUser.objects.get(id=user_id)
             verification = EmailVerificationCode.objects.get(
                 code=code, is_used=False
             )
@@ -156,15 +223,21 @@ class VerifyEmailView(FormView, EmailNotVerifiedMixin):
             else:
                 verification.is_used = True
                 verification.save()
-                verification.user.is_active = True
-                verification.user.save()
+                user.is_active = True
+                user.save()
+                login(self.request, user)
+                del self.request.session['pending_verification_user_id']
                 messages.success(
                     self.request, "Your email has been verified successfully."
                 )
                 return redirect('dashboard')
+
+        except CustomUser.DoesNotExist:
+            messages.error(self.request, "User not found.")
+            return self.form_invalid(form)
         except EmailVerificationCode.DoesNotExist:
             messages.error(self.request, "Invalid verification code.")
-        return self.form_invalid(form)
+            return self.form_invalid(form)
 
 
 class ArtistApplicationView(FormView):
@@ -207,7 +280,11 @@ class ArtistApplicationView(FormView):
 
             if artist_application_form.is_valid():
                 artist_application = artist_application_form.save(commit=False)
-                artist_application.user = request.user
+                artist = Artist.objects.create(
+                    user_profile=request.user.user_profile,
+                    is_approved=False
+                )
+                artist_application.user = artist
                 artist_application.save()
 
                 messages.success(
@@ -238,20 +315,34 @@ class ArtistApplicationView(FormView):
                 and artist_application_form.is_valid()
             ):
                 user = signup_form.save()
+                request.session['pending_verification_user_id'] = user.id
                 user_profile = user.user_profile
+                customer = Customer.objects.create(
+                    user_profile=user_profile
+                )
+                artist = Artist.objects.create(
+                    user_profile=user_profile,
+                    is_approved=False
+                )
+
                 photo = profile_pic_form.save(
                     commit=False,
                     user=user,
                     user_profile=user_profile
                 )
-                photo.save()
+                if photo:
+                    photo.save()
+
+                    if user_profile:
+                        user_profile.profile_picture = photo
+                        user_profile.save()
 
                 address = address_form.save(commit=False)
-                address.user = user
+                address.customer = customer
                 address.save()
 
                 artist_application = artist_application_form.save(commit=False)
-                artist_application.user = user
+                artist_application.user = artist
                 artist_application.save()
 
                 messages.success(
@@ -272,3 +363,36 @@ class ArtistApplicationView(FormView):
                     'artist_application_form': artist_application_form,
                 },
             )
+
+
+class ResendVerificationCodeView(View, CustomerRequiredMixin):
+    def post(self, request, *args, **kwargs):
+        user_id = request.session.get('pending_verification_user_id')
+
+        if not user_id:
+            return JsonResponse({
+                "success": False,
+                "message": "No pending verification found."
+            }, status=400)
+
+        try:
+            user = CustomUser.objects.get(id=user_id)
+            # Generate a new verification code
+            generate_verification_code(user)
+
+            # Use the utility function to send the email
+            send_verification_email(user)
+
+            return JsonResponse({
+                "success": True,
+                "message": "Verification code resent successfully."
+            })
+        except CustomUser.DoesNotExist:
+            return JsonResponse({
+                "success": False,
+                "message": "User not found."
+            }, status=404)
+        except Exception as e:
+            return JsonResponse({
+                "success": False, "message": str(e)
+                }, status=500)
