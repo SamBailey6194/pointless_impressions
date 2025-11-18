@@ -6,6 +6,7 @@ from django.contrib.auth.models import (
 from django.conf import settings
 from django.db import models
 from django.utils import timezone
+import uuid
 
 
 # Create your models here.
@@ -96,13 +97,18 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
         blank=False,
         null=False,
         unique=True
-        )
+    )
     first_name = models.CharField(max_length=30, blank=False)
     last_name = models.CharField(max_length=30, blank=False)
     date_joined = models.DateTimeField(auto_now_add=True)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
     is_superuser = models.BooleanField(default=False)
+    public_id = models.UUIDField(
+        default=uuid.uuid4,
+        unique=True,
+        editable=False
+    )
 
     objects = CustomUserManager()
     USERNAME_FIELD = 'username'

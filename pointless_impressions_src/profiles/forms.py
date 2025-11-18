@@ -4,6 +4,7 @@ from crispy_forms.layout import Layout, Field, Submit, HTML, Div, Button
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 from django.core.exceptions import ValidationError
 from django.contrib.auth.password_validation import validate_password
+from django.urls import reverse
 from .models import Artist, Address, UserProfile
 from pointless_impressions_src.account.models import CustomUser
 from pointless_impressions_src.home.widgets import CountrySelectFormWidget
@@ -227,7 +228,7 @@ class LoginForm(AuthenticationForm):
         self.helper = FormHelper()
         self.helper.form_method = 'post'
         self.helper.form_tag = True
-        self.helper.form_action = '/dashboard/'
+        self.helper.form_action = reverse('profiles:login')
         self.helper.layout = Layout(
             Div(
                 HTML(
@@ -289,7 +290,7 @@ class LogoutForm(forms.Form):
         self.helper = FormHelper()
         self.helper.form_method = 'post'
         self.helper.form_tag = True
-        self.helper.form_action = '/profiles/logout/'
+        self.helper.form_action = reverse('profiles:logout')
         self.helper.layout = Layout(
             Div(
                 HTML(
@@ -599,6 +600,7 @@ class EmailVerificationForm(forms.Form):
         self.helper = FormHelper()
         self.helper.form_method = 'post'
         self.helper.form_tag = True
+        self.helper.form_action = reverse('profiles:verify_email')
         self.helper.layout = Layout(
             Div(
                 HTML(

@@ -1,0 +1,20 @@
+{% load static tailwind_tags cloudinary crispy_forms_tags %}
+
+<dialog id="add-artwork-modal" class="modal">
+    <div class="modal-box lg:w-7/12 lg:max-w-4xl lg:h-9/12">
+        <form method="post" action="{% url 'dashboard:add_artwork' %}" class="form-card">
+            {% csrf_token %}
+            {% crispy form %}
+            <div class="modal-action">
+                <button type="submit" class="btn btn-ghost btn-outline">Submit</button>
+                <button type="button" class="btn btn-ghost js-close-modal-btn" data-modal-id="add-artwork-modal">
+                    <i class="fa-solid fa-times"></i> Cancel
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <form method="dialog" class="modal-backdrop flex items-end justify-end">
+        <button>close</button>
+    </form>
+</dialog>

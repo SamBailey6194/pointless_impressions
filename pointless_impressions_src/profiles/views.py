@@ -141,7 +141,7 @@ class LoginView(FormView, AnonymousRequiredMixin):
         if user:
             login(self.request, user)
             messages.success(self.request, "Login successful!")
-            return redirect('dashboard')
+            return redirect('dashboard:landing')
         messages.error(self.request, "Invalid username or password.")
         return self.form_invalid(form)
 
@@ -230,7 +230,7 @@ class VerifyEmailView(FormView, EmailNotVerifiedMixin, CustomerRequiredMixin):
                 messages.success(
                     self.request, "Your email has been verified successfully."
                 )
-                return redirect('dashboard')
+                return redirect('dashboard:landing')
 
         except CustomUser.DoesNotExist:
             messages.error(self.request, "User not found.")

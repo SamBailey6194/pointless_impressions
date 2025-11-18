@@ -29,6 +29,7 @@ urlpatterns = [
     path('checkout/', include(
         'pointless_impressions_src.cart.urls', namespace='checkout'),
         ),
+    path('dashboard/', include('pointless_impressions_src.dashboard.urls')),
     path('health/', health_check, name='health'),
     path('order/', include('pointless_impressions_src.order.urls')),
     path('profiles/', include('pointless_impressions_src.profiles.urls')),

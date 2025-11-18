@@ -2,7 +2,9 @@ from django.forms import ModelForm
 from django import forms
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Div, Field, HTML
-from .models import ArtworkReview, Artwork, ArtworkFramingCondition
+from .models import (
+    ArtworkReview, Artwork, ArtworkFramingCondition, ArtworkCategory
+)
 
 
 # Write your forms here
@@ -65,122 +67,6 @@ class ArtworkReviewForm(ModelForm):
         return review_text
 
 
-class ArtworkForm(forms.ModelForm):
-    """
-    Form for admin staff to create and edit artwork.
-    Includes all fields for full CRUD operations.
-    """
-
-    price = forms.DecimalField(
-        max_digits=10,
-        decimal_places=2,
-        min_value=0.01,
-        error_messages={
-            'invalid': 'Price must be a valid decimal number.',
-            'min_value': 'Price must be greater than 0.',
-        }
-    )
-
-    quantity = forms.IntegerField(
-        min_value=0,
-        initial=0,
-        help_text='Number of pieces in stock'
-    )
-
-    selected_conditions = forms.ModelMultipleChoiceField(
-        queryset=ArtworkFramingCondition.objects.all(),
-        widget=forms.CheckboxSelectMultiple,
-        required=False,
-        help_text='Select available framing conditions'
-    )
-
-    class Meta:
-        model = Artwork
-        fields = [
-            'name',
-            'artist',
-            'description',
-            'price',
-            'category',
-            'selected_conditions',
-            'main_photo',
-            'quantity',
-            'is_available',
-            'is_featured'
-        ]
-        widgets = {
-            'name': forms.TextInput(attrs={
-                'class': 'form-control',
-                'placeholder': 'Artwork title'
-            }),
-            'artist': forms.Select(attrs={
-                'class': 'form-control'
-            }),
-            'description': forms.Textarea(attrs={
-                'class': 'form-control',
-                'rows': 5,
-                'placeholder': 'Detailed description of the artwork'
-            }),
-            'price': forms.NumberInput(attrs={
-                'class': 'form-control',
-                'placeholder': '0.00',
-                'step': '0.01'
-            }),
-            'category': forms.Select(attrs={
-                'class': 'form-control'
-            }),
-            'main_photo': forms.Select(attrs={
-                'class': 'form-control'
-            }),
-            'quantity': forms.NumberInput(attrs={
-                'class': 'form-control',
-                'min': '0'
-            }),
-            'is_available': forms.CheckboxInput(attrs={
-                'class': 'form-check-input'
-            }),
-            'is_featured': forms.CheckboxInput(attrs={
-                'class': 'form-check-input'
-            })
-        }
-
-    def clean_name(self):
-        """Validate artwork name is not blank."""
-        name = self.cleaned_data.get('name')
-        if not name or not name.strip():
-            raise forms.ValidationError(
-                'Artwork name cannot be empty.'
-            )
-        return name
-
-    def clean_description(self):
-        """Validate description is not blank."""
-        description = self.cleaned_data.get('description')
-        if not description or not description.strip():
-            raise forms.ValidationError(
-                'Description cannot be empty.'
-            )
-        return description
-
-    def clean_price(self):
-        """Validate price is positive."""
-        price = self.cleaned_data.get('price')
-        if price is not None and price <= 0:
-            raise forms.ValidationError(
-                'Price must be greater than 0.'
-            )
-        return price
-
-    def clean_quantity(self):
-        """Validate quantity is non-negative."""
-        quantity = self.cleaned_data.get('quantity')
-        if quantity is not None and quantity < 0:
-            raise forms.ValidationError(
-                'Quantity cannot be negative.'
-            )
-        return quantity
-
-
 class ArtworkSubmissionForm(forms.ModelForm):
     """
     Form for artists to submit artwork for approval.
@@ -234,6 +120,106 @@ class ArtworkSubmissionForm(forms.ModelForm):
             })
         }
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.helper = FormHelper()
+        self.helper.form_method = 'post'
+        self.helper.layout = Layout(
+            Div(
+                HTML(
+                    "<h2 class='card-title text-center mb-4 "
+                    "text-(--pointless-black) dark:text-(--pointless-white)'>"
+                    "Submit Artwork</h2>"
+                ),
+                Div(
+                    HTML(
+                        "<h4 class='mb-2 text-(--pointless-black) "
+                        "dark:text-(--pointless-white)'>"
+                        "Artwork Details</h4>"
+                    ),
+                    Div(
+                        Field(
+                            'name',
+                            placeholder="Artwork Title",
+                            css_class='mb-4 custom-input w-full lg:w-66'
+                        ),
+                        Field(
+                            'description',
+                            placeholder="Describe your artwork...",
+                            css_class='mb-4 custom-input w-full lg:w-66'
+                        ),
+                        css_class='lg:flex lg:gap-4 mb-4'
+                    ),
+                    HTML(
+                        "<div class='form-divider'></div>"
+                    ),
+                    HTML(
+                        "<h4 class='mb-2 text-(--pointless-black) "
+                        "dark:text-(--pointless-white)'>"
+                        "Pricing and Category</h4>"
+                    ),
+                    Div(
+                        Field(
+                            'price',
+                            placeholder="0.00",
+                            css_class='mb-4 custom-input w-full lg:w-66'
+                        ),
+                        Div(
+                            Field(
+                                'category',
+                                css_class='custom-input w-full lg:w-66'
+                            ),
+                            HTML(
+                                "<button type='button' class='btn btn-outline "
+                                "add-category'>Add</button>"
+                            ),
+                            HTML(
+                                "<button type='button' class='btn btn-outline "
+                                "remove-category'>Remove</button>"
+                            ),
+                            css_class='flex items-center gap-2'
+                        ),
+                        css_class='lg:flex lg:gap-4 mb-4'
+                    ),
+                    HTML(
+                        "<div class='form-divider'></div>"
+                    ),
+                    HTML(
+                        "<h4 class='mb-2 text-(--pointless-black) "
+                        "dark:text-(--pointless-white)'>"
+                        "Framing Options</h4>"
+                    ),
+                    Div(
+                        Div(
+                            Field(
+                                'selected_conditions',
+                                css_class='custom-input w-full'
+                            ),
+                            HTML(
+                                "<button type='button' class='btn btn-outline "
+                                "add-condition'>Add</button>"
+                            ),
+                            HTML(
+                                "<button type='button' class='btn btn-outline "
+                                "remove-condition'>Remove</button>"
+                            ),
+                            css_class='flex items-center gap-2'
+                        ),
+                        css_class='mb-4'
+                    ),
+                    HTML(
+                        "<div class='form-divider'></div>"
+                    ),
+                    css_class='flex flex-col gap-4'
+                ),
+                css_class='px-6 py-2 mb-4',
+                id='artwork-submission-form'
+            ),
+            HTML(
+                "<button type='submit' class='btn btn-primary'>Submit</button>"
+            )
+        )
+
     def clean_name(self):
         """Validate name is unique (except for current instance)."""
         name = self.cleaned_data.get('name')
@@ -267,14 +253,40 @@ class ArtworkSubmissionForm(forms.ModelForm):
     def save(self, commit=True, artist=None):
         """
         Save artwork with artist and pending approval status.
+        Dynamically add new categories and framing conditions to the database.
         """
         artwork = super().save(commit=False)
+
+        # Handle artist assignment
         if artist:
             artwork.artist = artist
-        artwork.is_available = False  # Pending approval
+
+        # Set artwork as pending approval
+        artwork.is_available = False
+
+        # Save the artwork instance if commit is True
         if commit:
             artwork.save()
-            self.save_m2m()  # Save framing conditions
+
+            # Handle dynamic categories
+            category_name = self.cleaned_data.get('category')
+            if category_name:
+                category, created = ArtworkCategory.objects.get_or_create(
+                    name=category_name
+                )
+                artwork.category = category
+
+            # Handle dynamic framing conditions
+            selected_conditions = self.cleaned_data.get('selected_conditions')
+            if selected_conditions:
+                for condition_name in selected_conditions:
+                    condition, created = ArtworkFramingCondition.objects.\
+                        get_or_create(condition_friendly_name=condition_name)
+                    artwork.selected_conditions.add(condition)
+
+            # Save many-to-many relationships
+            self.save_m2m()
+
         return artwork
 
 
