@@ -2,10 +2,9 @@
 
 <dialog id="edit-address-modal" class="modal">
     <div class="modal-box lg:w-7/12 lg:max-w-4xl lg:h-9/12">
-        <form method="post" action="{% url 'dashboard:edit_address' address.id %}" class="form-card">
+        <form id="edit-address-form" method="post" action="" class="form-card">
             {% csrf_token %}
-            {% crispy form %}
-            <input type="hidden" name="address_id" value="{{ address.id|default:'' }}">
+            {% crispy edit_address_form %}
             <div class="modal-action">
                 <button type="submit" class="btn btn-ghost btn-outline">Save</button>
                 <button type="button" class="btn btn-ghost js-close-modal-btn" data-modal-id="edit-address-modal">

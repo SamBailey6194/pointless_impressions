@@ -2,7 +2,7 @@ from django.views.generic import TemplateView, FormView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
-from .forms import EditOrderForm, OrderProcessingForm
+from .forms import EditOrderForm, OrderProcessingForm, ChangePasswordForm
 from pointless_impressions_src.profiles.forms import SignupForm, AddressForm
 from pointless_impressions_src.profiles.mixins import (
     ArtistRequiredMixin, StaffRequiredMixin
@@ -46,33 +46,51 @@ class UserProfileDashboardView(LoginRequiredMixin, TemplateView):
         public_id = self.kwargs.get('public_id')
         user = get_object_or_404(CustomUser, public_id=public_id)
         context = super().get_context_data(**kwargs)
-        context['user_profile'] = {
-            'username': user.username,
+
+        profile_photo = user.user_profile.photos.filter(
+            photo_type='profile'
+        ).first()
+
+        context['user_profile'] = user
+        context['profile_photo'] = profile_photo
+        context['addresses'] = user.user_profile.customer.addresses.all()
+        context['orders'] = user.orders.all()
+        context['change_password_form'] = self._get_password_form()
+        context['edit_user_info_form'] = self._get_user_info_form(user)
+        context['change_profile_pic_form'] = ProfilePhotoForm()
+        context['edit_address_form'] = AddressForm()
+
+        return context
+
+    def _get_password_form(self):
+        """Create a password-only form."""
+        form = ChangePasswordForm(user=self.request.user)
+        return form
+
+    def _get_user_info_form(self, user):
+        """Create a user info form (no passwords)."""
+        form = SignupForm(initial={
             'first_name': user.first_name,
             'last_name': user.last_name,
             'email': user.email,
             'phone': user.phone,
-            'profile_picture': (
-                user.user_profile.profile_picture.url
-                if user.user_profile.profile_picture else None
-            ),
-        }
-        context['addresses'] = user.user_profile.customer.addresses.all()
-        context['orders'] = user.user_profile.customer.orders.all()
-        return context
+        })
+        for field in ['password1', 'password2']:
+            form.fields.pop(field, None)
+        return form
 
 
 class ChangePasswordView(LoginRequiredMixin, FormView):
     template_name = 'dashboard/includes/change_password_modal.html'
-    form_class = SignupForm
+    form_class = ChangePasswordForm
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['user'] = self.request.user
+        return kwargs
 
     def get_form(self, form_class=None):
         form = super().get_form(form_class)
-        # Only include password fields
-        form.fields = {
-            key: form.fields[key]
-            for key in ['password1', 'password2']
-        }
         return form
 
     def form_valid(self, form):

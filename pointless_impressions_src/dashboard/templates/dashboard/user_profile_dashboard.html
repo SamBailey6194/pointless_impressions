@@ -15,8 +15,8 @@
                 <p><strong>Phone:</strong> {{ user_profile.phone }}</p>
             </div>
             <div>
-                {% if user_profile.profile_picture %}
-                    {% cloudinary user_profile.profile_picture  %}
+                {% if profile_photo %}
+                    {% cloudinary profile_photo.image format="webp" quality="auto" width="200" height="200" crop="fill" alt=profile_photo.alt_text_or_default %}
                 {% else %}
                     <p>No profile picture uploaded.</p>
                 {% endif %}
@@ -47,7 +47,19 @@
                     {% if not address.is_default %}
                         <button class="btn btn-secondary btn-ghost btn-outline w-fit">Set Default</button>
                     {% endif %}
-                    <button class="btn btn-ghost btn-outline w-fit js-edit-address-btn" data-address-id="{{ address.id }}">Edit</button>
+                    <button class="btn btn-ghost btn-outline w-fit js-edit-address-btn" 
+                            data-address-id="{{ address.id }}"
+                            data-address-label="{{ address.label }}"
+                            data-address-first-name="{{ address.first_name }}"
+                            data-address-last-name="{{ address.last_name }}"
+                            data-address-line-1="{{ address.address_line_1 }}"
+                            data-address-line-2="{{ address.address_line_2 }}"
+                            data-address-city="{{ address.city }}"
+                            data-address-county="{{ address.county }}"
+                            data-address-postcode="{{ address.postcode }}"
+                            data-address-country="{{ address.country }}">
+                        Edit
+                    </button>
                     <button class="btn btn-ghost btn-outline w-fit js-remove-address-btn" data-address-id="{{ address.id }}">Remove</button>
                 </div>
             </div>
@@ -71,7 +83,7 @@
                 <p><strong>Status:</strong> {{ order.status }}</p>
                 <div class="flex justify-between mt-4">
                     <button class="btn btn-info btn-ghost btn-outline w-fit js-order-summary-btn" data-order-id="{{ order.id }}">View</button>
-                    {% if order.status not in ['Completed', 'Cancelled'] %}
+                    {% if order.status not in 'COMPLETED' and order.status != 'CANCELLED' %}
                         <button class="btn btn-warning btn-ghost btn-outline w-fit js-edit-order-btn" data-order-id="{{ order.id }}">Request Edit</button>
                         <button class="btn btn-danger btn-ghost btn-outline w-fit js-delete-order-btn" data-order-id="{{ order.id }}">Delete</button>
                     {% endif %}
@@ -82,14 +94,13 @@
     </div>
 </section>
 {% endblock %}
+{% endblock %}
 
 {% block extramodals %}
     {% include 'dashboard/includes/change_password_modal.html' %}
     {% include 'dashboard/includes/edit_user_info_modal.html' %}
     {% include 'dashboard/includes/change_profile_pic_modal.html' %}
     {% include 'dashboard/includes/edit_address_modal.html' %}
-    {% include 'dashboard/includes/order_summary_modal.html' %}
-    {% include 'dashboard/includes/edit_order_modal.html' %}
 {% endblock %}
 
 {% block postloadjs %}

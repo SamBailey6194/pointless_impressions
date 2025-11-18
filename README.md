@@ -623,7 +623,7 @@ Toast.handleAPIError(error)                // Displays API error messages
 
 **Image Optimization:**
 - **Development**: Local image URLs via Django media storage
-- **Production**: Cloudinary with auto-formatting (format="auto"), quality optimization (quality="auto")
+- **Production**: Cloudinary with auto-formatting (format="webp"), quality optimization (quality="auto")
 - **Responsive Images**: Width/height specifications for each context
 - **Fallback Handling**: Placeholder icons for missing images
 

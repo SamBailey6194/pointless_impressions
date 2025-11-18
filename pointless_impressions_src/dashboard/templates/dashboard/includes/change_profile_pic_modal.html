@@ -2,9 +2,9 @@
 
 <dialog id="change-profile-pic-modal" class="modal">
     <div class="modal-box w-66 lg:w-1/7">
-        <form method="post" action="{% url 'dashboard:change_password' %}" class="form-card">
+        <form method="post" action="{% url 'dashboard:change_profile_pic' %}" class="form-card">
             {% csrf_token %}
-            {% crispy form %}
+            {% crispy change_profile_pic_form %}
             <div class="modal-action">
                 <button type="submit" class="btn btn-ghost btn-outline">Save</button>
                 <button type="button" class="btn btn-ghost btn-outline js-close-modal-btn" data-modal-id="change-profile-pic-modal">

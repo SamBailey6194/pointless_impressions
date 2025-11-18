@@ -119,7 +119,7 @@
                   Display user's profile picture if logged in and has one 
                 {% endcomment %}
                 {% with profile_pic=request.user.user_profile.profile_picture %}
-                  {% cloudinary profile_pic.image format="auto" quality="auto" width=80 height=80 crop="fill" class="w-10 rounded-full" alt=profile_pic.alt_text_or_default %}
+                  {% cloudinary profile_pic.image format="webp" quality="auto" width=80 height=80 crop="fill" class="w-10 rounded-full" alt=profile_pic.alt_text_or_default %}
                 {% endwith %}
 
               {% else %}
@@ -163,13 +163,8 @@
                 {% endif %}
                 {% endcomment %}
                 <li>
-                  <a href="#" class="hover:bg-(--pointless-yellow)">
+                  <a href="{% url 'dashboard:user_profile_dashboard' user.public_id %}" class="hover:bg-(--pointless-yellow)">
                     <i class="fa-solid fa-user-circle"></i> My Profile
-                  </a>
-                </li>
-                <li>
-                  <a href="#" class="hover:bg-(--pointless-yellow)">
-                    <i class="fa-solid fa-box"></i> My Orders
                   </a>
                 </li>
                 <li>

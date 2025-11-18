@@ -163,6 +163,8 @@ TEMPLATES = [
                 "global_profiles_context",
                 "pointless_impressions_src.profiles.context_processors."
                 "auth_forms",
+                "pointless_impressions_src.account.context_processor."
+                "user_context",
             ],
         },
     },
@@ -177,6 +179,11 @@ WSGI_APPLICATION = (
 # Authentication Settings
 # Custom user model
 AUTH_USER_MODEL = "account.CustomUser"
+
+LOGIN_URL = '/profiles/login/'
+
+# Redirect users to the dashboard landing page after login
+LOGIN_REDIRECT_URL = '/dashboard/'
 
 # Verification token expiry time
 VERIFICATION_TOKEN_EXPIRY = 604800

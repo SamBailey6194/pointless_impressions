@@ -14,7 +14,7 @@
                         {% for image in artwork.images.all %}
                         <div class="carousel-item w-full h-full justify-center" id="slide-{{ artwork.id }}-{{ forloop.counter0 }}">
                             <figure class="w-full h-full">
-                                {% cloudinary image.url format="auto" quality="auto" class="w-full h-full object-cover" alt=image.alt_text %}
+                                {% cloudinary image.url format="webp" quality="auto" class="w-full h-full object-cover" alt=image.alt_text %}
                             </figure>
                         </div>
                         {% endfor %}
@@ -32,7 +32,7 @@
                     <div class="flex gap-2 mt-4 overflow-x-auto pb-2" id="thumbnail-container-{{ artwork.id }}">
                         {% for image in artwork.images.all %}
                         <button class="thumbnail-btn w-16 h-16 rounded border-2 border-gray-300 shrink-0 overflow-hidden hover:border-primary" data-slide="{{ forloop.counter0 }}">
-                            {% cloudinary image.url format="auto" quality="auto" class="w-full h-full object-cover" alt=image.alt_text %}
+                            {% cloudinary image.url format="webp" quality="auto" class="w-full h-full object-cover" alt=image.alt_text %}
                         </button>
                         {% endfor %}
                     </div>

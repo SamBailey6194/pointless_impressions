@@ -153,22 +153,30 @@ function populateAddressModal(addressData) {
 
   // Reset the form for adding a new address
   form.reset();
-  form.action = addressData
-    ? `/dashboard/edit-address/${addressData.id}/`
-    : `/dashboard/add-address/`;
+  
+  // Set form action dynamically
+  if (addressData) {
+    form.action = `/dashboard/user-profile/edit-address/${addressData.id}/`;
+  } else {
+    form.action = '/dashboard/user-profile/add-address/';
+  }
 
   // Populate the form fields if editing an existing address
   if (addressData) {
-    form.querySelector('input[name="address_id"]').value = addressData.id || '';
-    form.querySelector('input[name="label"]').value = addressData.label || '';
-    form.querySelector('input[name="first_name"]').value = addressData.first_name || '';
-    form.querySelector('input[name="last_name"]').value = addressData.last_name || '';
-    form.querySelector('input[name="address_line_1"]').value = addressData.address_line_1 || '';
-    form.querySelector('input[name="address_line_2"]').value = addressData.address_line_2 || '';
-    form.querySelector('input[name="city"]').value = addressData.city || '';
-    form.querySelector('input[name="county"]').value = addressData.county || '';
-    form.querySelector('input[name="postcode"]').value = addressData.postcode || '';
-    form.querySelector('select[name="country"]').value = addressData.country || '';
+    const setFieldValue = (name, value) => {
+      const field = form.querySelector(`[name="${name}"]`);
+      if (field) field.value = value || '';
+    };
+
+    setFieldValue('label', addressData.label);
+    setFieldValue('first_name', addressData.first_name);
+    setFieldValue('last_name', addressData.last_name);
+    setFieldValue('address_line_1', addressData.address_line_1);
+    setFieldValue('address_line_2', addressData.address_line_2);
+    setFieldValue('city', addressData.city);
+    setFieldValue('county', addressData.county);
+    setFieldValue('postcode', addressData.postcode);
+    setFieldValue('country', addressData.country);
   }
 
   modal.showModal();
@@ -184,7 +192,18 @@ document.addEventListener('click', async (event) => {
   }
 
   if (editAddressBtn) {
-    const addressId = editAddressBtn.getAttribute('data-address-id');
+    const addressData = {
+        id: editAddressBtn.dataset.addressId,
+        label: editAddressBtn.dataset.addressLabel,
+        first_name: editAddressBtn.dataset.addressFirstName,
+        last_name: editAddressBtn.dataset.addressLastName,
+        address_line_1: editAddressBtn.dataset.addressLine1,
+        address_line_2: editAddressBtn.dataset.addressLine2,
+        city: editAddressBtn.dataset.addressCity,
+        county: editAddressBtn.dataset.addressCounty,
+        postcode: editAddressBtn.dataset.addressPostcode,
+        country: editAddressBtn.dataset.addressCountry,
+    };
 
     try {
       const response = await fetch(`/dashboard/edit-address/${addressId}/`, {

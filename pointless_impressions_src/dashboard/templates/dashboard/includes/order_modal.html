@@ -4,9 +4,9 @@
     <div class="modal-box lg:w-7/12 lg:max-w-4xl lg:h-9/12">
         {% include 'order/includes/order_summary.html' %}
 
-        <form id="edit-order-form" class="hidden" method="post" action="{% url 'dashboard:edit_order' order.id %}">
+        <form id="edit-order-form" class="hidden" method="post" action="">
             {% csrf_token %}
-            {% crispy form %}
+            {% crispy edit_order_form %}
             <div class="modal-action">
                 <button type="submit" class="btn btn-ghost btn-outline">Submit Request</button>
                 <button type="button" class="btn btn-ghost btn-outline js-close-modal-btn" data-modal-id="order-modal">

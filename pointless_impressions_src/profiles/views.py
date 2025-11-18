@@ -1,7 +1,9 @@
+from django.contrib.auth.views import LoginView as AuthLoginView
 from django.views.generic import FormView, View
-from django.contrib.auth import login, logout, authenticate
+from django.contrib.auth import login, logout
 from django.contrib import messages
 from django.shortcuts import redirect, render
+from django.urls import reverse
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import JsonResponse
 from .models import UserProfile, Customer, Artist
@@ -112,7 +114,7 @@ class SignupView(View, AnonymousRequiredMixin):
             return render(request, self.template_name, context)
 
 
-class LoginView(FormView, AnonymousRequiredMixin):
+class LoginView(AuthLoginView):
     """
     User login view that handles user login.
 
@@ -132,18 +134,11 @@ class LoginView(FormView, AnonymousRequiredMixin):
     """
     template_name = 'profiles/includes/login_modal.html'
     form_class = LoginForm
+    redirect_authenticated_user = True
 
-    def form_valid(self, form):
-        user = authenticate(
-            username=form.cleaned_data['username'],
-            password=form.cleaned_data['password']
-        )
-        if user:
-            login(self.request, user)
-            messages.success(self.request, "Login successful!")
-            return redirect('dashboard:landing')
-        messages.error(self.request, "Invalid username or password.")
-        return self.form_invalid(form)
+    def get_success_url(self):
+        messages.success(self.request, "Login successful!")
+        return self.request.GET.get('next') or reverse('dashboard:landing')
 
 
 class LogoutView(

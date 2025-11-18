@@ -328,3 +328,100 @@ class OrderProcessingForm(forms.ModelForm):
             )
 
         return new_status
+
+
+class ChangePasswordForm(forms.Form):
+    current_password = forms.CharField(
+        widget=forms.PasswordInput(
+            attrs={
+                'placeholder': 'Current Password'
+                }),
+        label="Current Password",
+        required=True
+    )
+    new_password = forms.CharField(
+        widget=forms.PasswordInput(
+            attrs={
+                'placeholder': 'New Password'
+                }),
+        label="New Password",
+        required=True
+    )
+    confirm_new_password = forms.CharField(
+        widget=forms.PasswordInput(
+            attrs={
+                'placeholder': 'Confirm New Password'
+                }),
+        label="Confirm New Password",
+        required=True
+    )
+
+    def __init__(self, user, *args, **kwargs):
+        """
+        We must pass the 'user' to the form __init__ so we can
+        validate their current password in the clean method.
+        """
+        self.user = user
+        super().__init__(*args, **kwargs)
+
+        self.helper = FormHelper()
+        self.helper.form_tag = False
+
+        self.helper.layout = Layout(
+            Div(
+                HTML(
+                    "<h2 class='card-title text-center mb-4 "
+                    "text-(--pointless-black) "
+                    "dark:text-(--pointless-white)'>Change Password</h2>"
+                ),
+                Div(
+                    Field(
+                        'current_password',
+                        css_class='mb-4 custom-input w-full lg:w-66'
+                        ),
+                    Field(
+                        'new_password',
+                        css_class='mb-4 custom-input w-full lg:w-66'
+                        ),
+                    Field(
+                        'confirm_new_password',
+                        css_class='mb-4 custom-input w-full lg:w-66'
+                        ),
+                    css_class='flex flex-col gap-4'
+                ),
+                css_class='px-6 py-2 mb-4',
+                id='change-password-form'
+            )
+        )
+
+    def clean_current_password(self):
+        """
+        Validate that the current password is correct.
+        """
+        current_password = self.cleaned_data.get('current_password')
+        if not self.user.check_password(current_password):
+            raise forms.ValidationError("Your current password is incorrect.")
+        return current_password
+
+    def clean(self):
+        cleaned_data = super().clean()
+        new_password = cleaned_data.get("new_password")
+        confirm_new_password = cleaned_data.get("confirm_new_password")
+
+        if new_password and confirm_new_password:
+            if new_password != confirm_new_password:
+                raise forms.ValidationError(
+                    "New password and confirmation do not match."
+                    )
+        return cleaned_data
+
+    def save(self, user=None):
+        """
+        Save the new password for the user.
+        If a user argument is provided, it overrides self.user.
+        """
+        user = user or self.user
+        new_password = self.cleaned_data.get("new_password")
+        user.set_password(new_password)
+        user.save()
+        return user
