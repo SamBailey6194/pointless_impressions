@@ -7,7 +7,6 @@ from pointless_impressions_src.artwork.models import (
     Artwork, ArtworkCategory, ArtworkFramingCondition
     )
 from pointless_impressions_src.photo.models import Photo
-# from pointless_impressions_src.blog.models import BlogPost
 from pointless_impressions_src.profiles.models import Artist
 
 

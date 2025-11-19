@@ -86,12 +86,6 @@
               </li>
             </ul>
           </div>
-          <a href="/blog/" class="btn btn-ghost rounded-lg px-4 py-2 flex items-center gap-2">
-            <i class="fa-solid fa-blog"></i> Blog
-          </a>
-          <a href="/about/" class="btn btn-ghost rounded-lg px-4 py-2 flex items-center gap-2">
-            <i class="fa-solid fa-info-circle"></i> About
-          </a>
           <a href="/contact/" class="btn btn-ghost rounded-lg px-4 py-2 flex items-center gap-2">
             <i class="fa-solid fa-envelope"></i> Contact
           </a>
@@ -119,7 +113,7 @@
                   Display user's profile picture if logged in and has one 
                 {% endcomment %}
                 {% with profile_pic=request.user.user_profile.profile_picture %}
-                  {% cloudinary profile_pic.image format="auto" quality="auto" width=80 height=80 crop="fill" class="w-10 rounded-full" alt=profile_pic.alt_text_or_default %}
+                  {% cloudinary profile_pic.image format="webp" quality="auto" width=80 height=80 crop="fill" class="w-10 rounded-full" alt=profile_pic.alt_text_or_default %}
                 {% endwith %}
 
               {% else %}
@@ -152,29 +146,9 @@
                     </a>
                   </li>
                 {% endif %}
-                {% comment %} Artist Dashboard Link if user is an artist {% endcomment %}
-                {% comment %}
-                {% if hasattr(request.user, 'artist_profile') %}
-                  <li>
-                    <a href="#" class="hover:bg-(--pointless-yellow)">
-                      <i class="fa-solid fa-paint-brush"></i> Artist Dashboard
-                    </a>
-                  </li>
-                {% endif %}
-                {% endcomment %}
                 <li>
-                  <a href="#" class="hover:bg-(--pointless-yellow)">
+                  <a href="{% url 'dashboard:user_profile_dashboard' user.public_id %}" class="hover:bg-(--pointless-yellow)">
                     <i class="fa-solid fa-user-circle"></i> My Profile
-                  </a>
-                </li>
-                <li>
-                  <a href="#" class="hover:bg-(--pointless-yellow)">
-                    <i class="fa-solid fa-box"></i> My Orders
-                  </a>
-                </li>
-                <li>
-                  <a href="{% url 'profiles:artist_application' %}" class="hover:bg-(--pointless-yellow)">
-                    <i class="fa-solid fa-user-plus"></i> Artists: Apply Here
                   </a>
                 </li>
                 <div class="divider my-1"></div>
@@ -314,14 +288,6 @@
                 {% endfor %}
                 </ul>
               </ul>
-            </li>
-            <li><a href="/blog/" class="hover:bg-(--pointless-yellow)">
-                <i class="fa-solid fa-blog"></i> Blog
-              </a>
-            </li>
-            <li><a href="/about/" class="hover:bg-(--pointless-yellow)">
-                <i class="fa-solid fa-info-circle"></i> About
-              </a>
             </li>
             <li><a href="/contact/" class="hover:bg-(--pointless-yellow)">
                 <i class="fa-solid fa-envelope"></i> Contact

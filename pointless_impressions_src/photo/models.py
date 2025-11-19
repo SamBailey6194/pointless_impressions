@@ -7,14 +7,13 @@ from cloudinary.models import CloudinaryField
 # Create your models here.
 class Photo(models.Model):
     """
-    Model to store photos linked to Artwork, Blog, Account, or Site Assets.
+    Model to store photos linked to Artwork, Account, or Site Assets.
     """
 
     PHOTO_TYPE_CHOICES = [
         ('artwork', 'Artwork Image'),
         ('profile', 'Profile Picture'),
         ('site_asset', 'Site Asset (Logo, Banner, etc.)'),
-        # ('blog', 'Blog Image'),
     ]
     artwork = models.ForeignKey(
         'artwork.Artwork',
@@ -23,13 +22,6 @@ class Photo(models.Model):
         on_delete=models.CASCADE,
         related_name='photos'
     )
-    # blog = models.ForeignKey(
-    #     Blog,
-    #     null=True,
-    #     blank=True,
-    #     on_delete=models.CASCADE,
-    #     related_name='photos'
-    # )
 
     user_profile = models.ForeignKey(
         'profiles.UserProfile',
@@ -85,7 +77,6 @@ class Photo(models.Model):
         if self.photo_type not in ['site_asset', 'profile']:
             parents = [
                 bool(self.artwork),
-                # bool(self.blog),
             ]
             if sum(parents) > 1:
                 raise ValidationError(
@@ -137,8 +128,6 @@ class Photo(models.Model):
 
         if self.photo_type == 'artwork' and self.artwork:
             return self.artwork.name
-        # elif self.photo_type == 'blog' and self.blog:
-        #     return self.blog.title
         elif self.photo_type == 'profile' and self.user_profile:
             username = self.user_profile.user.username
             return f"{username}'s profile picture"

@@ -3,7 +3,6 @@ from django.utils.text import slugify
 import random
 import string
 import json
-from django.conf import settings
 from pointless_impressions_src.photo.models import Photo
 from pointless_impressions_src.profiles.models import Artist
 
@@ -172,32 +171,3 @@ class ArtworkFramingCondition(models.Model):
 
     def get_friendly_name(self):
         return self.condition_friendly_name
-
-
-class ArtworkReview(models.Model):
-    """Model to represent reviews for artworks."""
-    artwork = models.ForeignKey(
-        Artwork,
-        on_delete=models.SET_NULL,
-        null=True,
-        related_name='reviews'
-    )
-    reviewer = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
-        on_delete=models.SET_NULL,
-        null=True,
-        related_name='reviews_written'
-    )
-    review_title = models.CharField(
-        max_length=255, blank=False, default='Review'
-    )
-    review_text = models.TextField(blank=False, default='')
-    rating = models.PositiveIntegerField(blank=False, default=5)
-    created_at = models.DateTimeField(auto_now_add=True)
-
-    class Meta:
-        unique_together = ('artwork', 'reviewer')
-        ordering = ['-created_at']
-
-    def __str__(self):
-        return f"Review for {self.artwork.name} by {self.reviewer.username}"

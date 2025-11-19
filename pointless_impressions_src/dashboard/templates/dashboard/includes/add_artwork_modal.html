@@ -4,7 +4,7 @@
     <div class="modal-box lg:w-7/12 lg:max-w-4xl lg:h-9/12">
         <form method="post" action="{% url 'dashboard:add_artwork' %}" class="form-card">
             {% csrf_token %}
-            {% crispy form %}
+            {% crispy artwork_submission_form %}
             <div class="modal-action">
                 <button type="submit" class="btn btn-ghost btn-outline">Submit</button>
                 <button type="button" class="btn btn-ghost js-close-modal-btn" data-modal-id="add-artwork-modal">

@@ -19,6 +19,7 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 from .views import health_check
+from pointless_impressions_src.order.views import SquareWebhookView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -27,7 +28,7 @@ urlpatterns = [
         'pointless_impressions_src.artwork.urls', namespace='artwork'),
         ),
     path('checkout/', include(
-        'pointless_impressions_src.cart.urls', namespace='checkout'),
+        'pointless_impressions_src.cart.urls', namespace='cart'),
         ),
     path('dashboard/', include('pointless_impressions_src.dashboard.urls')),
     path('health/', health_check, name='health'),

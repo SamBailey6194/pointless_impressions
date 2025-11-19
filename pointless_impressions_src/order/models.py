@@ -223,6 +223,13 @@ class Order(models.Model):
         max_length=2000,
         null=True
     )
+    payment_id = models.CharField(
+        max_length=255,
+        unique=True,
+        blank=True,
+        null=True,
+        help_text="Unique Square payment ID associated with the order"
+    )
 
     def delete(self, using=None, keep_parents=False):
         """

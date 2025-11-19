@@ -2,7 +2,6 @@ from django.utils.functional import lazy
 from pointless_impressions_src.artwork.models import (
     ArtworkCategory, ArtworkFramingCondition, Artwork
     )
-# from pointless_impressions_src.blog.models import BlogCategory
 from pointless_impressions_src.photo.models import Photo
 
 
@@ -42,8 +41,6 @@ def global_context(request):
             view_name = request.resolver_match.view_name
             if view_name.startswith('artwork:'):
                 return site_logo_white_bg or placeholder_image
-            elif view_name.startswith('blog:'):
-                return site_logo or placeholder_image
             elif view_name.startswith('profiles:'):
                 return placeholder_image
         return placeholder_image
@@ -67,7 +64,6 @@ def global_context(request):
         # navbar categories
         'artwork_categories': ArtworkCategory.objects.all(),
         'framing_options': ArtworkFramingCondition.objects.all(),
-        # 'blog_categories': BlogCategory.objects.all(),
         'featured_artworks': featured_artworks,
 
         # --- NEWLY ADDED ---

@@ -163,6 +163,8 @@ TEMPLATES = [
                 "global_profiles_context",
                 "pointless_impressions_src.profiles.context_processors."
                 "auth_forms",
+                "pointless_impressions_src.account.context_processors."
+                "user_context",
             ],
         },
     },

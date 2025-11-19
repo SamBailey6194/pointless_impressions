@@ -14,4 +14,9 @@ urlpatterns = [
         views.OrderSuccessView.as_view(),
         name='order_success'
     ),
+    path(
+        'webhooks/square/',
+        views.SquareWebhookView.as_view(),
+        name='square_webhook'
+    ),
 ]
