@@ -6,16 +6,17 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib import messages
 from django.utils.translation import gettext_lazy as _
+from decimal import Decimal
 import json
 import uuid
 import os
 import hmac
 import hashlib
 import base64
-from .models import Order
-from .utils import create_order_from_cart
+from .models import Order, PaymentRecovery
+from .utils import create_order_from_cart, build_address_dict
 from .forms import OrderForm
-from pointless_impressions_src.cart.utils import get_cart
+from pointless_impressions_src.cart.utils import get_cart, serialize_items
 from square.client import Square
 from square.environment import SquareEnvironment
 
@@ -49,14 +50,11 @@ class OrderConfirmationView(View):
     Response: Redirects to order success page or back to checkout on failure
     """
     def post(self, request, *args, **kwargs):
-        print('Processing order confirmation...')
         if not request.headers.get('X-Requested-With') == 'XMLHttpRequest':
             return JsonResponse(
                 {
                     'status': 'error', 'message': 'Invalid request method'
                 }, status=400)
-
-        print('Received AJAX request for order confirmation.')
 
         try:
             data = json.loads(request.body)
@@ -85,8 +83,8 @@ class OrderConfirmationView(View):
 
             grand_total = cart.get_grand_total()
             amount_in_pence = int(grand_total * 100)
-
-            print('Payment details prepared:')
+            payment_id = None
+            payment_result = None
 
             try:
                 payment_response = square_client.payments.create(
@@ -100,80 +98,99 @@ class OrderConfirmationView(View):
                     note=f"Order for {form.cleaned_data.get('email')}",
                     buyer_email_address=form.cleaned_data.get('email'),
                 )
-
-                print(f'Payment created: {payment_response}')
-            except Exception as e:
+            except Exception:
                 return JsonResponse({
                     'status': 'error',
-                    'message': f"Payment processing error: {str(e)}"
+                    'message': "Payment processing error. Please try again."
                 }, status=500)
 
             if payment_response.errors:
                 error_msg = payment_response.errors[0].get(
-                    'detail', 'Payment processing failed.'
+                    'detail', 'Payment processing failed. Please try again.'
                     )
                 return JsonResponse({
                     'status': 'error',
                     'message': error_msg
                 }, status=400)
-            elif payment_response.errors is None:
-                payment_result = payment_response.payment
 
-                cleaned_data = form.cleaned_data
+            payment_result = payment_response.payment
+            payment_id = payment_result.id
 
-                shipping_address_snapshot = self.build_address_snapshot(
-                    cleaned_data, "shipping"
-                )
-                billing_address_snapshot = self.build_address_snapshot(
-                    cleaned_data, "billing"
-                )
+            cleaned_data = form.cleaned_data
 
-                order_data = {
-                    'email': cleaned_data.get('email') or (
-                        request.user.email if
-                        request.user.is_authenticated
-                        else None
+            shipping_address_snapshot = self.build_address_snapshot(
+                cleaned_data, "shipping"
+            )
+            billing_address_snapshot = self.build_address_snapshot(
+                cleaned_data, "billing"
+            )
+
+            order_data = {
+                'email': cleaned_data.get('email') or (
+                    request.user.email if
+                    request.user.is_authenticated
+                    else None
+                ),
+                'phone': cleaned_data.get('phone'),
+                'shipping_address': shipping_address_snapshot,
+                'billing_address': billing_address_snapshot,
+                'payment_id': payment_id
+            }
+
+            try:
+                new_order = create_order_from_cart(cart, order_data)
+                new_order.payment_id = payment_id
+                new_order.save()
+
+                if 'cart_id' in request.session:
+                    del request.session['cart_id']
+
+                request.session['recent_order_id'] = str(new_order.id)
+
+                return JsonResponse({
+                    'status': 'success',
+                    'redirect_url': reverse(
+                        'orders:order_success',
+                        args=[new_order.id]
                     ),
-                    'phone': cleaned_data.get('phone'),
-                    'shipping_address': shipping_address_snapshot,
-                    'billing_address': billing_address_snapshot,
-                    'payment_id': payment_result.id
-                }
-
-                try:
-                    new_order = create_order_from_cart(cart, order_data)
-                    new_order.payment_id = payment_result.id
-                    new_order.save()
-
-                    if 'cart_id' in request.session:
-                        del request.session['cart_id']
-
-                    request.session['recent_order_id'] = str(new_order.id)
-
-                    return JsonResponse({
-                        'status': 'success',
-                        'redirect_url': reverse(
-                            'orders:order_success',
-                            args=[new_order.id]
-                        )
-                    })
-                except Exception as e:
-                    return JsonResponse({
-                        'status': 'error',
-                        'message': f"Order creation failed: {str(e)}"
-                        }, status=500)
-            else:
+                    'message': "Order placed successfully. "
+                    "Check your email for order confirmation."
+                })
+            except Exception:
                 return JsonResponse({
                     'status': 'error',
-                    'message': (
-                        "Payment processing failed. "
-                        "Please check your payment details and try again."
-                    )
-                }, status=400)
-        except Exception as e:
+                    'message': "Order creation failed. Please contact support."
+                    }, status=500)
+
+        except Exception:
+            payment_id_recovery = payment_result.id if payment_result else None
+            shipping_snapshot = self.build_address_snapshot(
+                form_data, 'shipping'
+                )
+            billing_snapshot = self.build_address_snapshot(
+                form_data, 'billing'
+                )
+
+            payment_recovered = PaymentRecovery.objects.create(
+                payment_id=payment_id_recovery,
+                amount=cart.get_grand_total(),
+                currency='GBP',
+                buyer_email=form_data.get('email'),
+                buyer_phone=form_data.get('phone'),
+                billing_address=build_address_dict(
+                    billing_snapshot
+                    ),
+                shipping_address=build_address_dict(
+                    shipping_snapshot
+                    ),
+                cart_snapshot=serialize_items(cart),
+                notes="Order creation failed."
+            )
+            payment_recovered.save()
             return JsonResponse({
                 'status': 'error',
-                'message': f"An error occurred: {str(e)}"
+                'message': "An error occurred while processing your order. "
+                "Please try again later."
             }, status=500)
 
     def build_address_snapshot(self, form_data, prefix):
@@ -250,20 +267,19 @@ class OrderSuccessView(View):
 @method_decorator(csrf_exempt, name='dispatch')
 class SquareWebhookView(View):
     def post(self, request, *args, **kwargs):
-        print('Received Square webhook notification.')
-        print('Incoming webhook headers:', request.headers)
-        print('Incoming webhook body:', request.body.decode('utf-8'))
-        print('Incoming webhook host:', request.get_host())
+        retry_number = request.headers.get('Square-Retry-Number')
+        if retry_number and int(retry_number) > 0:
+            print(
+                f"Retry attempt #{retry_number} detected. "
+                "Ignoring duplicate webhook."
+                )
+            return HttpResponse("OK", status=200)
 
         signature = request.headers.get('x-square-hmacsha256-signature')
         body = request.body.decode('utf-8')
         notification_url = os.getenv('SQUARE_WEBHOOK_URL')
         signature_key = os.getenv('SQUARE_WEBHOOK_SIGNATURE_KEY')
         subscription_id = request.headers.get('Square-Subscription-Id')
-
-        print("Square:", signature)
-        print("URL used:", notification_url)
-        print("BODY:", body)
 
         # Compute the HMAC-SHA256 signature
         computed_signature = base64.b64encode(
@@ -273,8 +289,6 @@ class SquareWebhookView(View):
                 hashlib.sha256
             ).digest()
         ).decode('utf-8')
-
-        print("Computed:", computed_signature)
 
         # Compare the computed signature with the Square signature
         if not hmac.compare_digest(computed_signature, signature):
@@ -287,8 +301,6 @@ class SquareWebhookView(View):
                 'SQUARE_WEBHOOK_SUBSCRIPTION_ID'
                 )
 
-            print("Event Subscription ID:", event_subscription_id)
-            print("Expected Subscription ID:", expected_subscription_id)
             if event_subscription_id != expected_subscription_id:
                 return HttpResponse("Invalid Subscription ID", status=403)
 
@@ -296,16 +308,60 @@ class SquareWebhookView(View):
                 payment_data = event['data']['object']['payment']
                 square_id = payment_data['id']
                 status = payment_data['status']
+                line_items = payment_data.get(
+                    'order', {}
+                    ).get('line_items', [])
+
+                cart_snapshot = []
+                for item in line_items:
+                    cart_snapshot.append({
+                        'item_name': item.get('name'),
+                        'quantity': int(item.get('quantity', '1')),
+                        'price_at_purchase': Decimal(
+                            item.get('base_price_money', {}).get('amount', 0)
+                            ) / 100,
+                        'currency': (
+                            item.get(
+                                'base_price_money', {}
+                                ).get('currency', 'GBP')
+                            )
+                    })
 
                 try:
                     order = Order.objects.get(payment_id=square_id)
                     order.status = status
                     order.save()
                 except Order.DoesNotExist:
-                    return HttpResponse("Order Not Found", status=404)
-            print("Event Type Processed:", event.get('type'))
-            print("Webhook processing completed.")
+                    payment_recovered, _ = (
+                        PaymentRecovery.objects.get_or_create(
+                            payment_id=square_id,
+                            defaults={
+                                'amount': Decimal(
+                                    payment_data['total_money']['amount']
+                                    ) / 100,
+                                'currency': (
+                                    payment_data['total_money']['currency']
+                                    ),
+                                'buyer_email': payment_data.get(
+                                    'buyer_email_address', ''
+                                    ),
+                                'buyer_phone': payment_data.get(
+                                    'buyer_phone_number', ''
+                                    ),
+                                'billing_address': build_address_dict(
+                                    payment_data.get('billing_address', {})
+                                    ),
+                                'shipping_address': build_address_dict(
+                                    payment_data.get('shipping_address', {})
+                                    ),
+                                'cart_snapshot': cart_snapshot,
+                                'notes': f"Recovered from webhook event "
+                                f"{event.get('id')}"
+                            }
+                        )
+                    )
+                    payment_recovered.save()
+                    return HttpResponse("Ok", status=200)
             return HttpResponse("OK", status=200)
-        except Exception as e:
-            print(f"Webhook Error: {e}")
+        except Exception:
             return HttpResponse("Error", status=200)

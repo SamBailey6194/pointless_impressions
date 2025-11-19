@@ -15,6 +15,9 @@ def create_order_from_cart(cart: Cart, form_data: dict) -> Order:
         cart (Cart): The shopping cart to convert into an order.
         form_data (dict): The validated checkout form data containing
                           user info, shipping address, payment details, etc.
+
+    Returns:
+        Order: The created Order instance.
     """
     subtotal = cart.get_subtotal()
     delivery_fee = cart.get_delivery_cost()
@@ -88,3 +91,42 @@ def create_order_from_cart(cart: Cart, form_data: dict) -> Order:
     cart.delete()
 
     return new_order
+
+
+def build_address_dict(addr: dict) -> dict:
+    """
+    Build a standardized address dictionary from the given address data.
+
+    Args:
+        addr (dict): Address data containing fields like first name, last name,
+                     address lines, city, county, postcode, country.
+
+    Returns:
+        dict: A dictionary with standardized address fields.
+    """
+    return {
+        'first_name': addr.get('shipping_first_name') or addr.get(
+            'billing_first_name', ''
+            ),
+        'last_name': addr.get('shipping_last_name') or addr.get(
+            'billing_last_name', ''
+            ),
+        'address_line_1': addr.get('shipping_address_line_1') or addr.get(
+            'billing_address_line_1', ''
+            ),
+        'address_line_2': addr.get('shipping_address_line_2') or addr.get(
+            'billing_address_line_2', ''
+            ),
+        'city': addr.get('shipping_city') or addr.get(
+            'billing_city', ''
+            ),
+        'county': addr.get('shipping_county') or addr.get(
+            'billing_county', ''
+            ),
+        'postcode': addr.get('shipping_postcode') or addr.get(
+            'billing_postcode', ''
+            ),
+        'country': addr.get('shipping_country') or addr.get(
+            'billing_country', ''
+            ),
+    }

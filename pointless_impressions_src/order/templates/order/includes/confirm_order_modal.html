@@ -97,7 +97,7 @@
     </div>
 
     <div class="modal-action">
-      <button class="btn btn-primary" id="modal-confirm-btn" type="button">
+      <button class="btn btn-primary" id="modal-confirm-btn" type="button" data-amount="{{ cart.get_grand_total|floatformat:2 }}">
         <i class="fa-solid fa-check"></i> Yes, Confirm Order
       </button>
 

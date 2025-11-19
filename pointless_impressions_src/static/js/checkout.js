@@ -57,12 +57,9 @@
 
   // pointless_impressions_src/theme/static_src/src/js/checkout.js
   var card = null;
+  var payments = null;
   var paymentInProgress = false;
-  function isDarkMode() {
-    return window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
-  }
   function getSquareCardStyles() {
-    const isDark = isDarkMode();
     const pointlessWhite = "#FAFAFA";
     const pointlessBlack = "#050505";
     const pointlessBlue = "#2563EB";
@@ -101,55 +98,13 @@
       if (!window.Square) {
         throw new Error("Square.js script not loaded");
       }
-      const payments = window.Square.payments(appId, locationId);
+      payments = window.Square.payments(appId, locationId);
       const cardStyles = getSquareCardStyles();
       card = await payments.card({ style: cardStyles });
       await card.attach("#card-container");
-      const darkModeQuery = window.matchMedia("(prefers-color-scheme: dark)");
-      darkModeQuery.addEventListener("change", async () => {
-        try {
-          if (card) {
-            await card.destroy();
-          }
-          const newStyles = getSquareCardStyles();
-          card = await payments.card({ style: newStyles });
-          await card.attach("#card-container");
-        } catch (e) {
-          console.error("Error updating Square card styles:", e);
-        }
-      });
     } catch (e) {
       console.error("Error initializing Square Payments:", e);
       if (window.Toast) window.Toast.show("Error initializing payment form.", "error");
-    }
-  }
-  async function refreshOrderSummary() {
-    window.location.reload();
-  }
-  async function handleCartUpdate(form) {
-    const formData = new FormData(form);
-    const artworkId = form.querySelector('input[name="artwork_id"]').value;
-    if (!artworkId) return;
-    try {
-      const response = await fetch("/checkout/update/", {
-        method: "POST",
-        headers: {
-          "X-Requested-With": "XMLHttpRequest",
-          "X-CSRFToken": getCsrfToken()
-        },
-        body: formData,
-        credentials: "include"
-      });
-      const data = await response.json();
-      if (data.success) {
-        if (window.Toast) window.Toast.show(data.message, "success");
-        await refreshOrderSummary();
-      } else {
-        if (window.Toast) window.Toast.show(data.error, "error");
-      }
-    } catch (err) {
-      console.error("Failed to submit form:", err);
-      if (window.Toast) window.Toast.show("Error updating cart.", "error");
     }
   }
   function getSelectText(id) {
@@ -375,20 +330,59 @@
         const formDataObj = Object.fromEntries(new FormData(checkoutForm).entries());
         try {
           if (!card) throw new Error("Payment form not initialized, please refresh the page.");
-          let billingPostcode = "";
-          const isSameAsShipping = document.getElementById("id_billing_same_as_shipping");
-          if (isSameAsShipping && isSameAsShipping.checked) {
-            billingPostcode = getValue("id_shipping_postcode");
+          const countryVal = getValue("id_billing_country") || getValue("id_shipping_country");
+          console.log("Raw Country Value:", countryVal);
+          const isoCountry = countryVal.length ? countryVal.trim().substring(0, 2).toUpperCase() : "GB";
+          const phonePrefixInput = document.getElementById("id_phone_0");
+          const phoneNumberInput = document.getElementById("id_phone_1");
+          const authUserPhone = document.getElementById("id_phone");
+          let fullPhone = "";
+          if (phonePrefixInput && phoneNumberInput && phonePrefixInput.offsetParent !== null) {
+            const rawPrefix = phonePrefixInput.value;
+            const cleanPrefix = rawPrefix.replace(/[^0-9+]/g, "");
+            fullPhone = (cleanPrefix + phoneNumberInput.value).trim();
+          } else if (authUserPhone) {
+            fullPhone = authUserPhone.value.replace(/[^0-9+]/g, "").trim();
           } else {
-            billingPostcode = getValue("id_billing_postcode");
+            let rawString = formDataObj["phone"] || formDataObj["id_phone_0"] + formDataObj["id_phone_1"] || "";
+            fullPhone = rawString.replace(/[^0-9+]/g, "").trim();
           }
-          if (!billingPostcode) throw new Error("Billing postcode is required.");
-          const tokenResult = await card.tokenize();
+          const amountString = finalConfirmBtn.dataset.amount;
+          if (!amountString) throw new Error("Payment amount not found.");
+          const verificationDetails = {
+            amount: amountString,
+            billingContact: {
+              givenName: getValue("id_billing_first_name") || getValue("id_shipping_first_name"),
+              familyName: getValue("id_billing_last_name") || getValue("id_shipping_last_name"),
+              email: getValue("id_email") || formDataObj["email"],
+              phone: fullPhone,
+              addressLines: [
+                getValue("id_billing_address_line_1") || getValue("id_shipping_address_line_2"),
+                getValue("id_billing_address_line_2") || getValue("id_shipping_address_line_2")
+              ],
+              city: getValue("id_billing_city") || getValue("id_shipping_city"),
+              postalCode: getValue("id_billing_postcode") || getValue("id_shipping_postcode"),
+              state: getValue("id_billing_county") || getValue("id_shipping_county"),
+              countryCode: isoCountry
+            },
+            currencyCode: "GBP",
+            intent: "CHARGE",
+            customerInitiated: true,
+            sellerKeyedIn: false
+          };
+          setTimeout(() => {
+            confirmModal.close();
+          }, 3e3);
+          if (placeOrderButton) {
+            placeOrderButton.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Processing...';
+            placeOrderButton.disabled = true;
+          }
+          const tokenResult = await card.tokenize(verificationDetails);
           if (tokenResult.status !== "OK") {
             const errorMsg = tokenResult.errors?.[0]?.message || "Tokenization failed";
             throw new Error(errorMsg);
           }
-          const response = await fetch(checkoutForm.action, {
+          const response = await fetch("/order/confirmation/", {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
@@ -401,26 +395,21 @@
             }),
             credentials: "include"
           });
-          const contentType = response.headers.get("Content-Type");
-          if (!contentType || !contentType.includes("application/json")) {
-            throw new Error("Unexpected response from server.");
-          }
-          const serverData = await response.json();
-          if (response.ok && serverData.status === "success") {
-            window.location.href = serverData.redirect_url;
+          const result = await response.json();
+          if (result.status === "success") {
+            window.location.href = result.redirect_url;
           } else {
-            let msg = serverData.message || "Payment processing failed.";
-            if (serverData.errors) {
-              msg += " (" + serverData.errors.join(" ") + ")";
-            }
-            throw new Error(msg);
+            throw new Error(result.message || "Payment failed");
           }
         } catch (err) {
           console.error("Payment failed:", err);
           if (modalLoadingSpinner) modalLoadingSpinner.style.display = "none";
           finalConfirmBtn.disabled = false;
           paymentInProgress = false;
-          confirmModal.close();
+          if (placeOrderButton) {
+            placeOrderButton.disabled = false;
+            placeOrderButton.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Processing...';
+          }
           const errorMessage = err.message || "An error occurred during payment processing.";
           if (window.Toast) {
             window.Toast.show(errorMessage, "error");
@@ -430,58 +419,6 @@
         }
       });
     }
-    document.body.addEventListener("submit", function(e) {
-      if (e.target.classList.contains("js-cart-item-form")) {
-        e.preventDefault();
-        handleCartUpdate(e.target);
-      }
-    });
-    document.body.addEventListener("click", function(e) {
-      const qtyBtn = e.target.closest(".js-qty-plus, .js-qty-minus");
-      if (qtyBtn) {
-        e.preventDefault();
-        const form = qtyBtn.closest(".js-cart-item-form");
-        if (form) {
-          const qtyInput = form.querySelector('input[name="quantity"]');
-          if (qtyInput) {
-            let val = parseInt(qtyInput.value, 10) || 0;
-            const max = parseInt(qtyInput.getAttribute("max"), 10) || 999;
-            const min = 0;
-            if (qtyBtn.classList.contains("js-qty-plus") && val < max) {
-              qtyInput.value = val + 1;
-            } else if (qtyBtn.classList.contains("js-qty-minus") && val > min) {
-              qtyInput.value = val - 1;
-            }
-          }
-        }
-        return;
-      }
-      const removeBtn = e.target.closest(".js-remove-item");
-      if (removeBtn) {
-        e.preventDefault();
-        const artworkId = removeBtn.getAttribute("data-artwork-id");
-        if (!artworkId) return;
-        fetch(`/checkout/remove-item/`, {
-          method: "POST",
-          headers: {
-            "X-Requested-With": "XMLHttpRequest",
-            "X-CSRFToken": getCsrfToken()
-          },
-          body: JSON.stringify({ artwork_id: artworkId }),
-          credentials: "include"
-        }).then((response) => response.json()).then((data) => {
-          if (data.success) {
-            if (window.Toast) window.Toast.show(data.message, "success");
-            refreshOrderSummary();
-          } else {
-            if (window.Toast) window.Toast.show(data.error, "error");
-          }
-        }).catch((err) => {
-          console.error("Failed to remove item:", err);
-          if (window.Toast) window.Toast.show("Error removing item.", "error");
-        });
-      }
-    });
   });
 })();
 //# sourceMappingURL=checkout.js.map

@@ -68,3 +68,25 @@ def calculate_delivery_cost(total_quantity):
         return Decimal(max_tier_fee)
 
     return Decimal('0.00')
+
+
+def serialize_items(cart):
+    """
+    Serialize cart items into a list of dictionaries.
+
+    Args:
+        cart (Cart): The shopping cart containing items to serialize.
+
+    Returns:
+        list: A list of dictionaries representing serialized cart items.
+    """
+    return [
+        {
+            'artwork_id': item.artwork.id,
+            'quantity': item.quantity,
+            'price': str(item.price_at_purchase),
+            'framing_condition': item.framing_condition,
+            'notes': item.notes,
+        }
+        for item in cart.items.all()
+    ]

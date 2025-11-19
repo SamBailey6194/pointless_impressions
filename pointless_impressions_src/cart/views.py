@@ -62,7 +62,7 @@ class CheckoutView(TemplateView):
                         initial={
                             'quantity': item.quantity,
                             'framing_option': (
-                                item.framing_condition.condition_friendly_name
+                                item.framing_condition.id
                                 if item.framing_condition else None
                             ),
                         },
