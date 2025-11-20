@@ -24,11 +24,11 @@
       {% comment %} Open Graph Image Block uses Cloudinary {% endcomment %}
       {% comment %}
       {% if artwork.main_photo %}
-          <meta property="og:image" content="{% cloudinary_url artwork.main_photo width=1200 height=630 crop='fill' format='webp' quality='auto' %}">
+          <meta property="og:image" content="{% cloudinary_url artwork.main_photo width=1200 height=630 crop='fill' format='webp' quality='auto' crossorigin='anonymous' %}">
       {% elif post.featured_image %}
-          <meta property="og:image" content="{% cloudinary_url post.featured_image width=1200 height=630 crop='fill' format='webp' quality='auto' %}">
+          <meta property="og:image" content="{% cloudinary_url post.featured_image width=1200 height=630 crop='fill' format='webp' quality='auto' crossorigin='anonymous' %}">
       {% elif site_logo %}
-          <meta property="og:image" content="{% cloudinary_url site_logo.image width=1200 height=630 crop='fill' format='webp' quality='auto' %}">
+          <meta property="og:image" content="{% cloudinary_url site_logo.image width=1200 height=630 crop='fill' format='webp' quality='auto' crossorigin='anonymous' %}">
       {% endif %}
       {% endcomment %}
 
@@ -47,18 +47,18 @@
       {% comment %} Favicon {% endcomment %}
       {# Modern browsers with auto format (AVIF/WebP/PNG fallback) #}
       {% cloudinary_url site_logo_white_bg.image width=32 height=32 crop='fit' format='svg' quality='auto' as favicon_32 %}
-      <link rel="icon" type="image/png" sizes="32x32" href="{{ favicon_32 }}">
+      <link rel="icon" type="image/png" sizes="32x32" href="{{ favicon_32 }}" crossorigin="anonymous">
       
       {% cloudinary_url site_logo_white_bg.image width=16 height=16 crop='fit' format='svg' quality='auto' as favicon_16 %}
-      <link rel="icon" type="image/png" sizes="16x16" href="{{ favicon_16 }}">
+      <link rel="icon" type="image/png" sizes="16x16" href="{{ favicon_16 }}" crossorigin="anonymous">
       
       {# Apple Touch Icon #}
       {% cloudinary_url site_logo_white_bg.image width=180 height=180 crop='fit' format='webp' quality='auto' as apple_touch %}
-      <link rel="apple-touch-icon" href="{{ apple_touch }}">
+      <link rel="apple-touch-icon" href="{{ apple_touch }}" crossorigin="anonymous">
       
       {# Android Chrome #}
       {% cloudinary_url site_logo_white_bg.image width=192 height=192 crop='fit' format='webp' quality='auto' as android_192 %}
-      <link rel="icon" type="image/png" sizes="192x192" href="{{ android_192 }}">
+      <link rel="icon" type="image/png" sizes="192x192" href="{{ android_192 }}" crossorigin="anonymous">
     {% endblock %}
 
     {% block extra_meta %}

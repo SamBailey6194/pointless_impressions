@@ -186,7 +186,7 @@
             <figure>
               {% with image_to_render=artwork.main_photo|default:placeholder_image %}
                 {% comment %} An image exists for this artwork {% endcomment %}
-                {% cloudinary image_to_render.image format="webp" quality="auto" width=400 height=300 crop="fill" class="w-full h-64 object-cover" alt=image_to_render.alt_text_or_default %}
+                {% cloudinary image_to_render.image format="webp" quality="auto" width=400 height=300 crop="fill" class="w-full h-64 object-cover" alt=image_to_render.alt_text_or_default crossorigin="anonymous" %}
               {% endwith %}
             </figure>
             <div class="card-body">

@@ -96,7 +96,7 @@ def _serialize_artwork_data(artwork_queryset, placeholder_image):
                     # Clean placeholder path if ID is missing
                     if not image_public_id and hasattr(
                         placeholder_image_obj, 'image'
-                        ):
+                    ):
                         raw_path = str(placeholder_image_obj.image)
                         image_public_id = re.sub(
                             r'^(image/upload/)?(v\d+/)?', '', raw_path
@@ -151,7 +151,7 @@ def _serialize_artwork_data(artwork_queryset, placeholder_image):
                 'is_featured': artwork.is_featured,
                 'sku': artwork.sku,
                 'slug': artwork.slug,
-                'image_url': image_url, 
+                'image_url': image_url,
                 'image_public_id': image_public_id,
                 'image_alt_text': image_alt_text,
                 'created_at': artwork.created_at.isoformat() if getattr(

@@ -221,7 +221,8 @@ cloudinary.config(
     cloud_name=CLOUDINARY_CLOUD_NAME,
     api_key=CLOUDINARY_API_KEY,
     api_secret=CLOUDINARY_API_SECRET,
-    secure=True
+    secure=True,
+    api_proxy="https://res.cloudinary.com"
 )
 
 # Default primary key field type
