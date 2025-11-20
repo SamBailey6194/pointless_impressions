@@ -1,0 +1,44 @@
+# -----------------------------
+# Markdown
+# -----------------------------
+*.md
+docs/
+
+# -----------------------------
+# Environment Example files 
+# -----------------------------
+.env.dev.example
+.env.staging.example
+.env.production.example
+
+# -----------------------------
+# Docker Files
+# -----------------------------
+/**/*-entrypoint.sh
+.dockerignore
+Dockerfile.*
+docker-compose.*.yml
+*.sh
+redis.conf
+
+# -----------------------------
+# Tests
+# -----------------------------
+**/static_src/cypress.config.js
+**/static_src/jest.config.js
+**/static_src/src/tests.js/**
+
+# -----------------------------
+# Generated / local CSS (will be hashed in build)
+# -----------------------------
+**/static/css/styles.css
+
+# -----------------------------
+# Media files - stored in Cloudinary, not needed in production
+# -----------------------------
+pointless_impressions_src/media/
+
+# -----------------------------
+# Coverage reports
+# -----------------------------
+coverage/

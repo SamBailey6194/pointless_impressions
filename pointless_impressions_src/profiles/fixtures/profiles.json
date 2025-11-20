@@ -1,0 +1,94 @@
+[
+    {
+        "model": "profiles.UserProfile",
+        "fields": { "user": 1 }
+    },
+    {
+        "model": "profiles.Customer",
+        "fields": { "user_profile": 1 }
+    },
+    {
+        "model": "profiles.StaffRole",
+        "fields": {
+            "user_profile": 1,
+            "role": "OWNER",
+            "created_at": "2023-01-01T00:00:00Z"
+        }
+    },
+    {
+        "model": "profiles.UserProfile",
+        "fields": { "user": 2 }
+    },
+    {
+        "model": "profiles.Customer",
+        "fields": { "user_profile": 2 }
+    },
+    {
+        "model": "profiles.StaffRole",
+        "fields": {
+            "user_profile": 2,
+            "role": "MANAGER",
+            "created_at": "2023-01-02T00:00:00Z"
+        }
+    },
+    {
+        "model": "profiles.UserProfile",
+        "fields": { "user": 3 }
+    },
+    {
+        "model": "profiles.Customer",
+        "fields": { "user_profile": 3 }
+    },
+    {
+        "model": "profiles.StaffRole",
+        "fields": {
+            "user_profile": 3,
+            "role": "EMPLOYEE",
+            "created_at": "2023-01-03T00:00:00Z"
+        }
+    },
+    {
+        "model": "profiles.UserProfile",
+        "fields": { "user": 4 }
+    },
+    {
+        "model": "profiles.Customer",
+        "fields": { "user_profile": 4 }
+    },
+    {
+        "model": "profiles.UserProfile",
+        "fields": { "user": 5 }
+    },
+    {
+        "model": "profiles.Customer",
+        "fields": { "user_profile": 5 }
+    },
+    {
+        "model": "profiles.UserProfile",
+        "fields": { "user": 6 }
+    },
+    {
+        "model": "profiles.Customer",
+        "fields": { "user_profile": 6 }
+    },
+    {
+        "model": "profiles.UserProfile",
+        "fields": { "user": 7 }
+    },
+    {
+        "model": "profiles.Customer",
+        "fields": { "user_profile": 7 }
+    },
+    {
+        "model": "profiles.Artist",
+        "fields": { 
+            "user_profile": 7, 
+            "bio": "Passionate artist specializing in digital illustrations and concept art.",
+            "portfolio_url": "https://artist7portfolio.com",
+            "social_links": {
+                "instagram": "https://instagram.com/artist7",
+                "x": "https://x.com/artist7"
+            }
+        }
+    }
+]

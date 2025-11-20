@@ -15,7 +15,6 @@ env/
 *.pot
 *.mo
 /staticfiles/
-media/
 docs/
 READEME.md
 
@@ -48,7 +47,6 @@ docker-compose.override.*.yml.bak
 # -----------------------------
 node_modules/
 **/node_modules
-package-lock.json
 npm-debug.log
 dist/
 build/
@@ -84,3 +82,10 @@ coverage.xml
 *.py,cover
 .cache
 pytest_cache/
+
+
+# -----------------------------
+# Other Ignores
+# -----------------------------
+fixture_passwords.txt
+.github/workflows/*

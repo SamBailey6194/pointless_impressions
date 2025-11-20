@@ -1,0 +1,327 @@
+{% load static cloudinary tailwind_tags %}
+
+<body data-toast-success="{{ messages.success|escapejs }}" data-toast-error="{{ messages.error|escapejs }}">
+
+<div class="w-full">
+  {% comment %} Main Navbar - Logo and Actions {% endcomment %}
+  <nav class="navbar shadow-lg min-h-16">
+    {% comment %} Logo Section {% endcomment %}
+    <div class="navbar-start">
+      <a href="{% url 'home' %}" class="btn btn-ghost normal-case text-xl h-auto p-2">
+        {% with image_to_render=site_logo %}
+          {% cloudinary image_to_render.image height=60 crop='fit' format='auto' quality='auto' alt=image_to_render.alt_text_or_default class="h-8 sm:h-10 md:h-12 w-auto" %}
+        {% endwith %}
+      </a>
+    </div>
+
+    {% comment %} Center Section - Desktop Navigation Menu and Mobile Search {% endcomment %}
+    <div class="navbar-center">
+      {% comment %} Desktop Navigation Menu {% endcomment %}
+      <nav class="hidden md:flex items-center justify-center w-full">
+        <div class="flex flex-row items-center gap-1">
+          <a href="{% url 'home' %}" class="btn btn-ghost rounded-lg px-4 py-2 flex items-center gap-2">
+            <i class="fa-solid fa-home"></i> Home
+          </a>
+          <div class="dropdown dropdown-hover">
+            <label tabindex="0" class="btn btn-ghost rounded-lg px-4 py-2 flex items-center gap-2">
+              <i class="fa-solid fa-store"></i> Shop
+              <i class="fa-solid fa-circle-chevron-down"></i>
+            </label>
+            <ul tabindex="0" class="menu menu-sm dropdown-content z-10 p-2 shadow-lg rounded-box w-52">
+              <li>
+                <a href="{% url 'artwork:list' %}">
+                  <i class="fa-solid fa-list"></i>All Artwork
+                </a>
+              </li>
+              <li>
+                <div class="dropdown dropdown-click">
+                    <label tabindex="0" class="rounded-lg flex items-center gap-2">
+                        <i class="fa-solid fa-palette"></i>Artwork Categories
+                        <i class="fa-solid fa-circle-chevron-down"></i>
+                    </label>
+                    <ul tabindex="0" class="menu menu-sm dropdown-content z-10 p-2 shadow-lg rounded-box w-52 ml-32">
+                        {% for category in artwork_categories %}
+                            <li>
+                                <a href="{% url 'artwork:list' %}?category={{ category.slug }}" class="hover:bg-(--pointless-yellow)">
+                                    {{ category.friendly_name|default:category.name }}
+                                </a>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+              </li>
+              <li>
+                <div class="dropdown dropdown-click">
+                    <label tabindex="0" class="rounded-lg flex items-center gap-2">
+                        <i class="fa-solid fa-crop-simple"></i>Framing Options
+                        <i class="fa-solid fa-circle-chevron-down"></i>
+                    </label>
+                    <ul tabindex="0" class="menu menu-sm dropdown-content z-10 p-2 shadow-lg rounded-box w-52 ml-28">
+                        {% for framing in framing_options %}
+                            <li>
+                                <a href="{% url 'artwork:list' %}?selected_condition={{ framing.slug }}" class="hover:bg-(--pointless-yellow)">
+                                    {{ framing.condition_friendly_name|default:framing.condition_name }}
+                                </a>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>  
+              </li>
+              <li>
+                <div class="dropdown dropdown-click">
+                  <label tabindex="0" class="rounded-lg flex items-center gap-2">
+                      <i class="fa-solid fa-brush"></i>Artists
+                      <i class="fa-solid fa-circle-chevron-down"></i>
+                  </label>
+                  <ul tabindex="0" class="menu menu-sm dropdown-content z-10 p-2 shadow-lg rounded-box w-52 ml-14">
+                      {% for artist in artists %}
+                          <li>
+                              <a href="{% url 'artwork:list' %}?artist={{ artist.user_profile.user.username }}" class="hover:bg-(--pointless-yellow)">
+                                  {{ artist.user_profile.user.username|title }}
+                              </a>
+                          </li>
+                      {% endfor %}
+                  </ul>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </nav>
+
+      {% comment %} Mobile Search Button - Hidden on desktop (md+) {% endcomment %}
+      <div class="flex md:hidden items-center justify-center">
+        <button class="btn btn-ghost btn-circle" onclick="toggleMobileSearch()">
+          <i class="fa-solid fa-magnifying-glass text-lg"></i>
+        </button>
+      </div>
+    </div>
+
+    {% comment %} Right Section - Actions {% endcomment %}
+    <div class="navbar-end">
+      <div class="flex items-center gap-2">
+
+        {% comment %} Account Dropdown {% endcomment %}
+        <div class="flex flex-col items-center">
+          <div class="dropdown dropdown-end">
+            <label tabindex="0" class="btn btn-ghost btn-circle flex flex-col items-center h-auto px-2 py-1 normal-case">
+              {% if request.user.is_authenticated and request.user.user_profile.profile_picture %}
+                {% comment %} 
+                  Display user's profile picture if logged in and has one 
+                {% endcomment %}
+                {% with profile_pic=request.user.user_profile.profile_picture %}
+                  {% cloudinary profile_pic.image format="webp" quality="auto" width=80 height=80 crop="fill" class="w-10 rounded-full" alt=profile_pic.alt_text_or_default %}
+                {% endwith %}
+
+              {% else %}
+                {% comment %} 
+                  Fallback for logged-out users OR users with no profile pic
+                {% endcomment %}
+                <div class="avatar placeholder">
+                  <i class="fa-solid fa-user text-lg"></i>
+                </div>
+              {% endif %}
+            </label>      
+            <ul tabindex="0" class="menu menu-sm dropdown-content mt-3 z-10 p-2 shadow-lg rounded-box w-52">
+              {% if request.user.is_authenticated %}
+                <li class="menu-title text-(--pointless-blue) md:hidden">
+                  <span>Welcome, {{ request.user.username|title }}</span>
+                </li>
+                {% comment %} Django Site Admin for Developers {% endcomment %}
+                {% if request.user.is_staff %}
+                  <li>
+                    <a href="{% url 'admin' %}" class="hover:bg-(--pointless-yellow)">
+                      <i class="fa-solid fa-shield-halved"></i> Site Admin (Dev)
+                    </a>
+                  </li>
+                {% endif %}
+                {% comment %} Custom Dashboard Access for Admin {% endcomment %}
+                {% if request.user.is_dashboard_admin %}
+                  <li>
+                    <a href="{% url 'dashboard:admin_dashboard' user.public_id %}" class="hover:bg-(--pointless-yellow)">
+                      <i class="fa-solid fa-cog"></i> Admin Dashboard
+                    </a>
+                  </li>
+                {% endif %}
+                <li>
+                  <a href="{% url 'dashboard:user_profile_dashboard' user.public_id %}" class="hover:bg-(--pointless-yellow)">
+                    <i class="fa-solid fa-user-circle"></i> My Profile
+                  </a>
+                </li>
+                <div class="divider my-1"></div>
+                <li>
+                  <button class="hover:bg-(--pointless-red) hover:text-white" id="logout-button">
+                    <i class="fa-solid fa-sign-out-alt"></i> Logout
+                  </button>
+                </li>
+              {% else %}
+                <li class="menu-title text-(--pointless-blue) md:hidden">
+                  <span>Welcome, Guest</span>
+                </li>
+                <li>
+                  <button class="hover:bg-(--pointless-yellow)" id="login-button">
+                    <i class="fa-solid fa-sign-in-alt"></i> Login
+                  </button>
+                </li>
+                <li>
+                  <a href="{% url 'profiles:signup' %}" class="hover:bg-(--pointless-yellow)">
+                    <i class="fa-solid fa-user-plus"></i> Sign Up
+                  </a>
+                </li>
+                <li>
+                  <a href="{% url 'profiles:artist_application' %}" class="hover:bg-(--pointless-yellow)">
+                    <i class="fa-solid fa-user-plus"></i> Artists: Apply Here
+                  </a>
+                </li>
+              {% endif %}
+            </ul>
+          </div>
+          <div class="hidden md:block text-sm mt-1">
+            {% if request.user.is_authenticated %}
+              <span class="font-medium">{{ request.user.username|title }}'s Account</span>
+            {% else %}
+              <span class="font-medium">Account</span>
+            {% endif %}
+          </div>
+        </div>
+
+        {% comment %} Cart Dropdown {% endcomment %}
+        <div class="flex flex-col items-center">
+            <div class="dropdown dropdown-end">
+
+                <label tabindex="0" class="btn btn-ghost btn-circle">
+                    <div class="indicator">
+                        <i class="fa-solid fa-cart-shopping text-lg"></i>
+                        <span class="badge badge-sm indicator-item translate-x-5 -translate-y-4" id="cart-count-badge">{{ total_quantity|default:"0" }}</span>
+                    </div>
+                </label>
+                
+                <div tabindex="0" 
+                     id="cart-dropdown-content" 
+                     class="card card-compact dropdown-content w-80 shadow-lg mt-3 z-10">
+                    
+                    <div class="card-body">
+                        <p>Loading cart...</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="hidden md:block text-sm mt-1">
+                {% if not forloop.parentloop %}
+                    {% if request.user.is_authenticated %}
+                        <span class="font-medium">{{ request.user.username|title }}'s Cart</span>
+                    {% else %}
+                        <span class="font-medium">Your Cart</span>
+                    {% endif %}
+                {% endif %}
+            </div>
+        </div>
+
+        {% comment %} Mobile Hamburger Menu {% endcomment %}
+        <div class="dropdown dropdown-end md:hidden">
+          <label tabindex="0" class="btn btn-ghost btn-circle">
+            <i class="fa-solid fa-bars text-lg"></i>
+          </label>
+          <ul tabindex="0" class="menu menu-sm dropdown-content mt-3 z-50 p-2 shadow-lg rounded-box w-48 right-0">
+            <li>
+              <a href="{% url 'home' %}" class="hover:bg-(--pointless-yellow)">
+                <i class="fa-solid fa-home"></i> Home
+              </a>
+            </li>
+            <li class="dropdown">
+              <a tabindex="0" class="hover:bg-(--pointless-yellow)">
+                <i class="fa-solid fa-store"></i> Shop
+                <i class="fa-solid fa-circle-chevron-down"></i>
+              </a>
+              <ul tabindex="0" class="menu menu-sm dropdown-content z-10 shadow-lg rounded-box w-52">
+                <li>
+                  <a href="{% url 'artwork:list' %}">
+                    <i class="fa-solid fa-list"></i>All Artwork
+                  </a>
+                </li>
+                <li class="dropdown">
+                  <a tabindex="0">
+                    <i class="fa-solid fa-palette"></i>Artwork Categories
+                    <i class="fa-solid fa-circle-chevron-down"></i>
+                  </a>
+                </li>
+                <ul tabindex="0">
+                {% for category in artwork_categories %}
+                  <li>
+                    <a href="{% url 'artwork:list' %}?category={{ category.slug }}">
+                      {{ category.friendly_name|default:category.name }}
+                    </a>
+                  </li>
+                {% endfor %}
+                </ul>
+                <li class="dropdown">
+                  <a tabindex="0">
+                    <i class="fa-solid fa-crop-simple"></i>Framing Options
+                    <i class="fa-solid fa-circle-chevron-down"></i>
+                  </a>
+                </li>
+                <ul tabindex="0">
+                {% for framing in framing_options %}
+                  <li>
+                    <a href="{% url 'artwork:list' %}?selected_condition={{ framing.slug }}">
+                      {{ framing.condition_friendly_name|default:framing.condition_name }}
+                    </a>
+                  </li>
+                {% endfor %}
+                </ul>
+                <li class="dropdown">
+                  <a tabindex="0">
+                    <i class="fa-solid fa-palette"></i>Artists
+                    <i class="fa-solid fa-circle-chevron-down"></i>
+                  </a>
+                </li>
+                <ul tabindex="0">
+                {% for artist in artists %}
+                  <li>
+                    <a href="{% url 'artwork:list' %}?artist={{ artist.user.username }}">
+                      {{ artist.user.username|title }}
+                    </a>
+                  </li>
+                {% endfor %}
+                </ul>
+              </ul>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  {% comment %} Full Width Search Bar (desktop only) {% endcomment %}
+  <div class="hidden md:block py-3">
+    <div class="max-w-6xl mx-auto px-4">
+      <div class="max-w-md mx-auto">
+        <div class="flex w-full relative">
+          <form method="get" action="{% url 'search:search_results' %}" class="flex w-full">
+            <input type="text" name="q" id="desktop-search-input" placeholder="Search products, artists..." autocomplete="off" class="custom-input flex-1 rounded-r-none" />
+            <button type="submit" class="btn rounded-l-none">
+              <i class="fa-solid fa-magnifying-glass"></i>
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {% comment %} Mobile Search Bar (toggleable) {% endcomment %}
+  <div id="mobile-search-bar" class="hidden md:hidden pb-4 w-full">
+    <div class="w-full px-2">
+      <div class="flex w-full relative">
+        <form method="get" action="{% url 'search:search_results' %}" class="flex w-full">
+          <input type="text" name="q" id="mobile-search-input" placeholder="Search products, artists..." autocomplete="off" class="custom-input w-full rounded-r-none" />
+          <button type="submit" class="btn rounded-l-none">
+            <i class="fa-solid fa-magnifying-glass"></i>
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  {% comment %} Yellow line under the search bar {% endcomment %}
+  <div class="border-t border-(--pointless-yellow)"></div>
+</div>

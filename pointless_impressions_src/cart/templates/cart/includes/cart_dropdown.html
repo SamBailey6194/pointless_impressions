@@ -1,0 +1,64 @@
+{% load static tailwind_tags cloudinary %}
+
+<div class="card-body">
+    <span class="font-bold text-lg text-(--pointless-blue)">
+        {% if total_quantity > 0 %}
+            <span id="cart-items-text">{{ total_quantity }} Items</span> in Cart
+        {% else %}
+            <span id="cart-items-text">0 Items</span> in Cart
+        {% endif %}
+    </span>
+    <ul id="cart-items-list">
+        {% for item in cart_items %}
+            <li class="flex items-center gap-4 py-2">
+                {% if item.artwork_image_url %}
+                    {% cloudinary item.artwork_image_url height=48 crop='fit' format='auto' quality='auto' alt=item.artwork_name class="w-12 h-12 object-cover rounded" %}
+                {% else %}
+                    <div class="w-12 h-12 rounded bg-gray-200 flex items-center justify-center">
+                        <i class="fa-solid fa-image text-gray-400"></i>
+                    </div>
+                {% endif %}
+                <div class="flex-1">
+                    <span class="block font-medium">{{ item.artwork_name }}</span>
+                    <span class="block text-sm">Framing: {{ item.framing_condition }}</span>
+                    <span class="block text-sm">Quantity: {{ item.quantity }}</span>
+                    <span class="block text-sm">Price: £{{ item.price|floatformat:2 }}</span>
+                </div>
+            </li>
+        {% empty %}
+            <li class="py-2">
+                <span class="block font-medium">Cart is empty.</span>
+            </li>
+        {% endfor %}
+    </ul>
+    {% if total_quantity > 0 %}
+        <span class="text-(--pointless-blue)"><strong>Subtotal:</strong> £{{ subtotal|floatformat:2 }}</span>
+        {% if delivery_cost %}
+            <span class="text-(--pointless-blue)"><strong>Delivery:</strong> £{{ delivery_cost|floatformat:2 }}</span>
+        {% else %}
+            <span class="text-(--pointless-blue)"><strong>Delivery:</strong> Free</span>
+        {% endif %}
+        <span class="text-(--pointless-blue) font-extrabold">Total: £{{ grand_total|floatformat:2 }}</span>
+        {% if items_needed_for_free_delivery > 0 %}
+            <span class="text-xs text-(--pointless-blue) ">Add <strong>{{ items_needed_for_free_delivery }}</strong> more item{{ items_needed_for_free_delivery|pluralize }} for free delivery!</span>
+        {% endif %}
+        <span class="card-actions">
+            <a href="{% url 'cart:checkout' %}" class="btn btn-ghost w-full">
+            <i class="fa-solid fa-shopping-bag"></i> View Cart
+            </a>
+        </span>
+    {% else %}
+        <a href="{% url 'artwork:list' %}" class="btn btn-ghost w-full">
+        <i class="fa-solid fa-store"></i> Shop Now
+        </a>
+    {% endif %}
+</div>
+
+<script>
+  (function() {
+    const badge = document.getElementById('cart-items-text');
+    if (badge) {
+      badge.textContent = '{{ total_quantity|default:0 }}';
+    }
+  })();
+</script>

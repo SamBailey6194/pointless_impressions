@@ -18,8 +18,8 @@ env/
 *.pot
 *.mo
 db.sqlite3
+db.sqlite3-journal
 /staticfiles/
-media/
 
 # -----------------------------
 # Environment / secrets
@@ -36,7 +36,7 @@ media/
 # -----------------------------
 # Docker
 # -----------------------------
-*.dockerfile              # Optional: ignore local Dockerfile variants if you want
+*.dockerfile
 docker-compose.override.yml
 docker-compose.override.*.yml
 docker-compose.override.yml.bak
@@ -49,7 +49,6 @@ docker-compose.override.*.yml.bak
 # Node / npm (if used)
 # -----------------------------
 node_modules/
-package-lock.json
 npm-debug.log
 
 # -----------------------------
@@ -74,6 +73,7 @@ Thumbs.db
 # -----------------------------
 # Coverage / testing
 # -----------------------------
+coverage/
 htmlcov/
 .coverage
 .tox/
@@ -83,3 +83,14 @@ coverage.xml
 *.py,cover
 .cache
 pytest_cache/
+
+
+# -----------------------------
+# Fixture Password Ignore
+# -----------------------------
+fixture_passwords.txt
+
+# -----------------------------
+# Media files
+# -----------------------------
+pointless_impressions_src/media/

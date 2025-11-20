@@ -8,7 +8,7 @@
   - [Table of Contents](#table-of-contents)
   - [Sprint 1: Core Setup \& Artwork Display (11 points)](#sprint-1-core-setup--artwork-display-11-points)
   - [Sprint 2: Cart \& Checkout (11 points)](#sprint-2-cart--checkout-11-points)
-  - [Sprint 3: Stripe Payments \& Order Confirmation (11 points)](#sprint-3-stripe-payments--order-confirmation-11-points)
+  - [Sprint 3: Square Payments \& Order Confirmation (11 points)](#sprint-3-square-payments--order-confirmation-11-points)
   - [Sprint 4: User Accounts \& Order Tracking (11 points)](#sprint-4-user-accounts--order-tracking-11-points)
   - [Sprint 5: Full Order Tracking \& Admin Content Management (11 points)](#sprint-5-full-order-tracking--admin-content-management-11-points)
   - [Sprint 6: Blog \& Marketing Integrations (11 points)](#sprint-6-blog--marketing-integrations-11-points)
@@ -50,17 +50,17 @@
 
 ---
 
-## Sprint 3: Stripe Payments & Order Confirmation (11 points)
+## Sprint 3: Square Payments & Order Confirmation (11 points)
 **Goal:** Process secure payments and send confirmation emails after successful orders.  
 
 **Included User Stories:**  
-- US005: Pay Securely with Stripe — 8 pts  
+- US005: Pay Securely with Square — 8 pts  
 - US013 (partial): Order Confirmation (Email only) — 3 pts  
 
 **Total:** 11 pts  
 
 **Focus:**  
-- Integrate Stripe for payment processing and webhooks.  
+- Integrate Square for payment processing and webhooks.  
 - Update order status upon successful payment.  
 - Send confirmation email with basic details and receipt.  
 

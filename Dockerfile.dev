@@ -5,8 +5,11 @@ FROM python:3.13-slim-bookworm
 # Set environment variables
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
+ENV DEBIAN_FRONTEND=noninteractive
+ENV NODE_VERSION=24.2.0
+ENV NPM_VERSION=11.3.0
 
-# Wokrking directory
+# Working directory
 WORKDIR /app
 
 # System dependencies
@@ -15,27 +18,40 @@ RUN apt-get update && apt-get install -y \
     netcat-openbsd \
     gcc \
     libpq-dev \
-    && curl -fsSL https://deb.nodesource.com/setup_24.x | bash - \
-    && apt-get install -y nodejs \
-    && npm install -g npm@11.6.2 \
-    && apt-get install -y inotify-tools \
+    xz-utils \
     && rm -rf /var/lib/apt/lists/*
+
+# Install Node.js 24.2.0 and npm 11.3.0 from official binaries
+RUN curl -fsSL https://nodejs.org/dist/v${NODE_VERSION}/node-v${NODE_VERSION}-linux-x64.tar.xz -o node.tar.xz && \
+    tar -xJf node.tar.xz -C /usr/local --strip-components=1 && \
+    rm node.tar.xz && \
+    npm install -g npm@${NPM_VERSION} && \
+    node --version && \
+    npm --version
 
 # UV binary
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
 
-# Install dependencies
+# Install Python dependencies
 COPY requirements.txt .
 RUN uv pip install --upgrade pip --system && \
     uv pip install -r requirements.txt --system
 
 # Copy project files
+COPY package.json package-lock.json* ./
+COPY jest.config.js cypress.config.js ./
+
+# Install Node dependencies at project root
+RUN CYPRESS_INSTALL_BINARY=0 npm install
+
+# Copy project files
 COPY pointless_impressions_src/ ./pointless_impressions_src/
+COPY manage.py .
 
 # Make entrypoint executable
 RUN chmod +x ./pointless_impressions_src/dev-entrypoint.sh
 
-# Expose port
+# Expose ports
 EXPOSE 8000
 
 # Default command

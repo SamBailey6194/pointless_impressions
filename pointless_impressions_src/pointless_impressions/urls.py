@@ -17,13 +17,38 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
+from django.conf.urls.static import static
+from . import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include('home.urls')),
+    path('', include('pointless_impressions_src.home.urls')),
+    path('artworks/', include(
+        'pointless_impressions_src.artwork.urls', namespace='artwork'),
+        ),
+    path('checkout/', include(
+        'pointless_impressions_src.cart.urls', namespace='cart'),
+        ),
+    path('dashboard/', include('pointless_impressions_src.dashboard.urls')),
+    path('health/', views.health_check, name='health'),
+    path('order/', include('pointless_impressions_src.order.urls')),
+    path('profiles/', include('pointless_impressions_src.profiles.urls')),
+    path('search/', include('pointless_impressions_src.search.urls')),
 ]
 
 if settings.DEBUG:
     urlpatterns += [
         path("__reload__/", include("django_browser_reload.urls")),
     ]
+    urlpatterns += static(
+        settings.STATIC_URL, document_root=settings.STATIC_ROOT
+    )
+
+handler400 = 'pointless_impressions.views.error_400_view'
+handler401 = 'pointless_impressions.views.error_401_view'
+handler403 = 'pointless_impressions.views.error_403_view'
+handler404 = 'pointless_impressions.views.error_404_view'
+handler408 = 'pointless_impressions.views.error_408_view'
+handler500 = 'pointless_impressions.views.error_500_view'
+handler502 = 'pointless_impressions.views.error_502_view'
+handler503 = 'pointless_impressions.views.error_503_view'
