@@ -55,6 +55,10 @@ I implemented a comprehensive SEO strategy directly within the Django `base.html
 
 **Result:** Every page of Pointless Impressions is optimised for search engines, social media sharing, and user experience, while sensitive pages are protected from indexing. This setup reduces maintenance overhead by centralising SEO logic in a single template.
 
+### Payments Feature
+
+Due to the client having an existing Square account with a subscription already set up, I integrated Square payments into the checkout process. This allows users to securely complete their purchases using Square's payment gateway, ensuring compliance with payment regulations and providing a seamless checkout experience. The features are listed in the next section.
+
 ### Existing Features
 
 #### Header & Navigation (Responsive Navbar)
@@ -421,7 +425,7 @@ Toast.handleAPIError(error)                // Displays API error messages
 
 **Image Optimization:**
 - **Development**: Local image URLs via Django media storage
-- **Production**: Cloudinary with auto-formatting (format="webp"), quality optimization (quality="auto")
+- **Production**: Cloudinary with auto-formatting (format="auto"), quality optimization (quality="auto")
 - **Responsive Images**: Width/height specifications for each context
 - **Fallback Handling**: Placeholder icons for missing images
 
@@ -437,6 +441,8 @@ Toast.handleAPIError(error)                // Displays API error messages
 ---
 
 ### Features Left to Implement
+
+Some of the features listed below have the backend structure in place but need frontend implementation or further refinement:
 
 - Blog App with full CRUD functionality for posts and comments
 - Adding and editing Addresses in User Profile

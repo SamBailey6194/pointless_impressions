@@ -4,12 +4,11 @@ from django.contrib import messages
 from django.shortcuts import redirect, render
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import JsonResponse
-from .models import UserProfile, Customer, Artist
+from .models import UserProfile, Customer
 from .forms import (
     SignupForm,
     LoginForm,
     EmailVerificationForm,
-    ArtistApplicationForm,
     AddressForm,
     LogoutForm
 )
@@ -241,131 +240,6 @@ class VerifyEmailView(FormView, EmailNotVerifiedMixin, CustomerRequiredMixin):
         except EmailVerificationCode.DoesNotExist:
             messages.error(self.request, "Invalid verification code.")
             return self.form_invalid(form)
-
-
-class ArtistApplicationView(FormView):
-    """
-    Artist application view that handles the submission of artist applications.
-
-    Features:
-    - Uses multiple forms: SignupForm, PhotoForm, AddressForm,
-      and ArtistApplicationForm.
-    - Handles both new user registration and existing user applications.
-    - Displays success or error messages based on form submission outcome.
-
-    Template:
-    - 'profiles/templates/profiles/artist_application.html'
-
-    Context:
-    - signup_form: Instance of SignupForm for new user registration.
-    - photo_form: Instance of PhotoForm for photo uploads.
-    - address_form: Instance of AddressForm for address details.
-    - artist_application_form: Instance of ArtistApplicationForm for
-      artist-specific details.
-    """
-    template_name = 'profiles/artist_application.html'
-    form_class = ArtistApplicationForm
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        if self.request.user.is_authenticated:
-            context['artist_application_form'] = ArtistApplicationForm()
-        else:
-            context['signup_form'] = SignupForm()
-            context['profile_pic_form'] = ProfilePhotoForm()
-            context['address_form'] = AddressForm()
-            context['artist_application_form'] = ArtistApplicationForm()
-        return context
-
-    def post(self, request, *args, **kwargs):
-        if request.user.is_authenticated:
-            artist_application_form = ArtistApplicationForm(request.POST)
-
-            if artist_application_form.is_valid():
-                artist_application = artist_application_form.save(commit=False)
-                artist = Artist.objects.create(
-                    user_profile=request.user.user_profile,
-                    is_approved=False
-                )
-                artist_application.user = artist
-                artist_application.save()
-
-                messages.success(
-                    request, "Your artist application has been submitted."
-                )
-                return render(
-                    request, self.template_name, self.get_context_data()
-                )
-
-            messages.error(request, "Please correct the errors in the form.")
-            return render(
-                request,
-                self.template_name,
-                {'artist_application_form': artist_application_form},
-            )
-        else:
-            signup_form = SignupForm(request.POST)
-            profile_pic_form = ProfilePhotoForm(
-                request.POST, request.FILES
-            )
-            address_form = AddressForm(request.POST)
-            artist_application_form = ArtistApplicationForm(request.POST)
-
-            if (
-                signup_form.is_valid()
-                and profile_pic_form.is_valid()
-                and address_form.is_valid()
-                and artist_application_form.is_valid()
-            ):
-                user = signup_form.save()
-                request.session['pending_verification_user_id'] = user.id
-                user_profile = user.user_profile
-                customer = Customer.objects.create(
-                    user_profile=user_profile
-                )
-                artist = Artist.objects.create(
-                    user_profile=user_profile,
-                    is_approved=False
-                )
-
-                photo = profile_pic_form.save(
-                    commit=False,
-                    user=user,
-                    user_profile=user_profile
-                )
-                if photo:
-                    photo.save()
-
-                    if user_profile:
-                        user_profile.profile_picture = photo
-                        user_profile.save()
-
-                address = address_form.save(commit=False)
-                address.customer = customer
-                address.save()
-
-                artist_application = artist_application_form.save(commit=False)
-                artist_application.user = artist
-                artist_application.save()
-
-                messages.success(
-                    request, "Your artist application has been submitted."
-                )
-                return render(
-                    request, self.template_name, self.get_context_data()
-                )
-
-            messages.error(request, "Please correct the errors in the form.")
-            return render(
-                request,
-                self.template_name,
-                {
-                    'signup_form': signup_form,
-                    'profile_pic_form': profile_pic_form,
-                    'address_form': address_form,
-                    'artist_application_form': artist_application_form,
-                },
-            )
 
 
 class ResendVerificationCodeView(View, CustomerRequiredMixin):

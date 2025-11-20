@@ -34,7 +34,7 @@
               <div class="rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-shadow duration-200 cursor-pointer card-adaptive h-full flex flex-col">
                 <figure>
                   {% with image_to_render=artwork.main_photo|default:placeholder_image %}
-                    {% cloudinary image_to_render.image format="webp" quality="auto" width=400 height=400 crop="fill" alt=image_to_render.alt_text_or_default crossorigin="anonymous" %}
+                    {% cloudinary image_to_render.image format="auto" quality="auto" width=400 height=400 crop="fill" alt=image_to_render.alt_text_or_default crossorigin="anonymous" %}
                   {% endwith %}
                 </figure>
                 <div class="p-6 flex flex-col h-56">

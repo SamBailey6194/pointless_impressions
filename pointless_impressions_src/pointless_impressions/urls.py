@@ -21,19 +21,38 @@ from django.conf.urls.static import static
 from . import views
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('', include('pointless_impressions_src.home.urls')),
+    path('admin/', admin.site.urls, namespace='admin'),
+    path('', include('pointless_impressions_src.home.urls', namespace='home')),
     path('artworks/', include(
         'pointless_impressions_src.artwork.urls', namespace='artwork'),
         ),
     path('checkout/', include(
         'pointless_impressions_src.cart.urls', namespace='cart'),
         ),
-    path('dashboard/', include('pointless_impressions_src.dashboard.urls')),
+    path(
+        'dashboard/',
+        include(
+            'pointless_impressions_src.dashboard.urls',
+            namespace='dashboard'
+            )),
     path('health/', views.health_check, name='health'),
-    path('order/', include('pointless_impressions_src.order.urls')),
-    path('profiles/', include('pointless_impressions_src.profiles.urls')),
-    path('search/', include('pointless_impressions_src.search.urls')),
+    path(
+        'order/',
+        include(
+            'pointless_impressions_src.order.urls',
+            namespace='order'
+            )),
+    path(
+        'profiles/',
+        include(
+            'pointless_impressions_src.profiles.urls',
+            namespace='profiles'
+            )),
+    path(
+        'search/',
+        include('pointless_impressions_src.search.urls',
+                namespace='search'
+                )),
 ]
 
 if settings.DEBUG:

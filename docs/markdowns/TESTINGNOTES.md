@@ -73,6 +73,7 @@ Please note for the Jest testing there was a need to create html fixture files a
 - **Confirm Order Modal Not Scrolling**: Confirm order modal was not scrolling to the top when opened, causing users to miss important information at the top of the modal. Fixed this by adding `modalContent.scrollTop = 0;` when the modal is opened to ensure it starts at the top and when the Yes, Confirm Order button is clicked it scrolls to the top to show the spinner.
 - **Deletion of Orders**: If a user deleted an order it changed to cancelled but was still showing in the user profile orders list. Fixed this by excluding cancelled orders from the orders list in the UserProfileView CBV.
 - **Cloudianry Images Being Blocked and Returning 404**: Cloudinary images were being blocked due to lack of CORS, so added `crossorigin='anonymous'` to the image tags to fix this issue. It then returned 404 error due to a wrong path being stored in the DB. Fixed this by ensuring the correct public id was stored in the DB.
+- **Cloudinary not serialisable into JSON**: Cloudinary image objects were not serialisable into JSON when sending data via AJAX for filtering and sorting. Fixed this by adding fallbacks in the `-serialize_artwork_data` function to extract the image URL from the Cloudinary object or use the image field directly if necessary.
 
 ### Unfixed Bugs
 

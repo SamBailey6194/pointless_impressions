@@ -22,7 +22,7 @@
               {% for photo in artwork.photos.all %}
                 <div class="carousel-item w-full h-full justify-center" id="slide-{{ forloop.counter0 }}">
                   <figure class="w-full h-full">
-                    {% cloudinary photo.image format="webp" quality="auto" width=400 class="w-full h-full object-cover" alt=photo.alt_text_or_default %}
+                    {% cloudinary photo.image format="auto" quality="auto" width=400 class="w-full h-full object-cover" alt=photo.alt_text_or_default %}
                   </figure>
                 </div>
               {% endfor %}
@@ -42,7 +42,7 @@
           <div class="flex gap-2 mt-4 overflow-x-auto pb-2" id="thumbnail-container">
             {% for photo in artwork.photos.all %}
               <button class="thumbnail-btn w-16 h-16 rounded border-2 border-gray-300 shrink-0 overflow-hidden hover:border-primary" data-slide="{{ forloop.counter0 }}">
-                {% cloudinary photo.image format="webp" quality="auto" class="w-full h-full object-cover" alt=photo.alt_text_or_default crossorigin="anonymous" %}
+                {% cloudinary photo.image format="auto" quality="auto" class="w-full h-full object-cover" alt=photo.alt_text_or_default crossorigin="anonymous" %}
               </button>
             {% endfor %}
           </div>
@@ -172,7 +172,7 @@
                 <div class="rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-shadow duration-200 cursor-pointer card-adaptive h-full flex flex-col">
                   <figure>
                       {% with image_to_render=similar_artist.main_photo|default:placeholder_image %}
-                        {% cloudinary image_to_render.image format="webp" quality="auto" width=400 height=300 crop="fill" class="w-full h-64 object-cover" alt=image_to_render.alt_text_or_default crossorigin="anonymous" %}
+                        {% cloudinary image_to_render.image format="auto" quality="auto" width=400 height=300 crop="fill" class="w-full h-64 object-cover" alt=image_to_render.alt_text_or_default crossorigin="anonymous" %}
                       {% endwith %}
                   </figure>
                   <div class="p-6 flex flex-col h-56">
@@ -230,7 +230,7 @@
                 <div class="rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-shadow duration-200 cursor-pointer card-adaptive h-full flex flex-col">
                   <figure>
                     {% with image_to_render=similar_artwork.main_photo|default:placeholder_image %}
-                      {% cloudinary image_to_render.image format="webp" quality="auto" width=400 height=400 crop="fill" alt=image_to_render.alt_text_or_default crossorigin="anonymous" %}
+                      {% cloudinary image_to_render.image format="auto" quality="auto" width=400 height=400 crop="fill" alt=image_to_render.alt_text_or_default crossorigin="anonymous" %}
                     {% endwith %}
                   </figure>
                   <div class="p-6 flex flex-col h-56">

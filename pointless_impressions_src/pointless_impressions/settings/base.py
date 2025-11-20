@@ -166,6 +166,8 @@ TEMPLATES = [
                 "auth_forms",
                 "pointless_impressions_src.account.context_processors."
                 "user_context",
+                "pointless_impressions_src.pointless_impressions."
+                "context_processors.page_slug_detector",
             ],
         },
     },

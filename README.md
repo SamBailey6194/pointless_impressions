@@ -165,8 +165,6 @@ Some of these will be models rather than full pages.
 
 As you venture to look at the [Features](#features) you will notice some design choices, flow and relationships between the database tables were changed while the project was being made.
 
-![Responsive Image]()
-
 ---
 
 ## Features 
