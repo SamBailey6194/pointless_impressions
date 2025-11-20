@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% load static tailwind_tags %}
+
+{% block content %}
+<section class="section-alt py-16 w-full">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <h1 class="text-4xl font-bold mb-4">401 Unauthorized</h1>
+        <p class="text-lg mb-6">{{ message|default:"You are not authorized to access this resource." }}</p>
+        <p class="text-lg mb-6">Please log in using the navbar to access this page.</p>
+        <a href="{% url 'home' %}" class="btn btn-ghost btn-outline">Return to Home</a>
+    </div>
+</section>
+{% endblock %}

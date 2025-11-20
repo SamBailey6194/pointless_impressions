@@ -63,6 +63,7 @@ class ArtworkSubmissionForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.helper = FormHelper()
+        self.helper.form_tag = False
         self.helper.form_method = 'post'
         self.helper.layout = Layout(
             Div(
@@ -104,20 +105,9 @@ class ArtworkSubmissionForm(forms.ModelForm):
                             placeholder="0.00",
                             css_class='mb-4 custom-input w-full lg:w-66'
                         ),
-                        Div(
-                            Field(
-                                'category',
-                                css_class='custom-input w-full lg:w-66'
-                            ),
-                            HTML(
-                                "<button type='button' class='btn btn-outline "
-                                "add-category'>Add</button>"
-                            ),
-                            HTML(
-                                "<button type='button' class='btn btn-outline "
-                                "remove-category'>Remove</button>"
-                            ),
-                            css_class='flex items-center gap-2'
+                        Field(
+                            'category',
+                            css_class='custom-input w-full lg:w-66'
                         ),
                         css_class='lg:flex lg:gap-4 mb-4'
                     ),
@@ -130,20 +120,9 @@ class ArtworkSubmissionForm(forms.ModelForm):
                         "Framing Options</h4>"
                     ),
                     Div(
-                        Div(
-                            Field(
-                                'selected_conditions',
-                                css_class='custom-input w-full'
-                            ),
-                            HTML(
-                                "<button type='button' class='btn btn-outline "
-                                "add-condition'>Add</button>"
-                            ),
-                            HTML(
-                                "<button type='button' class='btn btn-outline "
-                                "remove-condition'>Remove</button>"
-                            ),
-                            css_class='flex items-center gap-2'
+                        Field(
+                            'selected_conditions',
+                            css_class='custom-input w-full'
                         ),
                         css_class='mb-4'
                     ),
@@ -155,9 +134,6 @@ class ArtworkSubmissionForm(forms.ModelForm):
                 css_class='px-6 py-2 mb-4',
                 id='artwork-submission-form'
             ),
-            HTML(
-                "<button type='submit' class='btn btn-primary'>Submit</button>"
-            )
         )
 
     def clean_name(self):
@@ -197,34 +173,37 @@ class ArtworkSubmissionForm(forms.ModelForm):
         """
         artwork = super().save(commit=False)
 
-        # Handle artist assignment
         if artist:
             artwork.artist = artist
 
-        # Set artwork as pending approval
         artwork.is_available = False
 
-        # Save the artwork instance if commit is True
-        if commit:
-            artwork.save()
-
-            # Handle dynamic categories
-            category_name = self.cleaned_data.get('category')
-            if category_name:
+        category_name = self.cleaned_data.get('category')
+        if category_name:
+            if isinstance(category_name, str) and category_name.strip():
                 category, created = ArtworkCategory.objects.get_or_create(
-                    name=category_name
+                    name=category_name.strip()
                 )
                 artwork.category = category
 
-            # Handle dynamic framing conditions
-            selected_conditions = self.cleaned_data.get('selected_conditions')
-            if selected_conditions:
-                for condition_name in selected_conditions:
-                    condition, created = ArtworkFramingCondition.objects.\
-                        get_or_create(condition_friendly_name=condition_name)
-                    artwork.selected_conditions.add(condition)
+        if commit:
+            artwork.save()
 
-            # Save many-to-many relationships
+            selected_conditions = self.cleaned_data.get('selected_conditions')
+
+            if selected_conditions:
+
+                for condition_name in selected_conditions:
+                    if condition_name and isinstance(
+                        condition_name, str
+                    ) and condition_name.strip():
+                        condition, created = (
+                            ArtworkFramingCondition.objects.get_or_create(
+                                condition_friendly_name=condition_name.strip()
+                            )
+                        )
+                        artwork.selected_conditions.add(condition)
+
             self.save_m2m()
 
         return artwork

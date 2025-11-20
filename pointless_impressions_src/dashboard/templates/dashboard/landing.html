@@ -9,7 +9,7 @@
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {% if access.user_profile %}
-            <div class="block p-4 bg-gray-300 dark:bg-gray-700 rounded shadow">
+            <div class="block p-4 bg-gray-300 dark:bg-gray-700 text-(--pointless-black) dark:text-(--pointless-white) rounded shadow">
                 <h2 class="text-xl font-semibold mb-2">User Profile</h2>
                 <p class="mb-4">Manage your profile, addresses, and orders.</p>
                 <a href="{% url 'dashboard:user_profile_dashboard' user.public_id %}" class="px-4 py-2 btn btn-ghost btn-outline w-fit">Go to User Profile</a>
@@ -17,7 +17,7 @@
             {% endif %}
 
             {% if access.admin %}
-            <div class="block p-4 bg-gray-300 dark:bg-gray-700 rounded shadow">
+            <div class="block p-4 bg-gray-300 dark:bg-gray-700 text-(--pointless-black) dark:text-(--pointless-white) rounded shadow">
                 <h2 class="text-xl font-semibold mb-2">Admin Dashboard</h2>
                 <p class="mb-4">Manage site operations and user activities.</p>
                 <a href="{% url 'dashboard:admin_dashboard' user.public_id %}" class="px-4 py-2 btn btn-ghost btn-outline w-fit">Go to Admin Dashboard</a>

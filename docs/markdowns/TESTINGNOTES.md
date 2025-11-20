@@ -69,10 +69,12 @@ Please note for the Jest testing there was a need to create html fixture files a
 - **Cloudinary Images Not Working**: Fixed various issues with Cloudinary image fetching by ensuring proper configuration of Cloudinary settings, using correct tags in templates, and handling both development and production image URLs in views. Used a context processor to handle placeholder image and the image to render function as well. Ensured the DB image path matched the public id as well. Once set up use Cloudinary in local development as well to avoid issues.
 - **400 and 500 Requests to Square**: Payment was throwing 400 and 500 errors firstly the order was not creating a payment_id in the Order model. Fixed this by adding payment_id being created when the order is created and sent to the DB and Square. Secondly, Sqaure was not updating the payment due to incorrect headers and body being sent. Fixed this by ensuring the correct headers and body were being sent to Square API by including them in OrderCOnfirmationView CBV.
 - **Confirm Order Modal Not Scrolling**: Confirm order modal was not scrolling to the top when opened, causing users to miss important information at the top of the modal. Fixed this by adding `modalContent.scrollTop = 0;` when the modal is opened to ensure it starts at the top and when the Yes, Confirm Order button is clicked it scrolls to the top to show the spinner.
+- **Deletion of Orders**: If a user deleted an order it changed to cancelled but was still showing in the user profile orders list. Fixed this by excluding cancelled orders from the orders list in the UserProfileView CBV.
 
 ### Unfixed Bugs
 
 - **Square payment styling**: I could not figure out how to style the input background colour to match the rest of the site. It was stuck as white despite trying multiple methods. However, this does not affect functionality. 
+- **Using Authenticated Users Info for Checkout**: When an authenticated user goes to checkout the form does not prefill with their information from their profile. I could not figure out how to do this with the current setup. However, this does not affect functionality as the user can still input their information manually.
 
 ### Validator Testing 
 

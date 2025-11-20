@@ -446,6 +446,16 @@ Toast.handleAPIError(error)                // Displays API error messages
 
 ### Features Left to Implement
 
-- Create
+- Blog App with full CRUD functionality for posts and comments
+- Adding and editing Addresses in User Profile
+- Adding and editing profile picture in User Profile
+- Adding and editing payment methods in User Profile
+- Enabling people to sign up as Artists and sell their artwork on the platform
+- Admin Dashboard Analytics with charts and graphs showing sales data, user registrations, and other key metrics
+- About page content and styling
+- Contact page with contact form and map integration
+- When editing an artwork in the Admin Dashboard, the admin can see the images currently uploaded for that artwork and can delete them individually while also adding new images.
+- Implementing unit and integration tests for critical components and features of the application to ensure reliability and maintainability.
+- Some of the modals styling could be improved further to make them more visually appealing and user-friendly.
 
 ---

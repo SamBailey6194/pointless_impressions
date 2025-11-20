@@ -1,0 +1,18 @@
+{% load static tailwind_tags cloudinary crispy_forms_tags %}
+
+<dialog id="edit-order-modal"  class="modal">
+    <div class="modal-box lg:w-7/12 lg:max-w-4xl lg:h-9/12">
+        <h3 class="font-bold text-lg mb-4">Edit Order #{{ order.order_number }}</h3>
+        <form id="edit-order-form" method="post" class="form-card p-8">
+            {% csrf_token %}
+            {% crispy order_form %}
+            <div class="modal-action">
+                <button type="button" class="btn btn-ghost btn-outline" onclick="this.closest('dialog').close()">Cancel</button>
+                <button type="submit" class="btn btn-ghost btn-outline">Save Changes</button>
+            </div>
+        </form>
+    </div>
+    <form method="dialog" class="modal-backdrop">
+        <button>close</button>
+    </form>
+</dialog>

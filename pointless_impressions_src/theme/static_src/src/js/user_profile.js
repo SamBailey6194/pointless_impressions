@@ -232,12 +232,10 @@ function attachDeleteFormSubmitListener(modal) {
     const deleteOrderForm = document.getElementById('delete-order-form');
 
     if (deleteOrderForm) {
-        console.log('Delete form found. Attaching submit listener.');
         deleteOrderForm.addEventListener('submit', async (event) => {
             event.preventDefault();
 
             const orderId = deleteOrderForm.dataset.orderId;
-            console.log(`Submitting delete request for order ID: ${orderId}`);
 
             try {
                 const response = await fetch(`/dashboard/user-profile/${orderId}/order/delete/`, {
@@ -250,11 +248,8 @@ function attachDeleteFormSubmitListener(modal) {
                 });
 
                 const result = await response.json();
-                console.log('Delete response:', result);
 
                 if (result.success) {
-                    console.log('Order deleted successfully.');
-
                     // Remove the order card from the DOM
                     const orderCard = document.querySelector(`[data-order="${orderId}"]`).closest('.rounded-lg');
                     if (orderCard) {

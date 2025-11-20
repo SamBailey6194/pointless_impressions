@@ -535,7 +535,6 @@ def setup_test_data(request):
     - Is protected by a test-mode database check
     - Creates sample artworks (Sunset, Starry Night)
     - Creates required artist and category records
-    - Returns 403 if not running with test settings
 
     Args:
         request: HTTP request object
@@ -544,7 +543,7 @@ def setup_test_data(request):
         JSON response with created artworks or error message
 
     Raises:
-        403 Forbidden: If not running with test settings
+        PermissionDenied: If not running with test settings
     """
     try:
         db_name = settings.DATABASES.get('default', {}).get('NAME', '')

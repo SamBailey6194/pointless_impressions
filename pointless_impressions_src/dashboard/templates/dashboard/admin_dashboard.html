@@ -2,56 +2,166 @@
 {% load static tailwind_tags cloudinary crispy_forms_tags %}
 
 {% block content %}
+<input type="hidden" name="public_id" value="{{ user.public_id }}">
 {% block section_1 %}
-<section class="section-alt py-16 w-full">
+<section class="section-alt py-16 w-full" id="artwork-section">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h2 class="text-2xl font-bold mb-4">Manage Profile</h2>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-                <p><strong>Username:</strong> {{ user_profile.username }}</p>
-                <p><strong>First Name:</strong> {{ user_profile.first_name }}</p>
-                <p><strong>Last Name:</strong> {{ user_profile.last_name }}</p>
-                <p><strong>Email:</strong> {{ user_profile.email }}</p>
-                <p><strong>Phone:</strong> {{ user_profile.phone }}</p>
-            </div>
-            <div>
-                {% if user_profile.profile_picture %}
-                    {% cloudinary profile_photo.image format="webp" quality="auto" width="200" height="200" crop="fill" alt=profile_photo.alt_text_or_default %}
-                {% else %}
-                    <p>No profile picture uploaded.</p>
-                {% endif %}
-            </div>
+        <h2 class="text-2xl font-bold mb-4">Manage Artwork</h2>
+        
+        <div class="overflow-x-auto shadow-md rounded-lg">
+            <table class="min-w-full divide-y bg-gray-300 dark:bg-gray-700 text-(--pointless-black) dark:text-(--pointless-white)" id="artwork-table-container">
+                <thead>
+                    <tr>
+                        <th class="px-6 py-3 text-center text-xs font-medium uppercase tracking-wider">
+                            Artwork Name
+                        </th>
+                        <th class="px-6 py-3 text-center text-xs font-medium uppercase tracking-wider">
+                            Description
+                        </th>
+                        <th class="px-6 py-3 text-center text-xs font-medium uppercase tracking-wider">
+                            Artist
+                        </th>
+                        <th class="px-6 py-3 text-center text-xs font-medium uppercase tracking-wider">
+                            Price
+                        </th>
+                        <th class="px-6 py-3 text-center text-xs font-medium uppercase tracking-wider">
+                            Actions
+                        </th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y">
+                    {% for artwork in artworks %}
+                    <tr> 
+                        <td class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
+                            {{ artwork.name }}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-center text-sm">
+                            {{ artwork.description|truncatechars:50 }}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-center text-sm">
+                            {{ artwork.artist.user_profile.user.first_name }}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-center text-sm">
+                            £{{ artwork.price|floatformat:2 }}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium gap-2">
+                            <button class="btn btn-ghost btn-outline btn-sm w-20 js-edit-artwork-btn" 
+                                    data-artwork-id="{{ artwork.id }}" data-artwork-slug="{{ artwork.slug }}">
+                                Edit
+                            </button>
+                            <button class="btn btn-ghost btn-outline btn-sm w-20 js-delete-artwork-btn" 
+                                    data-artwork-id="{{ artwork.id }}" data-artwork-slug="{{ artwork.slug }}">
+                                Delete
+                            </button>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="px-6 py-4 text-center text-sm text-gray-500">
+                            No artworks found.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div class="mt-8" id="artwork-pagination-container">
+            {% with page_obj=artwork_page_obj is_paginated=artwork_is_paginated page_param='artwork_page' %}
+                {% include 'includes/pagination.html' %}
+            {% endwith %}
+        </div>
+        <div>
+            <button class="mt-4 btn btn-ghost btn-outline js-add-artwork-btn">
+                Add New Artwork
+            </button>
         </div>
     </div>
 </section>
 {% endblock %}
 
 {% block section_2 %}
-<section class="section-blue py-16 w-full">
+<section class="section-blue py-16 w-full" id="order-section">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h2 class="text-2xl font-bold mb-4">Manage Addresses</h2>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {% for address in addresses %}
-            <div class="card bg-white shadow-md p-4">
-                <p><strong>Label:</strong> {{ address.label }}</p>
-                <p><strong>Type:</strong> 
-                    {% if address.is_shipping %}Shipping{% endif %}
-                    {% if address.is_billing %}Billing{% endif %}
-                </p>
-                <p><strong>Name:</strong> {{ address.first_name }} {{ address.last_name }}</p>
-                <p><strong>Address:</strong> {{ address.address_line_1 }}, {{ address.address_line_2 }}, {{ address.city }}, {{ address.county }}, {{ address.postcode }}, {{ address.country }}</p>
-                <div class="flex justify-between mt-4">
-                    {% if not address.is_default %}
-                        <button class="btn btn-secondary btn-ghost btn-outline w-fit">Set Default</button>
-                    {% endif %}
-                    <button class="btn btn-ghost btn-outline w-fit js-edit-address-btn" data-address-id="{{ address.id }}">Edit</button>
-                    <button class="btn btn-ghost btn-outline w-fit js-remove-address-btn" data-address-id="{{ address.id }}">Remove</button>
-                </div>
-            </div>
-            {% endfor %}
+        <h2 class="text-2xl font-bold mb-4">Manage Orders</h2>
+        
+        <div class="overflow-x-auto shadow-md rounded-lg">
+            <table class="min-w-full divide-y bg-(--pointless-white) dark:bg-(--pointless-black) text-(--pointless-black) dark:text-(--pointless-white)" id="order-table-container">
+                <thead>
+                    <tr>
+                        <th class="px-6 py-3 text-center text-xs font-medium uppercase tracking-wider">
+                            Order Number
+                        </th><input type="hidden" name="public_id" value="{{ user.public_id }}">
+                        <th class="px-6 py-3 text-center text-xs font-medium uppercase tracking-wider">
+                            Customer Email
+                        </th>
+                        <th class="px-6 py-3 text-center text-xs font-medium uppercase tracking-wider">
+                            Status
+                        </th>
+                        <th class="px-6 py-3 text-center text-xs font-medium uppercase tracking-wider">
+                            Total
+                        </th>
+                        <th class="px-6 py-3 text-center text-xs font-medium uppercase tracking-wider">
+                            Date
+                        </th>
+                        <th class="px-6 py-3 text-center text-xs font-medium uppercase tracking-wider">
+                            Actions
+                        </th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y">
+                    {% for order in orders %}
+                    <tr> 
+                        <td class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
+                            {{ order.order_number }}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-center text-sm">
+                            {% if order.user %}
+                                {{ order.user.email|default:"Guest" }}
+                            {% else %}
+                                {{ order.guest_email }}
+                            {% endif %}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-center text-sm">
+                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                                {% if order.status == 'completed' %}
+                                {% elif order.status == 'pending' %}
+                                {% elif order.status == 'processing' %}
+                                {% elif order.status == 'cancelled' %}
+                                {% endif %}">
+                                {{ order.status|title }}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-center text-sm">
+                            £{{ order.grand_total|floatformat:2 }}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-center text-sm">
+                            {{ order.created_at|date:"d M Y" }}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium gap-2">
+                            <button class="btn btn-ghost btn-outline btn-sm w-20 js-edit-order-btn" 
+                                    data-order-id="{{ order.id }}">
+                                Edit
+                            </button>
+                            <button class="btn btn-ghost btn-outline btn-sm w-20 js-delete-order-btn" 
+                                    data-order-id="{{ order.id }}">
+                                Delete
+                            </button>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="px-6 py-4 text-center text-sm text-gray-500">
+                            No orders found.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
         </div>
-        <div class="flex justify-end mt-4">
-            <button class="btn btn-primary btn-ghost btn-outline w-fit js-add-address-btn">Add Address</button>
+        <div class="mt-8" id="order-pagination-container">
+            {% with page_obj=order_page_obj is_paginated=order_is_paginated page_param='order_page' %}
+                {% include 'includes/pagination.html' %}
+            {% endwith %}
         </div>
     </div>
 </section>
@@ -59,30 +169,24 @@
 
 {% block section_3 %}
 <section class="section-alt py-16 w-full">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h2 class="text-2xl font-bold mb-4">Manage Orders</h2>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {% for order in orders %}
-            <div class="card bg-white shadow-md p-4">
-                <p><strong>Order ID:</strong> {{ order.id }}</p>
-                <p><strong>Status:</strong> {{ order.status }}</p>
-                <div class="flex justify-between mt-4">
-                    <button class="btn btn-info btn-ghost btn-outline w-fit js-order-summary-btn" data-order-id="{{ order.id }}">View</button>
-                    {% if order.status not in ['Completed', 'Cancelled'] %}
-                        <button class="btn btn-warning btn-ghost btn-outline w-fit js-edit-order-btn" data-order-id="{{ order.id }}">Request Edit</button>
-                        <button class="btn btn-danger btn-ghost btn-outline w-fit js-delete-order-btn" data-order-id="{{ order.id }}">Delete</button>
-                    {% endif %}
-                </div>
-            </div>
-            {% endfor %}
+    <div class="max-w-md mx-auto px-4 sm:px-6 lg:px-8">
+        <h2 class="text-2xl font-bold mb-4">Go to Your Profile</h2>
+        <div class="block p-4 bg-gray-300 dark:bg-gray-700 rounded text-(--pointless-black) dark:text-(--pointless-white) shadow w-80">
+            <h3 class="text-xl font-semibold mb-2">User Profile</h3>
+            <p class="mb-4">Manage your profile, addresses, and orders.</p>
+            <a href="{% url 'dashboard:user_profile_dashboard' user.public_id %}" class="px-4 py-2 btn btn-ghost btn-outline w-fit">Go to User Profile</a>
         </div>
     </div>
 </section>
 {% endblock %}
+{% endblock %}
 
 {% block extramodals %}
-    {% include 'dashboard/includes/edit_artwork_modal.html' %}
-    {% include 'dashboard/includes/add_artwork_modal.html' %}
+    <div id="edit-artwork-modal-container"></div>
+    <div id="add-artwork-modal-container"></div>
+    <div id="delete-artwork-modal-container"></div>
+    <div id="edit-order-modal-container"></div>
+    <div id="delete-order-modal-container"></div>
 {% endblock %}
 
 {% block postloadjs %}

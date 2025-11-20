@@ -2,7 +2,7 @@
 
 <dialog id="edit-artwork-modal" class="modal">
     <div class="modal-box lg:w-7/12 lg:max-w-4xl lg:h-9/12">
-        <form method="post" action="{% url 'dashboard:edit_artwork' artwork.id %}" class="form-card">
+        <form id="edit-artwork-form" method="post" class="form-card p-6" action="{% url 'dashboard:edit_artwork_modal' user.public_id artwork.slug %}">
             {% csrf_token %}
             {% crispy artwork_submission_form %}
             <div class="modal-action">

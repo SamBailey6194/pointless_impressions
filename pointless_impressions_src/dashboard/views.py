@@ -1,10 +1,11 @@
 from django.views.generic import TemplateView, FormView, View
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.http import JsonResponse, HttpResponseForbidden, Http404
+from django.http import JsonResponse, Http404
 from django.shortcuts import get_object_or_404, render
 from django.core.exceptions import PermissionDenied
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from .forms import EditOrderForm
-from pointless_impressions_src.profiles.mixins import StaffRequiredMixin
+from .mixins import AdminRequiredMixin
 from pointless_impressions_src.account.models import CustomUser
 from pointless_impressions_src.artwork.forms import ArtworkSubmissionForm
 from pointless_impressions_src.artwork.models import Artwork
@@ -35,6 +36,8 @@ class DashboardLandingView(LoginRequiredMixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         user = self.request.user
+        print(f"Current user: {self.request.user}")
+        print(f"User groups: {self.request.user.groups.all()}")
         context['access'] = {
             'user_profile': True,
             'admin': (
@@ -77,11 +80,13 @@ class UserProfileDashboardView(LoginRequiredMixin, TemplateView):
         context['user_profile'] = user
         context['profile_photo'] = profile_photo
         context['addresses'] = user.user_profile.customer.addresses.all()
-        context['orders'] = user.orders.order_by('-order_number')
+        context['orders'] = user.orders.exclude(
+            status='CANCELLED'
+        ).order_by('-order_number')
         return context
 
 
-class EditArtworkModalView(StaffRequiredMixin, FormView):
+class EditArtworkModalView(AdminRequiredMixin, FormView):
     """
     Modal view for editing existing artwork details.
 
@@ -101,16 +106,26 @@ class EditArtworkModalView(StaffRequiredMixin, FormView):
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
-        artwork_id = self.kwargs.get('artwork_id')
-        if artwork_id:
-            artwork = get_object_or_404(
-                self.request.user.artist.artworks,
-                id=artwork_id
-            )
+
+        slug = self.kwargs.get('artwork_slug')
+
+        if slug:
+            artwork = get_object_or_404(Artwork, slug=slug)
             kwargs['instance'] = artwork
         else:
             kwargs['instance'] = None
         return kwargs
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        slug = self.kwargs.get('artwork_slug')
+
+        if slug:
+
+            context['artwork'] = get_object_or_404(Artwork, slug=slug)
+
+        context['artwork_submission_form'] = context['form']
+        return context
 
     def form_valid(self, form):
         form.save()
@@ -126,7 +141,7 @@ class EditArtworkModalView(StaffRequiredMixin, FormView):
         }, status=400)
 
 
-class AddArtworkModalView(StaffRequiredMixin, FormView):
+class AddArtworkModalView(AdminRequiredMixin, FormView):
     """
     Modal view for adding new artwork submissions.
 
@@ -145,7 +160,14 @@ class AddArtworkModalView(StaffRequiredMixin, FormView):
     form_class = ArtworkSubmissionForm
 
     def form_valid(self, form):
-        form.save(artist=self.request.user.artist)
+        artist = None
+
+        if hasattr(self.request.user, 'user_profile'):
+            if hasattr(self.request.user.user_profile, 'artist'):
+                artist = self.request.user.user_profile.artist
+
+        form.save(artist=artist)
+
         return JsonResponse({
             'success': True,
             'message': 'Artwork added successfully.'
@@ -158,7 +180,7 @@ class AddArtworkModalView(StaffRequiredMixin, FormView):
         }, status=400)
 
 
-class AdminDashboardView(StaffRequiredMixin, TemplateView):
+class AdminDashboardView(AdminRequiredMixin, TemplateView):
     """
     Admin dashboard view for managing artwork submissions.
 
@@ -173,28 +195,43 @@ class AdminDashboardView(StaffRequiredMixin, TemplateView):
         dashboard/admin_dashboard.html
     """
     template_name = 'dashboard/admin_dashboard.html'
+    paginate_by = 15
 
     def get_context_data(self, **kwargs):
-        public_id = self.kwargs.get('public_id')
-        if str(self.request.user.public_id) != public_id:
-            return HttpResponseForbidden(
-                "You are not authorized to view this page."
-                )
-
         context = super().get_context_data(**kwargs)
-        user = self.request.user
-        context['access'] = {
-            'artwork_submissions': True,
-            'artwork_removal': user.groups.filter(
-                name__in=['Owner', 'Manager']
-            ).exists(),
-        }
 
-        # Add context for artwork management functionality
+        all_artworks = Artwork.objects.all().order_by('-created_at')
+        artwork_page = self.request.GET.get('artwork_page', 1)
+        artwork_paginator = Paginator(all_artworks, 15)
+
+        try:
+            artworks = artwork_paginator.page(artwork_page)
+        except PageNotAnInteger:
+            artworks = artwork_paginator.page(1)
+        except EmptyPage:
+            artworks = artwork_paginator.page(artwork_paginator.num_pages)
+
+        context['artworks'] = artworks
+        context['artwork_page_obj'] = artworks
+        context['artwork_is_paginated'] = artwork_paginator.num_pages > 1
+
         context['artwork_submission_form'] = ArtworkSubmissionForm()
-        context['artwork_submissions'] = Artwork.objects.filter(
-            is_available=False
-        )
+
+        all_orders = Order.objects.all().order_by('-order_number')
+        order_page = self.request.GET.get('order_page', 1)
+        order_paginator = Paginator(all_orders, 15)
+
+        try:
+            orders = order_paginator.page(order_page)
+        except PageNotAnInteger:
+            orders = order_paginator.page(1)
+        except EmptyPage:
+            orders = order_paginator.page(order_paginator.num_pages)
+
+        context['orders'] = orders
+        context['order_page_obj'] = orders
+        context['order_is_paginated'] = order_paginator.num_pages > 1
+
         return context
 
 
@@ -218,34 +255,16 @@ class GuestOrderView(View):
 
         try:
             order = Order.objects.get(id=order_id, user=None)
-            print(
-                'Found order:', order,
-                'and access_code:', access_code
-                )
         except Order.DoesNotExist:
-            print(
-                f"Order with id {order_id} does not exist "
-                "or is not a guest order."
-                )
             raise Http404("Order does not exist.")
 
         if access_code:
-            print(
-                'Comparing provided code:',
-                access_code,
-                'with order code:',
-                order.guest_access_code
-                )
             if order.guest_access_code != access_code:
-                print('Access code mismatch detected.')
                 raise PermissionDenied("Invalid access token.")
             request.session[session_key] = access_code
-            print('Access granted via URL parameter.')
         elif request.session.get(session_key) == order.guest_access_code:
-            print('Access granted via session.')
             pass
         else:
-            print('Access denied: No valid access token provided.')
             raise PermissionDenied("Access token required.")
 
         featured_artworks = Artwork.objects.filter(is_featured=True)[:10]
@@ -269,7 +288,6 @@ class UpdateOrderView(LoginRequiredMixin, View):
     template_name = 'dashboard/includes/update_order_modal.html'
 
     def get(self, request, order_id):
-        print(f"Fetching order with ID: {order_id} for user: {request.user}")
         order = get_object_or_404(Order, id=order_id, user=request.user)
         form = EditOrderForm(instance=order)
 
@@ -280,7 +298,6 @@ class UpdateOrderView(LoginRequiredMixin, View):
 
     def post(self, request, *args, **kwargs):
         order_id = self.kwargs.get('order_id')
-        print(f"Updating order with ID: {order_id} for user: {request.user}")
         order = get_object_or_404(Order, id=order_id, user=request.user)
         form = EditOrderForm(request.POST, instance=order)
 
@@ -288,7 +305,6 @@ class UpdateOrderView(LoginRequiredMixin, View):
 
         if form.is_valid():
             form.save()
-            print(f"Order {order_id} updated successfully.")
 
             updated_shipping_address = (
                 f"{order.shipping_first_name} {order.shipping_last_name}, "
@@ -311,7 +327,6 @@ class UpdateOrderView(LoginRequiredMixin, View):
                 'updated_billing_address': updated_billing_address,
             })
 
-        print(f"Failed to update order {order_id}. Errors: {form.errors}")
         return JsonResponse({
             'success': False,
             'message': 'Failed to update order.',
@@ -356,3 +371,96 @@ class DeleteOrderView(LoginRequiredMixin, View):
             return JsonResponse(
                 {'success': False, 'message': str(e)}, status=400
             )
+
+
+class DeleteArtworkModalView(AdminRequiredMixin, View):
+    """
+    Modal view for deleting artwork.
+    """
+    template_name = 'dashboard/includes/delete_artwork_modal.html'
+
+    def get(self, request, artwork_slug, *args, **kwargs):
+        artwork = get_object_or_404(Artwork, slug=artwork_slug)
+        return render(
+            request, self.template_name,
+            {'artwork': artwork}
+        )
+
+    def post(self, request, artwork_slug, *args, **kwargs):
+        artwork = get_object_or_404(Artwork, slug=artwork_slug)
+        try:
+            artwork_name = artwork.name
+            artwork.delete()
+            return JsonResponse({
+                'success': True,
+                'message': f'Artwork "{artwork_name}" deleted successfully.'
+            })
+        except Exception as e:
+            return JsonResponse({
+                'success': False,
+                'message': str(e)
+            }, status=400)
+
+
+class EditOrderModalView(AdminRequiredMixin, View):
+    """
+    Modal view for editing orders.
+    """
+    template_name = 'dashboard/includes/edit_order_modal.html'
+
+    def get(self, request, public_id, order_id):
+        order = get_object_or_404(Order, id=order_id)
+        form = EditOrderForm(instance=order)
+        return render(
+            request, self.template_name,
+            {
+                'order_form': form,
+                'order': order,
+                'order_id': order_id
+            }
+        )
+
+    def post(self, request, public_id, order_id):
+        order = get_object_or_404(Order, id=order_id)
+        form = EditOrderForm(request.POST, instance=order)
+
+        if form.is_valid():
+            form.save()
+            return JsonResponse({
+                'success': True,
+                'message': 'Order updated successfully.'
+            })
+
+        return JsonResponse({
+            'success': False,
+            'errors': form.errors
+        }, status=400)
+
+
+class DeleteOrderModalView(AdminRequiredMixin, View):
+    """
+    Modal view for deleting orders.
+    """
+    template_name = 'dashboard/includes/delete_order_modal.html'
+
+    def get(self, request, order_id, *args, **kwargs):
+        order = get_object_or_404(Order, id=order_id)
+        return render(
+            request, self.template_name,
+            {'order': order, 'order_id': order_id}
+        )
+
+    def post(self, request, order_id, *args, **kwargs):
+        order = get_object_or_404(Order, id=order_id)
+        try:
+            order_number = order.order_number
+            order.delete()
+            return JsonResponse({
+                'success': True,
+                'message': f'Order #{order_number} deleted successfully.'
+            })
+        except Exception as e:
+            return JsonResponse({
+                'success': False,
+                'message': str(e)
+            }, status=400)

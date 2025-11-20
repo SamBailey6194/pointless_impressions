@@ -28,14 +28,29 @@ urlpatterns = [
         name='admin_dashboard',
     ),
     path(
-        'admin-dashboard/<uuid:public_id>/edit-artwork/<int:artwork_id>/',
+        'admin-dashboard/<uuid:public_id>/edit-artwork/<slug:artwork_slug>/',
         views.EditArtworkModalView.as_view(),
         name='edit_artwork_modal'
+    ),
+    path(
+        'admin-dashboard/<uuid:public_id>/delete-artwork/<slug:artwork_slug>/',
+        views.DeleteArtworkModalView.as_view(),
+        name='delete_artwork_modal'
     ),
     path(
         'admin-dashboard/<uuid:public_id>/add-artwork/',
         views.AddArtworkModalView.as_view(),
         name='add_artwork_modal'
+    ),
+    path(
+        'admin-dashboard/<uuid:public_id>/edit-order/<uuid:order_id>/',
+        views.EditOrderModalView.as_view(),
+        name='edit_order_modal'
+    ),
+    path(
+        'admin-dashboard/<uuid:public_id>/delete-order/<uuid:order_id>/',
+        views.DeleteOrderModalView.as_view(),
+        name='delete_order_modal'
     ),
     path(
         'guest-order/<uuid:order_id>/',

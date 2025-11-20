@@ -86,9 +86,6 @@
               </li>
             </ul>
           </div>
-          <a href="/contact/" class="btn btn-ghost rounded-lg px-4 py-2 flex items-center gap-2">
-            <i class="fa-solid fa-envelope"></i> Contact
-          </a>
         </div>
       </nav>
 
@@ -133,7 +130,7 @@
                 {% comment %} Django Site Admin for Developers {% endcomment %}
                 {% if request.user.is_staff %}
                   <li>
-                    <a href="#" class="hover:bg-(--pointless-yellow)">
+                    <a href="{% url 'admin' %}" class="hover:bg-(--pointless-yellow)">
                       <i class="fa-solid fa-shield-halved"></i> Site Admin (Dev)
                     </a>
                   </li>
@@ -141,7 +138,7 @@
                 {% comment %} Custom Dashboard Access for Admin {% endcomment %}
                 {% if request.user.is_dashboard_admin %}
                   <li>
-                    <a href="#" class="hover:bg-(--pointless-yellow)">
+                    <a href="{% url 'dashboard:admin_dashboard' user.public_id %}" class="hover:bg-(--pointless-yellow)">
                       <i class="fa-solid fa-cog"></i> Admin Dashboard
                     </a>
                   </li>
@@ -288,10 +285,6 @@
                 {% endfor %}
                 </ul>
               </ul>
-            </li>
-            <li><a href="/contact/" class="hover:bg-(--pointless-yellow)">
-                <i class="fa-solid fa-envelope"></i> Contact
-              </a>
             </li>
           </ul>
         </div>
