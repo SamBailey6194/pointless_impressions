@@ -53,6 +53,10 @@ I implemented a comprehensive SEO strategy directly within the Django `base.html
      - `meta_og_tags` block for Open Graph tags.  
      - `extra_meta` block for page-specific tags like noindex or canonical overrides.
 
+8. **Sitemap and Robot.txt**:
+    - A `robots.txt` file is included to guide search engine crawlers.  
+    - Using `django.contrib.sitemaps`, a dynamic `sitemap.xml` is generated to list all public URLs for better indexing. It can be accessed at `/sitemap.xml`.
+
 **Result:** Every page of Pointless Impressions is optimised for search engines, social media sharing, and user experience, while sensitive pages are protected from indexing. This setup reduces maintenance overhead by centralising SEO logic in a single template.
 
 ### Payments Feature

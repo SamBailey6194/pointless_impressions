@@ -50,6 +50,7 @@ Below are my credits for where I got inspiration for some of the code and conten
 - For using Crispy Forms I followed [Bug Bytes - Django Crispy Forms from Scratch!](https://www.youtube.com/watch?v=Hh6b9X8bG1o) and used the official [Django Crispy Forms Documentation](https://django-crispy-forms.readthedocs.io/en/latest/) to help understand how to use Tailwind CSS with Crispy Forms.
 - Creating your own widgets and fields for forms I used [Django Custom Form Widgets Documentation](https://docs.djangoproject.com/en/5.2/ref/forms/widgets/#custom-widgets)
 - Integrating Square for payments I used [Square Payments API Documentation](https://developer.squareup.com/docs/payments-api/overview)
+- To understand how to make `sitemap.xml` be dynamic I used [Django Sitemaps Framework Documentation](https://docs.djangoproject.com/en/5.2/ref/contrib/sitemaps/)
 
 ### Removed Features Credits as not used anymore
 

@@ -1,0 +1,17 @@
+# --- Private Areas (Save Crawl Budget) ---
+Disallow: /admin/
+Disallow: /dashboard/
+Disallow: /order/
+Disallow: /checkout/
+Disallow: /cart/
+Disallow: /accounts/
+Disallow: /profiles/
+Disallow: /static/
+Disallow: /media/
+
+# --- Public Areas (Explicitly Allow) ---
+Allow: /
+Allow: /artworks/
+
+# --- Sitemap Location ---
+Sitemap: https://pointless-impressions-c0e03a9cdc86.herokuapp.com/sitemap.xml

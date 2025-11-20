@@ -18,13 +18,21 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
+from django.contrib.sitemaps.views import sitemap
+from django.views.generic import TemplateView
 from . import views
+from . import sitemaps
+
+sitemaps = {
+    'artworks': sitemaps.ArtworkSitemap,
+    'static': sitemaps.StaticViewSitemap,
+}
 
 urlpatterns = [
-    path('admin/', admin.site.urls, namespace='admin'),
-    path('', include('pointless_impressions_src.home.urls', namespace='home')),
+    path('admin/', admin.site.urls),
+    path('', include('pointless_impressions_src.home.urls')),
     path('artworks/', include(
-        'pointless_impressions_src.artwork.urls', namespace='artwork'),
+        'pointless_impressions_src.artwork.urls'),
         ),
     path('checkout/', include(
         'pointless_impressions_src.cart.urls', namespace='cart'),
@@ -33,26 +41,35 @@ urlpatterns = [
         'dashboard/',
         include(
             'pointless_impressions_src.dashboard.urls',
-            namespace='dashboard'
-            )),
+        )),
     path('health/', views.health_check, name='health'),
     path(
         'order/',
         include(
             'pointless_impressions_src.order.urls',
-            namespace='order'
-            )),
+        )),
     path(
         'profiles/',
         include(
-            'pointless_impressions_src.profiles.urls',
-            namespace='profiles'
-            )),
+            'pointless_impressions_src.profiles.urls'
+        )),
+    path(
+        "robots.txt",
+        TemplateView.as_view(
+            template_name="robots.txt",
+            content_type="text/plain"
+        )),
+    path(
+        'sitemap.xml',
+        sitemap,
+        {'sitemaps': sitemaps},
+        name='django.contrib.sitemaps.views.sitemap'
+        ),
     path(
         'search/',
-        include('pointless_impressions_src.search.urls',
-                namespace='search'
-                )),
+        include(
+            'pointless_impressions_src.search.urls'
+        )),
 ]
 
 if settings.DEBUG:

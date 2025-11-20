@@ -1,4 +1,5 @@
 from django.db import models
+from django.urls import reverse
 from django.utils.text import slugify
 import random
 import string
@@ -126,6 +127,12 @@ class Artwork(models.Model):
                 'slug': condition.slug
             })
         return json.dumps(options)
+
+    def get_absolute_url(self):
+        """
+        Returns the public URL for this specific artwork.
+        """
+        return reverse('artwork:detail', kwargs={'slug': self.slug})
 
 
 class ArtworkCategory(models.Model):
