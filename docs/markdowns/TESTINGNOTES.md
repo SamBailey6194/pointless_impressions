@@ -72,6 +72,7 @@ Please note for the Jest testing there was a need to create html fixture files a
 - **400 and 500 Requests to Square**: Payment was throwing 400 and 500 errors firstly the order was not creating a payment_id in the Order model. Fixed this by adding payment_id being created when the order is created and sent to the DB and Square. Secondly, Sqaure was not updating the payment due to incorrect headers and body being sent. Fixed this by ensuring the correct headers and body were being sent to Square API by including them in OrderCOnfirmationView CBV.
 - **Confirm Order Modal Not Scrolling**: Confirm order modal was not scrolling to the top when opened, causing users to miss important information at the top of the modal. Fixed this by adding `modalContent.scrollTop = 0;` when the modal is opened to ensure it starts at the top and when the Yes, Confirm Order button is clicked it scrolls to the top to show the spinner.
 - **Deletion of Orders**: If a user deleted an order it changed to cancelled but was still showing in the user profile orders list. Fixed this by excluding cancelled orders from the orders list in the UserProfileView CBV.
+- **Cloudianry Images Being Blocked and Returning 404**: Cloudinary images were being blocked due to lack of CORS, so added `crossorigin='anonymous'` to the image tags to fix this issue. It then returned 404 error due to a wrong path being stored in the DB. Fixed this by ensuring the correct public id was stored in the DB.
 
 ### Unfixed Bugs
 

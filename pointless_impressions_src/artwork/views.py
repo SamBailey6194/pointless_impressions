@@ -82,7 +82,11 @@ def _serialize_artwork_data(artwork_queryset, placeholder_image):
             # Fallback: Try to get URL from image field directly
             if not image_url and hasattr(image_obj, 'image'):
                 try:
-                    image_url = getattr(image_obj, 'image', None)
+                    img_field = getattr(image_obj, 'image', None)
+                    if hasattr(img_field, 'url'):
+                        image_url = img_field.url
+                    else:
+                        image_url = str(img_field)
                 except (AttributeError, ValueError):
                     pass
             else:
