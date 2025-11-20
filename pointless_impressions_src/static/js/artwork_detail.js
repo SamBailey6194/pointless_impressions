@@ -73,7 +73,7 @@
     }
     if (imageElement) {
       imageElement.src = artworkData.image_url || "";
-      imageElement.alt = artworkData.image_alt_text || artworkData.name || "";
+      imageElement.alt = artworkData.alt_text || artworkData.name || "";
     }
     if (statusElement) {
       statusElement.textContent = artworkData.availability || "Unknown";

@@ -14,6 +14,8 @@ For BDD I used Behave for Python and Cypress for JavaScript.
 
 Please note for the Jest testing there was a need to create html fixture files as Jest doesn't always read the Django dynamic structure.
 
+**Important 2.0**: I did have Behave tests working previously. But after removing the local image calls to Cloudinary tags they were no longer working as the images were not being found. Due to time constraints I could not fix this issue. Therefore, I have removed the all the Behave tests. I also have removed cypress tests for the same reason.
+
 ### Fixed Bugs
 
 - **Tailwind build failure**: The `npm run dev` and `npm run build` commands were failing because the PostCSS scripts pointed to a non-existent `./src/style.css` file. Updated paths to the correct `src/css/styles.css` file.

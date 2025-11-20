@@ -457,5 +457,7 @@ Toast.handleAPIError(error)                // Displays API error messages
 - When editing an artwork in the Admin Dashboard, the admin can see the images currently uploaded for that artwork and can delete them individually while also adding new images.
 - Implementing unit and integration tests for critical components and features of the application to ensure reliability and maintainability.
 - Some of the modals styling could be improved further to make them more visually appealing and user-friendly.
+- Review system for Artwork to be reviewed by verified purchasers.
+- Link the DB newsletter subscriptions to an actual email marketing service like Mailchimp. For now we are using the newsletter subscription in the footer to send to MailChimp.
 
 ---
