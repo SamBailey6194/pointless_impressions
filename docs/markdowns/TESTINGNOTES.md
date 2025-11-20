@@ -79,6 +79,7 @@ Please note for the Jest testing there was a need to create html fixture files a
 
 - **Square payment styling**: I could not figure out how to style the input background colour to match the rest of the site. It was stuck as white despite trying multiple methods. However, this does not affect functionality. 
 - **Using Authenticated Users Info for Checkout**: When an authenticated user goes to checkout the form does not prefill with their information from their profile. I could not figure out how to do this with the current setup. However, this does not affect functionality as the user can still input their information manually.
+- **Image Sizes**: Images were provided by artists in various sizes and resolutions. Even with Cloudinary optimisations some images load slower than others. I could not fix this as I do not have access to the original image files to resize them. However, this does not affect functionality.
 
 ### Validator Testing
 

@@ -444,6 +444,14 @@ Toast.handleAPIError(error)                // Displays API error messages
 
 ---
 
+### Example of Social Media Marketing
+
+I used Facebook to make a page. Below are examples of the page.
+
+![Facebook Page Screenshot](/docs/images/facebook_page.png)
+
+![Facebook Posts Screenshot](/docs/images/facebook_posts.png)
+
 ### Features Left to Implement
 
 Some of the features listed below have the backend structure in place but need frontend implementation or further refinement:
