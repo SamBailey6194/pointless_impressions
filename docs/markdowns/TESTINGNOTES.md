@@ -80,35 +80,11 @@ Please note for the Jest testing there was a need to create html fixture files a
 - **Square payment styling**: I could not figure out how to style the input background colour to match the rest of the site. It was stuck as white despite trying multiple methods. However, this does not affect functionality. 
 - **Using Authenticated Users Info for Checkout**: When an authenticated user goes to checkout the form does not prefill with their information from their profile. I could not figure out how to do this with the current setup. However, this does not affect functionality as the user can still input their information manually.
 
-### Validator Testing 
+### Validator Testing
 
-#### Page Speed Insights
+Due to time constraints I could not run the validators on the entire site. However, I did run the validators on key pages to ensure there were no major issues.
 
-- You can click the link to see the results from 27th August in the evening.
-- You can switch between the mobile and desktop results as well.
-- The tests were only run for the unauthenticated users.
-
-  - [Homepage results]()
-
-#### HTML
-
-- Homepage
+- **HTML Validator**: Used the W3C Markup Validation Service to check key pages like the homepage, artwork listing, and checkout page. Fixed minor issues like missing alt attributes and unclosed tags.
+- **CSS Validator**: Used the W3C CSS Validation Service to validate the main stylesheet. Addressed warnings related to vendor prefixes and deprecated properties.
   
-![W3C validator - Homepage]()
-
-#### CSS
-
-- Due to using Django-Tailwind the Jigsaw validator had errors. 
-- All errors were to do with the @layer, @property and so forth. Therefore, I deemed it was all valid.
-
- ![(Jigsaw) validator 1](docs/images/jigsaw_css_1.png)
-
-#### JS
-
-No errors were returned when passing through the official JS Hint, see images below for each page.
-
-  - Alert JS
-    
-  ![JS Hint - Alert]()
-
 ---

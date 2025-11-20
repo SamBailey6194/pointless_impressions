@@ -461,5 +461,7 @@ Some of the features listed below have the backend structure in place but need f
 - Some of the modals styling could be improved further to make them more visually appealing and user-friendly.
 - Review system for Artwork to be reviewed by verified purchasers.
 - Link the DB newsletter subscriptions to an actual email marketing service like Mailchimp. For now we are using the newsletter subscription in the footer to send to MailChimp.
+- Enhancing accessibility features across the site to ensure compliance with WCAG standards, for example ensuring everything has a aria-label when required.
+- Change size of PNGs to be smaller for faster loading times.
 
 ---
