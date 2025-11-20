@@ -77,31 +77,11 @@ class CheckoutView(TemplateView):
             return context
 
         context['cart_items'] = cart_items_data
-        context['order_form'] = OrderForm(user=self.request.user)
+
+        context['order_form'] = OrderForm()
         context['subtotal'] = cart.get_subtotal()
         context['delivery_cost'] = cart.get_delivery_cost()
         context['grand_total'] = cart.get_grand_total()
-
-        if self.request.user.is_authenticated:
-            try:
-                customer_profile = context.get('current_user_customer_profile')
-                if customer_profile:
-                    context['shipping_addresses'] = (
-                        customer_profile.user_profile.addresses.filter(
-                            address_type='SHIPPING'
-                        )
-                    )
-                    context['billing_addresses'] = (
-                        customer_profile.user_profile.addresses.filter(
-                            address_type='BILLING'
-                            )
-                    )
-                else:
-                    context['shipping_addresses'] = None
-                    context['billing_addresses'] = None
-            except Exception:
-                context['shipping_addresses'] = None
-                context['billing_addresses'] = None
 
         context['square_app_id'] = os.getenv('SQUARE_APP_ID', '')
         context['square_location_id'] = os.getenv('SQUARE_LOCATION_ID', '')

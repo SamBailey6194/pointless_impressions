@@ -20,6 +20,7 @@ load_dotenv(os.path.join(ENV_PATH, ".env"))
 # Pull from environment (works with .env.dev locally or Heroku config vars)
 _raw_hosts = os.getenv("ALLOWED_HOSTS", "localhost")
 ALLOWED_HOSTS = [h.strip() for h in _raw_hosts.split(",") if h.strip()]
+DOMAIN = os.getenv("DOMAIN", "http://localhost:8000")
 
 # Application definition
 DJANGO_APPS = [

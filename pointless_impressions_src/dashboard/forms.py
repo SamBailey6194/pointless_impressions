@@ -3,17 +3,15 @@ from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Field, Div, HTML
 from pointless_impressions_src.home.widgets import CountrySelectFormWidget
 from pointless_impressions_src.home.countries import COUNTRY_CHOICES
-from pointless_impressions_src.home.fields import CustomPhoneField
+from pointless_impressions_src.order.models import Order
 
 
 # Write your crispy form here
-class OrderForm(forms.Form):
+class EditOrderForm(forms.ModelForm):
     """
     Form for collecting customer details during checkout.
 
     Fields:
-    - email: Customer's email address.
-    - phone: Customer's phone number.
     - shipping_first_name: Full name for shipping.
     - shipping_last_name: Full name for shipping.
     - shipping_address_line_1: Shipping address line 1.
@@ -33,21 +31,6 @@ class OrderForm(forms.Form):
     - billing_postcode: Billing postcode.
     - billing_country: Billing country.
     """
-    email = forms.EmailField(
-        required=True,
-        label="Email Address",
-        help_text="We'll send your order confirmation here.",
-        widget=forms.EmailInput(attrs={
-            'placeholder': 'your@email.com',
-            })
-    )
-
-    phone = CustomPhoneField(
-        required=True,
-        label="Phone Number",
-        initial='GB+44'
-    )
-
     shipping_first_name = forms.CharField(label="First Name")
     shipping_last_name = forms.CharField(label="Last Name")
     shipping_address_line_1 = forms.CharField(label="Address Line 1")
@@ -98,6 +81,19 @@ class OrderForm(forms.Form):
         widget=CountrySelectFormWidget()
     )
 
+    class Meta:
+        model = Order
+        fields = [
+            'shipping_first_name', 'shipping_last_name',
+            'shipping_address_line_1', 'shipping_address_line_2',
+            'shipping_city', 'shipping_county', 'shipping_postcode',
+            'shipping_country', 'billing_same_as_shipping',
+            'billing_first_name', 'billing_last_name',
+            'billing_address_line_1', 'billing_address_line_2',
+            'billing_city', 'billing_county', 'billing_postcode',
+            'billing_country',
+        ]
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -108,76 +104,138 @@ class OrderForm(forms.Form):
             Div(
                 Div(
                     HTML(
-                        "<h3 class='card-title mb-2'>Contact Information</h3>"
+                        "<h3 class='card-title mb-2'>"
+                        "Shipping Address</h3>"
                     ),
-                    Div(
-                        Field(
-                            'email',
-                            css_class='custom-input w-full lg:w-66'
-                        ),
-                        Field(
-                            'phone',
-                            css_class=(
-                                'custom-input '
-                                'h-10 '
-                                'w-full '
-                                'lg:w-66 '
-                                'my-2 '
-                                'lg:my-0 '
-                                'lg:mx-2 '
-                                'rounded-lg'
-                            )
-                        ),
-                        css_class='lg:flex lg:gap-4 mb-2'
-                    ),
-
                     HTML(
-                        "<div class='form-divider'></div>"
+                        "<p class='mb-4'>"
+                        "Enter your shipping details below</p>"
                     ),
+                    Div(
+                        Field(
+                            'shipping_first_name',
+                            placeholder="First Name",
+                            css_class='mb-4 custom-input w-full lg:w-66'
+                        ),
+                        Field(
+                            'shipping_last_name',
+                            placeholder="Last Name",
+                            css_class='mb-4 custom-input w-full lg:w-66'
+                        ),
+                        css_class='lg:flex lg:gap-4 mb-4'
+                    ),
+                    Div(
+                        Field(
+                            'shipping_address_line_1',
+                            placeholder="Address Line 1",
+                            css_class='mb-4 custom-input w-full lg:w-96'
+                        ),
+                        Field(
+                            'shipping_address_line_2',
+                            placeholder="Address Line 2 (Optional)",
+                            css_class='mb-4 custom-input w-full lg:w-96'
+                        ),
+                        css_class='mb-4 lg:flex lg:gap-4'
+                    ),
+                    Div(
+                        Field(
+                            'shipping_city',
+                            placeholder="City/Town",
+                            css_class='w-full lg:w-64 custom-input'
+                        ),
+                        Field(
+                            'shipping_county',
+                            placeholder="County (Optional)",
+                            css_class='w-full lg:w-64 custom-input'
+                        ),
+                        css_class='lg:flex lg:gap-4 mb-4'
+                    ),
+                    Div(
+                        Field(
+                            'shipping_postcode',
+                            placeholder="Postcode",
+                            css_class='w-full lg:w-40 custom-input'
+                        ),
+                        Field(
+                            'shipping_country'
+                        ),
+                        css_class='lg:flex lg:gap-4 mb-4'
+                    ),
+                    css_class='shipping-group',
+                    id="update-shipping-fields-container",
+                ),
 
+                HTML("<div class='form-divider'></div>"),
+
+                Div(
+                    HTML(
+                        "<h3 class='card-title mb-2'>Billing Address</h3>"
+                        "<p class='mb-4'>"
+                        "Enter your billing details below"
+                        "</p>"
+                    ),
                     Div(
                         HTML(
-                            "<h3 class='card-title mb-2'>"
-                            "Shipping Address</h3>"
+                            "<p class='text-sm text-gray-600'>"
+                            "Same as shipping address:"
+                            "</p>"
                         ),
                         HTML(
-                            "<p class='mb-4'>"
-                            "Enter your shipping details below</p>"
-                            ),
+                            "<p "
+                            "class='font-semibold' "
+                            "id='billing-confirmation-text'>"
+                            "</p>"
+                        ),
+                        css_class=(
+                            'billing-confirmation-container '
+                            'p-3 rounded-lg '
+                            'mb-4'
+                        ),
+                        style="display: none;"
+                    ),
+                    Div(
                         Div(
                             Field(
-                                'shipping_first_name',
+                                'billing_first_name',
                                 placeholder="First Name",
-                                css_class='mb-4 custom-input w-full lg:w-66'
+                                css_class=(
+                                    'mb-4 custom-input w-full lg:w-66'
+                                )
                             ),
                             Field(
-                                'shipping_last_name',
+                                'billing_last_name',
                                 placeholder="Last Name",
-                                css_class='mb-4 custom-input w-full lg:w-66'
+                                css_class=(
+                                    'mb-4 custom-input w-full lg:w-66'
+                                )
                             ),
                             css_class='lg:flex lg:gap-4 mb-4'
                         ),
                         Div(
                             Field(
-                                'shipping_address_line_1',
+                                'billing_address_line_1',
                                 placeholder="Address Line 1",
-                                css_class='mb-4 custom-input w-full lg:w-96'
+                                css_class=(
+                                    'mb-4 custom-input w-full lg:w-96'
+                                )
                             ),
                             Field(
-                                'shipping_address_line_2',
+                                'billing_address_line_2',
                                 placeholder="Address Line 2 (Optional)",
-                                css_class='mb-4 custom-input w-full lg:w-96'
+                                css_class=(
+                                    'mb-4 custom-input w-full lg:w-96'
+                                )
                             ),
                             css_class='mb-4 lg:flex lg:gap-4'
                         ),
                         Div(
                             Field(
-                                'shipping_city',
+                                'billing_city',
                                 placeholder="City/Town",
                                 css_class='w-full lg:w-64 custom-input'
                             ),
                             Field(
-                                'shipping_county',
+                                'billing_county',
                                 placeholder="County (Optional)",
                                 css_class='w-full lg:w-64 custom-input'
                             ),
@@ -185,118 +243,21 @@ class OrderForm(forms.Form):
                         ),
                         Div(
                             Field(
-                                'shipping_postcode',
+                                'billing_postcode',
                                 placeholder="Postcode",
                                 css_class='w-full lg:w-40 custom-input'
                             ),
                             Field(
-                                'shipping_country'
+                                'billing_country'
                             ),
                             css_class='lg:flex lg:gap-4 mb-4'
                         ),
-                        Field(
-                            'billing_same_as_shipping',
-                            css_class='mr-4'
-                        ),
-                        css_class='shipping-group',
-                        id="shipping-fields-container",
                     ),
-
-                    HTML("<div class='form-divider'></div>"),
-
-                    Div(
-                        HTML(
-                            "<h3 class='card-title mb-2'>Billing Address</h3>"
-                            "<p class='mb-4'>"
-                            "Enter your billing details below"
-                            "</p>"
-                        ),
-                        Div(
-                            HTML(
-                                "<p class='text-sm text-gray-600'>"
-                                "Same as shipping address:"
-                                "</p>"
-                            ),
-                            HTML(
-                                "<p "
-                                "class='font-semibold' "
-                                "id='billing-confirmation-text'>"
-                                "</p>"
-                            ),
-                            css_class=(
-                                'billing-confirmation-container '
-                                'p-3 rounded-lg '
-                                'mb-4'
-                            ),
-                            style="display: none;"
-                        ),
-                        Div(
-                            Div(
-                                Field(
-                                    'billing_first_name',
-                                    placeholder="First Name",
-                                    css_class=(
-                                        'mb-4 custom-input w-full lg:w-66'
-                                        )
-                                ),
-                                Field(
-                                    'billing_last_name',
-                                    placeholder="Last Name",
-                                    css_class=(
-                                        'mb-4 custom-input w-full lg:w-66'
-                                        )
-                                ),
-                                css_class='lg:flex lg:gap-4 mb-4'
-                            ),
-                            Div(
-                                Field(
-                                    'billing_address_line_1',
-                                    placeholder="Address Line 1",
-                                    css_class=(
-                                        'mb-4 custom-input w-full lg:w-96'
-                                        )
-                                ),
-                                Field(
-                                    'billing_address_line_2',
-                                    placeholder="Address Line 2 (Optional)",
-                                    css_class=(
-                                        'mb-4 custom-input w-full lg:w-96'
-                                        )
-                                ),
-                                css_class='mb-4 lg:flex lg:gap-4'
-                            ),
-                            Div(
-                                Field(
-                                    'billing_city',
-                                    placeholder="City/Town",
-                                    css_class='w-full lg:w-64 custom-input'
-                                ),
-                                Field(
-                                    'billing_county',
-                                    placeholder="County (Optional)",
-                                    css_class='w-full lg:w-64 custom-input'
-                                ),
-                                css_class='lg:flex lg:gap-4 mb-4'
-                            ),
-                            Div(
-                                Field(
-                                    'billing_postcode',
-                                    placeholder="Postcode",
-                                    css_class='w-full lg:w-40 custom-input'
-                                ),
-                                Field(
-                                    'billing_country'
-                                ),
-                                css_class='lg:flex lg:gap-4 mb-4'
-                            ),
-                        ),
-                        css_class='billing-group',
-                        id="billing-fields-container",
-                    ),
-
-                    HTML("<div class='form-divider'></div>"),
+                    css_class='billing-group',
+                    id="update-billing-fields-container",
                 ),
-                css_class='card-body p-6'
+
+                HTML("<div class='form-divider'></div>"),
             ),
         )
 
@@ -347,3 +308,16 @@ class OrderForm(forms.Form):
                     self.add_error(field_name, 'This field is required.')
 
         return cleaned_data
+
+    def save(self, commit=True):
+        """
+        Override save to ensure guest_email and guest_phone are preserved.
+        """
+        instance = super().save(commit=False)
+        if self.instance.pk:
+            instance.guest_email = self.instance.guest_email
+            instance.guest_phone = self.instance.guest_phone
+
+        if commit:
+            instance.save()
+        return instance

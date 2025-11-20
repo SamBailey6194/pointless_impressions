@@ -14,7 +14,11 @@ import hmac
 import hashlib
 import base64
 from .models import Order, PaymentRecovery
-from .utils import create_order_from_cart, build_address_dict
+from .utils import (
+    create_order_from_cart,
+    build_address_dict,
+    send_order_confirmation_email
+    )
 from .forms import OrderForm
 from pointless_impressions_src.cart.utils import get_cart, serialize_items
 from square.client import Square
@@ -72,7 +76,7 @@ class OrderConfirmationView(View):
                         )
                 }, status=400)
 
-            form = OrderForm(data=form_data, user=request.user)
+            form = OrderForm(data=form_data)
 
             if not form.is_valid():
                 return JsonResponse({
@@ -141,6 +145,13 @@ class OrderConfirmationView(View):
                 new_order = create_order_from_cart(cart, order_data)
                 new_order.payment_id = payment_id
                 new_order.save()
+
+                try:
+                    send_order_confirmation_email(new_order)
+                except Exception as e:
+                    import traceback
+                    print("Failed to send order confirmation email:", e)
+                    print(traceback.format_exc())
 
                 if 'cart_id' in request.session:
                     del request.session['cart_id']

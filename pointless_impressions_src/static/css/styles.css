@@ -3867,6 +3867,9 @@
   .border-red-500 {
     border-color: var(--color-red-500);
   }
+  .bg-\(--pointless-white\) {
+    background-color: var(--pointless-white);
+  }
   .bg-base-100 {
     background-color: var(--color-base-100);
   }
@@ -3881,6 +3884,9 @@
   }
   .bg-gray-300 {
     background-color: var(--color-gray-300);
+  }
+  .bg-gray-300\! {
+    background-color: var(--color-gray-300) !important;
   }
   .bg-primary {
     background-color: var(--color-primary);
@@ -4721,9 +4727,19 @@
       width: calc(var(--spacing) * 72);
     }
   }
+  .dark\:bg-\(--pointless-black\) {
+    @media (prefers-color-scheme: dark) {
+      background-color: var(--pointless-black);
+    }
+  }
   .dark\:bg-gray-700 {
     @media (prefers-color-scheme: dark) {
       background-color: var(--color-gray-700);
+    }
+  }
+  .dark\:bg-gray-700\! {
+    @media (prefers-color-scheme: dark) {
+      background-color: var(--color-gray-700) !important;
     }
   }
   .dark\:text-\(--pointless-white\) {

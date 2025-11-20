@@ -3,6 +3,7 @@ import { getCsrfToken } from './cart.js';
 let card = null; // Holds the Square Card instance
 let payments = null; // Holds the Square Payments instance
 let paymentInProgress = false; // Prevent multiple submissions
+const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
 /**
  * Get Square Card styles based on theme
@@ -384,16 +385,14 @@ document.addEventListener('DOMContentLoaded', async function () {
 
         const countryVal = getValue('id_billing_country') || getValue('id_shipping_country');
 
-        console.log("Raw Country Value:", countryVal);
-
         const isoCountry = countryVal.length ? countryVal.trim().substring(0, 2).toUpperCase() : 'GB';
 
         // Guest User Phone Handling
         const phonePrefixInput = document.getElementById('id_phone_0');
         const phoneNumberInput = document.getElementById('id_phone_1');
 
-        // Authenticated User Phone Handling
-        const authUserPhone = document.getElementById('id_phone');
+        // Auth User Phone Handling
+        const authPhoneInput = document.getElementById('id_phone');
 
         let fullPhone = '';
 
@@ -401,52 +400,86 @@ document.addEventListener('DOMContentLoaded', async function () {
           const rawPrefix = phonePrefixInput.value;
           const cleanPrefix = rawPrefix.replace(/[^0-9+]/g, '');
           fullPhone = (cleanPrefix + phoneNumberInput.value).trim();
-        } else if (authUserPhone) {
-          fullPhone = authUserPhone.value.replace(/[^0-9+]/g, '').trim();
+        } else if (authPhoneInput) {
+          fullPhone = authPhoneInput.value.replace(/[^0-9+]/g, '').trim();
         } else {
           let rawString = formDataObj['phone'] || formDataObj['id_phone_0'] + formDataObj['id_phone_1'] || '';
           fullPhone = rawString.replace(/[^0-9+]/g, '').trim();
         }
 
-        const amountString = finalConfirmBtn.dataset.amount;
+        formDataObj['phone'] = fullPhone;
 
-        if (!amountString) throw new Error("Payment amount not found.");
+        console.log('Full Phone:', fullPhone);
+
+        let finalEmail = getValue('id_email') || formDataObj['email'] || '';
+        if (!finalEmail) {
+          const hiddenEmailInput = document.getElementById('id-email');
+          if (hiddenEmailInput) {
+            finalEmail = hiddenEmailInput.value;
+          }
+        }
+
+        const amountClean = finalConfirmBtn.dataset.amount;
+        if (!amountClean) throw new Error("Payment amount not found.");
+        const amountString = amountClean.replace(/,/g, '');
+
+        const billingContact = {
+          givenName: getValue('id_billing_first_name') || getValue('id_shipping_first_name'),
+          familyName: getValue('id_billing_last_name') || getValue('id_shipping_last_name'),
+          email: finalEmail,
+          addressLines: [
+            getValue('id_billing_address_line_1') || getValue('id_shipping_address_line_2'),
+          ],
+          city: getValue('id_billing_city') || getValue('id_shipping_city'),
+          postalCode: getValue('id_billing_postcode') || getValue('id_shipping_postcode'),
+          state: getValue('id_billing_county') || getValue('id_shipping_county'),
+          countryCode: isoCountry,
+        };
+
+        const line2 = getValue('id_billing_address_line_2') || getValue('id_shipping_address_line_2');
+        if (line2) {
+          billingContact.addressLines.push(line2);
+        }
+
+        const stateVal = getValue('id_billing_county') || getValue('id_shipping_county');
+        if (stateVal) {
+          billingContact.state = stateVal;
+        }
+
+        if (fullPhone && fullPhone.length > 5) {
+          billingContact.phone = fullPhone;
+        }
+
+        console.log('Billing Contact:', billingContact);
 
         const verificationDetails = {
           amount: amountString,
-          billingContact: {
-            givenName: getValue('id_billing_first_name') || getValue('id_shipping_first_name'),
-            familyName: getValue('id_billing_last_name') || getValue('id_shipping_last_name'),
-            email: getValue('id_email') || formDataObj['email'],
-            phone: fullPhone,
-            addressLines: [
-              getValue('id_billing_address_line_1') || getValue('id_shipping_address_line_2'),
-              getValue('id_billing_address_line_2') || getValue('id_shipping_address_line_2'),
-            ],
-            city: getValue('id_billing_city') || getValue('id_shipping_city'),
-            postalCode: getValue('id_billing_postcode') || getValue('id_shipping_postcode'),
-            state: getValue('id_billing_county') || getValue('id_shipping_county'),
-            countryCode: isoCountry,
-          },
+          billingContact: billingContact,
           currencyCode: 'GBP',
           intent: 'CHARGE',
           customerInitiated: true,
           sellerKeyedIn: false,
         };
 
-        setTimeout(() => {
-          confirmModal.close();
-        }, 3000);
+        console.log('Verification Details:', verificationDetails);
+
+        await delay(3000);
+        confirmModal.close();
 
         if (placeOrderButton) {
-          placeOrderButton.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Processing...';
+          placeOrderButton.innerHTML = '<i class="fa-solid fa-shield-halved fa-spin mr-2"></i> Verifying Security...';
           placeOrderButton.disabled = true;
         }
+
         const tokenResult = await card.tokenize(verificationDetails);
 
         if (tokenResult.status !== 'OK') {
           const errorMsg = tokenResult.errors?.[0]?.message || 'Tokenization failed';
           throw new Error(errorMsg);
+        }
+
+        if (placeOrderButton) {
+             placeOrderButton.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i> Finalizing Order...';
         }
 
         const response = await fetch('/order/confirmation/', {
@@ -478,7 +511,7 @@ document.addEventListener('DOMContentLoaded', async function () {
 
         if (placeOrderButton) {
           placeOrderButton.disabled = false;
-          placeOrderButton.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Processing...';
+          placeOrderButton.innerHTML = '<i class="fa-solid fa-credit-card mr-2"></i> Confirm & Pay';
         } 
 
         const errorMessage = err.message || 'An error occurred during payment processing.';

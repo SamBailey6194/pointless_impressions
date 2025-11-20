@@ -3,6 +3,7 @@ from decimal import Decimal
 import uuid
 import secrets
 from django.conf import settings
+from django.urls import reverse
 from pointless_impressions_src.artwork.models import Artwork
 
 
@@ -242,6 +243,27 @@ class Order(models.Model):
 
     def __str__(self):
         return f"Order {self.order_number} - {self.status}"
+
+    def get_authenticated_user_link(self):
+        """
+        Generate the dashboard link for authenticated users.
+        """
+        return reverse(
+            'dashboard:user_profile_dashboard',
+            kwargs={'public_id': self.user.public_id}
+        )
+
+    def get_guest_user_link(self):
+        """
+        Generate the dashboard link for guest users.
+        """
+        base_url = reverse(
+            'dashboard:guest_order',
+            kwargs={
+                'order_id': self.id,
+            }
+        )
+        return f"{base_url}?access_code={self.guest_access_code}"
 
 
 # ----------------------------------

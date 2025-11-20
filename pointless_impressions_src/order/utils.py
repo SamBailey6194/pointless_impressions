@@ -1,6 +1,12 @@
 from django.db import transaction
+from django.conf import settings
+from django.http import HttpRequest
+from django.template.loader import render_to_string
+from django.core.mail import send_mail
 from pointless_impressions_src.cart.models import Cart
 from .models import Order, OrderItem
+from pointless_impressions_src.pointless_impressions.context_processors \
+    import global_context
 
 
 # Write your utility functions here.
@@ -130,3 +136,68 @@ def build_address_dict(addr: dict) -> dict:
             'billing_country', ''
             ),
     }
+
+
+def send_order_confirmation_email(order):
+    """
+    Send an order confirmation email based on user type.
+    """
+    request = HttpRequest()
+    context = {
+        'order': order,
+        'domain': settings.DOMAIN,
+    }
+    context.update(global_context(request))
+
+    if order.user:
+        # Authenticated user
+        subject = "Your Email Verification Code"
+        plain_message = (
+            f"Hello {order.user.first_name},\n\nYour order number is: "
+            f"{order.order_number}.\n\n"
+            "You can see updates on your dashboard.\n"
+            f"Click here: {order.get_authenticated_user_link()}\n\n"
+            "Thank you!"
+        )
+        context.update({
+            'user': order.user,
+            'user_first_name': order.user.first_name,
+            'dashboard_link': order.get_authenticated_user_link(),
+        })
+        html_message = render_to_string(
+            'emails/order_confirmation_authenticated.html',
+            context
+        )
+        recipient = order.user.email
+    else:
+        # Guest user
+        subject = "Order Confirmation"
+        guest_name = f"{order.shipping_first_name}"
+        plain_message = (
+            f"Hello {guest_name},\n\nYour order number is: "
+            f"{order.order_number}.\n\n"
+            "You can see updates here:.\n"
+            f"{order.get_guest_user_link()}\n\n"
+            "Thank you!"
+        )
+        context.update({
+            'guest_name': guest_name,
+            'guest_link': order.get_guest_user_link(),
+        })
+        html_message = render_to_string(
+            'emails/order_confirmation_guest.html',
+            context
+        )
+        recipient = order.guest_email
+
+    from_email = settings.DEFAULT_FROM_EMAIL
+    recipient_list = [recipient]
+
+    send_mail(
+        subject,
+        plain_message,
+        from_email,
+        recipient_list,
+        html_message=html_message,
+        fail_silently=False,
+    )

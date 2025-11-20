@@ -22,8 +22,9 @@ from pointless_impressions_src.account.mixins import (
     AnonymousRequiredMixin, EmailNotVerifiedMixin
     )
 from pointless_impressions_src.account.utils import (
-    send_verification_email, generate_verification_code
-    )
+    send_verification_email, generate_verification_code,
+    send_email_verified_confirmation
+)
 
 
 # Create your views here
@@ -217,20 +218,22 @@ class VerifyEmailView(FormView, EmailNotVerifiedMixin, CustomerRequiredMixin):
                 code=code, is_used=False
             )
             if verification.is_expired():
-                messages.error(
-                    self.request, "The verification code has expired."
-                )
-            else:
-                verification.is_used = True
-                verification.save()
-                user.is_active = True
-                user.save()
-                login(self.request, user)
-                del self.request.session['pending_verification_user_id']
-                messages.success(
-                    self.request, "Your email has been verified successfully."
-                )
-                return redirect('dashboard:landing')
+                messages.error(self.request, "Verification code has expired.")
+                return self.form_invalid(form)
+
+            # Mark the verification code as used
+            verification.is_used = True
+            verification.save()
+
+            # Activate the user
+            user.is_active = True
+            user.save()
+
+            # Send email verified confirmation
+            send_email_verified_confirmation(user)
+
+            messages.success(self.request, "Your email has been verified!")
+            return redirect('dashboard:landing')
 
         except CustomUser.DoesNotExist:
             messages.error(self.request, "User not found.")

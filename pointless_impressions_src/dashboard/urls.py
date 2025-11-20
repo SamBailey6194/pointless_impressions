@@ -13,6 +13,11 @@ urlpatterns = [
         name='user_profile_dashboard',
     ),
     path(
+        'user-profile/<uuid:order_id>/order/update/',
+        views.UpdateOrderView.as_view(),
+        name='order_update',
+    ),
+    path(
         'admin-dashboard/<uuid:public_id>/',
         views.AdminDashboardView.as_view(),
         name='admin_dashboard',
@@ -26,5 +31,10 @@ urlpatterns = [
         'admin-dashboard/<uuid:public_id>/add-artwork/',
         views.AddArtworkModalView.as_view(),
         name='add_artwork_modal'
+    ),
+    path(
+        'guest-order/<uuid:order_id>/',
+        views.GuestOrderView.as_view(),
+        name='guest_order',
     ),
 ]
