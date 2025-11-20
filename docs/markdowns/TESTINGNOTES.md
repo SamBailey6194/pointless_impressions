@@ -6,7 +6,7 @@ You can see the manual testing table [here](docs/markdowns/MANUALTESTING.md).
 
 You can see the automatic testing table [here](docs/markdowns/AUTOMATICTESTING.md).
 
-**Important**: Due to time constraints only US001, US002, US003 and US008 Backend TDD and BDD tests were implemented. The importance of completing the project to a high standard was prioritised over completing all tests.
+**Important**: Due to time constraints only US001, US002, US003 and US008 Backend TDD and BDD tests were implemented. I also only noted down the manual tests for the same user stories. The importance of completing the project to a high standard was prioritised over completing all tests.
 
 For TDD I used TestCase for Django and Jest for JavaScript
 

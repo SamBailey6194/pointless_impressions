@@ -497,14 +497,25 @@ The app deployed via Heroku [here]() following the steps below:
        - **Important:** Download the Access Key ID and Secret Access Key
        - Store these securely - they won't be shown again
 
-8. **Create Heroku App:**
+8. **Square Setup:**
+   1. Log into your [Square Developer Dashboard](https://developer.squareup.com/apps)
+   2. Create a new application for staging or production
+   3. Note down the Application ID, Access Token, and Application Secret
+   4. Set up Webhooks:
+      - Navigate to "Webhooks" tab in your application
+      - Add a new subscription with the following details:
+        - Event Types: Select relevant events (e.g., payment updates)
+        - Notification URL: Your webhook endpoint (e.g., `https://your-domain.com/order/webhooks/square`)
+      - Note down the Webhook Subscription ID and Signature Key
+
+9.  **Create Heroku App:**
    1. Navigate to Heroku Dashboard
    2. Click "New" → "Create new app"
    3. App name: Global Name
    4. Choose region: EU
    5. Click "Create app"
 
-9. **Create Config Vars:**
+10. **Create Config Vars:**
    1. In the Heroku app dashboard, navigate to "Settings" → "Config Vars"
    2. Add all necessary environment variables as per your `.env.production.example` or `.env.staging.example` files.
    3. Ensure to include AWS, Cloudinary, Email, and Django secret key settings.
@@ -534,12 +545,16 @@ The app deployed via Heroku [here]() following the steps below:
     AWS_S3_REGION_NAME= 
     AWS_ACCESS_KEY_ID= 
     AWS_SECRET_ACCESS_KEY= 
-    STRIPE_PUBLIC_KEY= 
-    STRIPE_SECRET_KEY= 
-    STRIPE_WH_SECRET= 
+    SQUARE_APP_ID=
+    SQUARE_ACCESS_TOKEN=
+    SQUARE_APP_SECRET=
+    SQUARE_LOCATION_ID=
+    SQUARE_WEBHOOK_SUBSCRIPTION_ID=
+    SQUARE_WEBHOOK_URL=
+    SQUARE_WEBHOOK_SIGNATURE_KEY=
     ```
 
-10. **Deploy the App:**
+11. **Deploy the App:**
     1. In the Heroku app dashboard, navigate to "Deploy" tab
     2. Under "Deployment method," select "GitHub"
     3. Connect to your GitHub account and select the repository

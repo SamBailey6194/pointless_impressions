@@ -1,5 +1,7 @@
 ## Features 
 
+Due to time constraints I haven't been able to post the screenshots for the features implemented.
+
 Below are the features for the website and at the end is listed any features that weren't able to be implemented but would be with more time. Please note as this is a resubmission I have not changed the screenshots of the features as they are essentially the same with minor differences.
 
 ### SEO Features
@@ -60,7 +62,7 @@ I implemented a comprehensive SEO strategy directly within the Django `base.html
 **Desktop View:**
 - **Logo**: Clickable Pointless Impressions logo (top-left) with fallback text branding
 - **Primary Navigation Menu** (visible on md+ screens):
-  - Home, Shop (with dropdown: Categories, Framing Options, Artists), Blog, About, Contact
+  - Home, Shop (with dropdown: Categories, Framing Options, Artists)
   - Each link styled with hover states (yellow background, black text)
 - **Search Button**: Top-right icon button with "Search" label (visible on desktop)
 - **Account Dropdown**: Profile picture if authenticated, user icon if guest; expandable menu showing profile options
@@ -68,7 +70,7 @@ I implemented a comprehensive SEO strategy directly within the Django `base.html
 - **Responsive Grid Layout**: Items evenly distributed with navbar-start/center/end sections
 
 **Mobile View:**
-- **Hamburger Menu**: Collapsible navigation drawer revealing Shop, Blog, About, Contact
+- **Hamburger Menu**: Collapsible navigation drawer revealing Shop
 - **Logo**: Scaled appropriately for smaller screens
 - **Search Icon**: Visible in mobile menu, integrated with search functionality
 - **Account/Cart Buttons**: Positioned in navbar-end, accessible without hamburger
@@ -77,7 +79,7 @@ I implemented a comprehensive SEO strategy directly within the Django `base.html
 **Authentication States:**
 - **Logged In**: Shows user profile picture, username in dropdown, "Profile" and "Logout" options
 - **Guest**: Shows generic user icon, "Login" and "Signup" options in dropdown
-- **Authenticated Features Unlock**: Account menu expands with order history, saved addresses, preferences
+- **Authenticated Features Unlock**: Account menu expands with profile dashboard links
 
 **User Interactions:**
 - Hover effects on navigation items (yellow highlight with smooth transitions)
@@ -93,11 +95,6 @@ I implemented a comprehensive SEO strategy directly within the Django `base.html
 - The dropdown updates instantly after any cart change (add, update, remove) via AJAX.
 - Clicking "View Cart" in the dropdown takes the user directly to the checkout page.
 
-**Real-Time Updates & Persistence:**
-- Cart state is persisted using localStorage and synchronized with the backend session.
-- All cart actions (add, update, remove) trigger real-time UI updates in the header dropdown and badge.
-- Cart remains consistent across page reloads and navigation.
-
 ---
 
 #### Footer
@@ -105,13 +102,14 @@ I implemented a comprehensive SEO strategy directly within the Django `base.html
 **Content Sections (Responsive Grid):**
 - **Newsletter Signup**: Email subscription form with validation, success confirmation via toast
 - **Company Info**: Logo, brand description ("Discover unique Pointillism artwork..."), social links placeholder
-- **Quick Links**: Home, Shop, Blog, About, Contact, Privacy Policy (all clickable)
+- **Quick Links**: Home and Shop links
 - **Branding**: Uses --pointless-blue, --pointless-yellow brand colors
 
 **Features:**
 - **Responsive Layout**: Stacks vertically on mobile (md:grid-cols-3 on tablet+)
 - **Dark Mode Support**: Adapts colors for light/dark themes
 - **Newsletter Integration**: Email validation, success toasts on subscription
+- **Social Media Icons**: Facebook link sends user to Pointless Impressions Facebook page
 - **Accessibility**: Semantic HTML, proper link structure
 
 ---
@@ -134,11 +132,6 @@ I implemented a comprehensive SEO strategy directly within the Django `base.html
 - **Navigation**: Previous/Next buttons (❮ ❯) for manual carousel control
 - **Responsive Sizing**: w-72 (mobile), md:w-80, lg:w-96 for adaptive card widths
 - **Hover Effects**: Shadow transitions on card hover
-
-**Latest Blog Posts Section:**
-- Similar carousel structure to Featured Artwork
-- Shows latest blog posts with title, author, date, excerpt
-- Links to full blog post pages
 
 **Interaction Features:**
 - Carousel auto-scrolls smoothly
@@ -258,62 +251,9 @@ I implemented a comprehensive SEO strategy directly within the Django `base.html
 - Details scroll naturally
 - Buttons full-width for easy tapping
 
----
-
-#### Add to Cart Modal
-
-**Modal Structure:**
-- **Overlay**: Semi-transparent backdrop (closes on outside click)
-- **Modal Box**: Centered dialog with max-width container
-
-**Product Summary Card:**
-- **Image Thumbnail**: Small (80x80px) preview of artwork
-- **Product Info**: 
-  - "Adding to cart:" label
-  - Artwork name (line-clamped to 2 lines)
-  - Price (£ format, bold)
-  - Stock status ("2 items available" etc.)
-
-**Quantity Selection:**
-- **Input Field**: Number input with min=1, max=max_stock
-- **Decrement Button**: "-" button reduces quantity by 1
-- **Increment Button**: "+" button increases quantity by 1
-- **Error Display**: Shows validation errors if quantity invalid (red text below field)
-- **Max Quantity Info**: Shows "Max: X items" label
-- **Validation**: 
-  - Prevents quantity < 1 (client-side)
-  - Prevents quantity > stock (client-side)
-  - Server-side protection prevents manipulation
-
-**Framing Options:**
-- **Dropdown Select**: Lists available framing conditions
-  - Example options: "Unframed", "Wood Frame", "Canvas Only", "Metal Frame"
-  - Placeholder: "Select framing option..."
-- **Conditional Display**: Only shows if artwork has framing options
-- **Required Field**: Must select before adding if section visible
-
-**Special Requests (Optional):**
-- **Textarea**: Max 500 characters for gift messages, special instructions
-- **Character Counter**: Shows "0/500" live counter
-
-**Error & Success Messages:**
-- **Error Alert**: Red background with icon, displays validation errors
-- **Success Alert**: Green background with checkmark, "Added to cart successfully!"
-
-**Form Actions:**
-- **Cancel Button**: Closes modal without changes (ghost style)
-- **Add to Cart Button**: Submits form, triggers add-to-cart logic
-- **Button States**: Disabled during submission, shows loading state
-
-**User Flows:**
-- **Flow 1 (SSR)**: User submits form → POST request to server → Django message → Toast success → Cart updated → Modal closes
-- **Flow 2 (API)**: User submits form → AJAX to API endpoint → JSON response with message → Toast display → Modal closes
-- **Flow 3 (Validation Error)**: Invalid quantity → Error toast/inline message → User can correct and resubmit
-
-**Toast Notifications Integration:**
-- **Success Toast**: "Item added to cart! (top-right, 3-second duration, green)"
-- **Error Toast**: "Invalid quantity. Please select 1-X items. (top-right, 4-second duration, red)"
-- **Info Toast**: "Please select a framing option. (top-right, 3-second duration, blue)"
+**Add To Cart Form**
+- Form is on the page with quantity, framing options and notes
+- "Add to Cart" button triggers adding to cart and scrolling to top with toast notification and cart dropdown update
 
 ---
 
@@ -332,8 +272,8 @@ I implemented a comprehensive SEO strategy directly within the Django `base.html
 - "Remove" button allows users to delete items from the cart instantly.
 
 **Cart Synchronization:**
-- Cart UUID is synced between localStorage and cookies to ensure backend and frontend are always in sync.
-- All cart data is fetched from the backend to prevent stale or out-of-sync UI.
+- Cart is stored in cookies session id
+- It updates via AJAX to keep backend and frontend in sync.
 
 **AJAX Integration:**
 - All cart updates (quantity, framing, removal) use AJAX for a seamless user experience.
@@ -344,9 +284,15 @@ I implemented a comprehensive SEO strategy directly within the Django `base.html
 - Error messages are displayed via toast notifications for invalid actions (e.g., exceeding stock).
 
 **Checkout Actions:**
-- "Proceed to Payment" button is enabled only if the cart is valid and not empty.
-- Delivery address and payment method sections are shown after order summary (if user is authenticated).
-- Guest checkout prompts for login or registration before payment.
+- Checkout form is displayed below order summary.
+- Guest and Authentiticated users need to fill in necessary details.
+- When they click to pay it opens a confirm order modal to finalise the order.
+- If they confirm it scrolls to top of the modal and shows a spinner while processing the order.
+- Once processed, user is redirected to order confirmation page.
+- If they are in a region that requires SCA compliance the modal closes and the button on the checkout form has a spinning shield icon then the SCA confirmation appears for the user to complete, the checkout form button then becomes a spinner.
+- If all is a success they are redirected to the order confirmation page.
+- If an error occurs during order processing, an error toast notification is displayed and the user remains on the checkout page to correct any issues.
+- If the payment goes through the order gets stored on the PaymentRecovery model.
 
 **Security & SEO:**
 - Checkout page uses `<meta name="robots" content="noindex, nofollow" />` to prevent indexing.
@@ -356,6 +302,52 @@ I implemented a comprehensive SEO strategy directly within the Django `base.html
 - Fully responsive layout for mobile and desktop.
 - All form controls are accessible via keyboard and screen readers.
 - Clear focus states and error indicators for all inputs.
+
+---
+
+### Additional Features
+
+#### Email Templates
+- **Order Confirmation for Guests**: Sends an email confirmation for guest orders. This grants them access to track their order.
+- **Email Verified Confirmation**: Notifies users when their email is successfully verified.
+- **Verification Email**: Sends a verification email to users upon registration.
+- **Order Confirmation for Authenticated Users**: Sends an email confirmation for orders placed by logged-in users. Has a button that takes them to their user profile dashboard to track their order.
+
+#### Error Templates
+- Custom error pages for various HTTP status codes:
+  - `400.html`: Bad Request
+  - `401.html`: Unauthorized
+  - `403.html`: Forbidden
+  - `404.html`: Not Found
+  - `408.html`: Request Timeout
+  - `500.html`: Internal Server Error
+  - `502.html`: Bad Gateway
+  - `503.html`: Service Unavailable
+
+#### Dashboard App
+- **Admin Dashboard**: Provides an interface for managing artworks, orders, and users.
+- **User Profile Dashboard**: Allows users to view and manage their profile details. They can manage their orders and see order history, all cancelled orders are hidden.
+- **Guest Order Dashboard**: Enables guests to track their orders.
+- **Modals for Admin Actions**:
+  - Edit Artwork
+  - Add Artwork
+  - Delete Artwork
+  - Edit Order
+  - Delete Order
+  - Update Order
+
+#### Profiles App
+- **User Profiles**: Stores user-specific information, including addresses and preferences.
+- **Admin Features**: Allows management of user roles and approvals for artists.
+- **Signals**: Handles events like profile creation upon user registration.
+- **Fixtures**: Predefined data for testing profiles and addresses.
+- **Authentication** Features: Login, logout, signup, and email verification.
+
+#### Square Integration with SCA
+- **Secure Payments**: Integrated Square API for processing payments with Strong Customer Authentication (SCA).
+- **Order Confirmation**: Ensures payment details are securely handled and confirmed.
+- **Error Handling**: Custom logic to manage Square API errors, ensuring a seamless user experience.
+- **Testing**: Comprehensive tests to validate payment workflows and error scenarios.
 
 ---
 

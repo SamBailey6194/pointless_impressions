@@ -86,9 +86,9 @@ class Photo(models.Model):
     def get_folder(self):
         """Determine Cloudinary folder based on photo type."""
         folder_map = {
-            'artwork': 'pointless-impressions-local/artwork',
-            'profile': 'pointless-impressions-local/profiles',
-            'site_asset': 'pointless-impressions-local/site_assets',
+            'artwork': 'pointless-impressions/artwork',
+            'profile': 'pointless-impressions/profiles',
+            'site_asset': 'pointless-impressions/site_assets',
         }
         return folder_map.get(
             self.photo_type, 'pointless-impressions-local/others'
