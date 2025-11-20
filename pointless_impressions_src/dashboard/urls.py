@@ -18,6 +18,11 @@ urlpatterns = [
         name='order_update',
     ),
     path(
+        'user-profile/<uuid:order_id>/order/delete/',
+        views.DeleteOrderView.as_view(),
+        name='order_delete',
+    ),
+    path(
         'admin-dashboard/<uuid:public_id>/',
         views.AdminDashboardView.as_view(),
         name='admin_dashboard',

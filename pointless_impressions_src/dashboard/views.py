@@ -324,3 +324,35 @@ class UpdateOrderView(LoginRequiredMixin, View):
             del form.fields['email']
         if 'phone' in form.fields:
             del form.fields['phone']
+
+
+class DeleteOrderView(LoginRequiredMixin, View):
+    """
+    View to handle updating an order.
+
+    POST: Updates the order details based on the provided data.
+    Returns the updated order details.
+
+    Context:
+        order (Order): The order being updated.
+    """
+    template_name = 'dashboard/includes/delete_order_modal.html'
+
+    def get(self, request, order_id):
+        order = get_object_or_404(Order, id=order_id, user=request.user)
+        return render(
+            request, 'dashboard/includes/delete_order_modal.html',
+            {'order': order, 'order_id': order_id}
+        )
+
+    def post(self, request, order_id):
+        order = get_object_or_404(Order, id=order_id, user=request.user)
+        try:
+            order.delete()
+            return JsonResponse(
+                {'success': True, 'message': 'Order deleted successfully.'}
+            )
+        except Exception as e:
+            return JsonResponse(
+                {'success': False, 'message': str(e)}, status=400
+            )

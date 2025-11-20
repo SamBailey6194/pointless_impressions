@@ -171,8 +171,9 @@
                             {% endif %}
                         </div>
                     </div>
-                    <div class="flex justify-end mt-4">
+                    <div class="flex mt-4 justify-between">
                         <button class="btn btn-ghost btn-outline btn-sm js-update-order-btn" data-order="{{ order.id }}">Edit Addresses</button>
+                        <button class="btn btn-ghost btn-outline btn-sm js-delete-order-btn" data-order="{{ order.id }}">Delete Order</button>
                     </div>
                 </div> 
             {% endfor %}
@@ -236,6 +237,7 @@
 
 {% block extramodals %}
     <div id="update-order-modal-container"></div>
+    <div id="delete-order-modal-container"></div>
 {% endblock %}
 
 {% block postloadjs %}
