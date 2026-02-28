@@ -93,8 +93,8 @@
 
       {% comment %} Mobile Search Button - Hidden on desktop (md+) {% endcomment %}
       <div class="flex md:hidden items-center justify-center">
-        <button class="btn btn-ghost btn-circle" onclick="toggleMobileSearch()">
-          <i class="fa-solid fa-magnifying-glass text-lg"></i>
+        <button class="btn btn-ghost btn-circle" onclick="toggleMobileSearch()" aria-label="Search">
+          <i class="fa-solid fa-magnifying-glass text-lg" aria-hidden="true"></i>
         </button>
       </div>
     </div>

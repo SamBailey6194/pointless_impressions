@@ -271,7 +271,8 @@ class AddToCartForm(forms.Form):
                     <div class="flex items-center space-x-2">
                         <button type="button"
                                 class="btn btn-outline"
-                                id="decrement-quantity">
+                                id="decrement-quantity"
+                                aria-label="Decrease quantity">
                             -
                         </button>
                         <input type="number"
@@ -282,7 +283,8 @@ class AddToCartForm(forms.Form):
                                min="1">
                         <button type="button"
                                 class="btn btn-outline"
-                                id="increment-quantity">
+                                id="increment-quantity"
+                                aria-label="Increase quantity">
                             +
                         </button>
                     </div>
