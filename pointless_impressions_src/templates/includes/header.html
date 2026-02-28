@@ -9,7 +9,7 @@
     <div class="navbar-start">
       <a href="{% url 'home' %}" class="btn btn-ghost normal-case text-xl h-auto p-2">
         {% with image_to_render=site_logo %}
-          {% cloudinary image_to_render.image height=60 crop='fit' format='auto' quality='auto' alt=image_to_render.alt_text_or_default class="h-8 sm:h-10 md:h-12 w-auto" %}
+          {% cloudinary image_to_render.image height=60 crop='fit' format='webp' quality='auto' alt=image_to_render.alt_text_or_default class="h-8 sm:h-10 md:h-12 w-auto" crossorigin="anonymous" %}
         {% endwith %}
       </a>
     </div>
@@ -74,7 +74,7 @@
                       <i class="fa-solid fa-circle-chevron-down"></i>
                   </label>
                   <ul tabindex="0" class="menu menu-sm dropdown-content z-10 p-2 shadow-lg rounded-box w-52 ml-14">
-                      {% for artist in artists %}
+                      {% for artist in all_artists %}
                           <li>
                               <a href="{% url 'artwork:list' %}?artist={{ artist.user_profile.user.username }}" class="hover:bg-(--pointless-yellow)">
                                   {{ artist.user_profile.user.username|title }}
@@ -86,15 +86,6 @@
               </li>
             </ul>
           </div>
-          <a href="/blog/" class="btn btn-ghost rounded-lg px-4 py-2 flex items-center gap-2">
-            <i class="fa-solid fa-blog"></i> Blog
-          </a>
-          <a href="/about/" class="btn btn-ghost rounded-lg px-4 py-2 flex items-center gap-2">
-            <i class="fa-solid fa-info-circle"></i> About
-          </a>
-          <a href="/contact/" class="btn btn-ghost rounded-lg px-4 py-2 flex items-center gap-2">
-            <i class="fa-solid fa-envelope"></i> Contact
-          </a>
         </div>
       </nav>
 
@@ -139,7 +130,7 @@
                 {% comment %} Django Site Admin for Developers {% endcomment %}
                 {% if request.user.is_staff %}
                   <li>
-                    <a href="#" class="hover:bg-(--pointless-yellow)">
+                    <a href="{% url 'admin:index' %}" class="hover:bg-(--pointless-yellow)">
                       <i class="fa-solid fa-shield-halved"></i> Site Admin (Dev)
                     </a>
                   </li>
@@ -147,34 +138,14 @@
                 {% comment %} Custom Dashboard Access for Admin {% endcomment %}
                 {% if request.user.is_dashboard_admin %}
                   <li>
-                    <a href="#" class="hover:bg-(--pointless-yellow)">
+                    <a href="{% url 'dashboard:admin_dashboard' user.public_id %}" class="hover:bg-(--pointless-yellow)">
                       <i class="fa-solid fa-cog"></i> Admin Dashboard
                     </a>
                   </li>
                 {% endif %}
-                {% comment %} Artist Dashboard Link if user is an artist {% endcomment %}
-                {% comment %}
-                {% if hasattr(request.user, 'artist_profile') %}
-                  <li>
-                    <a href="#" class="hover:bg-(--pointless-yellow)">
-                      <i class="fa-solid fa-paint-brush"></i> Artist Dashboard
-                    </a>
-                  </li>
-                {% endif %}
-                {% endcomment %}
                 <li>
-                  <a href="#" class="hover:bg-(--pointless-yellow)">
+                  <a href="{% url 'dashboard:user_profile_dashboard' user.public_id %}" class="hover:bg-(--pointless-yellow)">
                     <i class="fa-solid fa-user-circle"></i> My Profile
-                  </a>
-                </li>
-                <li>
-                  <a href="#" class="hover:bg-(--pointless-yellow)">
-                    <i class="fa-solid fa-box"></i> My Orders
-                  </a>
-                </li>
-                <li>
-                  <a href="{% url 'profiles:artist_application' %}" class="hover:bg-(--pointless-yellow)">
-                    <i class="fa-solid fa-user-plus"></i> Artists: Apply Here
                   </a>
                 </li>
                 <div class="divider my-1"></div>
@@ -195,11 +166,6 @@
                 <li>
                   <a href="{% url 'profiles:signup' %}" class="hover:bg-(--pointless-yellow)">
                     <i class="fa-solid fa-user-plus"></i> Sign Up
-                  </a>
-                </li>
-                <li>
-                  <a href="{% url 'profiles:artist_application' %}" class="hover:bg-(--pointless-yellow)">
-                    <i class="fa-solid fa-user-plus"></i> Artists: Apply Here
                   </a>
                 </li>
               {% endif %}
@@ -305,27 +271,15 @@
                   </a>
                 </li>
                 <ul tabindex="0">
-                {% for artist in artists %}
+                {% for artist in all_artists %}
                   <li>
-                    <a href="{% url 'artwork:list' %}?artist={{ artist.user.username }}">
-                      {{ artist.user.username|title }}
+                    <a href="{% url 'artwork:list' %}?artist={{ artist.user_profile.user.username }}">
+                      {{ artist.user_profile.user.username|title }}
                     </a>
                   </li>
                 {% endfor %}
                 </ul>
               </ul>
-            </li>
-            <li><a href="/blog/" class="hover:bg-(--pointless-yellow)">
-                <i class="fa-solid fa-blog"></i> Blog
-              </a>
-            </li>
-            <li><a href="/about/" class="hover:bg-(--pointless-yellow)">
-                <i class="fa-solid fa-info-circle"></i> About
-              </a>
-            </li>
-            <li><a href="/contact/" class="hover:bg-(--pointless-yellow)">
-                <i class="fa-solid fa-envelope"></i> Contact
-              </a>
             </li>
           </ul>
         </div>

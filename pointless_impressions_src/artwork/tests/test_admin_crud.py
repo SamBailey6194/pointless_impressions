@@ -7,7 +7,11 @@ from pointless_impressions_src.artwork.models import (
     ArtworkCategory,
     ArtworkFramingCondition
 )
-from pointless_impressions_src.profiles.models import Artist
+from pointless_impressions_src.profiles.models import Artist, UserProfile
+from pointless_impressions_src.photo.forms import ProfilePhotoForm
+from pointless_impressions_src.artwork.forms import (
+    ArtworkSubmissionForm
+)
 
 
 User = get_user_model()
@@ -46,16 +50,22 @@ class ArtworkAdminCRUDTest(TestCase):
             phone='+441234567892'
         )
 
-        # Create test artist
-        self.artist_user = User.objects.create_user(
-            username='artist1',
-            email='artist@test.com',
-            password='artistpass123',
-            phone='+441234567893',
+        # Create test user
+        artist_user = User.objects.create_user(
+            username='artist_user',
+            password='testpass123',
+            email='artist@example.com',
+            phone='+441234567893'
         )
+
+        # Create UserProfile for the user
+        user_profile = UserProfile.objects.create(user=artist_user)
+
+        # Create Artist instance using the UserProfile
         self.artist = Artist.objects.create(
-            user=self.artist_user,
-            bio='Test artist'
+            user_profile=user_profile,
+            bio='Test',
+            portfolio_url='https://testartist.com'
         )
 
         # Create test category
@@ -240,7 +250,7 @@ class ArtworkAdminCRUDTest(TestCase):
             phone='0987654321'
         )
         artist_2 = Artist.objects.create(
-            user=artist_user_2,
+            user_profile=UserProfile.objects.create(user=artist_user_2),
             bio='Another artist'
         )
 
@@ -256,7 +266,7 @@ class ArtworkAdminCRUDTest(TestCase):
         artwork.save()
 
         updated = Artwork.objects.get(id=artwork.id)
-        self.assertEqual(updated.artist.user.username, 'artist2')
+        self.assertEqual(updated.artist.user_profile.user.username, 'artist2')
 
     def test_delete_artwork(self):
         """Test that admin can delete artwork."""
@@ -427,7 +437,11 @@ class ArtworkPermissionsTest(TestCase):
             password='artistpass123',
             phone='+441234567899'
         )
-        self.artist = Artist.objects.create(user=artist_user, bio='Test')
+        artist_profile = UserProfile.objects.create(user=artist_user)
+        self.artist = Artist.objects.create(
+            user_profile=artist_profile,
+            bio='Test'
+        )
 
         self.category = ArtworkCategory.objects.create(name='Test')
 
@@ -514,7 +528,11 @@ class ArtworkValidationTest(TestCase):
             password='pass123',
             phone='1234567890'
         )
-        self.artist = Artist.objects.create(user=artist_user, bio='Test')
+        artist_profile = UserProfile.objects.create(user=artist_user)
+        self.artist = Artist.objects.create(
+            user_profile=artist_profile,
+            bio='Test'
+        )
         self.category = ArtworkCategory.objects.create(name='Test')
 
     def test_artwork_name_is_unique(self):
@@ -674,8 +692,9 @@ class ArtworkFormTest(TestCase):
             password='pass123',
             phone='1234567890'
         )
+        artist_profile = UserProfile.objects.create(user=artist_user)
         self.artist = Artist.objects.create(
-            user=artist_user,
+            user_profile=artist_profile,
             bio='Test artist'
         )
         self.category = ArtworkCategory.objects.create(name='Pointillism')
@@ -684,9 +703,7 @@ class ArtworkFormTest(TestCase):
         )
 
     def test_artwork_form_valid_data(self):
-        """Test ArtworkForm with valid data."""
-        from pointless_impressions_src.artwork.forms import ArtworkForm
-
+        """Test ArtworkSubmissionForm with valid data."""
         form_data = {
             'name': 'Test Artwork',
             'artist': self.artist.id,
@@ -696,55 +713,49 @@ class ArtworkFormTest(TestCase):
             'is_available': True,
             'quantity': 5
         }
-        form = ArtworkForm(data=form_data)
+        form = ArtworkSubmissionForm(data=form_data)
         self.assertTrue(form.is_valid())
 
     def test_artwork_form_missing_name(self):
-        """Test ArtworkForm with missing name."""
-        from pointless_impressions_src.artwork.forms import ArtworkForm
-
+        """Test ArtworkSubmissionForm with missing name."""
         form_data = {
             'artist': self.artist.id,
             'description': 'Test description',
             'price': 199.99,
-            'category': self.category.id
+            'category': self.category.id,
+            'is_available': True,
+            'quantity': 5
         }
-        form = ArtworkForm(data=form_data)
+        form = ArtworkSubmissionForm(data=form_data)
         self.assertFalse(form.is_valid())
         self.assertIn('name', form.errors)
 
     def test_artwork_form_missing_price(self):
-        """Test ArtworkForm with missing price."""
-        from pointless_impressions_src.artwork.forms import ArtworkForm
-
+        """Test ArtworkSubmissionForm with missing price."""
         form_data = {
             'name': 'Test Artwork',
             'artist': self.artist.id,
             'description': 'Test description',
             'category': self.category.id
         }
-        form = ArtworkForm(data=form_data)
+        form = ArtworkSubmissionForm(data=form_data)
         self.assertFalse(form.is_valid())
         self.assertIn('price', form.errors)
 
     def test_artwork_form_missing_description(self):
-        """Test ArtworkForm with missing description."""
-        from pointless_impressions_src.artwork.forms import ArtworkForm
-
+        """Test ArtworkSubmissionForm with missing description."""
         form_data = {
             'name': 'Test Artwork',
             'artist': self.artist.id,
             'price': 199.99,
             'category': self.category.id
         }
-        form = ArtworkForm(data=form_data)
+        form = ArtworkSubmissionForm(data=form_data)
         self.assertFalse(form.is_valid())
         self.assertIn('description', form.errors)
 
     def test_artwork_form_invalid_price_format(self):
-        """Test ArtworkForm with invalid price format."""
-        from pointless_impressions_src.artwork.forms import ArtworkForm
-
+        """Test ArtworkSubmissionForm with invalid price format."""
         form_data = {
             'name': 'Test Artwork',
             'artist': self.artist.id,
@@ -752,14 +763,12 @@ class ArtworkFormTest(TestCase):
             'price': 'invalid',
             'category': self.category.id
         }
-        form = ArtworkForm(data=form_data)
+        form = ArtworkSubmissionForm(data=form_data)
         self.assertFalse(form.is_valid())
         self.assertIn('price', form.errors)
 
     def test_artwork_form_negative_price(self):
-        """Test ArtworkForm rejects negative prices."""
-        from pointless_impressions_src.artwork.forms import ArtworkForm
-
+        """Test ArtworkSubmissionForm rejects negative prices."""
         form_data = {
             'name': 'Test Artwork',
             'artist': self.artist.id,
@@ -767,12 +776,11 @@ class ArtworkFormTest(TestCase):
             'price': -50.00,
             'category': self.category.id
         }
-        form = ArtworkForm(data=form_data)
+        form = ArtworkSubmissionForm(data=form_data)
         self.assertFalse(form.is_valid())
 
     def test_artwork_form_save_creates_artwork(self):
-        """Test ArtworkForm.save() creates artwork."""
-        from pointless_impressions_src.artwork.forms import ArtworkForm
+        """Test ArtworkSubmissionForm.save() creates artwork."""
         from decimal import Decimal
 
         form_data = {
@@ -784,7 +792,7 @@ class ArtworkFormTest(TestCase):
             'is_available': True,
             'quantity': 3
         }
-        form = ArtworkForm(data=form_data)
+        form = ArtworkSubmissionForm(data=form_data)
         self.assertTrue(form.is_valid())
 
         artwork = form.save()
@@ -794,10 +802,6 @@ class ArtworkFormTest(TestCase):
 
     def test_artwork_submission_form_limits_fields(self):
         """Test ArtworkSubmissionForm has limited fields."""
-        from pointless_impressions_src.artwork.forms import (
-            ArtworkSubmissionForm
-        )
-
         form_data = {
             'name': 'Artist Submission',
             'description': 'Artwork for approval',
@@ -809,10 +813,6 @@ class ArtworkFormTest(TestCase):
 
     def test_artwork_submission_form_excludes_admin_fields(self):
         """Test ArtworkSubmissionForm doesn't expose admin fields."""
-        from pointless_impressions_src.artwork.forms import (
-            ArtworkSubmissionForm
-        )
-
         form = ArtworkSubmissionForm()
         # Should not include admin-only fields
         self.assertNotIn('is_featured', form.fields)
@@ -821,10 +821,6 @@ class ArtworkFormTest(TestCase):
 
     def test_artwork_submission_form_save_sets_artist(self):
         """Test submission form save sets artist from user."""
-        from pointless_impressions_src.artwork.forms import (
-            ArtworkSubmissionForm
-        )
-
         form_data = {
             'name': 'Artist Submitted',
             'description': 'Test submission',
@@ -888,8 +884,9 @@ class ArtworkFormTest(TestCase):
         self.assertTrue(approved_artwork.is_available)
 
     def test_artwork_form_with_framing_conditions(self):
-        """Test ArtworkForm can save with framing conditions."""
-        from pointless_impressions_src.artwork.forms import ArtworkForm
+        """Test ArtworkSubmissionForm can save with framing conditions."""
+        from pointless_impressions_src.artwork.forms import \
+            ArtworkSubmissionForm
 
         form_data = {
             'name': 'Framed Test',
@@ -900,7 +897,7 @@ class ArtworkFormTest(TestCase):
             'selected_conditions': [self.framing_condition.id],
             'quantity': 1
         }
-        form = ArtworkForm(data=form_data)
+        form = ArtworkSubmissionForm(data=form_data)
         self.assertTrue(form.is_valid(), form.errors)
 
         artwork = form.save()
@@ -910,8 +907,9 @@ class ArtworkFormTest(TestCase):
         )
 
     def test_artwork_form_price_decimal_places(self):
-        """Test ArtworkForm preserves decimal precision."""
-        from pointless_impressions_src.artwork.forms import ArtworkForm
+        """Test ArtworkSubmissionForm preserves decimal precision."""
+        from pointless_impressions_src.artwork.forms import \
+            ArtworkSubmissionForm
 
         form_data = {
             'name': 'Precise Price',
@@ -921,8 +919,17 @@ class ArtworkFormTest(TestCase):
             'category': self.category.id,
             'quantity': 1
         }
-        form = ArtworkForm(data=form_data)
+        form = ArtworkSubmissionForm(data=form_data)
         self.assertTrue(form.is_valid(), form.errors)
 
         artwork = form.save()
         self.assertEqual(str(artwork.price), '99.99')
+
+    def test_photo_form_valid_data(self):
+        form = ProfilePhotoForm(data={
+            'photo_type': 'profile',
+            'title': 'Valid Title',
+            'description': 'Valid Description',
+            'image': 'test_image.jpg'
+        })
+        self.assertTrue(form.is_valid())

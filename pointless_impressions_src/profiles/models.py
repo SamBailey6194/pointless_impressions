@@ -85,7 +85,7 @@ class Artist(models.Model):
 class StaffRole(models.Model):
     """
     Represents a staff role assigned to a user.
-    They curate the artwork and blogs on the platform.
+    They curate the artwork on the platform.
     """
     class RoleChoices(models.TextChoices):
         OWNER = 'OWNER', 'Owner'
@@ -147,64 +147,3 @@ class Address(models.Model):
             f"{self.customer.user_profile.user.username} - "
             f"{self.label} Address"
             )
-
-
-class PaymentInfo(models.Model):
-    """
-    Stores a tokenized payment method for a Customer.
-    A Customer can have multiple cards.
-    """
-    customer = models.ForeignKey(
-        'Customer',
-        on_delete=models.CASCADE,
-        related_name='payment_methods'
-    )
-    processor_customer_id = models.CharField(max_length=255)
-    payment_method_id = models.CharField(max_length=255, unique=True)
-    brand = models.CharField(max_length=50)
-    last_four_digits = models.CharField(max_length=4)
-    expiry_month = models.PositiveSmallIntegerField()
-    expiry_year = models.PositiveSmallIntegerField()
-    is_default = models.BooleanField(default=False)
-    address = models.ForeignKey(
-        Address,
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
-        related_name='billing_payment_addresses'
-    )
-
-    def __str__(self):
-        return (
-            f"{self.customer.user.username} - {self.brand} **** "
-            f"{self.last_four_digits}"
-            )
-
-
-class BankDetails(models.Model):
-    """
-    Stores the bank account information for an Artist to receive payouts.
-    """
-    artist = models.OneToOneField(
-        Artist,
-        on_delete=models.CASCADE,
-        related_name='bank_details'
-    )
-    account_holder_name = models.CharField(max_length=255)
-    sort_code = models.CharField(max_length=10, blank=True)
-    account_number = models.CharField(max_length=20, blank=True)
-    iban = models.CharField("IBAN", max_length=34, blank=True)
-    swift_bic = models.CharField("SWIFT/BIC", max_length=11, blank=True)
-    billing_address_line_1 = models.CharField(max_length=255)
-    billing_address_line_2 = models.CharField(
-        max_length=255,
-        blank=True,
-        null=True
-        )
-    billing_city = models.CharField(max_length=100)
-    billing_county = models.CharField(max_length=100, blank=True)
-    billing_postcode = models.CharField(max_length=20)
-    billing_country = models.CharField(max_length=100)
-
-    def __str__(self):
-        return f"Bank Details for {self.artist.user.username}"

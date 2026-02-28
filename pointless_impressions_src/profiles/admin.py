@@ -1,6 +1,6 @@
 from django.contrib import admin
 from .models import (
-    UserProfile, Customer, Artist, StaffRole, Address, PaymentInfo, BankDetails
+    UserProfile, Customer, Artist, StaffRole, Address
 )
 
 
@@ -21,16 +21,6 @@ class StaffRoleInline(admin.StackedInline):
 
 class AddressInline(admin.StackedInline):
     model = Address
-    extra = 0
-
-
-class PaymentInfoInline(admin.StackedInline):
-    model = PaymentInfo
-    extra = 0
-
-
-class BankInfoInline(admin.StackedInline):
-    model = BankDetails
     extra = 0
 
 
@@ -104,7 +94,7 @@ class CustomerAdmin(admin.ModelAdmin):
         'get_username',
         'receive_newsletter',
     )
-    inlines = [AddressInline, PaymentInfoInline]
+    inlines = [AddressInline]
     search_fields = (
         'user_profile__user__username',
         'user_profile__user__email',
@@ -138,7 +128,6 @@ class ArtistAdmin(admin.ModelAdmin):
         'user_profile__user__username',
         'user_profile__user__email',
     )
-    inlines = [BankInfoInline]
     actions = [approve_artists]
 
     def get_username(self, obj):
@@ -185,37 +174,3 @@ class AddressAdmin(admin.ModelAdmin):
     def get_username(self, obj):
         return obj.user_profile.user.username
     get_username.short_description = 'Username'
-
-
-@admin.register(PaymentInfo)
-class PaymentInfoAdmin(admin.ModelAdmin):
-    """Admin panel configuration for PaymentInfo model."""
-    list_display = (
-        'customer', 'brand', 'last_four_digits', 'is_default', 'address'
-    )
-    search_fields = (
-        'customer__user__username', 'brand'
-    )
-
-
-@admin.register(BankDetails)
-class BankDetailsAdmin(admin.ModelAdmin):
-    """Admin panel configuration for BankDetails model."""
-    list_display = (
-        'artist',
-        'account_holder_name',
-        'account_number',
-        'sort_code',
-        'iban',
-        'swift_bic',
-        'billing_address_line_1',
-        'billing_address_line_2',
-        'billing_city',
-        'billing_postcode',
-        'billing_county',
-        'billing_country',
-    )
-    search_fields = (
-        'artist__user__username', 'artist__user__email', 'billing_city',
-        'billing_country'
-    )

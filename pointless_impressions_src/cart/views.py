@@ -4,13 +4,14 @@ from django.views import View
 from django.views.generic import TemplateView
 from django.conf import settings
 from decimal import Decimal
+import json
+import os
 from .utils import get_cart
 from .forms import CartItemUpdateForm
 from pointless_impressions_src.order.forms import OrderForm
 from pointless_impressions_src.artwork.models import (
     Artwork, ArtworkFramingCondition
     )
-import json
 
 
 # Write your views here.
@@ -61,7 +62,7 @@ class CheckoutView(TemplateView):
                         initial={
                             'quantity': item.quantity,
                             'framing_option': (
-                                item.framing_condition.condition_friendly_name
+                                item.framing_condition.id
                                 if item.framing_condition else None
                             ),
                         },
@@ -76,28 +77,14 @@ class CheckoutView(TemplateView):
             return context
 
         context['cart_items'] = cart_items_data
-        context['order_form'] = OrderForm(user=self.request.user)
 
-        if self.request.user.is_authenticated:
-            try:
-                customer_profile = context.get('current_user_customer_profile')
-                if customer_profile:
-                    context['shipping_addresses'] = (
-                        customer_profile.user_profile.addresses.filter(
-                            address_type='SHIPPING'
-                        )
-                    )
-                    context['billing_addresses'] = (
-                        customer_profile.user_profile.addresses.filter(
-                            address_type='BILLING'
-                            )
-                    )
-                else:
-                    context['shipping_addresses'] = None
-                    context['billing_addresses'] = None
-            except Exception:
-                context['shipping_addresses'] = None
-                context['billing_addresses'] = None
+        context['order_form'] = OrderForm()
+        context['subtotal'] = cart.get_subtotal()
+        context['delivery_cost'] = cart.get_delivery_cost()
+        context['grand_total'] = cart.get_grand_total()
+
+        context['square_app_id'] = os.getenv('SQUARE_APP_ID', '')
+        context['square_location_id'] = os.getenv('SQUARE_LOCATION_ID', '')
 
         return context
 

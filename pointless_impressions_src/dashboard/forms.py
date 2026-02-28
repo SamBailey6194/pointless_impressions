@@ -1,254 +1,323 @@
 from django import forms
-import json
 from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Layout, Field, HTML, Div, Submit
-from pointless_impressions_src.order.models import OrderItem
+from crispy_forms.layout import Layout, Field, Div, HTML
 from pointless_impressions_src.home.widgets import CountrySelectFormWidget
 from pointless_impressions_src.home.countries import COUNTRY_CHOICES
 from pointless_impressions_src.order.models import Order
 
 
-class EditOrderForm(forms.Form):
-    items = forms.ModelMultipleChoiceField(
-        queryset=OrderItem.objects.all(),
-        widget=forms.CheckboxSelectMultiple,
-        required=False,
-        label="Select items to modify"
-    )
-    quantities = forms.IntegerField(
-        min_value=1,
-        initial=1,
-        label="Quantity",
-        widget=forms.NumberInput(
-            attrs={
-                'class': 'text-center custom-input !w-24',
-                'id': 'id_quantity'
-            }
-        )
-    )
-    framing_option = forms.ChoiceField(
-        choices=[],
-        required=False,
-        label="Framing Options",
-        widget=forms.Select(
-            attrs={
-                'class': 'select-dropdown w-full',
-                'id': 'id_framing_option'
-            }
-        )
-    )
-    notes = forms.CharField(
-        widget=forms.Textarea(attrs={
-            'placeholder': (
-                'Enter notes as a JSON object, e.g., {"item_id": "new_note"}'
-            ),
-            'rows': 3,
-            'class': 'custom-input'
-        }),
-        required=False,
-        label="Notes"
-    )
-    shipping_first_name = forms.CharField(
-        max_length=255,
-        required=False,
-        label="Shipping First Name"
-    )
-    shipping_last_name = forms.CharField(
-        max_length=255,
-        required=False,
-        label="Shipping Last Name"
-    )
-    shipping_address_line_1 = forms.CharField(
-        max_length=255,
-        required=False,
-        label="Shipping Address Line 1"
-    )
+# Write your crispy form here
+class EditOrderForm(forms.ModelForm):
+    """
+    Form for collecting customer details during checkout.
+
+    Fields:
+    - shipping_first_name: Full name for shipping.
+    - shipping_last_name: Full name for shipping.
+    - shipping_address_line_1: Shipping address line 1.
+    - shipping_address_line_2: Shipping address line 2 (optional).
+    - shipping_city: Shipping city/town.
+    - shipping_county: Shipping county (optional).
+    - shipping_postcode: Shipping postcode.
+    - shipping_country: Shipping country.
+    - billing_same_as_shipping: Checkbox if billing address is same as
+      shipping.
+    - billing_first_name: Full name for billing.
+    - billing_last_name: Full name for billing.
+    - billing_address_line_1: Billing address line 1.
+    - billing_address_line_2: Billing address line 2 (optional).
+    - billing_city: Billing city/town.
+    - billing_county: Billing county (optional).
+    - billing_postcode: Billing postcode.
+    - billing_country: Billing country.
+    """
+    shipping_first_name = forms.CharField(label="First Name")
+    shipping_last_name = forms.CharField(label="Last Name")
+    shipping_address_line_1 = forms.CharField(label="Address Line 1")
     shipping_address_line_2 = forms.CharField(
-        max_length=255,
-        required=False,
-        label="Shipping Address Line 2"
+        label="Address Line 2 (Optional)",
+        required=False
     )
-    shipping_city = forms.CharField(
-        max_length=255,
-        required=False,
-        label="Shipping City"
-    )
+    shipping_city = forms.CharField(label="City/Town")
     shipping_county = forms.CharField(
-        max_length=255,
-        required=False,
-        label="Shipping County"
+        label="County (Optional)",
+        required=False
     )
-    shipping_postcode = forms.CharField(
-        max_length=20,
-        required=False,
-        label="Shipping Postcode"
-    )
+    shipping_postcode = forms.CharField(label="Postcode")
     shipping_country = forms.ChoiceField(
         choices=COUNTRY_CHOICES,
-        required=False,
-        label="Shipping Country",
-        widget=CountrySelectFormWidget(
-            attrs={
-                'class': 'custom-input w-full lg:w-66'
-            }
-        )
+        initial='GB',
+        label="Country",
+        widget=CountrySelectFormWidget()
     )
 
+    billing_same_as_shipping = forms.BooleanField(
+        required=False,
+        label="Billing address same as shipping",
+        initial=False,
+        help_text=(
+            "Check if your billing address is the "
+            "same as your shipping address."
+            )
+    )
+
+    billing_first_name = forms.CharField(label="First Name")
+    billing_last_name = forms.CharField(label="Last Name")
+    billing_address_line_1 = forms.CharField(label="Address Line 1")
+    billing_address_line_2 = forms.CharField(
+        label="Address Line 2 (Optional)",
+        required=False
+        )
+    billing_city = forms.CharField(label="City/Town")
+    billing_county = forms.CharField(
+        label="County (Optional)",
+        required=False
+        )
+    billing_postcode = forms.CharField(label="Postcode")
+    billing_country = forms.ChoiceField(
+        choices=COUNTRY_CHOICES,
+        initial='GB',
+        label="Country",
+        widget=CountrySelectFormWidget()
+    )
+
+    class Meta:
+        model = Order
+        fields = [
+            'shipping_first_name', 'shipping_last_name',
+            'shipping_address_line_1', 'shipping_address_line_2',
+            'shipping_city', 'shipping_county', 'shipping_postcode',
+            'shipping_country', 'billing_same_as_shipping',
+            'billing_first_name', 'billing_last_name',
+            'billing_address_line_1', 'billing_address_line_2',
+            'billing_city', 'billing_county', 'billing_postcode',
+            'billing_country',
+        ]
+
     def __init__(self, *args, **kwargs):
-        artwork = kwargs.pop('artwork', None)
         super().__init__(*args, **kwargs)
-
-        if artwork:
-            # Populate framing options dynamically
-            self.fields['framing_option'].choices = [
-                (condition.id, condition.condition_friendly_name)
-                for condition in artwork.selected_conditions.all()
-            ]
-
-            max_stock = artwork.stock
-            self.fields['quantities'].widget.attrs['max'] = max_stock
 
         self.helper = FormHelper()
         self.helper.form_tag = False
+
         self.helper.layout = Layout(
             Div(
-                HTML(
-                    "<h2 class='card-title text-center mb-4 "
-                    "text-(--pointless-black) "
-                    "dark:text-(--pointless-white)'>Edit Order</h2>"
-                ),
                 Div(
                     HTML(
-                        """
-                        <label for="id_quantity" class="font-bold text-lg \
-                        text-(--pointless-black) \
-                        dark:text-(--pointless-white)">
-                        Quantity
-                        </label>
-                        <div class="flex items-center space-x-2">
-                            <button type="button" class="btn btn-outline" \
-                            id="decrement-quantity">-</button>
-                            <input type="number" name="quantity" \
-                                   id="id_quantity" \
-                                   class="text-center custom-input !w-24" \
-                                   value="1" min="1">
-                            <button type="button" class="btn btn-outline" \
-                            id="increment-quantity">+</button>
-                        </div>
-                        """
+                        "<h3 class='card-title mb-2'>"
+                        "Shipping Address</h3>"
                     ),
-                    Field(
-                        'framing_option',
-                        css_class='mb-4 custom-input w-full lg:w-66'
+                    HTML(
+                        "<p class='mb-4'>"
+                        "Enter your shipping details below</p>"
                     ),
-                    Field(
-                        'notes',
-                        css_class='mb-4 custom-input w-full lg:w-66'
+                    Div(
+                        Field(
+                            'shipping_first_name',
+                            placeholder="First Name",
+                            css_class='mb-4 custom-input w-full lg:w-66'
+                        ),
+                        Field(
+                            'shipping_last_name',
+                            placeholder="Last Name",
+                            css_class='mb-4 custom-input w-full lg:w-66'
+                        ),
+                        css_class='lg:flex lg:gap-4 mb-4'
                     ),
-                    Field(
-                        'shipping_first_name',
-                        css_class='mb-4 custom-input w-full lg:w-66'
+                    Div(
+                        Field(
+                            'shipping_address_line_1',
+                            placeholder="Address Line 1",
+                            css_class='mb-4 custom-input w-full lg:w-96'
+                        ),
+                        Field(
+                            'shipping_address_line_2',
+                            placeholder="Address Line 2 (Optional)",
+                            css_class='mb-4 custom-input w-full lg:w-96'
+                        ),
+                        css_class='mb-4 lg:flex lg:gap-4'
                     ),
-                    Field(
-                        'shipping_last_name',
-                        css_class='mb-4 custom-input w-full lg:w-66'
+                    Div(
+                        Field(
+                            'shipping_city',
+                            placeholder="City/Town",
+                            css_class='w-full lg:w-64 custom-input'
+                        ),
+                        Field(
+                            'shipping_county',
+                            placeholder="County (Optional)",
+                            css_class='w-full lg:w-64 custom-input'
+                        ),
+                        css_class='lg:flex lg:gap-4 mb-4'
                     ),
-                    Field(
-                        'shipping_address_line_1',
-                        css_class='mb-4 custom-input w-full lg:w-66'
+                    Div(
+                        Field(
+                            'shipping_postcode',
+                            placeholder="Postcode",
+                            css_class='w-full lg:w-40 custom-input'
+                        ),
+                        Field(
+                            'shipping_country'
+                        ),
+                        css_class='lg:flex lg:gap-4 mb-4'
                     ),
-                    Field(
-                        'shipping_address_line_2',
-                        css_class='mb-4 custom-input w-full lg:w-66'
-                    ),
-                    Field(
-                        'shipping_city',
-                        css_class='mb-4 custom-input w-full lg:w-66'
-                    ),
-                    Field(
-                        'shipping_county',
-                        css_class='mb-4 custom-input w-full lg:w-66'
-                    ),
-                    Field(
-                        'shipping_postcode',
-                        css_class='mb-4 custom-input w-full lg:w-66'
-                    ),
-                    Field(
-                        'shipping_country',
-                        css_class='mb-4 custom-input w-full lg:w-66'
-                    ),
-                    css_class='flex flex-col gap-4'
+                    css_class='shipping-group',
+                    id="update-shipping-fields-container",
                 ),
+
+                HTML("<div class='form-divider'></div>"),
+
                 Div(
-                    Submit(
-                        'submit',
-                        'Save Changes',
-                        css_class='btn btn-ghost btn-outline w-fit'
+                    HTML(
+                        "<h3 class='card-title mb-2'>Billing Address</h3>"
+                        "<p class='mb-4'>"
+                        "Enter your billing details below"
+                        "</p>"
                     ),
-                    css_class='flex justify-end mt-4'
+                    Div(
+                        HTML(
+                            "<p class='text-sm text-gray-600'>"
+                            "Same as shipping address:"
+                            "</p>"
+                        ),
+                        HTML(
+                            "<p "
+                            "class='font-semibold' "
+                            "id='billing-confirmation-text'>"
+                            "</p>"
+                        ),
+                        css_class=(
+                            'billing-confirmation-container '
+                            'p-3 rounded-lg '
+                            'mb-4'
+                        ),
+                        style="display: none;"
+                    ),
+                    Div(
+                        Div(
+                            Field(
+                                'billing_first_name',
+                                placeholder="First Name",
+                                css_class=(
+                                    'mb-4 custom-input w-full lg:w-66'
+                                )
+                            ),
+                            Field(
+                                'billing_last_name',
+                                placeholder="Last Name",
+                                css_class=(
+                                    'mb-4 custom-input w-full lg:w-66'
+                                )
+                            ),
+                            css_class='lg:flex lg:gap-4 mb-4'
+                        ),
+                        Div(
+                            Field(
+                                'billing_address_line_1',
+                                placeholder="Address Line 1",
+                                css_class=(
+                                    'mb-4 custom-input w-full lg:w-96'
+                                )
+                            ),
+                            Field(
+                                'billing_address_line_2',
+                                placeholder="Address Line 2 (Optional)",
+                                css_class=(
+                                    'mb-4 custom-input w-full lg:w-96'
+                                )
+                            ),
+                            css_class='mb-4 lg:flex lg:gap-4'
+                        ),
+                        Div(
+                            Field(
+                                'billing_city',
+                                placeholder="City/Town",
+                                css_class='w-full lg:w-64 custom-input'
+                            ),
+                            Field(
+                                'billing_county',
+                                placeholder="County (Optional)",
+                                css_class='w-full lg:w-64 custom-input'
+                            ),
+                            css_class='lg:flex lg:gap-4 mb-4'
+                        ),
+                        Div(
+                            Field(
+                                'billing_postcode',
+                                placeholder="Postcode",
+                                css_class='w-full lg:w-40 custom-input'
+                            ),
+                            Field(
+                                'billing_country'
+                            ),
+                            css_class='lg:flex lg:gap-4 mb-4'
+                        ),
+                    ),
+                    css_class='billing-group',
+                    id="update-billing-fields-container",
                 ),
-                css_class='px-6 py-2 mb-4',
-                id='edit-order-form'
-            )
+
+                HTML("<div class='form-divider'></div>"),
+            ),
         )
 
-    def save(self, order_id):
-        order = Order.objects.get(id=order_id)
-        data = self.cleaned_data
+    def clean(self):
+        """
+        Ensure billing address is provided if not same as shipping.
+        """
+        cleaned_data = super().clean()
+        billing_same = cleaned_data.get('billing_same_as_shipping')
 
-        # Update quantities
-        if data['quantities']:
-            quantities = json.loads(data['quantities'])
-            for item_id, quantity in quantities.items():
-                item = order.items.get(id=item_id)
-                item.quantity = quantity
-                item.save()
+        if billing_same:
+            cleaned_data['billing_first_name'] = cleaned_data.get(
+                'shipping_first_name'
+                )
+            cleaned_data['billing_last_name'] = cleaned_data.get(
+                'shipping_last_name'
+                )
+            cleaned_data['billing_address_line_1'] = cleaned_data.get(
+                'shipping_address_line_1'
+                )
+            cleaned_data['billing_address_line_2'] = cleaned_data.get(
+                'shipping_address_line_2'
+                )
+            cleaned_data['billing_city'] = cleaned_data.get(
+                'shipping_city'
+                )
+            cleaned_data['billing_county'] = cleaned_data.get(
+                'shipping_county'
+                )
+            cleaned_data['billing_postcode'] = cleaned_data.get(
+                'shipping_postcode'
+                )
+            cleaned_data['billing_country'] = cleaned_data.get(
+                'shipping_country'
+                )
+        else:
+            required_billing_fields = [
+                'billing_first_name',
+                'billing_last_name',
+                'billing_address_line_1',
+                'billing_city',
+                'billing_postcode',
+                'billing_country'
+            ]
 
-        # Update framing options
-        if data['framing_options']:
-            framing_options = json.loads(data['framing_options'])
-            for item_id, framing_option in framing_options.items():
-                item = order.items.get(id=item_id)
-                item.framing_condition = framing_option
-                item.save()
+            for field_name in required_billing_fields:
+                if not cleaned_data.get(field_name):
+                    self.add_error(field_name, 'This field is required.')
 
-        # Update notes
-        if data['notes']:
-            notes = json.loads(data['notes'])
-            for item_id, note in notes.items():
-                item = order.items.get(id=item_id)
-                item.notes = note
-                item.save()
+        return cleaned_data
 
-        # Remove items
-        if data['items']:
-            for item in data['items']:
-                order.items.remove(item)
+    def save(self, commit=True):
+        """
+        Override save to ensure guest_email and guest_phone are preserved.
+        """
+        instance = super().save(commit=False)
+        if self.instance.pk:
+            instance.guest_email = self.instance.guest_email
+            instance.guest_phone = self.instance.guest_phone
 
-        # Update shipping details
-        order.shipping_first_name = data.get(
-            'shipping_first_name', order.shipping_first_name
-        )
-        order.shipping_last_name = data.get(
-            'shipping_last_name', order.shipping_last_name
-        )
-        order.shipping_address_line_1 = data.get(
-            'shipping_address_line_1', order.shipping_address_line_1
-        )
-        order.shipping_address_line_2 = data.get(
-            'shipping_address_line_2', order.shipping_address_line_2
-        )
-        order.shipping_city = data.get(
-            'shipping_city', order.shipping_city
-        )
-        order.shipping_county = data.get(
-            'shipping_county', order.shipping_county
-        )
-        order.shipping_postcode = data.get(
-            'shipping_postcode', order.shipping_postcode
-        )
-        order.shipping_country = data.get(
-            'shipping_country', order.shipping_country
-        )
-
-        order.save()
+        if commit:
+            instance.save()
+        return instance

@@ -9,7 +9,7 @@
             <div class="breadcrumbs text-sm mb-6">
                 <ul>
                     <li>
-                        <a href="/"><i class="fa-solid fa-home"></i> Home</a>
+                        <a href="{% url 'home' %}"><i class="fa-solid fa-home"></i> Home</a>
                     </li>
                     <li>
                         <a href="{% url 'artwork:list' %}"><i class="fa-solid fa-palette"></i> Artworks</a>
@@ -49,10 +49,22 @@
                 <form action="{% url 'orders:confirmation' %}" method="post" id="checkout-form" class="form-card p-6 mb-6">
                     {% csrf_token %}
                     {% crispy order_form %}
-                    <div class="card-actions justify-end mt-2">
+
+                    <div class="mb-6 mx-6">
+                        <h3 class="text-xl font-bold mb-4">Payment Details</h3>
+
+                        <div id="card-container"></div>
+                        
+                        <div id="payment-status" class="text-sm mt-2"></div>
+
+                        <div class="form-divider"></div>
+                    </div>
+
+                    <div class="card-actions justify-end mt-4">
                         <button type="submit" class="btn btn-ghost btn-outline mr-6 mb-6" id="place-order-button">
-                            <i class="fa-solid fa-credit-card mr-2"></i> Place Order
+                            <i class="fa-solid fa-credit-card mr-2"></i> Confirm & Pay
                         </button>
+                        <button type="button" id="modal-trigger-btn" class="hidden"></button>
                     </div>
                 </form>
             {% else %}
@@ -74,7 +86,7 @@
                             <div class="rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-shadow duration-200 cursor-pointer card-adaptive h-full flex flex-col">
                                 <figure>
                                 {% with image_to_render=artwork.main_photo|default:placeholder_image %}
-                                    {% cloudinary image_to_render.image format="auto" quality="auto" width=400 height=300 crop="fill" class="w-full h-64 object-cover" alt=image_to_render.alt_text_or_default %}
+                                    {% cloudinary image_to_render.image format="auto" quality="auto" width=400 height=400 crop="fill" alt=image_to_render.alt_text_or_default crossorigin="anonymous" %}
                                 {% endwith %}
                                 </figure>
                                 <div class="p-6 flex flex-col h-56">
@@ -126,5 +138,10 @@
 
 {% block postloadjs %}
 {{ block.super }}
-<script src="{% static 'js/checkout.js' %}" type="module" defer></script>
+    <script src="https://sandbox.web.squarecdn.com/v1/square.js"></script>
+
+    {{ square_app_id|json_script:"square-app-id" }}
+    {{ square_location_id|json_script:"square-location-id" }}
+
+    <script src="{% static 'js/checkout.js' %}" type="module" defer></script>
 {% endblock %}

@@ -8,9 +8,9 @@
     <div style="max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ddd; border-radius: 8px; background-color: #f9f9f9;">
         <div style="text-align: center; margin-bottom: 20px;">
             {% cloudinary_url site_logo_white_bg.image width=180 height=180 crop='fit' format='auto' quality='auto' as email %}
-            <img src="{{ email }}" alt="Pointless Impressions Logo" style="max-width: 150px;">
+            <img src="{{ email }}" alt="Pointless Impressions Logo" style="max-width: 150px;" crossorigin="anonymous">
         </div>
-        <p>Hello {{ user.username }},</p>
+        <p>Hello {{ user_first_name }},</p>
         <p>Your email verification code is:</p>
         <div style="font-size: 24px; color: #4CAF50; font-weight: bold; text-align: center; margin: 20px 0;">
             <p>{{ verification_code }}</p>

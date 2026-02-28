@@ -5,7 +5,7 @@ from pointless_impressions_src.artwork.models import (
     Artwork, ArtworkFramingCondition, ArtworkCategory
 )
 from pointless_impressions_src.photo.models import Photo
-from pointless_impressions_src.profiles.models import Artist
+from pointless_impressions_src.profiles.models import Artist, UserProfile
 
 
 @override_settings(
@@ -25,7 +25,7 @@ class ArtworkCartSessionTest(TestCase):
         """Set up test data for cart tests."""
         self.client = Client()
 
-        # Create test user/artist
+        # Create test user with phone
         User = get_user_model()
         self.artist_user = User.objects.create_user(
             username='testartist',
@@ -34,8 +34,12 @@ class ArtworkCartSessionTest(TestCase):
             phone='+441234567890'
         )
 
+        # Create UserProfile for the user
+        user_profile = UserProfile.objects.create(user=self.artist_user)
+
+        # Create Artist instance using the UserProfile
         self.artist_profile = Artist.objects.create(
-            user=self.artist_user,
+            user_profile=user_profile,
             bio="Test Artist Bio",
             portfolio_url="https://testartist.com"
         )

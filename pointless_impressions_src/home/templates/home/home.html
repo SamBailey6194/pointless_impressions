@@ -33,8 +33,8 @@
             <div class="shrink-0 w-72 md:w-80 lg:w-96 snap-start h-full">
               <div class="rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-shadow duration-200 cursor-pointer card-adaptive h-full flex flex-col">
                 <figure>
-                  {% with image_to_render=artwork.get_primary_image|default:placeholder_image %}
-                    {% cloudinary image_to_render.image format="auto" quality="auto" width=400 height=300 crop="fill" class="w-full h-64 object-cover" alt=image_to_render.alt_text_or_default %}
+                  {% with image_to_render=artwork.main_photo|default:placeholder_image %}
+                    {% cloudinary image_to_render.image format="auto" quality="auto" width=400 height=400 crop="fill" alt=image_to_render.alt_text_or_default crossorigin="anonymous" %}
                   {% endwith %}
                 </figure>
                 <div class="p-6 flex flex-col h-56">
@@ -72,118 +72,6 @@
       <div class="text-center mt-8">
         <a href="{% url 'artwork:list' %}" class="inline-block px-8 py-3 rounded-xl btn btn-ghost transition-colors duration-200 cursor-pointer">
           Browse Art
-        </a>
-      </div>
-    {% endblock %}
-  </div>
-</section>
-{% endblock %}
-
-{% block section_3 %}
-<section class="py-16 section-alt w-full">
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-    {% block section_3_content %}
-      <h2 class="text-3xl font-bold mb-12 text-center">Latest Blog Posts</h2>
-      
-      {% comment %} Horizontal Scrolling Container {% endcomment %}
-      <div class="relative">
-        <div class="flex overflow-x-auto gap-6 pb-4 snap-x snap-mandatory blog-scrollbar">
-          {% comment %} Blog Card 1 {% endcomment %}
-          <div class="shrink-0 w-72 md:w-80 lg:w-96 snap-start">
-            <div class="rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-shadow duration-200 cursor-pointer card-adaptive">
-              <img src="" alt="Blog Post 1" class="w-full h-48 object-cover bg-gray-200">
-              <div class="p-6">
-                <h3 class="text-xl font-semibold mb-2 card-title">The History of Pointillism</h3>
-                <p class="text-sm mb-3 opacity-70">Learn about the origins and evolution of this fascinating art technique.</p>
-                <p class="text-xs opacity-60">Posted 2 days ago</p>
-              </div>
-            </div>
-          </div>
-          
-          {% comment %} Blog Card 2 {% endcomment %}
-          <div class="shrink-0 w-72 md:w-80 lg:w-96 snap-start">
-            <div class="rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-shadow duration-200 cursor-pointer card-adaptive">
-              <img src="" alt="Blog Post 2" class="w-full h-48 object-cover bg-gray-200">
-              <div class="p-6">
-                <h3 class="text-xl font-semibold mb-2 card-title">Artist Spotlight: Modern Masters</h3>
-                <p class="text-sm mb-3 opacity-70">Meet contemporary artists pushing the boundaries of Pointillism.</p>
-                <p class="text-xs opacity-60">Posted 5 days ago</p>
-              </div>
-            </div>
-          </div>
-          
-          {% comment %} Blog Card 3 {% endcomment %}
-          <div class="shrink-0 w-72 md:w-80 lg:w-96 snap-start">
-            <div class="rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-shadow duration-200 cursor-pointer card-adaptive">
-              <img src="" alt="Blog Post 3" class="w-full h-48 object-cover bg-gray-200">
-              <div class="p-6">
-                <h3 class="text-xl font-semibold mb-2 card-title">Collecting Tips for Beginners</h3>
-                <p class="text-sm mb-3 opacity-70">Essential advice for starting your art collection journey.</p>
-                <p class="text-xs opacity-60">Posted 1 week ago</p>
-              </div>
-            </div>
-          </div>
-          
-          {% comment %} Blog Card 4 {% endcomment %}
-          <div class="shrink-0 w-72 md:w-80 lg:w-96 snap-start">
-            <div class="rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-shadow duration-200 cursor-pointer card-adaptive">
-              <img src="" alt="Blog Post 4" class="w-full h-48 object-cover bg-gray-200">
-              <div class="p-6">
-                <h3 class="text-xl font-semibold mb-2 card-title">Color Theory in Pointillism</h3>
-                <p class="text-sm mb-3 opacity-70">Understanding how colors interact in dot-based artwork.</p>
-                <p class="text-xs opacity-60">Posted 2 weeks ago</p>
-              </div>
-            </div>
-          </div>
-          
-          {% comment %} Blog Card 5 {% endcomment %}
-          <div class="shrink-0 w-72 md:w-80 lg:w-96 snap-start">
-            <div class="rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-shadow duration-200 cursor-pointer card-adaptive" id="featured-blog-carousel">
-              <img src="" alt="Blog Post 5" class="w-full h-48 object-cover bg-gray-200">
-              <div class="p-6">
-                <h3 class="text-xl font-semibold mb-2 card-title">Digital vs Traditional Pointillism</h3>
-                <p class="text-sm mb-3 opacity-70">Exploring the differences between digital and traditional techniques.</p>
-                <p class="text-xs opacity-60">Posted 3 weeks ago</p>
-              </div>
-            </div>
-          </div>
-          
-          {% comment %} Blog Card 6 {% endcomment %}
-          <div class="shrink-0 w-72 md:w-80 lg:w-96 snap-start">
-            <div class="rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-shadow duration-200 cursor-pointer card-adaptive">
-              <img src="" alt="Blog Post 6" class="w-full h-48 object-cover bg-gray-200">
-              <div class="p-6">
-                <h3 class="text-xl font-semibold mb-2 card-title">Famous Pointillist Masterpieces</h3>
-                <p class="text-sm mb-3 opacity-70">A journey through the most iconic Pointillist artworks in history.</p>
-                <p class="text-xs opacity-60">Posted 1 month ago</p>
-              </div>
-            </div>
-          </div>
-          
-          {% comment %} Blog Card 7 {% endcomment %}
-          <div class="shrink-0 w-72 md:w-80 lg:w-96 snap-start">
-            <div class="rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-shadow duration-200 cursor-pointer card-adaptive">
-              <img src="" alt="Blog Post 7" class="w-full h-48 object-cover bg-gray-200">
-              <div class="p-6">
-                <h3 class="text-xl font-semibold mb-2 card-title">Creating Your First Pointillist Piece</h3>
-                <p class="text-sm mb-3 opacity-70">Step-by-step guide for beginners to create their own artwork.</p>
-                <p class="text-xs opacity-60">Posted 1 month ago</p>
-              </div>
-            </div>
-          </div>
-        </div>
-        {% if featured_artworks %}
-          <button class="carousel-nav-btn absolute left-5 top-1/3 -translate-y-1/2 z-10 btn btn-circle btn-sm border-0" data-carousel-id="featured-blog-carousel" data-direction="-1" aria-label="Previous blog post">
-            ❮
-          </button>
-          <button class="carousel-nav-btn absolute right-5 top-1/3 -translate-y-1/2 z-10 btn btn-circle btn-sm border-0" data-carousel-id="featured-blog-carousel" data-direction="1" aria-label="Next blog post">
-            ❯
-          </button>
-        {% endif %}
-      </div>
-      <div class="text-center mt-8">
-        <a href="/blog/" class="inline-block px-8 py-3 rounded-xl btn btn-ghost transition-colors duration-200 cursor-pointer">
-          Blog
         </a>
       </div>
     {% endblock %}

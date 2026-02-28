@@ -13,48 +13,48 @@ urlpatterns = [
         name='user_profile_dashboard',
     ),
     path(
-        'user-profile/change-password/',
-        views.ChangePasswordView.as_view(),
-        name='change_password'
+        'user-profile/<uuid:order_id>/order/update/',
+        views.UpdateOrderView.as_view(),
+        name='order_update',
     ),
     path(
-        'user-profile/edit-user-info/',
-        views.EditUserInfoView.as_view(),
-        name='edit_user_info'
+        'user-profile/<uuid:order_id>/order/delete/',
+        views.DeleteOrderView.as_view(),
+        name='order_delete',
     ),
     path(
-        'user-profile/change-profile-pic/',
-        views.ChangeProfilePictureView.as_view(),
-        name='change_profile_pic'
+        'admin-dashboard/<uuid:public_id>/',
+        views.AdminDashboardView.as_view(),
+        name='admin_dashboard',
     ),
     path(
-        'user-profile/edit-order/<int:order_id>/',
-        views.CombinedOrderView.as_view(),
-        name='edit_order'
-    ),
-    path(
-        'user-profile/edit-address/<int:address_id>/',
-        views.EditAddressView.as_view(),
-        name='edit_address'
-    ),
-    path(
-        'user-profile/add-address/',
-        views.EditAddressView.as_view(),
-        name='add_address'
-    ),
-    path(
-        'artist-dashboard/<uuid:public_id>/',
-        views.ArtistDashboardView.as_view(),
-        name='artist_dashboard'
-    ),
-    path(
-        'artist-dashboard/edit-artwork/<int:artwork_id>/',
+        'admin-dashboard/<uuid:public_id>/edit-artwork/<slug:artwork_slug>/',
         views.EditArtworkModalView.as_view(),
         name='edit_artwork_modal'
     ),
     path(
-        'artist-dashboard/add-artwork/',
+        'admin-dashboard/<uuid:public_id>/delete-artwork/<slug:artwork_slug>/',
+        views.DeleteArtworkModalView.as_view(),
+        name='delete_artwork_modal'
+    ),
+    path(
+        'admin-dashboard/<uuid:public_id>/add-artwork/',
         views.AddArtworkModalView.as_view(),
         name='add_artwork_modal'
+    ),
+    path(
+        'admin-dashboard/<uuid:public_id>/edit-order/<uuid:order_id>/',
+        views.EditOrderModalView.as_view(),
+        name='edit_order_modal'
+    ),
+    path(
+        'admin-dashboard/<uuid:public_id>/delete-order/<uuid:order_id>/',
+        views.DeleteOrderModalView.as_view(),
+        name='delete_order_modal'
+    ),
+    path(
+        'guest-order/<uuid:order_id>/',
+        views.GuestOrderView.as_view(),
+        name='guest_order',
     ),
 ]

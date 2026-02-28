@@ -18,22 +18,58 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
-from .views import health_check
+from django.contrib.sitemaps.views import sitemap
+from django.views.generic import TemplateView
+from . import views
+from . import sitemaps
+
+sitemaps = {
+    'artworks': sitemaps.ArtworkSitemap,
+    'static': sitemaps.StaticViewSitemap,
+}
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('pointless_impressions_src.home.urls')),
     path('artworks/', include(
-        'pointless_impressions_src.artwork.urls', namespace='artwork'),
+        'pointless_impressions_src.artwork.urls'),
         ),
     path('checkout/', include(
-        'pointless_impressions_src.cart.urls', namespace='checkout'),
+        'pointless_impressions_src.cart.urls', namespace='cart'),
         ),
-    path('dashboard/', include('pointless_impressions_src.dashboard.urls')),
-    path('health/', health_check, name='health'),
-    path('order/', include('pointless_impressions_src.order.urls')),
-    path('profiles/', include('pointless_impressions_src.profiles.urls')),
-    path('search/', include('pointless_impressions_src.search.urls')),
+    path(
+        'dashboard/',
+        include(
+            'pointless_impressions_src.dashboard.urls',
+        )),
+    path('health/', views.health_check, name='health'),
+    path(
+        'order/',
+        include(
+            'pointless_impressions_src.order.urls',
+        )),
+    path(
+        'profiles/',
+        include(
+            'pointless_impressions_src.profiles.urls'
+        )),
+    path(
+        "robots.txt",
+        TemplateView.as_view(
+            template_name="robots.txt",
+            content_type="text/plain"
+        )),
+    path(
+        'sitemap.xml',
+        sitemap,
+        {'sitemaps': sitemaps},
+        name='django.contrib.sitemaps.views.sitemap'
+        ),
+    path(
+        'search/',
+        include(
+            'pointless_impressions_src.search.urls'
+        )),
 ]
 
 if settings.DEBUG:
@@ -43,3 +79,12 @@ if settings.DEBUG:
     urlpatterns += static(
         settings.STATIC_URL, document_root=settings.STATIC_ROOT
     )
+
+handler400 = 'pointless_impressions_src.pointless_impressions.views.error_400_view'
+handler401 = 'pointless_impressions_src.pointless_impressions.views.error_401_view'
+handler403 = 'pointless_impressions_src.pointless_impressions.views.error_403_view'
+handler404 = 'pointless_impressions_src.pointless_impressions.views.error_404_view'
+handler408 = 'pointless_impressions_src.pointless_impressions.views.error_408_view'
+handler500 = 'pointless_impressions_src.pointless_impressions.views.error_500_view'
+handler502 = 'pointless_impressions_src.pointless_impressions.views.error_502_view'
+handler503 = 'pointless_impressions_src.pointless_impressions.views.error_503_view'

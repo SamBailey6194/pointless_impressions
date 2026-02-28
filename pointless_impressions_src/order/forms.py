@@ -11,15 +11,6 @@ class OrderForm(forms.Form):
     """
     Form for collecting customer details during checkout.
 
-    Authenticated users:
-    - Email and phone fields are hidden.
-    - Addresses are a dropdown of saved addressed in DB.
-    - Shipping and billing addresses can be the same or different.
-
-    Guest Users:
-    - Must fill in all fields manually.
-    - Shipping and billing addresses can be the same or different.
-
     Fields:
     - email: Customer's email address.
     - phone: Customer's phone number.
@@ -41,10 +32,6 @@ class OrderForm(forms.Form):
     - billing_county: Billing county (optional).
     - billing_postcode: Billing postcode.
     - billing_country: Billing country.
-
-    If the user address is outside UK, they will be asked to email the order
-    number to our support team for manual processing, as payments on the
-    website are not supported for international addresses at this time.
     """
     email = forms.EmailField(
         required=True,
@@ -112,10 +99,6 @@ class OrderForm(forms.Form):
     )
 
     def __init__(self, *args, **kwargs):
-        """
-        Add Crispy Form helper and hide email field for logged-in users.
-        """
-        user = kwargs.pop('user', None)
         super().__init__(*args, **kwargs)
 
         self.helper = FormHelper()
@@ -316,14 +299,6 @@ class OrderForm(forms.Form):
                 css_class='card-body p-6'
             ),
         )
-
-        if user and user.is_authenticated:
-            self.fields['email'].widget = forms.HiddenInput()
-            self.fields['email'].label = False
-            self.fields['email'].help_text = False
-            self.fields['phone'].widget = forms.HiddenInput()
-            self.fields['phone'].label = False
-            self.fields['phone'].help_text = False
 
     def clean(self):
         """

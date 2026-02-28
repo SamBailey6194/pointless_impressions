@@ -1,15 +1,16 @@
 from django.views.generic import FormView, View
 from django.contrib.auth import login, logout, authenticate
 from django.contrib import messages
+from django.db import transaction
 from django.shortcuts import redirect, render
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import JsonResponse
-from .models import UserProfile, Customer, Artist
+import logging
+from .models import UserProfile, Customer
 from .forms import (
     SignupForm,
     LoginForm,
     EmailVerificationForm,
-    ArtistApplicationForm,
     AddressForm,
     LogoutForm
 )
@@ -22,8 +23,11 @@ from pointless_impressions_src.account.mixins import (
     AnonymousRequiredMixin, EmailNotVerifiedMixin
     )
 from pointless_impressions_src.account.utils import (
-    send_verification_email, generate_verification_code
-    )
+    send_verification_email, generate_verification_code,
+    send_email_verified_confirmation
+)
+
+logger = logging.getLogger(__name__)
 
 
 # Create your views here
@@ -70,32 +74,47 @@ class SignupView(View, AnonymousRequiredMixin):
             profile_pic_form.is_valid() and
             address_form.is_valid()
         ):
-            user = signup_form.save(commit=False)
-            user.is_active = False
-            user.save()
+            with transaction.atomic():
+                user = signup_form.save(commit=False)
+                user.is_active = False
+                user.save()
 
-            request.session['pending_verification_user_id'] = user.id
+                request.session['pending_verification_user_id'] = user.id
 
-            user_profile = UserProfile.objects.create(user=user)
-            customer = Customer.objects.create(
-                user_profile=user_profile
-            )
+                user_profile = UserProfile.objects.create(user=user)
+                customer = Customer.objects.create(
+                    user_profile=user_profile
+                )
 
-            photo = profile_pic_form.save(
-                commit=False,
-                user=user,
-                user_profile=user_profile
-            )
-            if photo:
-                photo.save()
+                verification_code = generate_verification_code(user)
 
-                if user_profile:
-                    user_profile.profile_picture = photo
-                    user_profile.save()
+                photo = profile_pic_form.save(
+                    commit=False,
+                    user=user,
+                    user_profile=user_profile
+                )
+                if photo:
+                    photo.save()
 
-            address = address_form.save(commit=False)
-            address.customer = customer
-            address.save()
+                    if user_profile:
+                        user_profile.profile_picture = photo
+                        user_profile.save()
+
+                address = address_form.save(commit=False)
+                address.customer = customer
+                address.save()
+
+            try:
+                send_verification_email(user)
+            except Exception:
+                logger.exception(
+                    "Failed to send verification email to user %s", user.id
+                )
+                messages.warning(
+                    request,
+                    "Account created but we could not send your verification "
+                    "email. Please use 'Resend code'."
+                )
 
             login(request, user)
             messages.success(
@@ -217,20 +236,22 @@ class VerifyEmailView(FormView, EmailNotVerifiedMixin, CustomerRequiredMixin):
                 code=code, is_used=False
             )
             if verification.is_expired():
-                messages.error(
-                    self.request, "The verification code has expired."
-                )
-            else:
-                verification.is_used = True
-                verification.save()
-                user.is_active = True
-                user.save()
-                login(self.request, user)
-                del self.request.session['pending_verification_user_id']
-                messages.success(
-                    self.request, "Your email has been verified successfully."
-                )
-                return redirect('dashboard:landing')
+                messages.error(self.request, "Verification code has expired.")
+                return self.form_invalid(form)
+
+            # Mark the verification code as used
+            verification.is_used = True
+            verification.save()
+
+            # Activate the user
+            user.is_active = True
+            user.save()
+
+            # Send email verified confirmation
+            send_email_verified_confirmation(user)
+
+            messages.success(self.request, "Your email has been verified!")
+            return redirect('dashboard:landing')
 
         except CustomUser.DoesNotExist:
             messages.error(self.request, "User not found.")
@@ -238,131 +259,6 @@ class VerifyEmailView(FormView, EmailNotVerifiedMixin, CustomerRequiredMixin):
         except EmailVerificationCode.DoesNotExist:
             messages.error(self.request, "Invalid verification code.")
             return self.form_invalid(form)
-
-
-class ArtistApplicationView(FormView):
-    """
-    Artist application view that handles the submission of artist applications.
-
-    Features:
-    - Uses multiple forms: SignupForm, PhotoForm, AddressForm,
-      and ArtistApplicationForm.
-    - Handles both new user registration and existing user applications.
-    - Displays success or error messages based on form submission outcome.
-
-    Template:
-    - 'profiles/templates/profiles/artist_application.html'
-
-    Context:
-    - signup_form: Instance of SignupForm for new user registration.
-    - photo_form: Instance of PhotoForm for photo uploads.
-    - address_form: Instance of AddressForm for address details.
-    - artist_application_form: Instance of ArtistApplicationForm for
-      artist-specific details.
-    """
-    template_name = 'profiles/artist_application.html'
-    form_class = ArtistApplicationForm
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        if self.request.user.is_authenticated:
-            context['artist_application_form'] = ArtistApplicationForm()
-        else:
-            context['signup_form'] = SignupForm()
-            context['profile_pic_form'] = ProfilePhotoForm()
-            context['address_form'] = AddressForm()
-            context['artist_application_form'] = ArtistApplicationForm()
-        return context
-
-    def post(self, request, *args, **kwargs):
-        if request.user.is_authenticated:
-            artist_application_form = ArtistApplicationForm(request.POST)
-
-            if artist_application_form.is_valid():
-                artist_application = artist_application_form.save(commit=False)
-                artist = Artist.objects.create(
-                    user_profile=request.user.user_profile,
-                    is_approved=False
-                )
-                artist_application.user = artist
-                artist_application.save()
-
-                messages.success(
-                    request, "Your artist application has been submitted."
-                )
-                return render(
-                    request, self.template_name, self.get_context_data()
-                )
-
-            messages.error(request, "Please correct the errors in the form.")
-            return render(
-                request,
-                self.template_name,
-                {'artist_application_form': artist_application_form},
-            )
-        else:
-            signup_form = SignupForm(request.POST)
-            profile_pic_form = ProfilePhotoForm(
-                request.POST, request.FILES
-            )
-            address_form = AddressForm(request.POST)
-            artist_application_form = ArtistApplicationForm(request.POST)
-
-            if (
-                signup_form.is_valid()
-                and profile_pic_form.is_valid()
-                and address_form.is_valid()
-                and artist_application_form.is_valid()
-            ):
-                user = signup_form.save()
-                request.session['pending_verification_user_id'] = user.id
-                user_profile = user.user_profile
-                customer = Customer.objects.create(
-                    user_profile=user_profile
-                )
-                artist = Artist.objects.create(
-                    user_profile=user_profile,
-                    is_approved=False
-                )
-
-                photo = profile_pic_form.save(
-                    commit=False,
-                    user=user,
-                    user_profile=user_profile
-                )
-                if photo:
-                    photo.save()
-
-                    if user_profile:
-                        user_profile.profile_picture = photo
-                        user_profile.save()
-
-                address = address_form.save(commit=False)
-                address.customer = customer
-                address.save()
-
-                artist_application = artist_application_form.save(commit=False)
-                artist_application.user = artist
-                artist_application.save()
-
-                messages.success(
-                    request, "Your artist application has been submitted."
-                )
-                return render(
-                    request, self.template_name, self.get_context_data()
-                )
-
-            messages.error(request, "Please correct the errors in the form.")
-            return render(
-                request,
-                self.template_name,
-                {
-                    'signup_form': signup_form,
-                    'profile_pic_form': profile_pic_form,
-                    'address_form': address_form,
-                    'artist_application_form': artist_application_form,
-                },
-            )
 
 
 class ResendVerificationCodeView(View, CustomerRequiredMixin):

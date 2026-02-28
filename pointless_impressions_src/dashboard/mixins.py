@@ -1,5 +1,6 @@
 from django.contrib.auth.mixins import UserPassesTestMixin
 from django.core.exceptions import PermissionDenied
+from django.shortcuts import render
 
 
 # Mixins for role-based access control
@@ -16,12 +17,24 @@ class AdminRequiredMixin(UserPassesTestMixin):
             self.request.user.groups.filter(name__in=allowed_groups).exists()
             )
 
+        public_id = self.kwargs.get('public_id')
+
+        if public_id:
+            url_public_id = str(public_id)
+            user_public_id = str(self.request.user.public_id)
+
+            if url_public_id != user_public_id:
+                return False
+
         return has_group
 
     def handle_no_permission(self):
-        raise PermissionDenied(
-            "You do not have permissions to view the dashboard"
-            )
+        return render(
+            self.request,
+            "403.html",
+            {"message": "You do not have permissions to view the dashboard."},
+            status=403,
+        )
 
 
 class OwnerRequiredMixin(AdminRequiredMixin):

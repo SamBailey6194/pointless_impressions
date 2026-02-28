@@ -1,260 +1,278 @@
-import { getCsrfToken } from './cart.js';
+document.addEventListener('DOMContentLoaded', () => {
+    const updateButtons = document.querySelectorAll('.js-update-order-btn');
 
-/**
- * Fetch order data from the server.
- * @param {string} orderId - The ID of the order to fetch.
- * @returns {Promise<object>} - The order data.
- */
-async function fetchOrderData(orderId) {
-  try {
-    const response = await fetch(`/orders/${orderId}/`, {
-      method: 'GET',
-      headers: {
-        'X-Requested-With': 'XMLHttpRequest',
-        'X-CSRFToken': getCsrfToken(),
-      },
-      credentials: 'include',
+    updateButtons.forEach(button => {
+        button.addEventListener('click', (e) => {
+            e.preventDefault();
+            const orderId = button.dataset.order;
+
+            if (orderId) {
+                openUpdateOrderModal(orderId);
+            }
+        });
     });
 
-    if (!response.ok) {
-      throw new Error(`Failed to fetch order: ${response.status}`);
-    }
+    const deleteButtons = document.querySelectorAll('.js-delete-order-btn');
 
-    return await response.json();
-  } catch (error) {
-    console.error('Error fetching order data:', error);
-    return null;
-  }
-}
+    deleteButtons.forEach(button => {
+        button.addEventListener('click', (e) => {
+            e.preventDefault();
+            const orderId = button.dataset.order;
 
-/**
- * Prepare the SignupForm for editing user info by excluding password fields.
- * @param {object} formData - The user data to populate the form.
- */
-function populateEditUserInfoModal(formData) {
-  const modal = document.getElementById('edit-user-info-modal');
-  if (!modal || !formData) return;
-
-  modal.querySelector('input[name="first_name"]').value = formData.first_name || '';
-  modal.querySelector('input[name="last_name"]').value = formData.last_name || '';
-  modal.querySelector('input[name="username"]').value = formData.username || '';
-  modal.querySelector('input[name="email"]').value = formData.email || '';
-  modal.querySelector('input[name="phone"]').value = formData.phone || '';
-
-  modal.showModal();
-}
-
-/**
- * Populate the combined order modal with fetched data.
- * @param {object} orderData - The order data to populate the modal.
- */
-function populateCombinedOrderModal(orderData) {
-  const modal = document.getElementById('order-modal');
-  if (!modal || !orderData) return;
-
-  // Populate order summary section
-  modal.querySelector('.order-id').textContent = orderData.id;
-  modal.querySelector('.order-total').textContent = orderData.total;
-  modal.querySelector('.order-items').innerHTML = orderData.items
-    .map(item => `<li>${item.name} - ${item.quantity} x ${item.price}</li>`)
-    .join('');
-
-  // Populate edit form section
-  const editForm = modal.querySelector('#edit-order-form');
-  if (editForm) {
-    editForm.querySelector('textarea[name="edit_notes"]').value = '';
-  }
-}
-
-/**
- * Close a modal by its ID.
- * @param {string} modalId - The ID of the modal to close.
- */
-function closeModal(modalId) {
-  const modal = document.getElementById(modalId);
-  if (modal) {
-    modal.close();
-  }
-}
-
-/**
- * Open a modal by its ID.
- * @param {string} modalId - The ID of the modal to open.
- */
-function openModal(modalId) {
-  const modal = document.getElementById(modalId);
-  if (modal) {
-    modal.showModal();
-  }
-}
-
-/**
- * Toggle edit mode in the order modal.
- */
-function toggleEditMode() {
-  const editOrderForm = document.getElementById('edit-order-form');
-  const orderActions = document.getElementById('order-actions');
-
-  if (editOrderForm && orderActions) {
-    editOrderForm.classList.toggle('hidden');
-    orderActions.classList.toggle('hidden');
-  }
-}
-
-// Attach event listener for toggling edit mode
-const toggleEditModeButton = document.getElementById('toggle-edit-mode');
-if (toggleEditModeButton) {
-  toggleEditModeButton.addEventListener('click', toggleEditMode);
-}
-
-/**
- * Increment or decrement the quantity in the order modal.
- */
-function updateQuantity(button, increment) {
-  const quantityInput = button.closest('.quantity-control').querySelector('.quantity-input');
-  if (!quantityInput) return;
-
-  let currentQuantity = parseInt(quantityInput.value, 10) || 0;
-  const maxQuantity = parseInt(quantityInput.getAttribute('max'), 10) || Infinity;
-  const minQuantity = parseInt(quantityInput.getAttribute('min'), 10) || 0;
-
-  if (increment) {
-    currentQuantity = Math.min(currentQuantity + 1, maxQuantity);
-  } else {
-    currentQuantity = Math.max(currentQuantity - 1, minQuantity);
-  }
-
-  quantityInput.value = currentQuantity;
-}
-
-// Attach event listeners for quantity buttons
-document.addEventListener('click', (event) => {
-  const incrementButton = event.target.closest('.quantity-increment');
-  const decrementButton = event.target.closest('.quantity-decrement');
-
-  if (incrementButton) {
-    updateQuantity(incrementButton, true);
-  }
-
-  if (decrementButton) {
-    updateQuantity(decrementButton, false);
-  }
+            if (orderId) {
+                openDeleteOrderModal(orderId);
+            }
+        });
+    });
 });
 
-/**
- * Populate the address modal with data for editing or reset for adding a new address.
- * @param {object|null} addressData - The address data to populate the form, or null for a new address.
- */
-function populateAddressModal(addressData) {
-  const modal = document.getElementById('edit-address-modal');
-  const form = modal.querySelector('form');
+function openUpdateOrderModal(orderId) {
 
-  if (!modal || !form) return;
+    const modalContainer = document.getElementById('update-order-modal-container');
+    if (!modalContainer) {
+        console.error('Modal container not found.');
+        return;
+    }
 
-  // Reset the form for adding a new address
-  form.reset();
-  form.action = addressData
-    ? `/dashboard/edit-address/${addressData.id}/`
-    : `/dashboard/add-address/`;
+    fetch(`/dashboard/user-profile/${orderId}/order/update/`, {
+            method: 'GET',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'Content-Type': 'application/json',
+            },
+            credentials: 'include',
+        })
+        .then(response => {
+            if (!response.ok) throw new Error('Failed to fetch modal content');
+            return response.text();
+        })
+        .then(html => {
+            modalContainer.innerHTML = html;
 
-  // Populate the form fields if editing an existing address
-  if (addressData) {
-    form.querySelector('input[name="address_id"]').value = addressData.id || '';
-    form.querySelector('input[name="label"]').value = addressData.label || '';
-    form.querySelector('input[name="first_name"]').value = addressData.first_name || '';
-    form.querySelector('input[name="last_name"]').value = addressData.last_name || '';
-    form.querySelector('input[name="address_line_1"]').value = addressData.address_line_1 || '';
-    form.querySelector('input[name="address_line_2"]').value = addressData.address_line_2 || '';
-    form.querySelector('input[name="city"]').value = addressData.city || '';
-    form.querySelector('input[name="county"]').value = addressData.county || '';
-    form.querySelector('input[name="postcode"]').value = addressData.postcode || '';
-    form.querySelector('select[name="country"]').value = addressData.country || '';
-  }
+            const modal = document.getElementById('update-order-modal');
+            if (modal) {
+                modal.showModal();
 
-  modal.showModal();
+                attachFormSubmitListener(modal);
+
+                const closeBtn = modal.querySelector('.js-close-modal-btn');
+                if (closeBtn) {
+                    closeBtn.addEventListener('click', () => {
+                        modal.close();
+                    });
+                }
+            } else {
+                console.error('Modal element not found after fetching content.');
+            }
+        })
+        .catch(err => {
+            console.error('Error fetching update order modal:', err);
+            if (window.Toast) window.Toast.show('Failed to load modal.', 'error');
+        });
 }
 
-// Event listener for opening the address modal
-document.addEventListener('click', async (event) => {
-  const addAddressBtn = event.target.closest('.js-add-address-btn');
-  const editAddressBtn = event.target.closest('.js-edit-address-btn');
+// Helper function to handle the form submission
+function getValue(id) {
+    const element = document.getElementById(id);
+    return element ? element.value : '';
+}
 
-  if (addAddressBtn) {
-    populateAddressModal(null);
-  }
+function getSelectText(id) {
+    const element = document.getElementById(id);
+    return element ? element.options[element.selectedIndex].text : '';
+}
 
-  if (editAddressBtn) {
-    const addressId = editAddressBtn.getAttribute('data-address-id');
+// Explicitly express all fields for shipping and billing
+function getShippingFields() {
+    return {
+        firstName: getValue('id_shipping_first_name'),
+        lastName: getValue('id_shipping_last_name'),
+        addressLine1: getValue('id_shipping_address_line_1'),
+        addressLine2: getValue('id_shipping_address_line_2'),
+        city: getValue('id_shipping_city'),
+        county: getValue('id_shipping_county'),
+        postcode: getValue('id_shipping_postcode'),
+    };
+}
 
-    try {
-      const response = await fetch(`/dashboard/edit-address/${addressId}/`, {
-        method: 'GET',
-        headers: {
-          'X-Requested-With': 'XMLHttpRequest',
-          'X-CSRFToken': getCsrfToken(),
-        },
-        credentials: 'include',
-      });
+function getBillingFields() {
+    return {
+        firstName: getValue('id_billing_first_name'),
+        lastName: getValue('id_billing_last_name'),
+        addressLine1: getValue('id_billing_address_line_1'),
+        addressLine2: getValue('id_billing_address_line_2'),
+        city: getValue('id_billing_city'),
+        county: getValue('id_billing_county'),
+        postcode: getValue('id_billing_postcode'),
+    };
+}
 
-      if (!response.ok) {
-        throw new Error(`Failed to fetch address: ${response.status}`);
-      }
+function attachFormSubmitListener(modal) {
+    const updateOrderForm = document.getElementById('update-order-form');
 
-      const addressData = await response.json();
-      populateAddressModal(addressData);
-    } catch (error) {
-      console.error('Error fetching address data:', error);
+    if (updateOrderForm) {
+        updateOrderForm.addEventListener('submit', async (event) => {
+            event.preventDefault();
+
+            const orderId = updateOrderForm.dataset.orderId;
+            const formData = new FormData(updateOrderForm);
+
+            try {
+                const response = await fetch(`/dashboard/user-profile/${orderId}/order/update/`, {
+                    method: 'POST',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                    },
+                    body: formData,
+                    credentials: 'include',
+                });
+
+                const result = await response.json();
+
+                // Ensure the page reloads after updating the order
+                if (result.success) {
+                    // Update the order card with new data
+                    updateOrderCard(orderId, result.updated_shipping_address, result.updated_billing_address);
+
+                    // Reload the page to ensure the changes are fully reflected
+                    window.location.reload();
+
+                    // Close the modal
+                    modal.close();
+
+                    // Show success message
+                    if (window.Toast) window.Toast.show('Order updated successfully.', 'success');
+                } else {
+                    console.error('Failed to update order:', result.errors);
+                    if (window.Toast) window.Toast.show('Failed to update order.', 'error');
+                }
+            } catch (err) {
+                console.error('Error submitting update order form:', err);
+                if (window.Toast) window.Toast.show('An error occurred while updating the order.', 'error');
+            }
+        });
+    } else {
+        console.error('Update order form not found in modal.');
     }
-  }
-});
+}
 
-/**
- * Event listener to open modals and fetch data.
- */
-document.addEventListener('click', async (event) => {
-  const changePasswordBtn = event.target.closest('.js-change-password-btn');
-  const editUserInfoBtn = event.target.closest('.js-edit-user-info-btn');
-  const closeModalBtn = event.target.closest('.js-close-modal-btn');
-  const combinedOrderBtn = event.target.closest('.js-combined-order-btn');
+function updateOrderCard(orderId, updatedShipping, updatedBilling) {
+    const orderCard = document.querySelector(`[data-order="${orderId}"]`).closest('.rounded-lg');
 
-  if (changePasswordBtn) {
-    openModal('change-password-modal');
-  }
+    if (orderCard) {
+        const shippingEl = orderCard.querySelector('.shipping-address');
+        const billingEl = orderCard.querySelector('.billing-address');
 
-  if (editUserInfoBtn) {
-    const userId = editUserInfoBtn.getAttribute('data-user-id');
+        if (shippingEl) {
+            shippingEl.textContent = updatedShipping;
+        } else {
+            console.error('Shipping fields container not found in the DOM.');
+        }
 
-    try {
-      const response = await fetch(`/users/${userId}/`, {
-        method: 'GET',
-        headers: {
-          'X-Requested-With': 'XMLHttpRequest',
-          'X-CSRFToken': getCsrfToken(),
-        },
-        credentials: 'include',
-      });
-
-      if (!response.ok) {
-        throw new Error(`Failed to fetch user info: ${response.status}`);
-      }
-
-      const userData = await response.json();
-      populateEditUserInfoModal(userData);
-      openModal('edit-user-info-modal');
-    } catch (error) {
-      console.error('Error fetching user info:', error);
+        if (billingEl) {
+            billingEl.textContent = updatedBilling;
+        } else {
+            console.error('Billing fields container not found in the DOM.');
+        }
+    } else {
+        console.error('Order card not found in the DOM.');
     }
-  }
+}
 
-  if (combinedOrderBtn) {
-    const orderId = combinedOrderBtn.getAttribute('data-order-id');
-    const orderData = await fetchOrderData(orderId);
-    populateCombinedOrderModal(orderData);
-    openModal('order-modal');
-  }
+function openDeleteOrderModal(orderId) {
+    const modalContainer = document.getElementById('delete-order-modal-container');
+    if (!modalContainer) {
+        console.error('Delete modal container not found.');
+        return;
+    }
 
-  if (closeModalBtn) {
-    const modalId = closeModalBtn.getAttribute('data-modal-id');
-    closeModal(modalId);
-  }
-});
+    fetch(`/dashboard/user-profile/${orderId}/order/delete/`, {
+            method: 'GET',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'Content-Type': 'application/json',
+            },
+            credentials: 'include',
+        })
+        .then(response => {
+            if (!response.ok) throw new Error('Failed to fetch delete modal content');
+            return response.text();
+        })
+        .then(html => {
+            modalContainer.innerHTML = html;
+
+            const modal = document.getElementById('delete-order-modal');
+            if (modal) {
+                modal.showModal();
+
+                attachDeleteFormSubmitListener(modal);
+
+                const closeBtn = modal.querySelector('.js-close-modal-btn');
+                if (closeBtn) {
+                    closeBtn.addEventListener('click', () => {
+                        modal.close();
+                    });
+                }
+            } else {
+                console.error('Delete modal element not found after fetching content.');
+            }
+        })
+        .catch(err => {
+            console.error('Error fetching delete order modal:', err);
+            if (window.Toast) window.Toast.show('Failed to load delete modal.', 'error');
+        });
+}
+
+function getCSRFToken() {
+    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]');
+    return csrfToken ? csrfToken.value : '';
+}
+
+function attachDeleteFormSubmitListener(modal) {
+    const deleteOrderForm = document.getElementById('delete-order-form');
+
+    if (deleteOrderForm) {
+        deleteOrderForm.addEventListener('submit', async (event) => {
+            event.preventDefault();
+
+            const orderId = deleteOrderForm.dataset.orderId;
+
+            try {
+                const response = await fetch(`/dashboard/user-profile/${orderId}/order/delete/`, {
+                    method: 'POST',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'X-CSRFToken': getCSRFToken(),
+                    },
+                    credentials: 'include',
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    // Remove the order card from the DOM
+                    const orderCard = document.querySelector(`[data-order="${orderId}"]`).closest('.rounded-lg');
+                    if (orderCard) {
+                        orderCard.remove();
+                    } else {
+                        console.error('Order card not found in the DOM.');
+                    }
+
+                    // Close the modal
+                    modal.close();
+
+                    // Show success message
+                    if (window.Toast) window.Toast.show('Order deleted successfully.', 'success');
+                } else {
+                    console.error('Failed to delete order:', result.message);
+                    if (window.Toast) window.Toast.show('Failed to delete order.', 'error');
+                }
+            } catch (err) {
+                console.error('Error submitting delete order form:', err);
+                if (window.Toast) window.Toast.show('An error occurred while deleting the order.', 'error');
+            }
+        });
+    } else {
+        console.error('Delete order form not found in modal.');
+    }
+}

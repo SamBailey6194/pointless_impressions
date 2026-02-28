@@ -9,7 +9,10 @@ from pointless_impressions_src.artwork.models import (
     Artwork, ArtworkFramingCondition, ArtworkCategory
 )
 from pointless_impressions_src.photo.models import Photo
-from pointless_impressions_src.profiles.models import Artist
+from pointless_impressions_src.profiles.models import Artist, UserProfile
+
+
+User = get_user_model()
 
 
 # Create your tests here.
@@ -30,8 +33,7 @@ class ArtworkListViewsTest(TestCase):
         return json.loads(script.string)
 
     def setUp(self):
-        # Artists
-        User = get_user_model()
+        # Create test users with phone
         self.artist1 = User.objects.create_user(
             username='blake',
             password='testpassword',
@@ -46,16 +48,21 @@ class ArtworkListViewsTest(TestCase):
             phone='+441234567894'
         )
 
+        # Create UserProfiles for the users
+        artist1_profile = UserProfile.objects.create(user=self.artist1)
+        artist2_profile = UserProfile.objects.create(user=self.artist2)
+
+        # Create Artist instances using the UserProfiles
         self.artist1_profile = Artist.objects.create(
-            user=self.artist1,
-            bio="Bio for Blake",
-            portfolio_url="https://blakeart.com"
+            user_profile=artist1_profile,
+            bio='Bio for Blake',
+            portfolio_url='https://blakeart.com'
         )
 
         self.artist2_profile = Artist.objects.create(
-            user=self.artist2,
-            bio="Bio for Alice",
-            portfolio_url="https://aliceart.com"
+            user_profile=artist2_profile,
+            bio='Bio for Alice',
+            portfolio_url='https://aliceart.com'
         )
 
         # Framing conditions
@@ -245,7 +252,7 @@ class ArtworkDetailViewTest(TestCase):
         )
 
         self.artist = Artist.objects.create(
-            user=self.artist_user,
+            user_profile=UserProfile.objects.create(user=self.artist_user),
             bio='A talented pointillist artist.'
         )
 
@@ -287,6 +294,11 @@ class ArtworkDetailViewTest(TestCase):
         )
 
         self.artwork.main_photo = self.main_photo
+        self.artwork.save()
+
+        self.artwork.description = "A serene mountain landscape."
+        self.artwork.price = 249.99
+        self.artwork.is_available = True
         self.artwork.save()
 
     def test_artwork_detail_view_returns_200(self):

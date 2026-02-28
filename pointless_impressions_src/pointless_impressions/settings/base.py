@@ -20,6 +20,7 @@ load_dotenv(os.path.join(ENV_PATH, ".env"))
 # Pull from environment (works with .env.dev locally or Heroku config vars)
 _raw_hosts = os.getenv("ALLOWED_HOSTS", "localhost")
 ALLOWED_HOSTS = [h.strip() for h in _raw_hosts.split(",") if h.strip()]
+DOMAIN = os.getenv("DOMAIN", "http://localhost:8000")
 
 # Application definition
 DJANGO_APPS = [
@@ -29,6 +30,7 @@ DJANGO_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "django.contrib.sitemaps",
 ]
 
 THIRD_PARTY_APPS = [
@@ -163,6 +165,10 @@ TEMPLATES = [
                 "global_profiles_context",
                 "pointless_impressions_src.profiles.context_processors."
                 "auth_forms",
+                "pointless_impressions_src.account.context_processors."
+                "user_context",
+                "pointless_impressions_src.pointless_impressions."
+                "context_processors.page_slug_detector",
             ],
         },
     },
@@ -218,7 +224,8 @@ cloudinary.config(
     cloud_name=CLOUDINARY_CLOUD_NAME,
     api_key=CLOUDINARY_API_KEY,
     api_secret=CLOUDINARY_API_SECRET,
-    secure=True
+    secure=True,
+    api_proxy="https://res.cloudinary.com"
 )
 
 # Default primary key field type

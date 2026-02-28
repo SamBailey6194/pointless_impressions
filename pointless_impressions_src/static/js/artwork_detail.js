@@ -1,9 +1,5 @@
 (() => {
   // pointless_impressions_src/theme/static_src/src/js/cart.js
-  function getCsrfToken() {
-    const tokenEl = document.querySelector("[name=csrfmiddlewaretoken]");
-    return tokenEl ? tokenEl.value : "";
-  }
   async function updateCartDropdownHTML() {
     const cartDropdown = document.getElementById("cart-dropdown-content");
     if (!cartDropdown) {
@@ -77,7 +73,7 @@
     }
     if (imageElement) {
       imageElement.src = artworkData.image_url || "";
-      imageElement.alt = artworkData.image_alt_text || artworkData.name || "";
+      imageElement.alt = artworkData.alt_text || artworkData.name || "";
     }
     if (statusElement) {
       statusElement.textContent = artworkData.availability || "Unknown";
@@ -89,70 +85,7 @@
     } else {
       console.error("Carousel script not loaded.");
     }
-    initializeReviewFunctionality();
   }
-  async function submitReview() {
-    const form = document.getElementById("review_form");
-    const modal = document.getElementById("review_modal");
-    const formData = new FormData(form);
-    try {
-      const response = await fetch(form.action, {
-        method: "POST",
-        body: formData,
-        headers: {
-          "X-Requested-With": "XMLHttpRequest",
-          "X-CSRFToken": getCsrfToken()
-        }
-      });
-      const data = await response.json();
-      if (response.ok) {
-        if (window.Toast) {
-          window.Toast.show(data.message, "success");
-        }
-        form.reset();
-        if (modal) modal.close();
-        setTimeout(() => {
-          window.location.reload();
-        }, 1e3);
-      } else {
-        const errorMsg = data.error || (data.errors ? Object.values(data.errors).join(" ") : "An error occurred.");
-        if (window.Toast) {
-          window.Toast.show(errorMsg, "error");
-        }
-        console.error("Form errors:", data.errors);
-      }
-    } catch (error) {
-      console.error("Error submitting review:", error);
-      if (window.Toast) {
-        window.Toast.show("Failed to submit review. Please try again.", "error");
-      }
-    }
-  }
-  function handleViewReviewsScroll() {
-    const viewReviewsBtn = document.querySelector("[data-scroll-to-reviews]");
-    if (viewReviewsBtn) {
-      viewReviewsBtn.addEventListener("click", function() {
-        const reviewsSection = document.getElementById("reviews_section");
-        if (reviewsSection) {
-          reviewsSection.scrollIntoView({ behavior: "smooth" });
-        }
-      });
-    }
-  }
-  function initializeReviewForm() {
-    const reviewForm = document.getElementById("review_form");
-    if (reviewForm) {
-      reviewForm.addEventListener("submit", function(e) {
-        e.preventDefault();
-        submitReview();
-      });
-    }
-  }
-  function initializeReviewFunctionality() {
-    initializeReviewForm();
-    handleViewReviewsScroll();
-  }
-  window.submitReview = submitReview;
   document.addEventListener("DOMContentLoaded", initArtworkDetail);
 })();
 //# sourceMappingURL=artwork_detail.js.map

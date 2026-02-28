@@ -1,0 +1,20 @@
+{% load static tailwind_tags cloudinary crispy_forms_tags %}
+
+<dialog id="delete-artwork-modal" class="modal">
+    <div class="modal-box lg:w-7/12 lg:max-w-4xl">
+        <form method="post" class="form-card p-8 flex flex-col items-center justify-center gap-4" id="delete-artwork-form" data-artwork-id="{{ artwork.id }}">
+            {% csrf_token %}
+            <h1 class="text-lg font-bold">Are you sure you want to delete this {{ artwork.name }}?</h1>
+            <div class="flex gap-4">
+                <button type="submit" class="btn btn-ghost btn-outline">Yes, Delete</button>
+                <button type="button" class="btn btn-ghost js-close-modal-btn" data-modal-id="delete-artwork-modal">
+                    <i class="fa-solid fa-times"></i> No, Cancel
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <form method="dialog" class="modal-backdrop flex items-end justify-end">
+        <button>close</button>
+    </form>
+</dialog>

@@ -1,72 +1,12 @@
-from django.forms import ModelForm
 from django import forms
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Div, Field, HTML
 from .models import (
-    ArtworkReview, Artwork, ArtworkFramingCondition, ArtworkCategory
+    Artwork, ArtworkFramingCondition, ArtworkCategory
 )
 
 
-# Write your forms here
-class ArtworkReviewForm(ModelForm):
-    """Form for submitting artwork reviews."""
-    class Meta:
-        model = ArtworkReview
-        fields = [
-            'review_title',
-            'rating',
-            'review_text',
-        ]
-        widgets = {
-            'review_title': forms.TextInput(attrs={
-                'placeholder': 'Enter a review title',
-                'class': 'custom-input',
-            }),
-            'rating': forms.NumberInput(attrs={
-                'min': 1,
-                'max': 5,
-                'type': 'hidden',
-                'placeholder': 'Enter rating (1-5)'
-            }),
-            'review_text': forms.Textarea(attrs={
-                'placeholder': 'Share your thoughts about this artwork...',
-                'rows': 4,
-                'class': 'custom-input',
-            }),
-        }
-        labels = {
-            'review_title': 'Title',
-            'rating': 'Rating',
-            'review_text': 'Your Review',
-        }
-
-    def clean_review_title(self):
-        review_title = self.cleaned_data.get('review_title')
-        if not review_title or not review_title.strip():
-            raise forms.ValidationError("Title cannot be empty.")
-        if len(review_title.strip()) < 5:
-            raise forms.ValidationError(
-                "Title must be at least 5 characters long."
-            )
-        return review_title
-
-    def clean_rating(self):
-        rating = self.cleaned_data.get('rating')
-        if rating and (rating < 1 or rating > 5):
-            raise forms.ValidationError("Rating must be between 1 and 5.")
-        return rating
-
-    def clean_review_text(self):
-        review_text = self.cleaned_data.get('review_text')
-        if not review_text or not review_text.strip():
-            raise forms.ValidationError("Review cannot be empty.")
-        if len(review_text.strip()) < 10:
-            raise forms.ValidationError(
-                "Review must be at least 10 characters long."
-            )
-        return review_text
-
-
+# Write your forms here.
 class ArtworkSubmissionForm(forms.ModelForm):
     """
     Form for artists to submit artwork for approval.
@@ -123,6 +63,7 @@ class ArtworkSubmissionForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.helper = FormHelper()
+        self.helper.form_tag = False
         self.helper.form_method = 'post'
         self.helper.layout = Layout(
             Div(
@@ -164,20 +105,9 @@ class ArtworkSubmissionForm(forms.ModelForm):
                             placeholder="0.00",
                             css_class='mb-4 custom-input w-full lg:w-66'
                         ),
-                        Div(
-                            Field(
-                                'category',
-                                css_class='custom-input w-full lg:w-66'
-                            ),
-                            HTML(
-                                "<button type='button' class='btn btn-outline "
-                                "add-category'>Add</button>"
-                            ),
-                            HTML(
-                                "<button type='button' class='btn btn-outline "
-                                "remove-category'>Remove</button>"
-                            ),
-                            css_class='flex items-center gap-2'
+                        Field(
+                            'category',
+                            css_class='custom-input w-full lg:w-66'
                         ),
                         css_class='lg:flex lg:gap-4 mb-4'
                     ),
@@ -190,20 +120,9 @@ class ArtworkSubmissionForm(forms.ModelForm):
                         "Framing Options</h4>"
                     ),
                     Div(
-                        Div(
-                            Field(
-                                'selected_conditions',
-                                css_class='custom-input w-full'
-                            ),
-                            HTML(
-                                "<button type='button' class='btn btn-outline "
-                                "add-condition'>Add</button>"
-                            ),
-                            HTML(
-                                "<button type='button' class='btn btn-outline "
-                                "remove-condition'>Remove</button>"
-                            ),
-                            css_class='flex items-center gap-2'
+                        Field(
+                            'selected_conditions',
+                            css_class='custom-input w-full'
                         ),
                         css_class='mb-4'
                     ),
@@ -215,9 +134,6 @@ class ArtworkSubmissionForm(forms.ModelForm):
                 css_class='px-6 py-2 mb-4',
                 id='artwork-submission-form'
             ),
-            HTML(
-                "<button type='submit' class='btn btn-primary'>Submit</button>"
-            )
         )
 
     def clean_name(self):
@@ -257,61 +173,24 @@ class ArtworkSubmissionForm(forms.ModelForm):
         """
         artwork = super().save(commit=False)
 
-        # Handle artist assignment
         if artist:
             artwork.artist = artist
 
-        # Set artwork as pending approval
         artwork.is_available = False
 
-        # Save the artwork instance if commit is True
-        if commit:
-            artwork.save()
-
-            # Handle dynamic categories
-            category_name = self.cleaned_data.get('category')
-            if category_name:
+        category_name = self.cleaned_data.get('category')
+        if category_name:
+            if isinstance(category_name, str) and category_name.strip():
                 category, created = ArtworkCategory.objects.get_or_create(
-                    name=category_name
+                    name=category_name.strip()
                 )
                 artwork.category = category
 
-            # Handle dynamic framing conditions
-            selected_conditions = self.cleaned_data.get('selected_conditions')
-            if selected_conditions:
-                for condition_name in selected_conditions:
-                    condition, created = ArtworkFramingCondition.objects.\
-                        get_or_create(condition_friendly_name=condition_name)
-                    artwork.selected_conditions.add(condition)
-
-            # Save many-to-many relationships
+        if commit:
+            artwork.save()
             self.save_m2m()
 
         return artwork
-
-
-class ArtworkApprovalForm(forms.ModelForm):
-    """
-    Form for admin staff to approve/reject submitted artwork.
-    Limited to approval-related fields.
-    """
-
-    class Meta:
-        model = Artwork
-        fields = ['is_available']
-        widgets = {
-            'is_available': forms.CheckboxInput(attrs={
-                'class': 'form-check-input'
-            })
-        }
-        labels = {
-            'is_available': 'Approve artwork (make available for sale)'
-        }
-
-    def clean_is_available(self):
-        """Validate approval status."""
-        is_available = self.cleaned_data.get('is_available')
-        return is_available
 
 
 class AddToCartForm(forms.Form):

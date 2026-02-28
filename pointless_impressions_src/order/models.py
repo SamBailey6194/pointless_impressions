@@ -3,6 +3,7 @@ from decimal import Decimal
 import uuid
 import secrets
 from django.conf import settings
+from django.urls import reverse
 from pointless_impressions_src.artwork.models import Artwork
 
 
@@ -223,6 +224,13 @@ class Order(models.Model):
         max_length=2000,
         null=True
     )
+    payment_id = models.CharField(
+        max_length=255,
+        unique=True,
+        blank=True,
+        null=True,
+        help_text="Unique Square payment ID associated with the order"
+    )
 
     def delete(self, using=None, keep_parents=False):
         """
@@ -235,6 +243,27 @@ class Order(models.Model):
 
     def __str__(self):
         return f"Order {self.order_number} - {self.status}"
+
+    def get_authenticated_user_link(self):
+        """
+        Generate the dashboard link for authenticated users.
+        """
+        return reverse(
+            'dashboard:user_profile_dashboard',
+            kwargs={'public_id': self.user.public_id}
+        )
+
+    def get_guest_user_link(self):
+        """
+        Generate the dashboard link for guest users.
+        """
+        base_url = reverse(
+            'dashboard:guest_order',
+            kwargs={
+                'order_id': self.id,
+            }
+        )
+        return f"{base_url}?access_code={self.guest_access_code}"
 
 
 # ----------------------------------
@@ -296,3 +325,63 @@ class OrderItem(models.Model):
     def get_total_price(self):
         """Calculate total price for this order item."""
         return self.price_at_purchase * self.quantity
+
+
+class PaymentRecovery(models.Model):
+    """
+    Stores information for recovering payments that failed
+    during the checkout process.
+    """
+    id = models.UUIDField(
+        primary_key=True,
+        default=uuid.uuid4,
+        editable=False,
+        help_text="Unique identifier for the payment recovery record"
+    )
+    payment_id = models.CharField(
+        max_length=255,
+        unique=True,
+        help_text="Unique Square payment ID associated with the recovery"
+    )
+    amount = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        help_text="Amount to be recovered"
+    )
+    currency = models.CharField(
+        max_length=10,
+        default='GBP',
+        help_text="Currency of the amount"
+    )
+    buyer_email = models.EmailField(
+        help_text="Email of the buyer"
+    )
+    buyer_phone = models.CharField(
+        max_length=20,
+        blank=True,
+        null=True,
+        help_text="Phone number of the buyer (optional)"
+    )
+    shipping_address = models.JSONField()
+    billing_address = models.JSONField()
+    cart_snapshot = models.JSONField(
+        null=True,
+        blank=True,
+        help_text="Snapshot of the cart items at the time of payment failure"
+    )
+    notes = models.TextField(
+        blank=True,
+        null=True,
+        help_text="Additional notes regarding the payment recovery"
+    )
+    created_at = models.DateTimeField(
+        auto_now_add=True,
+        help_text="Timestamp when the payment recovery record was created"
+    )
+    processed = models.BooleanField(
+        default=False,
+        help_text="Flag to indicate if the payment recovery has been processed"
+    )
+
+    def __str__(self):
+        return f"PaymentRecovery for Order {self.order.order_number}"
