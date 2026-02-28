@@ -45,6 +45,7 @@ class CheckoutView(TemplateView):
         cart = get_cart(self.request)
 
         if not cart or cart.get_total_quantity() == 0:
+            context['cart_empty'] = True
             return context
 
         cart_items_data = []
