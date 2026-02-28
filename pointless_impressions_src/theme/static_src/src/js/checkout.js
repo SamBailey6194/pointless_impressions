@@ -101,6 +101,30 @@ async function handleCartUpdate(form) {
   }
 }
 
+async function handleRemoveItem(artworkId) {
+  try {
+    const response = await fetch('/checkout/remove-item/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Requested-With': 'XMLHttpRequest',
+        'X-CSRFToken': getCsrfToken(),
+      },
+      body: JSON.stringify({ artwork_id: artworkId }),
+      credentials: 'include',
+    });
+    const data = await response.json();
+    if (data.success) {
+      window.location.reload();
+    } else {
+      if (window.Toast) window.Toast.show(data.error || 'Failed to remove item.', 'error');
+    }
+  } catch (err) {
+    console.error('Failed to remove item:', err);
+    if (window.Toast) window.Toast.show('Error removing item.', 'error');
+  }
+}
+
 // ... Helper functions ...
 function getSelectText(id) {
     const el = document.getElementById(id);
@@ -329,6 +353,39 @@ document.addEventListener('DOMContentLoaded', async function () {
     });
     toggleBillingFields();
   }
+
+  document.querySelectorAll('.js-qty-minus').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      const input = btn.closest('form').querySelector('input[name="quantity"]');
+      if (!input) return;
+      const current = parseInt(input.value, 10) || 1;
+      if (current > 1) input.value = current - 1;
+    });
+  });
+
+  document.querySelectorAll('.js-qty-plus').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      const input = btn.closest('form').querySelector('input[name="quantity"]');
+      if (!input) return;
+      const current = parseInt(input.value, 10) || 1;
+      const max = parseInt(input.max, 10) || 999;
+      if (current < max) input.value = current + 1;
+    });
+  });
+
+  document.querySelectorAll('.js-cart-item-form').forEach(function (form) {
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      handleCartUpdate(form);
+    });
+  });
+
+  document.querySelectorAll('.js-remove-item').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      const artworkId = btn.dataset.artworkId;
+      if (artworkId) handleRemoveItem(artworkId);
+    });
+  });
 
   if (placeOrderButton && confirmModal && finalConfirmBtn) {
     
