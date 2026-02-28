@@ -25,6 +25,8 @@ This document outlines the manual tests to be carried out for each feature. Use 
       - [Test Add to Cart Functionality (Backend)](#test-add-to-cart-functionality-backend)
     - [US004: Checkout with Address Form](#us004-checkout-with-address-form)
       - [Test Checkout Functionality](#test-checkout-functionality)
+    - [User Registration Fix (4.1, 4.4) - Backend](#user-registration-fix-41-44---backend)
+      - [Test Registration Atomicity and Email Dispatch](#test-registration-atomicity-and-email-dispatch)
   - [Frontend Testing](#frontend-testing)
     - [US001: Browse Available Artworks - In Artwork App](#us001-browse-available-artworks---in-artwork-app-1)
       - [Test the Artwork Listing Page](#test-the-artwork-listing-page)
@@ -49,6 +51,8 @@ This document outlines the manual tests to be carried out for each feature. Use 
       - [Test Add to Cart Functionality](#test-add-to-cart-functionality)
     - [US004: Checkout with Address Form](#us004-checkout-with-address-form-1)
       - [Test Checkout Functionality](#test-checkout-functionality-1)
+    - [User Registration Fix (4.1, 4.4) - Frontend](#user-registration-fix-41-44---frontend)
+      - [Test Registration and Email Verification Flow](#test-registration-and-email-verification-flow)
 
 ---
 
@@ -204,6 +208,25 @@ Use `./dev.sh shell` to test photo form behavior with conditional fields.
 | 2 | Submit checkout form via API with missing fields | API returns error response with validation messages | Pass |
 | 3 | Submit checkout form via API with invalid address | API returns error response with validation messages | Pass |
 | 4 | Submit checkout form via API with valid address | API returns success response, and address is saved in the database | Pass |
+
+---
+
+### User Registration Fix (4.1, 4.4) - Backend
+
+#### Test Registration Atomicity and Email Dispatch
+
+Requires the dev environment running (`./dev.sh start`) with MailDev accessible at http://localhost:1080.
+
+| Step | Action | Expected Outcome | Pass / Fail |
+| :--- | :--- | :--- | :--- |
+| 1 | Navigate to http://localhost:8000/profiles/signup/ | Signup page loads with signup, profile photo, and address forms | Pass |
+| 2 | Fill all required signup fields (username, email, password, first name, last name) and submit without a profile photo | Registration completes successfully — photo is optional and must not block submission | Pass |
+| 3 | After successful submission, open MailDev at http://localhost:1080 | A "Your Email Verification Code" email is present for the registered email address, confirming `send_verification_email()` was called | Pass |
+| 4 | Note the 6-digit verification code from the email | Code is a zero-padded 6-digit number (e.g., 047821) | Pass |
+| 5 | Open the Django shell and run: `from pointless_impressions_src.account.models import CustomUser; u = CustomUser.objects.latest('date_joined'); print(u.is_active)` | Returns `False` — the user is inactive until email is verified | Pass |
+| 6 | Check that related records exist: `from pointless_impressions_src.profiles.models import UserProfile, Customer; print(UserProfile.objects.filter(user=u).exists(), Customer.objects.filter(user_profile__user=u).exists())` | Returns `True True` — UserProfile and Customer records were created atomically alongside the user | Pass |
+| 7 | Simulate a failed signup by temporarily disconnecting the database mid-transaction (or by checking that no orphan `CustomUser` record exists after a validation error on a later form field) | If any form fails validation, no user, profile, customer, or address record is created — the transaction rolls back completely | Pass |
+| 8 | With email sending configured, verify `EmailVerificationCode` record was created: `from pointless_impressions_src.account.models import EmailVerificationCode; print(EmailVerificationCode.objects.filter(user=u).count())` | Returns `1` — exactly one unused verification code exists for the new user | Pass |
 
 ---
 
@@ -395,3 +418,24 @@ Use `./dev.sh shell` to test photo form behavior with conditional fields.
 | 3 | Submit the form with missing fields | Form displays validation errors for required fields | Pass |
 | 4 | Submit the form with invalid address | Form displays validation errors for address fields | Pass |
 | 5 | Submit the form with valid address | Form submits successfully, and confirmation page is displayed | Pass |
+
+---
+
+### User Registration Fix (4.1, 4.4) - Frontend
+
+#### Test Registration and Email Verification Flow
+
+Requires the dev environment running (`./dev.sh start`) with MailDev accessible at http://localhost:1080.
+
+| Step | Action | Expected Outcome | Pass / Fail |
+| :--- | :--- | :--- | :--- |
+| 1 | Navigate to http://localhost:8000/profiles/signup/ as an unauthenticated user | Signup page loads with three form sections: account details, profile photo (optional), and address | Pass |
+| 2 | Submit the form with all required fields filled and no profile photo | Registration succeeds — page redirects to the email verification page at `/profiles/verify-email/` with a success message | Pass |
+| 3 | Open MailDev at http://localhost:1080 and check inbox | A "Your Email Verification Code" email is present for the registered address within a few seconds of submission | Pass |
+| 4 | On the email verification page, enter the correct 6-digit code from the MailDev email | Page redirects to the dashboard; success message "Your email has been verified!" displays | Pass |
+| 5 | Open MailDev again after successful verification | A "Your Email Has Been Verified!" confirmation email is present in the inbox | Pass |
+| 6 | Return to the verification page after already verifying (`/profiles/verify-email/`) | Redirect or error message displays — the user cannot re-verify an already verified account | Pass |
+| 7 | On the email verification page, enter an incorrect or expired code | Error message displays (e.g., "Invalid verification code.") — the user remains on the verify email page | Pass |
+| 8 | Click "Resend code" on the verification page | A new code email arrives in MailDev; the previous code is invalidated | Pass |
+| 9 | Submit the signup form with a required field missing (e.g., no email address) | Form re-renders with field-level validation error; no user is created; no verification email is sent | Pass |
+| 10 | Submit the signup form with a duplicate username or email already in the database | Form re-renders with a validation error on the relevant field; no duplicate user is created | Pass |
