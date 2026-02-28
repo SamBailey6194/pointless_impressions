@@ -2,10 +2,13 @@ from django.core.mail import send_mail
 from django.conf import settings
 from django.template.loader import render_to_string
 from django.http import HttpRequest
+import logging
 import random
 from .models import EmailVerificationCode
 from pointless_impressions_src.pointless_impressions.context_processors \
     import global_context
+
+logger = logging.getLogger(__name__)
 
 
 def generate_verification_code(user):
@@ -64,13 +67,19 @@ def send_verification_email(user):
     from_email = settings.DEFAULT_FROM_EMAIL
     recipient_list = [user.email]
 
-    send_mail(
-        subject,
-        plain_message,
-        from_email,
-        recipient_list,
-        html_message=html_message
-    )
+    try:
+        send_mail(
+            subject,
+            plain_message,
+            from_email,
+            recipient_list,
+            html_message=html_message
+        )
+    except Exception:
+        logger.exception(
+            "Failed to send verification email to %s", user.email
+        )
+        raise
 
 
 def send_email_verified_confirmation(user):
@@ -105,10 +114,15 @@ def send_email_verified_confirmation(user):
     from_email = settings.DEFAULT_FROM_EMAIL
     recipient_list = [user.email]
 
-    send_mail(
-        subject,
-        plain_message,
-        from_email,
-        recipient_list,
-        html_message=html_message
-    )
+    try:
+        send_mail(
+            subject,
+            plain_message,
+            from_email,
+            recipient_list,
+            html_message=html_message
+        )
+    except Exception:
+        logger.exception(
+            "Failed to send email verified confirmation to %s", user.email
+        )

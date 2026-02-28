@@ -1,9 +1,11 @@
 from django.views.generic import FormView, View
 from django.contrib.auth import login, logout, authenticate
 from django.contrib import messages
+from django.db import transaction
 from django.shortcuts import redirect, render
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import JsonResponse
+import logging
 from .models import UserProfile, Customer
 from .forms import (
     SignupForm,
@@ -24,6 +26,8 @@ from pointless_impressions_src.account.utils import (
     send_verification_email, generate_verification_code,
     send_email_verified_confirmation
 )
+
+logger = logging.getLogger(__name__)
 
 
 # Create your views here
@@ -70,32 +74,47 @@ class SignupView(View, AnonymousRequiredMixin):
             profile_pic_form.is_valid() and
             address_form.is_valid()
         ):
-            user = signup_form.save(commit=False)
-            user.is_active = False
-            user.save()
+            with transaction.atomic():
+                user = signup_form.save(commit=False)
+                user.is_active = False
+                user.save()
 
-            request.session['pending_verification_user_id'] = user.id
+                request.session['pending_verification_user_id'] = user.id
 
-            user_profile = UserProfile.objects.create(user=user)
-            customer = Customer.objects.create(
-                user_profile=user_profile
-            )
+                user_profile = UserProfile.objects.create(user=user)
+                customer = Customer.objects.create(
+                    user_profile=user_profile
+                )
 
-            photo = profile_pic_form.save(
-                commit=False,
-                user=user,
-                user_profile=user_profile
-            )
-            if photo:
-                photo.save()
+                verification_code = generate_verification_code(user)
 
-                if user_profile:
-                    user_profile.profile_picture = photo
-                    user_profile.save()
+                photo = profile_pic_form.save(
+                    commit=False,
+                    user=user,
+                    user_profile=user_profile
+                )
+                if photo:
+                    photo.save()
 
-            address = address_form.save(commit=False)
-            address.customer = customer
-            address.save()
+                    if user_profile:
+                        user_profile.profile_picture = photo
+                        user_profile.save()
+
+                address = address_form.save(commit=False)
+                address.customer = customer
+                address.save()
+
+            try:
+                send_verification_email(user)
+            except Exception:
+                logger.exception(
+                    "Failed to send verification email to user %s", user.id
+                )
+                messages.warning(
+                    request,
+                    "Account created but we could not send your verification "
+                    "email. Please use 'Resend code'."
+                )
 
             login(request, user)
             messages.success(
