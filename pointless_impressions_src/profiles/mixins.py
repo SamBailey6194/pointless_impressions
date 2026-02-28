@@ -10,7 +10,10 @@ class CustomerRequiredMixin(UserPassesTestMixin):
     def test_func(self):
         if not self.request.user.is_authenticated:
             return False
-        return hasattr(self.request.user, 'customer_profile')
+        try:
+            return bool(self.request.user.user_profile.customer)
+        except Exception:
+            return False
 
     def handle_no_permission(self):
         raise PermissionDenied("This view is for customers only.")

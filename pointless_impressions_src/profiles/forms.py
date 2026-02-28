@@ -217,7 +217,6 @@ class SignupForm(UserCreationForm):
         user.phone = self.cleaned_data['phone']
         if commit:
             user.save()
-            UserProfile.objects.create(user=user)
         return user
 
 
@@ -265,7 +264,7 @@ class LoginForm(AuthenticationForm):
                         css_class='mb-4 custom-input w-full lg:w-66'
                     ),
                     Submit(
-                        'submit',
+                        'login',
                         'Log In',
                         css_class='btn btn-ghost btn-outline w-fit'
                     ),
@@ -309,7 +308,7 @@ class LogoutForm(forms.Form):
                         "Are you sure you want to log out?</p>"
                     ),
                     Submit(
-                        'submit',
+                        'logout',
                         'Log Out',
                         css_class='btn btn-ghost btn-outline w-fit'
                     ),
@@ -578,6 +577,9 @@ class AddressForm(forms.ModelForm):
         address = super().save(commit=False)
         if user:
             address.customer_id = user  # Ensure the field matches the model
+        address_types = self.cleaned_data.get('address_types', [])
+        address.is_shipping = 'shipping' in address_types
+        address.is_billing = 'billing' in address_types
         if commit:
             address.save()
         return address
@@ -635,7 +637,7 @@ class EmailVerificationForm(forms.Form):
                     ),
                     Div(
                         Submit(
-                            'submit',
+                            'verify_email_code',
                             'Verify Email',
                             css_class='btn btn-ghost btn-outline w-fit'
                         ),

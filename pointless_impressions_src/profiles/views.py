@@ -116,7 +116,6 @@ class SignupView(View, AnonymousRequiredMixin):
                     "email. Please use 'Resend code'."
                 )
 
-            login(request, user)
             messages.success(
                 request, "Signup successful! Please verify your email."
             )
@@ -197,7 +196,7 @@ class LogoutView(
         return redirect('home')
 
 
-class VerifyEmailView(FormView, EmailNotVerifiedMixin, CustomerRequiredMixin):
+class VerifyEmailView(FormView):
     """
     Email verification view that handles user email verification.
 
@@ -250,6 +249,9 @@ class VerifyEmailView(FormView, EmailNotVerifiedMixin, CustomerRequiredMixin):
             # Send email verified confirmation
             send_email_verified_confirmation(user)
 
+            # Log the user in now they are verified and active
+            login(self.request, user)
+
             messages.success(self.request, "Your email has been verified!")
             return redirect('dashboard:landing')
 
@@ -261,7 +263,7 @@ class VerifyEmailView(FormView, EmailNotVerifiedMixin, CustomerRequiredMixin):
             return self.form_invalid(form)
 
 
-class ResendVerificationCodeView(View, CustomerRequiredMixin):
+class ResendVerificationCodeView(View):
     def post(self, request, *args, **kwargs):
         user_id = request.session.get('pending_verification_user_id')
 

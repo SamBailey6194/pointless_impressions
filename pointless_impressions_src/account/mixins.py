@@ -21,7 +21,7 @@ class EmailNotVerifiedMixin(UserPassesTestMixin):
     def test_func(self):
         if not self.request.user.is_authenticated:
             return False
-        return not self.request.user.profile.is_email_verified
+        return not self.request.user.is_active
 
     def handle_no_permission(self):
         return redirect('home')
