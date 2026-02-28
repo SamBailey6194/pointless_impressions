@@ -31,6 +31,12 @@ This document outlines the manual tests to be carried out for each feature. Use 
       - [Test Cart Update and Remove Endpoints](#test-cart-update-and-remove-endpoints)
     - [Image Dimension Cap - Backend](#image-dimension-cap---backend)
       - [Test Artwork API Image URL Dimensions](#test-artwork-api-image-url-dimensions)
+    - [Cart Persistence Fix (1.1) - Backend](#cart-persistence-fix-11---backend)
+      - [Test Cart Persists After Add-to-Cart](#test-cart-persists-after-add-to-cart)
+    - [Checkout Page Context Fix (1.1) - Backend](#checkout-page-context-fix-11---backend)
+      - [Test Checkout Page Loads with Empty and Non-Empty Cart](#test-checkout-page-loads-with-empty-and-non-empty-cart)
+    - [CRUD Artwork Detail Fix (1.4, 1.13) - Backend](#crud-artwork-detail-fix-14-113---backend)
+      - [Test CRUD Artwork Detail View](#test-crud-artwork-detail-view)
   - [Frontend Testing](#frontend-testing)
     - [US001: Browse Available Artworks - In Artwork App](#us001-browse-available-artworks---in-artwork-app-1)
       - [Test the Artwork Listing Page](#test-the-artwork-listing-page)
@@ -64,6 +70,12 @@ This document outlines the manual tests to be carried out for each feature. Use 
     - [Broken Links Fix (1.15) - Frontend](#broken-links-fix-115---frontend)
       - [Test Navigation and Breadcrumb Links](#test-navigation-and-breadcrumb-links)
       - [Test Error Handler Pages](#test-error-handler-pages)
+    - [Cart Persistence Fix (1.1) - Frontend](#cart-persistence-fix-11---frontend)
+      - [Test Cart Survives Page Reload After Add-to-Cart](#test-cart-survives-page-reload-after-add-to-cart)
+    - [Checkout Page Context Fix (1.1) - Frontend](#checkout-page-context-fix-11---frontend)
+      - [Test Checkout Page Renders Correctly](#test-checkout-page-renders-correctly)
+    - [CRUD Artwork Detail Fix (1.4, 1.13) - Frontend](#crud-artwork-detail-fix-14-113---frontend)
+      - [Test CRUD Artwork Detail Page Loads](#test-crud-artwork-detail-page-loads)
 
 ---
 
@@ -254,6 +266,57 @@ Use `./dev.sh shell` or a REST client (e.g. curl/Postman) to call the endpoints 
 | 3 | POST to `/checkout/update/` with a missing `artwork_id` | Returns an error response — no change to cart | Pass |
 | 4 | POST to `/checkout/remove-item/` with `X-Requested-With: XMLHttpRequest`, valid CSRF token, and JSON body `{"artwork_id": <id>}` | Returns `{"success": true}` and the item is removed from the cart session | Pass |
 | 5 | POST to `/checkout/remove-item/` with an `artwork_id` not in the cart | Returns an error or success response gracefully — no server 500 | Pass |
+
+---
+
+### Cart Persistence Fix (1.1) - Backend
+
+#### Test Cart Persists After Add-to-Cart
+
+Requires the dev environment running (`./dev.sh start`). Tests confirm that a cart created by adding an artwork is the same cart visible to the checkout page and dropdown — both for authenticated users and anonymous guests.
+
+| Step | Action | Expected Outcome | Pass / Fail |
+| :--- | :--- | :--- | :--- |
+| 1 | Log in as any user and navigate to an artwork detail page (e.g., http://localhost:8000/artworks/city-icons-01/) | Artwork detail page loads without errors | Pass |
+| 2 | Add the artwork to the cart using the Add to Cart form | AJAX response returns `{"success": true, "cart_count": 1}` | Pass |
+| 3 | Open the Django shell with `./dev.sh shell` and run: `from pointless_impressions_src.cart.models import Cart; from django.contrib.auth import get_user_model; User = get_user_model(); u = User.objects.get(username='<your_username>'); print(u.cart.items.count())` | Returns `1` — the item was saved to the user-linked cart, not an orphan session cart | Pass |
+| 4 | Navigate to http://localhost:8000/checkout/cart-dropdown/ | Response JSON contains `cart_count: 1` — the same cart count as reported by the add-to-cart response | Pass |
+| 5 | Navigate to http://localhost:8000/checkout/ | Checkout page loads and the cart summary shows the item added in step 2 | Pass |
+| 6 | Reload the checkout page | Cart items are still present — they persist across page loads | Pass |
+| 7 | Log out, then repeat steps 1–4 as an anonymous user (clear cookies between tests to start fresh) | Anonymous cart is created via session; `cart-dropdown/` and `/checkout/` both reflect the same item count after adding | Pass |
+
+---
+
+### Checkout Page Context Fix (1.1) - Backend
+
+#### Test Checkout Page Loads with Empty and Non-Empty Cart
+
+Requires the dev environment running (`./dev.sh start`).
+
+| Step | Action | Expected Outcome | Pass / Fail |
+| :--- | :--- | :--- | :--- |
+| 1 | Clear the cart (or use a fresh session with no items) and navigate to http://localhost:8000/checkout/ | Page loads without any server error — no `VariableDoesNotExist` exception | Pass |
+| 2 | Verify the empty-cart state renders correctly | The checkout details form (shipping, billing, payment) is **not** displayed; an empty cart message or prompt is shown instead | Pass |
+| 3 | Check the Django logs or terminal | No `500` error or `VariableDoesNotExist` traceback is present for the `/checkout/` request | Pass |
+| 4 | Add one item to the cart and navigate to http://localhost:8000/checkout/ | The checkout details form renders correctly, including the crispy `order_form` with shipping and billing fields | Pass |
+| 5 | Confirm the order form fields are visible | Email, phone, shipping address fields, and billing address fields all appear on the page | Pass |
+
+---
+
+### CRUD Artwork Detail Fix (1.4, 1.13) - Backend
+
+#### Test CRUD Artwork Detail View
+
+Requires the dev environment running (`./dev.sh start`). Tests confirm that artworks created via the frontend admin dashboard no longer crash when their detail page is visited.
+
+| Step | Action | Expected Outcome | Pass / Fail |
+| :--- | :--- | :--- | :--- |
+| 1 | Log in as a staff or superuser and navigate to the admin dashboard (e.g., http://localhost:8000/dashboard/) | Dashboard loads showing artwork management tools | Pass |
+| 2 | Use the "Add New Artwork" form to create an artwork with a name, price, description, and category but **without uploading an image** | Artwork is created successfully; no server error on submission | Pass |
+| 3 | Navigate to the artwork list (http://localhost:8000/artworks/) | The newly created artwork is visible in the list | Pass |
+| 4 | Click on the newly created artwork | Detail page loads without error — no `IndexError: list index out of range` and no `500` response | Pass |
+| 5 | Verify the detail page content | Artwork name, description, price, and category display correctly; image area shows a placeholder if no image was uploaded | Pass |
+| 6 | In the Django shell, run: `from pointless_impressions_src.artwork.views import _serialize_artwork_data; from pointless_impressions_src.artwork.models import Artwork; a = Artwork.objects.latest('created_at'); result = _serialize_artwork_data([a], None); print(len(result), result[0]['name'])` | Returns `1` and the artwork name — confirms the function always produces one entry per artwork regardless of whether `main_photo` is set | Pass |
 
 ---
 
@@ -562,3 +625,56 @@ Requires the dev environment running with `DEBUG = False` (use the staging or pr
 | 4 | Trigger a 403 response (e.g., attempt to access an admin-only view as a non-staff user) | The custom 403 page renders from `templates/errors/403.html` with status `403` | Pass |
 | 5 | Trigger a 500 response (e.g., temporarily break a view) | The custom 500 page renders from `templates/errors/500.html` with status `500` — not a raw Django traceback | Pass |
 | 6 | Check the Django error log after triggering each error | Log entries show the correct error and path — confirms the error handler views in `pointless_impressions_src.pointless_impressions.views` are being called | Pass |
+
+---
+
+### Cart Persistence Fix (1.1) - Frontend
+
+#### Test Cart Survives Page Reload After Add-to-Cart
+
+Requires the dev environment running (`./dev.sh start`). Tests confirm that items added via the artwork detail page are visible in the cart dropdown and checkout page on subsequent requests.
+
+| Step | Action | Expected Outcome | Pass / Fail |
+| :--- | :--- | :--- | :--- |
+| 1 | Log in as any user and navigate to an artwork detail page | Artwork detail page loads without errors | Pass |
+| 2 | Add the artwork to the cart using the Add to Cart button | Success toast appears; the cart badge in the header updates to show the new item count | Pass |
+| 3 | Click the cart icon in the header to open the cart dropdown | The dropdown shows the artwork just added — it is not empty | Pass |
+| 4 | Reload the page (F5 or browser refresh) | The cart badge still shows the correct item count — items are not lost on reload | Pass |
+| 5 | Navigate to http://localhost:8000/checkout/ | The checkout page shows the cart summary with the item added in step 2 — it is not empty | Pass |
+| 6 | Log out and repeat steps 1–5 as an anonymous guest (use a fresh incognito window to start with no session) | Anonymous cart also persists across page loads — the item count and checkout summary remain consistent | Pass |
+| 7 | Open browser DevTools → Network tab, reload the checkout page, and inspect the `/checkout/cart-dropdown/` request | Response JSON `cart_count` matches the number of items visible in the cart summary | Pass |
+
+---
+
+### Checkout Page Context Fix (1.1) - Frontend
+
+#### Test Checkout Page Renders Correctly
+
+Requires the dev environment running (`./dev.sh start`).
+
+| Step | Action | Expected Outcome | Pass / Fail |
+| :--- | :--- | :--- | :--- |
+| 1 | Clear the cart (or open a fresh incognito window) and navigate directly to http://localhost:8000/checkout/ | Page loads successfully — no `500 Internal Server Error` or blank page | Pass |
+| 2 | Inspect the page content with an empty cart | The checkout details form (shipping, billing, payment) is **not** shown; the page displays an appropriate empty-cart state | Pass |
+| 3 | Open browser DevTools → Console tab | No JavaScript errors related to missing form elements or undefined variables | Pass |
+| 4 | Add an item to the cart and navigate to http://localhost:8000/checkout/ | The checkout details form is now visible with all sections: Contact Information, Shipping Address, Billing Address, and Payment Details | Pass |
+| 5 | Verify the shipping and billing form fields render | Email, phone, first name, last name, address line 1, city, postcode, and country fields all appear and are interactable | Pass |
+| 6 | Check the "Billing address same as shipping" checkbox | The billing address fields hide or show accordingly | Pass |
+
+---
+
+### CRUD Artwork Detail Fix (1.4, 1.13) - Frontend
+
+#### Test CRUD Artwork Detail Page Loads
+
+Requires the dev environment running (`./dev.sh start`). Tests confirm that artworks created via the frontend admin dashboard can be clicked and their detail page loads without error.
+
+| Step | Action | Expected Outcome | Pass / Fail |
+| :--- | :--- | :--- | :--- |
+| 1 | Log in as a staff or superuser and use the dashboard to create a new artwork without uploading an image | Artwork creation succeeds; confirmation message or redirect occurs | Pass |
+| 2 | Navigate to http://localhost:8000/artworks/ | The newly created artwork is visible in the listing | Pass |
+| 3 | Click on the newly created artwork card | Detail page loads — no `500 Internal Server Error` and no `IndexError: list index out of range` | Pass |
+| 4 | Verify the detail page shows the artwork's data | Name, description, price, and category are displayed correctly | Pass |
+| 5 | Verify no broken image error is shown | If no image was uploaded, a placeholder or graceful fallback is displayed — no broken image icon | Pass |
+| 6 | Open browser DevTools → Console tab | No JavaScript errors on the detail page | Pass |
+| 7 | Navigate back to the artwork list and click another fixture artwork (e.g., "Painting The Bear") | Existing artworks still load correctly — the fix did not break artworks that have images | Pass |
