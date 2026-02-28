@@ -37,20 +37,22 @@ if User.objects.filter(username='superuser').exists():
 else:
     print('Database is empty. Loading fixtures...')
     try:
-        call_command('loaddata', 'account.json')
-        print('Loaded account.json')
-        call_command('loaddata', 'account_group.json')
-        print('Loaded account_group.json')
-        call_command('loaddata', 'profiles.json')
-        print('Loaded profiles.json')
-        call_command('loaddata', 'artwork_categories.json')
-        print('Loaded artwork_categories.json')
-        call_command('loaddata', 'artwork_framing_options.json')
-        print('Loaded artwork_framing_options.json')
-        call_command('loaddata', 'photo.json')
-        print('Loaded photo.json')
-        call_command('loaddata', 'artwork.json')
-        print('Loaded artwork.json')
+        # Load all fixtures in a single call so Django disables FK constraint
+        # checking across the entire batch, resolving circular dependencies
+        # between artwork (main_photo FK) and photo (artwork FK).
+        # Order still matters for non-circular FKs:
+        #   groups → users → profiles → categories → framing → artwork + photos → address
+        call_command(
+            'loaddata',
+            'account_group.json',
+            'account.json',
+            'profiles.json',
+            'artwork_categories.json',
+            'artwork_framing_options.json',
+            'artwork.json',
+            'photo_cloudinary_local.json',
+            'address.json',
+        )
         print('All fixtures loaded successfully.')
     except Exception as e:
         print(f'Error loading fixtures: {e}')
@@ -72,6 +74,10 @@ fi
 echo "Building Tailwind CSS and JavaScript..."
 cd /app
 npm run build || echo "Warning: Tailwind and JS build failed (check package.json)"
+
+# Collect static files into STATIC_ROOT
+echo "Collecting static files..."
+python /app/manage.py collectstatic --noinput
 
 # Function to handle graceful shutdown
 cleanup() {
