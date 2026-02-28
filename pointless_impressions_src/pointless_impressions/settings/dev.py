@@ -2,19 +2,32 @@
 Django settings for development environment.
 """
 
-from .base import *
 import os
+
+from .base import *
 
 # Environment settings
 ENVIRONMENT = "development"
-SECRET_KEY = os.getenv(
-    "DJANGO_SECRET_KEY",
-    "dev-secret-key-change-in-production"
-)
+SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", "dev-secret-key-change-in-production")
+ALLOWED_HOSTS += ["willia-preradio-hermila.ngrok-free.dev", ".ngrok-free.dev"]
 DEBUG = True
 PRODUCTION = False
 SESSION_COOKIE_SECURE = False
 CSRF_COOKIE_SECURE = False
+CSRF_TRUSTED_ORIGINS = [
+    "http://localhost",
+    "http://127.0.0.1",
+    "http://willia-preradio-hermila.ngrok-free.dev",
+    "https://willia-preradio-hermila.ngrok-free.dev",
+]
+
+USE_X_FORWARDED_HOST = True
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+APPEND_SLASH = False
+
+MIDDLEWARE = [
+    mw for mw in MIDDLEWARE if mw != "django.middleware.security.SecurityMiddleware"
+]
 
 # Development-specific apps
 INSTALLED_APPS += [
@@ -44,8 +57,7 @@ DATABASES = {
 
 # Email configuration (using MailDev for development)
 EMAIL_BACKEND = os.getenv(
-    "EMAIL_BACKEND",
-    "django.core.mail.backends.smtp.EmailBackend"
+    "EMAIL_BACKEND", "django.core.mail.backends.smtp.EmailBackend"
 )
 EMAIL_HOST = os.getenv("EMAIL_HOST", "maildev_dev")
 EMAIL_PORT = int(os.getenv("EMAIL_PORT", 1025))

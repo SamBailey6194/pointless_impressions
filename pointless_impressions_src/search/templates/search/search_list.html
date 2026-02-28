@@ -23,7 +23,7 @@
                         {% include "includes/pagination.html" %}
                     </div>
                 {% endif %}
-                {% comment %} Display search results from Artwork, Blog and Artist {% endcomment %}
+                {% comment %} Display search results from Artwork and Artist {% endcomment %}
                 <div id="search-results-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-6 rounded-2xl">
                     {% for result in results %}
                         {% with item=result.object %}
@@ -33,20 +33,8 @@
                                 {% if result.model_name == 'artwork' %}
                                     {% comment %} Handle Artwork Images {% endcomment %}
                                     {% with image_to_render=item.main_photo|default:placeholder_image %}
-                                        {% cloudinary image_to_render.image format="auto" quality="auto" width=400 height=300 crop="fill" class="w-full h-64 object-cover" alt=image_to_render.alt_text_or_default %}
+                                        {% cloudinary image_to_render.image format="auto" quality="auto" width=400 height=300 crop="fill" class="w-full h-64 object-cover" alt=image_to_render.alt_text_or_default crossorigin="anonymous" %}
                                     {% endwith %}
-                                {% elif result.model_name == 'blog' %}
-                                    {% comment %} Handle Blog Images {% endcomment %}
-                                    {% with image_to_render=item.main_photo|default:placeholder_image %}
-                                        {% cloudinary image_to_render.image format="auto" quality="auto" width=400 height=300 crop="fill" class="w-full h-64 object-cover" alt=image_to_render.alt_text_or_default %}
-                                    {% endwith %}
-
-                                {% elif result.model_name == 'artist' %}
-                                    {% comment %} Handle Artist Profile Images {% endcomment %}
-                                    {% with image_to_render=item.main_photo|default:placeholder_image %}
-                                        {% cloudinary image_to_render.image format="auto" quality="auto" width=400 height=300 crop="fill" class="w-full h-64 object-cover" alt=image_to_render.alt_text_or_default %}
-                                    {% endwith %}
-
                                 {% else %}
                                     {% comment %} Fallback for other models {% endcomment %}
                                     <div class="bg-base-300 w-full h-64 object-cover">
@@ -66,29 +54,6 @@
                                     {% comment %} Slug if available or ID if not {% endcomment %}
                                     <div class="card-actions justify-end mt-4">
                                         <a href="{% url 'artwork:detail' slug=item.slug|default:item.id %}" class="inline-block px-8 py-3 rounded-xl btn btn-ghost transition-colors duration-200 cursor-pointer">View Details</a>
-                                    </div>
-                                {% elif result.model_name == 'artist' %}
-                                    {% comment %} Artist Result {% endcomment %}
-                                    <h3 class="card-title text-xl font-semibold mb-2">{{ item.name }}</h3>
-                                    <span class="badge badge-lg badge-info">Artist</span>
-                                    <p class="text-sm mb-1">{{ item.bio|truncatewords:15 }}</p>
-                                    <p class="text-lg font-bold text-(--pointless-blue)">Joined {{ item.created_at|date:"F j, Y" }}</p>
-
-                                    {% comment %} Slug if available or ID if not {% endcomment %}
-                                    <div class="card-actions justify-end mt-4">
-                                        <a href="{% url 'artist:profile' username=item.user.username|default:item.id %}" class="inline-block px-8 py-3 rounded-xl btn btn-ghost transition-colors duration-200 cursor-pointer">View Profile</a>
-                                    </div>
-                                {% comment %} Blog Result {% endcomment %}
-                                {% elif result.model_name == 'blog' %}
-                                    <h3 class="card-title text-xl font-semibold mb-2">{{ item.title }}</h3>
-                                    <span class="badge badge-lg badge-info">Blog</span>
-                                    <p class="text-sm mb-1">{{ item.excerpt }}</p>
-                                    <p class="text-sm mb-1">By {{ item.author }}</p>
-                                    <p class="text-lg font-bold text-(--pointless-blue)">{{ item.published_date|date:"F j, Y" }}</p>
-
-                                    {% comment %} Slug if available or ID if not {% endcomment %}
-                                    <div class="card-actions justify-end mt-4">
-                                        <a href="{% url 'blog:detail' slug=item.slug|default:item.id %}" class="inline-block px-8 py-3 rounded-xl btn btn-ghost transition-colors duration-200 cursor-pointer">Read More</a>
                                     </div>
                                 {% comment %} Unknown Result {% endcomment %}
                                 {% else %}

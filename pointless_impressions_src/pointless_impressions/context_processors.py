@@ -1,11 +1,8 @@
-from django.conf import settings
 from django.utils.functional import lazy
 from pointless_impressions_src.artwork.models import (
-    ArtworkCategory, ArtworkFramingCondition
+    ArtworkCategory, ArtworkFramingCondition, Artwork
     )
-# from pointless_impressions_src.blog.models import BlogCategory
 from pointless_impressions_src.photo.models import Photo
-from pointless_impressions_src.profiles.models import Artist
 
 
 # Context processors to add global template variables
@@ -44,26 +41,30 @@ def global_context(request):
             view_name = request.resolver_match.view_name
             if view_name.startswith('artwork:'):
                 return site_logo_white_bg or placeholder_image
-            elif view_name.startswith('blog:'):
-                return site_logo or placeholder_image
             elif view_name.startswith('profiles:'):
                 return placeholder_image
         return placeholder_image
 
     image_to_render = lazy(resolve_image_to_render, Photo)()
 
+    # --- Featured artworks logic ---
+    featured_artworks = Artwork.objects.filter(
+        is_featured=True,
+        main_photo__isnull=False
+    ).select_related(
+        'main_photo',
+        'artist__user_profile__user',
+        'category'
+    ).prefetch_related(
+        'selected_conditions'
+    )[:10]
+
     # --- Return one single context dictionary ---
     return {
-        # Production flag
-        'production': settings.PRODUCTION,
-
         # navbar categories
         'artwork_categories': ArtworkCategory.objects.all(),
         'framing_options': ArtworkFramingCondition.objects.all(),
-        # 'blog_categories': BlogCategory.objects.all(),
-        'artists': Artist.objects.select_related('user').filter(
-            user__is_active=True
-        ).order_by('user__username'),
+        'featured_artworks': featured_artworks,
 
         # --- NEWLY ADDED ---
         'site_logo': site_logo,
@@ -71,3 +72,44 @@ def global_context(request):
         'placeholder_image': placeholder_image,
         'image_to_render': image_to_render,
     }
+
+
+def page_slug_detector(request):
+    """
+    Automatically determines the 'page_slug' based on the URL
+    namespace or name.
+
+    This prevents us from having to set context['page_slug'] in every view.
+    """
+    if not request.resolver_match:
+        return {'page_slug': ''}
+
+    namespace = request.resolver_match.namespace
+
+    url_name = request.resolver_match.url_name
+
+    if namespace == 'dashboard':
+        return {'page_slug': 'dashboard'}
+
+    elif namespace == 'search':
+        return {'page_slug': 'search'}
+
+    elif namespace == 'order':
+        return {'page_slug': 'order'}
+
+    elif namespace == 'cart':
+        return {'page_slug': 'checkout'}
+
+    elif namespace == 'profiles':
+        return {'page_slug': 'profiles'}
+
+    if url_name == 'login':
+        return {'page_slug': 'login'}
+
+    elif url_name == 'signup':
+        return {'page_slug': 'signup'}
+
+    elif url_name == 'health':
+        return {'page_slug': 'health'}
+
+    return {'page_slug': ''}

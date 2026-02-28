@@ -42,7 +42,7 @@ COPY package.json package-lock.json* ./
 COPY jest.config.js cypress.config.js ./
 
 # Install Node dependencies at project root
-RUN npm install
+RUN CYPRESS_INSTALL_BINARY=0 npm install
 
 # Copy project files
 COPY pointless_impressions_src/ ./pointless_impressions_src/

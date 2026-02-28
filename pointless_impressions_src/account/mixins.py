@@ -12,3 +12,16 @@ class AnonymousRequiredMixin(UserPassesTestMixin):
 
     def handle_no_permission(self):
         return redirect('home')
+
+
+class EmailNotVerifiedMixin(UserPassesTestMixin):
+    """
+    Ensures that the user's email is not verified to access certain views.
+    """
+    def test_func(self):
+        if not self.request.user.is_authenticated:
+            return False
+        return not self.request.user.profile.is_email_verified
+
+    def handle_no_permission(self):
+        return redirect('home')

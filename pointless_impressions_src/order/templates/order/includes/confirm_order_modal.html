@@ -1,5 +1,5 @@
 <dialog id="confirm-order-modal" class="modal">
-  <div class="modal-box lg:w-7/12 lg:max-w-4xl lg:h-9/12">
+  <div class="modal-box text-(--pointless-black) dark:text-(--pointless-white) lg:w-7/12 lg:max-w-4xl lg:h-9/12">
     <h3 class="font-bold text-lg">Confirm Your Order</h3>
     <p class="py-4">
       You are about to place your order. Please confirm your details below.
@@ -93,11 +93,11 @@
     <hr class="my-2" />
 
     <div>
-      {% include 'cart/includes/cart_summary.html' %}
+      {% include 'cart/includes/cart_summary.html' with show_forms=False show_info=True %}
     </div>
 
     <div class="modal-action">
-      <button class="btn btn-primary" id="modal-confirm-btn">
+      <button class="btn btn-primary" id="modal-confirm-btn" type="button" data-amount="{{ cart.get_grand_total|floatformat:2 }}">
         <i class="fa-solid fa-check"></i> Yes, Confirm Order
       </button>
 

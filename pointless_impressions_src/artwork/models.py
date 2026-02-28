@@ -1,9 +1,9 @@
 from django.db import models
+from django.urls import reverse
 from django.utils.text import slugify
 import random
 import string
 import json
-from django.conf import settings
 from pointless_impressions_src.photo.models import Photo
 from pointless_impressions_src.profiles.models import Artist
 
@@ -82,7 +82,7 @@ class Artwork(models.Model):
             else:
                 self._cached_photo = Photo.objects.filter(artwork=self).first()
         return self._cached_photo
-    
+
     @property
     def get_primary_image(self):
         """Get the primary photo object for this artwork."""
@@ -128,6 +128,12 @@ class Artwork(models.Model):
             })
         return json.dumps(options)
 
+    def get_absolute_url(self):
+        """
+        Returns the public URL for this specific artwork.
+        """
+        return reverse('artwork:detail', kwargs={'slug': self.slug})
+
 
 class ArtworkCategory(models.Model):
     """Model to represent artwork categories."""
@@ -172,32 +178,3 @@ class ArtworkFramingCondition(models.Model):
 
     def get_friendly_name(self):
         return self.condition_friendly_name
-
-
-class ArtworkReview(models.Model):
-    """Model to represent reviews for artworks."""
-    artwork = models.ForeignKey(
-        Artwork,
-        on_delete=models.SET_NULL,
-        null=True,
-        related_name='reviews'
-    )
-    reviewer = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
-        on_delete=models.SET_NULL,
-        null=True,
-        related_name='reviews_written'
-    )
-    review_title = models.CharField(
-        max_length=255, blank=False, default='Review'
-    )
-    review_text = models.TextField(blank=False, default='')
-    rating = models.PositiveIntegerField(blank=False, default=5)
-    created_at = models.DateTimeField(auto_now_add=True)
-
-    class Meta:
-        unique_together = ('artwork', 'reviewer')
-        ordering = ['-created_at']
-
-    def __str__(self):
-        return f"Review for {self.artwork.name} by {self.reviewer.username}"

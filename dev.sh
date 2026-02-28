@@ -236,7 +236,7 @@ case "${1:-help}" in
         docker ps | grep "pointless_impressions-web-run" | awk '{print $1}' | xargs -r docker kill 2>/dev/null || true
         docker compose -f docker-compose.dev.yml up -d web
         print_status "Loading Photo and Artwork fixtures back to dev database..."
-        docker compose -f docker-compose.dev.yml exec web python /app/manage.py loaddata photo.json artwork.json
+        docker compose -f docker-compose.dev.yml exec web python /app/manage.py loaddata artwork.json photo_cloudinary_local.json
         print_status "Added Photo and Artwork fixtures back to dev database."
         print_success "Cypress UI completed!"
         ;;
@@ -264,7 +264,7 @@ case "${1:-help}" in
         print_status "Flushing existing data..."
         docker compose -f docker-compose.dev.yml exec web python /app/manage.py flush --noinput
         print_status "Loading initial data fixtures into the database..."
-        docker compose -f docker-compose.dev.yml exec web python /app/manage.py loaddata account_group.json account.json profiles.json artwork_categories.json artwork_framing_options.json photo_cloudinary_local.json artwork.json
+        docker compose -f docker-compose.dev.yml exec web python /app/manage.py loaddata account_group.json account.json profiles.json address.json artwork_categories.json artwork_framing_options.json artwork.json photo_cloudinary_local.json
         print_success "Fixtures loaded successfully!"
         ;;
     status)

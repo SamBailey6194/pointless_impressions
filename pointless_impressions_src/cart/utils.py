@@ -6,7 +6,8 @@ from decimal import Decimal
 def get_cart(request):
     """
     Gets the cart from the request for either an authenticated
-    user or an anonymous session.
+    user or an anonymous session. If no cart exists for an authenticated user,
+    a new cart is created using the session ID.
     """
     from .models import Cart
     cart = None
@@ -18,6 +19,19 @@ def get_cart(request):
                 cart = None
         except Cart.DoesNotExist:
             cart = None
+
+        # Create a new cart if none exists
+        if not cart:
+            session_key = request.session.session_key
+            if not session_key:
+                request.session.create()
+                session_key = request.session.session_key
+
+            cart = Cart.objects.create(
+                user=request.user,
+                session_id=session_key,
+                is_active=True
+            )
     else:
         # User is anonymous, get cart from session
         session_key = request.session.session_key
@@ -54,3 +68,25 @@ def calculate_delivery_cost(total_quantity):
         return Decimal(max_tier_fee)
 
     return Decimal('0.00')
+
+
+def serialize_items(cart):
+    """
+    Serialize cart items into a list of dictionaries.
+
+    Args:
+        cart (Cart): The shopping cart containing items to serialize.
+
+    Returns:
+        list: A list of dictionaries representing serialized cart items.
+    """
+    return [
+        {
+            'artwork_id': item.artwork.id,
+            'quantity': item.quantity,
+            'price': str(item.price_at_purchase),
+            'framing_condition': item.framing_condition,
+            'notes': item.notes,
+        }
+        for item in cart.items.all()
+    ]

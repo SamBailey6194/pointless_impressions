@@ -9,7 +9,7 @@
             <div class="breadcrumbs text-sm mb-6">
                 <ul>
                     <li>
-                        <a href="/"><i class="fa-solid fa-home"></i> Home</a>
+                        <a href="{% url 'home' %}"><i class="fa-solid fa-home"></i> Home</a>
                     </li>
                     <li>
                         <a href="{% url 'artwork:list' %}"><i class="fa-solid fa-palette"></i> Artworks</a>
@@ -52,12 +52,12 @@
                         <div class="rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-shadow duration-200 cursor-pointer card-adaptive h-full flex flex-col">
                             <figure>
                             {% with image_to_render=artwork.main_photo|default:placeholder_image %}
-                                {% cloudinary image_to_render.image format="auto" quality="auto" width=80 height=80 crop="fill" class="w-10 rounded-full" alt=image_to_render.alt_text_or_default %}
+                                {% cloudinary image_to_render.image format="auto" quality="auto" width=400 height=400 crop="fill" alt=image_to_render.alt_text_or_default crossorigin="anonymous" %}
                             {% endwith %}
                             </figure>
                             <div class="p-6 flex flex-col h-56">
                                 <h3 class="text-xl font-semibold mb-2 card-title">{{ artwork.name }}</h3>
-                                <p class="text-xs mb-3 opacity-70">By: {{ artwork.artist.user.username }} | Category: {{ artwork.category }}</p>
+                                <p class="text-xs mb-3 opacity-70">By: {{ artwork.artist.user_profile.user.username }} | Category: {{ artwork.category.name }}</p>
                                 <p class="text-sm mb-3 card-description grow">{{ artwork.description }}</p>
                                 <p class="text-lg font-bold text-(--pointless-blue)">£{{ artwork.price }}</p>
                             </div>
@@ -65,8 +65,8 @@
                                 <a href="{% url 'artwork:list' %}?category={{ artwork.category.slug }}" class="btn btn-ghost btn-sm">
                                 <i class="fa-solid fa-palette"></i> View More {{ artwork.category.name }} 
                                 </a>
-                                <a href="{% url 'artwork:list' %}?artist={{ artwork.artist.user.username }}" class="btn btn-ghost btn-sm">
-                                <i class="fa-solid fa-brush"></i> View More By {{ artwork.artist.user.username }} 
+                                <a href="{% url 'artwork:list' %}?artist={{ artwork.artist.user_profile.user.username }}" class="btn btn-ghost btn-sm">
+                                <i class="fa-solid fa-brush"></i> View More By {{ artwork.artist.user_profile.user.username }} 
                                 </a>
                                 <a href="{% url 'artwork:detail' artwork.slug %}" class="btn btn-ghost btn-sm">
                                 <i class="fa-solid fa-eye"></i> Details

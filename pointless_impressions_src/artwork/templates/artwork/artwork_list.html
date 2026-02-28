@@ -62,9 +62,9 @@
                   <select name="artist" class="select select-bordered w-full">
                     <option value="">All Artists</option>
                     {% for artist in all_artists %}
-                        <option value="{{ artist.user.username }}"
-                          {% if request.GET.artist == artist.user.username %}selected{% endif %}>
-                            {{ artist.user.username }}
+                        <option value="{{ artist.user_profile.user.username }}"
+                          {% if request.GET.artist == artist.user_profile.user.username %}selected{% endif %}>
+                            {{ artist.user_profile.user.username }}
                         </option>
                     {% endfor %}
                   </select>
@@ -74,10 +74,10 @@
               {% comment %} Price Range Filter {% endcomment %}
               <div class="flex flex-col md:flex-row gap-4 justify-center items-center">
                 <div class="form-control w-full md:w-1/2 max-w-xs">
-                  <label class="label">
+                  <label class="label" for="min_price">
                     <span class="label-text">Min Price (£)</span>
                   </label>
-                  <input type="number" 
+                  <input type="number"
                          id="min_price"
                          name="min_price" 
                          placeholder="0" 
@@ -88,10 +88,10 @@
                 </div>
                 
                 <div class="form-control w-full md:w-1/2 max-w-xs">
-                  <label class="label">
+                  <label class="label" for="max_price">
                     <span class="label-text">Max Price (£)</span>
                   </label>
-                  <input type="number" 
+                  <input type="number"
                          id="max_price"
                          name="max_price" 
                          placeholder="1000+" 
@@ -103,11 +103,12 @@
               
                 {% comment %} Availability Filter {% endcomment %}
                 <div class="form-control p-8">
-                  <label class="label cursor-pointer gap-2">
+                  <label class="label cursor-pointer gap-2" for="id_available_only">
                     <span class="label-text">
                       <i class="fa-solid fa-check-circle"></i> Available Only
                     </span>
                     <input type="checkbox"
+                          id="id_available_only"
                           name="available_only"
                           class="checkbox checkbox-primary"
                           {% if request.GET.available_only %}checked{% endif %}>
@@ -186,13 +187,13 @@
             <figure>
               {% with image_to_render=artwork.main_photo|default:placeholder_image %}
                 {% comment %} An image exists for this artwork {% endcomment %}
-                {% cloudinary image_to_render.image format="auto" quality="auto" width=400 height=300 crop="fill" class="w-full h-64 object-cover" alt=image_to_render.alt_text_or_default %}
+                {% cloudinary image_to_render.image format="auto" quality="auto" width=400 height=300 crop="fill" class="w-full h-64 object-cover" alt=image_to_render.alt_text_or_default crossorigin="anonymous" loading="lazy" %}
               {% endwith %}
             </figure>
             <div class="card-body">
               <h2 class="artwork-name card-title">{{ artwork.name }}</h2>
               <p class="text-sm -mt-2 mb-2">
-                <a href="{% url 'artwork:list' %}?artist={{ artwork.artist.user.username }}" class="link link-hover">{{ artwork.artist }}</a>
+                <a href="{% url 'artwork:list' %}?artist={{ artwork.artist.user_profile.user.username }}" class="link link-hover">{{ artwork.artist }}</a>
               </p>
               <p class="artwork-description">{{ artwork.description|truncatewords:15 }}</p>
               <div class="divider my-2"></div>

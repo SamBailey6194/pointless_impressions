@@ -1,7 +1,5 @@
 from django.contrib.auth.mixins import UserPassesTestMixin
 from django.core.exceptions import PermissionDenied
-from django.shortcuts import redirect
-from django.contrib import messages
 
 
 # Mixins for role-based access control
@@ -29,21 +27,3 @@ class ArtistRequiredMixin(UserPassesTestMixin):
 
     def handle_no_permission(self):
         raise PermissionDenied("This view is for artists only.")
-
-
-class BankDetailsRequiredMixin(ArtistRequiredMixin):
-    """
-    Checks that an Artist has provided their bank details.
-    """
-    def test_func(self):
-        if not super().test_func():
-            return False
-
-        return hasattr(self.request.user.artist_profile, 'bank_details')
-
-    def handle_no_permission(self):
-        messages.warning(
-            self.request,
-            "Please add your bank details before you can list artwork."
-            )
-        return redirect('profile:artist-dashboard')

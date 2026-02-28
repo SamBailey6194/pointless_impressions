@@ -76,8 +76,8 @@ async function updateCartDropdownHTML() {
     }
 
     const data = await response.json();
+
     cartDropdown.innerHTML = data.html;
-    
   } catch (error) {
     console.error('Error refreshing cart dropdown:', error);
     cartDropdown.innerHTML = '<div class="p-4 text-error">Could not load cart.</div>';

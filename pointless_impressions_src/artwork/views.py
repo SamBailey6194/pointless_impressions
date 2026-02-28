@@ -1,36 +1,27 @@
 from django.views.generic import ListView, DetailView, View
-from django.db.models import Prefetch, Avg, Count
+from django.db.models import Prefetch
 from django.conf import settings
+import re
 import json
-from django.http import JsonResponse, Http404
-from django.utils.translation import gettext as _
+from django.http import JsonResponse
 from django.template.defaultfilters import truncatewords
 from django.views.decorators.http import require_http_methods
 from django.utils import timezone
 from django.contrib.auth import get_user_model
-from django.utils.decorators import method_decorator
 from .models import (
-    Artwork, ArtworkCategory, ArtworkFramingCondition, ArtworkReview
+    Artwork, ArtworkCategory, ArtworkFramingCondition
 )
-from .forms import ArtworkReviewForm, AddToCartForm
-from pointless_impressions_src.photo.models import Photo
+from .forms import AddToCartForm
 from pointless_impressions_src.profiles.models import Artist
 from pointless_impressions_src.cart.models import Cart
-from pointless_impressions_src.profiles.mixins import CustomerRequiredMixin
+from pointless_impressions_src.cart.utils import get_cart
+from pointless_impressions_src.photo.models import Photo
 
 
 # ----------------------------
 # Helper Functions
 # ---------------------------
 PLACEHOLDER_WORDS = 15
-
-
-def get_placeholder_image():
-    """Returns a placeholder image data."""
-    try:
-        return Photo.objects.get(asset_identifier='placeholder_image')
-    except Photo.DoesNotExist:
-        return None
 
 
 def _serialize_artwork_data(artwork_queryset, placeholder_image):
@@ -59,6 +50,27 @@ def _serialize_artwork_data(artwork_queryset, placeholder_image):
         image_obj = artwork.main_photo
 
         if image_obj:
+
+            try:
+                image_alt_text = image_obj.alt_text_or_default
+            except AttributeError:
+                image_alt_text = artwork.name
+
+            image_public_id = getattr(image_obj, 'asset_identifier', None)
+
+            if not image_public_id and hasattr(
+                image_obj, 'image'
+            ) and image_obj.image:
+                try:
+                    raw_path = str(image_obj.image)
+                    # Regex: Remove 'image/upload/' and version prefixes like
+                    # 'v1/' or 'v12345/'
+                    image_public_id = re.sub(
+                        r'^(image/upload/)?(v\d+/)?', '', raw_path
+                        )
+                except (AttributeError, ValueError):
+                    pass
+
             # Get image URL - for local dev with ImageField or Cloudinary
             image_url_attr = getattr(image_obj, 'get_image_url', None)
 
@@ -70,54 +82,57 @@ def _serialize_artwork_data(artwork_queryset, placeholder_image):
 
             # Fallback: Try to get URL from image field directly
             if not image_url and hasattr(image_obj, 'image'):
-                img_field = getattr(image_obj, 'image', None)
-                if img_field:
-                    try:
-                        # Try to get URL from image field directly
-                        image_url = img_field.url
-                    except (AttributeError, ValueError):
-                        pass
+                try:
+                    img_field = getattr(image_obj, 'image', None)
+                    if hasattr(img_field, 'url'):
+                        try:
+                            image_url = img_field.build_url(
+                                width=2000, height=2000, crop='limit'
+                            )
+                        except Exception:
+                            image_url = img_field.url
+                    else:
+                        image_url = str(img_field)
+                except (AttributeError, ValueError):
+                    pass
 
-            # Get Cloudinary public ID for site assets
-            image_public_id = getattr(image_obj, 'asset_identifier', None)
-
-            # Get alt text - this is a property, so just access it directly
-            try:
-                image_alt_text = image_obj.alt_text_or_default
-            except AttributeError:
-                image_alt_text = artwork.name
         else:
-            # Only use placeholder if artwork has no main_photo
+            # Fallback to placeholder if no main photo
             placeholder_image_obj = placeholder_image
             if placeholder_image_obj:
-                image_url_attr = getattr(
-                    placeholder_image_obj,
-                    'get_image_url',
-                    None
-                )
-                if callable(image_url_attr):
-                    url_result = image_url_attr()
-                    if url_result and url_result.strip():
-                        image_url = url_result
-
                 image_public_id = getattr(
-                    placeholder_image_obj,
-                    'asset_identifier',
-                    None
-                )
+                    placeholder_image_obj, 'asset_identifier', None
+                    )
+
+                # Clean placeholder path if ID is missing
+                if not image_public_id and hasattr(
+                    placeholder_image_obj, 'image'
+                ):
+                    raw_path = str(placeholder_image_obj.image)
+                    image_public_id = re.sub(
+                        r'^(image/upload/)?(v\d+/)?', '', raw_path
+                        )
+
+                image_url_attr = getattr(
+                    placeholder_image_obj, 'get_image_url', None
+                    )
+                if callable(image_url_attr):
+                    image_url = image_url_attr()
 
         # Artist Data
         artist_data = None
         if hasattr(artwork, 'artist') and artwork.artist:
-            user = artwork.artist.user
-            artist_data = {
-                'username': user.username,
-                'first_name': user.first_name,
-                'last_name': user.last_name,
-                'full_name': (
-                    f"{user.first_name} {user.last_name}".strip()
+            user_profile = getattr(artwork.artist, 'user_profile', None)
+            if user_profile:
+                user = user_profile.user
+                artist_data = {
+                    'username': user.username,
+                    'first_name': user.first_name,
+                    'last_name': user.last_name,
+                    'full_name': (
+                        f"{user.first_name} {user.last_name}".strip()
                     ),
-            }
+                }
 
         # Truncated Description
         full_desc = artwork.description
@@ -142,7 +157,9 @@ def _serialize_artwork_data(artwork_queryset, placeholder_image):
             'full_description': full_desc,
             'description': truncated_desc,
             'price': round(float(artwork.price), 2),
-            'category': artwork.category.name if artwork.category else None,
+            'category': (
+                artwork.category.name if artwork.category else None
+                ),
             'selected_conditions': conditions,
             'is_available': artwork.is_available,
             'is_in_stock': artwork.is_in_stock,
@@ -152,18 +169,33 @@ def _serialize_artwork_data(artwork_queryset, placeholder_image):
             'image_url': image_url,
             'image_public_id': image_public_id,
             'image_alt_text': image_alt_text,
-            'created_at': (
-                artwork.created_at.isoformat() if
-                getattr(artwork, 'created_at', None) else None
-                ),
-            'updated_at': (
-                artwork.updated_at.isoformat() if
-                getattr(artwork, 'updated_at', None) else None
-            ),
+            'created_at': artwork.created_at.isoformat() if getattr(
+                artwork, 'created_at', None) else None,
+            'updated_at': artwork.updated_at.isoformat() if getattr(
+                artwork, 'updated_at', None) else None,
             'quantity': artwork.quantity,
         }
         cleaned_data.append(item)
     return cleaned_data
+
+
+def get_placeholder_image_from_context(request):
+    """
+    Helper function to get placeholder image from request context.
+    Falls back to database query if context is not available.
+
+    Args:
+        request: Django request object
+        (may have context from context processor)
+
+    Returns:
+        Photo object or None
+    """
+    # This helper is primarily for API views that don't have template context
+    try:
+        return Photo.objects.get(asset_identifier='placeholder_image')
+    except Photo.DoesNotExist:
+        return None
 
 
 # ---------------------------
@@ -206,7 +238,7 @@ class ArtworkListView(ListView):
 
     def get_queryset(self):
         queryset = Artwork.objects.all().select_related(
-            'category', 'main_photo', 'artist__user'
+            'category', 'main_photo', 'artist__user_profile__user'
         ).prefetch_related(
             'photos',
             Prefetch(
@@ -217,30 +249,27 @@ class ArtworkListView(ListView):
             )
         )
 
-        # Only show available artworks
         general_filter = self.request.GET.get('filter')
         available_only = self.request.GET.get('available_only')
         if general_filter == 'available' or available_only == 'on':
             queryset = queryset.filter(is_available=True)
 
-        # Artist filtering
         artist_username = self.request.GET.get('artist')
         if artist_username:
-            queryset = queryset.filter(artist__user__username=artist_username)
+            queryset = queryset.filter(
+                artist__user_profile__user__username=artist_username
+                )
 
-        # Category filtering
         category_slug = self.request.GET.get('category')
         if category_slug:
             queryset = queryset.filter(category__slug=category_slug)
 
-        # Framing filtering
         framing_slug = self.request.GET.get('selected_conditions')
         if framing_slug:
             queryset = queryset.filter(
                 selected_conditions__slug=framing_slug
             )
 
-        # Price filtering
         min_price = self.request.GET.get('min_price')
         max_price = self.request.GET.get('max_price')
         if min_price and max_price:
@@ -252,13 +281,12 @@ class ArtworkListView(ListView):
         elif max_price:
             queryset = queryset.filter(price__lte=max_price)
 
-        # Sorting
         sort_key = self.request.GET.get('sort', 'price')
         direction = self.request.GET.get('direction', 'asc')
         sort_map = {
             'price': 'price',
             'name': 'name',
-            'artist': 'artist__user__username',
+            'artist': 'artist__user_profile__user__username',
         }
         order_field = sort_map.get(sort_key, 'price')
         if direction == 'desc':
@@ -269,22 +297,16 @@ class ArtworkListView(ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['artwork_categories'] = (
-            ArtworkCategory.objects.all()
-        )
-        context['framing_conditions'] = (
-            ArtworkFramingCondition.objects.all()
-        )
-        context['all_artists'] = Artist.objects.select_related(
-            'user').filter(user__is_active=True).order_by('user__username')
 
-        # Prepare AddToCartForm for each artwork
         artworks_on_page = context['artworks']
         for artwork in artworks_on_page:
-            artwork.add_to_cart_form = AddToCartForm(artwork_id=artwork.id)
+            if artwork.is_available:
+                artwork.add_to_cart_form = AddToCartForm(artwork_id=artwork.id)
+            else:
+                artwork.add_to_cart_form = None
 
-        # Prepare JSON data for artworks on the current page
-        placeholder = get_placeholder_image()
+        placeholder = context.get('placeholder_image')
+
         raw_artwork_data = _serialize_artwork_data(
             artworks_on_page, placeholder
         )
@@ -323,7 +345,7 @@ class ArtworkDetailView(DetailView):
 
     def get_queryset(self):
         return Artwork.objects.select_related(
-            'category', 'main_photo', 'artist__user'
+            'category', 'main_photo', 'artist__user_profile__user'
         ).prefetch_related(
             'photos',
             Prefetch(
@@ -334,42 +356,23 @@ class ArtworkDetailView(DetailView):
             )
         ).order_by('id')
 
-    def get_object(self, queryset=None):
-        queryset = self.get_queryset()
-
-        slug = self.kwargs.get(self.slug_url_kwarg)
-        if slug is not None:
-            queryset = queryset.filter(**{self.slug_url_kwarg: slug})
-
-        annotated_queryset = queryset.annotate(
-            average_rating=Avg('reviews__rating'),
-            review_count=Count('reviews')
-        )
-
-        try:
-            obj = annotated_queryset.get()
-        except queryset.model.DoesNotExist:
-            raise Http404(_("No %(verbose_name)s found matching the query") %
-                          {'verbose_name': queryset.model._meta.verbose_name})
-        return obj
-
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         artwork = self.get_object()
-        placeholder = get_placeholder_image()
+
+        placeholder = context.get('placeholder_image')
 
         serialized_data_list = _serialize_artwork_data(
             [artwork], placeholder
         )
 
-        artwork_data = serialized_data_list[0]
+        artwork_data = serialized_data_list[0] if serialized_data_list else {}
         context['artwork_data'] = artwork_data
 
         all_photos = artwork.photos.all()
         context['carousel_photos'] = all_photos
 
         context['prefetched_conditions'] = artwork.prefetched_conditions
-        context['reviews'] = artwork.reviews.all().order_by('-created_at')
 
         framing_options = []
         for condition in artwork.prefetched_conditions:
@@ -389,7 +392,7 @@ class ArtworkDetailView(DetailView):
             ).exclude(
                 pk=artwork.pk
             ).select_related(
-                'main_photo', 'artist__user'
+                'main_photo', 'artist__user_profile__user'
             )[:10]
             context['similar_artists'] = similar_artists
 
@@ -399,15 +402,14 @@ class ArtworkDetailView(DetailView):
             ).exclude(
                 pk=artwork.pk
             ).select_related(
-                'main_photo', 'artist__user'
+                'main_photo', 'artist__user_profile__user'
             )[:10]
             context['similar_artworks'] = similar_artworks
 
-        context['review_form'] = ArtworkReviewForm()
         context['add_to_cart_form'] = AddToCartForm(artwork_id=artwork.id)
 
         # Pass the stock quantity to the context
-        context['stock'] = artwork.stock
+        context['stock'] = artwork.quantity
 
         # Set the form action to the current page URL
         context['form_action'] = self.request.path
@@ -434,13 +436,17 @@ class ArtworkDetailView(DetailView):
         if form.is_valid():
             framing_option = form.cleaned_data.get('framing_option')
 
-            # Retrieve or create the cart for the current session
-            session_id = request.session.session_key
-            if not session_id:
+            # Retrieve or create the cart, consistent with get_cart() used
+            # by checkout/dropdown views (user-linked for auth, session for anon)
+            if not request.session.session_key:
                 request.session.create()
-                session_id = request.session.session_key
 
-            cart, created = Cart.get_or_create_from_sessionid(session_id)
+            cart = get_cart(request)
+            if not cart:
+                # Anonymous user with no existing cart — create one
+                cart, _ = Cart.get_or_create_from_sessionid(
+                    request.session.session_key
+                )
 
             quantity = form.cleaned_data.get('quantity')
             notes = form.cleaned_data.get('notes', '')
@@ -503,7 +509,7 @@ class ArtworkAPIView(View):
         artworks_queryset = Artwork.objects.filter(
             is_available=True
             ).select_related(
-            'main_photo', 'category', 'artist__user'
+            'main_photo', 'category', 'artist__user_profile__user'
             ).prefetch_related(
             Prefetch(
                 'selected_conditions',
@@ -513,7 +519,7 @@ class ArtworkAPIView(View):
                 )
         ).order_by('id')
 
-        placeholder = get_placeholder_image()
+        placeholder = get_placeholder_image_from_context(request)
 
         final_list = _serialize_artwork_data(
             artworks_queryset, placeholder
@@ -560,7 +566,6 @@ def setup_test_data(request):
     - Is protected by a test-mode database check
     - Creates sample artworks (Sunset, Starry Night)
     - Creates required artist and category records
-    - Returns 403 if not running with test settings
 
     Args:
         request: HTTP request object
@@ -569,10 +574,9 @@ def setup_test_data(request):
         JSON response with created artworks or error message
 
     Raises:
-        403 Forbidden: If not running with test settings
+        PermissionDenied: If not running with test settings
     """
     try:
-        # SECURITY: Only allow in test settings mode
         db_name = settings.DATABASES.get('default', {}).get('NAME', '')
         is_test_mode = 'test' in db_name.lower()
 
@@ -587,14 +591,12 @@ def setup_test_data(request):
 
         User = get_user_model()
 
-        # Check if test data already exists
         if Artwork.objects.filter(name='Sunset').exists():
             return JsonResponse({
                 'message': 'Test data already exists',
                 'artworks_created': False
             })
 
-        # Create default artist
         default_artist_user = User.objects.create(
             username='test_artist',
             email='test_artist@example.com',
@@ -602,25 +604,22 @@ def setup_test_data(request):
         )
 
         default_artist_profile = Artist.objects.create(
-            user=default_artist_user,
+            user_profile=default_artist_user.user_profile,
             bio="Test artist bio",
             portfolio_url="https://testartist.com"
         )
 
-        # Create default category
         default_category = ArtworkCategory.objects.create(
             name="Pointillism",
             friendly_name="Pointillism Art",
             description="Beautiful pointillism artworks."
         )
 
-        # Create default framing condition
         default_framing_condition = ArtworkFramingCondition.objects.create(
             condition_name="unframed",
             condition_description="Artwork is unframed."
         )
 
-        # Create test artworks
         test_artworks = [
             {
                 'name': 'Sunset',
@@ -636,7 +635,7 @@ def setup_test_data(request):
                 'description': 'A night sky full of stars.',
                 'price': 249.99,
                 'sku': 'STARRY001',
-                'is_available': False,  # Sold out
+                'is_available': False,
                 'is_in_stock': False,
                 'quantity': 0,
             }
@@ -670,138 +669,3 @@ def setup_test_data(request):
         return JsonResponse({
             'error': str(e)
         }, status=500)
-
-
-@method_decorator(require_http_methods(["POST"]), name='dispatch')
-class SubmitArtworkReviewView(CustomerRequiredMixin, View):
-    """
-    Handles creation and editing of artwork reviews by customers.
-
-    This view is protected by CustomerRequiredMixin, ensuring only
-    authenticated users with customer profiles can submit or edit reviews.
-    Each customer can only have one review per artwork (enforced by
-    database unique_together constraint). Attempting to review an artwork
-    twice will update the existing review.
-
-    **Access Control**
-    - Requires: Authenticated user with customer profile
-    - Returns 403 Forbidden if user is not a customer
-    - Returns 401 Unauthorized if user is not authenticated
-
-    **HTTP Methods**
-    - ``POST``: Submit or update artwork review
-
-    **POST Parameters**
-    - ``artwork_id`` (required): Primary key of the artwork being reviewed
-    - ``rating`` (required): Integer 1-5 rating value
-    - ``review_title`` (required): Title of the review
-    - ``review_text`` (required): Full review text (minimum 10 characters)
-
-    **Response Format (JSON)**
-    Success (200):
-    ```json
-    {
-        "success": true,
-        "message": "Review submitted successfully!" or "Review updated
-            successfully!"
-    }
-    ```
-
-    Error (400):
-    ```json
-    {
-        "error": "Please fix the errors in your review.",
-        "errors": {
-            "rating": ["field error message"],
-            "review_text": ["field error message"]
-        }
-    }
-    ```
-
-    **HTTP Status Codes**
-    - 200 OK: Review successfully created or updated
-    - 400 Bad Request: Form validation failed or missing artwork_id
-    - 401 Unauthorized: User is not authenticated
-    - 403 Forbidden: User is not a customer
-    - 404 Not Found: Artwork with given ID does not exist
-    - 500 Internal Server Error: Unexpected server error
-
-    **URL**
-    /artworks/reviews/submit/
-
-    **Behavior**
-    - **New Review**: Creates ArtworkReview with artwork FK and reviewer FK
-    - **Existing Review**: Updates existing review for same artwork+customer
-    - **Validation**: Enforces rating 1-5, title required, review min 10 chars
-    - **Customer Tied**: All reviews automatically tied to request.user
-    - **Edit Capability**: Customers can edit their own reviews via same
-        endpoint
-    """
-
-    def post(self, request):
-        # Get the artwork ID from POST data
-        artwork_id = request.POST.get('artwork_id')
-        if not artwork_id:
-            return JsonResponse({
-                'error': 'Artwork ID is required.'
-            }, status=400)
-
-        try:
-            artwork = Artwork.objects.get(id=artwork_id)
-        except Artwork.DoesNotExist:
-            return JsonResponse({
-                'error': 'Artwork not found.'
-            }, status=404)
-
-        # Check if user already has a review for this artwork
-        existing_review = ArtworkReview.objects.filter(
-            artwork=artwork,
-            reviewer=request.user
-        ).first()
-
-        # Get form data
-        rating = request.POST.get('rating')
-        review_title = request.POST.get('review_title')
-        review_text = request.POST.get('review_text')
-
-        # Validate form
-        form = ArtworkReviewForm(data={
-            'rating': rating,
-            'review_title': review_title,
-            'review_text': review_text
-        })
-
-        if not form.is_valid():
-            return JsonResponse({
-                'error': 'Please fix the errors in your review.',
-                'errors': form.errors
-            }, status=400)
-
-        try:
-            if existing_review:
-                # Update existing review
-                existing_review.rating = rating
-                existing_review.review_title = review_title
-                existing_review.review_text = review_text
-                existing_review.save()
-                message = 'Review updated successfully!'
-            else:
-                # Create new review
-                ArtworkReview.objects.create(
-                    artwork=artwork,
-                    reviewer=request.user,
-                    rating=rating,
-                    review_title=review_title,
-                    review_text=review_text
-                )
-                message = 'Review submitted successfully!'
-
-            return JsonResponse({
-                'success': True,
-                'message': message
-            }, status=200)
-
-        except Exception as e:
-            return JsonResponse({
-                'error': f'An error occurred: {str(e)}'
-            }, status=500)

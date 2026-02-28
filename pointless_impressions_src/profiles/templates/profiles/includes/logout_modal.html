@@ -1,0 +1,18 @@
+{% load static tailwind_tags cloudinary crispy_forms_tags %}
+
+<dialog id="logout-modal" class="modal">
+    <div class="modal-box w-66 lg:w-1/7">
+        {% crispy logout_form %}
+
+        <form method="dialog">
+            <button class="btn btn-ghost">
+                <i class="fa-solid fa-times"></i> Cancel
+            </button>
+        </form>
+    </div>
+
+    <form method="dialog" class="modal-backdrop">
+        <button>close</button>
+    </form>
+
+</dialog>

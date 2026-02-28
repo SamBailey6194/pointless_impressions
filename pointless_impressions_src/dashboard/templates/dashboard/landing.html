@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% load static tailwind_tags cloudinary %}
+
+{% block content %}
+<section class="section-alt py-16 w-full min-h-[calc(100vh-(--spacing(16))-(--spacing(16)))]">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <h1 class="text-2xl font-bold mb-4">{{ user.username }}'s Dashboard</h1>
+        <p class="mb-6">Welcome {{ user.username }} to your dashboard. Select an option below:</p>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {% if access.user_profile %}
+            <div class="block p-4 bg-gray-300 dark:bg-gray-700 text-(--pointless-black) dark:text-(--pointless-white) rounded shadow">
+                <h2 class="text-xl font-semibold mb-2">User Profile</h2>
+                <p class="mb-4">Manage your profile, addresses, and orders.</p>
+                <a href="{% url 'dashboard:user_profile_dashboard' user.public_id %}" class="px-4 py-2 btn btn-ghost btn-outline w-fit">Go to User Profile</a>
+            </div>
+            {% endif %}
+
+            {% if access.admin %}
+            <div class="block p-4 bg-gray-300 dark:bg-gray-700 text-(--pointless-black) dark:text-(--pointless-white) rounded shadow">
+                <h2 class="text-xl font-semibold mb-2">Admin Dashboard</h2>
+                <p class="mb-4">Manage site operations and user activities.</p>
+                <a href="{% url 'dashboard:admin_dashboard' user.public_id %}" class="px-4 py-2 btn btn-ghost btn-outline w-fit">Go to Admin Dashboard</a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</section>
+{% endblock %}

@@ -9,7 +9,7 @@
             <div class="breadcrumbs text-sm mb-6">
                 <ul>
                     <li>
-                        <a href="/"><i class="fa-solid fa-home"></i> Home</a>
+                        <a href="{% url 'home' %}"><i class="fa-solid fa-home"></i> Home</a>
                     </li>
                     <li>
                         <a href="{% url 'artwork:list' %}"><i class="fa-solid fa-palette"></i> Artworks</a>
@@ -30,7 +30,7 @@
     {% block section_2 %}
     <section class="section-blue py-16 w-full">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            {% include 'cart/includes/cart_summary.html' %}
+            {% include 'cart/includes/cart_summary.html' with show_forms=True %}
         </div>
     </section>
     {% endblock %}
@@ -46,13 +46,25 @@
                 <hr class="mb-4">
                 <p class="text-md">To complete your purchase, please provide your payment details and confirm your shipping and billing information.</p>
                 <hr class="my-4">
-                <form action="{% url 'orders:confirmation' %}" method="post" id="checkout-form" class="card checkout-card">
+                <form action="{% url 'orders:confirmation' %}" method="post" id="checkout-form" class="form-card p-6 mb-6">
                     {% csrf_token %}
                     {% crispy order_form %}
-                    <div class="card-actions justify-end mt-2">
+
+                    <div class="mb-6 mx-6">
+                        <h3 class="text-xl font-bold mb-4">Payment Details</h3>
+
+                        <div id="card-container"></div>
+                        
+                        <div id="payment-status" class="text-sm mt-2"></div>
+
+                        <div class="form-divider"></div>
+                    </div>
+
+                    <div class="card-actions justify-end mt-4">
                         <button type="submit" class="btn btn-ghost btn-outline mr-6 mb-6" id="place-order-button">
-                            <i class="fa-solid fa-credit-card mr-2"></i> Place Order
+                            <i class="fa-solid fa-credit-card mr-2"></i> Confirm & Pay
                         </button>
+                        <button type="button" id="modal-trigger-btn" class="hidden"></button>
                     </div>
                 </form>
             {% else %}
@@ -74,12 +86,12 @@
                             <div class="rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-shadow duration-200 cursor-pointer card-adaptive h-full flex flex-col">
                                 <figure>
                                 {% with image_to_render=artwork.main_photo|default:placeholder_image %}
-                                    {% cloudinary image_to_render.image format="auto" quality="auto" width=400 height=300 crop="fill" class="w-full h-64 object-cover" alt=image_to_render.alt_text_or_default %}
+                                    {% cloudinary image_to_render.image format="auto" quality="auto" width=400 height=400 crop="fill" alt=image_to_render.alt_text_or_default crossorigin="anonymous" loading="lazy" %}
                                 {% endwith %}
                                 </figure>
                                 <div class="p-6 flex flex-col h-56">
                                     <h3 class="text-xl font-semibold mb-2 card-title">{{ artwork.name }}</h3>
-                                    <p class="text-xs mb-3 opacity-70">By: {{ artwork.artist.user.username }} | Category: {{ artwork.category }}</p>
+                                    <p class="text-xs mb-3 opacity-70">By: {{ artwork.artist.user_profile.user.username }} | Category: {{ artwork.category.name }}</p>
                                     <p class="text-sm mb-3 card-description grow">{{ artwork.description }}</p>
                                     <p class="text-lg font-bold text-(--pointless-blue)">£{{ artwork.price }}</p>
                                 </div>
@@ -87,8 +99,8 @@
                                     <a href="{% url 'artwork:list' %}?category={{ artwork.category.slug }}" class="btn btn-ghost btn-sm">
                                     <i class="fa-solid fa-palette"></i> View More {{ artwork.category.name }} 
                                     </a>
-                                    <a href="{% url 'artwork:list' %}?artist={{ artwork.artist.user.username }}" class="btn btn-ghost btn-sm">
-                                    <i class="fa-solid fa-brush"></i> View More By {{ artwork.artist.user.username }} 
+                                    <a href="{% url 'artwork:list' %}?artist={{ artwork.artist.user_profile.user.username }}" class="btn btn-ghost btn-sm">
+                                    <i class="fa-solid fa-brush"></i> View More By {{ artwork.artist.user_profile.user.username }} 
                                     </a>
                                     <a href="{% url 'artwork:detail' artwork.slug %}" class="btn btn-ghost btn-sm">
                                     <i class="fa-solid fa-eye"></i> Details
@@ -126,5 +138,10 @@
 
 {% block postloadjs %}
 {{ block.super }}
-<script src="{% static 'js/checkout.js' %}" type="module" defer></script>
+    <script src="https://sandbox.web.squarecdn.com/v1/square.js"></script>
+
+    {{ square_app_id|json_script:"square-app-id" }}
+    {{ square_location_id|json_script:"square-location-id" }}
+
+    <script src="{% static 'js/checkout.js' %}" type="module" defer></script>
 {% endblock %}

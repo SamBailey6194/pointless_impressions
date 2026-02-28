@@ -4,14 +4,14 @@ from django.views import View
 from django.views.generic import TemplateView
 from django.conf import settings
 from decimal import Decimal
+import json
+import os
 from .utils import get_cart
 from .forms import CartItemUpdateForm
 from pointless_impressions_src.order.forms import OrderForm
 from pointless_impressions_src.artwork.models import (
     Artwork, ArtworkFramingCondition
     )
-from pointless_impressions_src.profiles.models import Customer, Address
-import json
 
 
 # Write your views here.
@@ -39,34 +39,13 @@ class CheckoutView(TemplateView):
     """
     template_name = 'cart/checkout.html'
 
-    def get(self, request, *args, **kwargs):
-        context = self.get_context_data(**kwargs)
-        response = self.render_to_response(context)
-        return response
-
     def get_context_data(self, **kwargs):
-
         context = super().get_context_data(**kwargs)
 
         cart = get_cart(self.request)
 
-        cart_is_empty = not cart or cart.get_total_quantity() == 0
-
-        if cart_is_empty:
+        if not cart or cart.get_total_quantity() == 0:
             context['cart_empty'] = True
-
-            featured_artworks = Artwork.objects.filter(
-                is_featured=True,
-                main_photo__isnull=False
-            ).select_related(
-                'main_photo',
-                'artist__user',
-                'category'
-                ).prefetch_related(
-                    'selected_conditions'
-                )[:10]
-
-            context['featured_artworks'] = featured_artworks
             return context
 
         cart_items_data = []
@@ -84,7 +63,7 @@ class CheckoutView(TemplateView):
                         initial={
                             'quantity': item.quantity,
                             'framing_option': (
-                                item.framing_condition.condition_friendly_name
+                                item.framing_condition.id
                                 if item.framing_condition else None
                             ),
                         },
@@ -95,47 +74,18 @@ class CheckoutView(TemplateView):
         except Exception:
             context['cart_error'] = (
                 "Could not load cart items. Due to an error."
-                )
+            )
             return context
 
-        total_quantity = cart.get_total_quantity()
-        subtotal = cart.get_subtotal()
-        delivery_cost = cart.get_delivery_cost()
-        grand_total = cart.get_grand_total()
+        context['cart_items'] = cart_items_data
 
-        items_needed_for_free_delivery = 0
-        if 0 < total_quantity < settings.FREE_DELIVERY_THRESHOLD:
-            items_needed_for_free_delivery = (
-                settings.FREE_DELIVERY_THRESHOLD - total_quantity
-            )
+        context['order_form'] = OrderForm()
+        context['subtotal'] = cart.get_subtotal()
+        context['delivery_cost'] = cart.get_delivery_cost()
+        context['grand_total'] = cart.get_grand_total()
 
-        context.update({
-            'cart_empty': False,
-            'cart_items': cart_items_data,
-            'total_quantity': total_quantity,
-            'subtotal': subtotal,
-            'delivery_cost': delivery_cost,
-            'grand_total': grand_total,
-            'items_needed_for_free_delivery': items_needed_for_free_delivery,
-            'free_delivery_item_threshold': settings.FREE_DELIVERY_THRESHOLD,
-        })
-
-        context['featured_artworks'] = []
-
-        context['order_form'] = OrderForm(user=self.request.user)
-
-        if self.request.user.is_authenticated:
-            try:
-                customer = self.request.user.customer
-                context['shipping_address'] = customer.addresses.filter(
-                    address_type=Address.SHIPPING
-                )
-                context['billing_address'] = customer.addresses.filter(
-                    address_type=Address.BILLING
-                )
-            except Customer.DoesNotExist:
-                context['shipping_address'] = None
-                context['billing_address'] = None
+        context['square_app_id'] = os.getenv('SQUARE_APP_ID', '')
+        context['square_location_id'] = os.getenv('SQUARE_LOCATION_ID', '')
 
         return context
 
@@ -158,80 +108,133 @@ class CartDropdownView(View):
     Response: JSON with rendered HTML for cart dropdown
     """
     def get(self, request, *args, **kwargs):
-        cart = get_cart(request)
-
-        cart_items_data = []
-        total_quantity = 0
-        subtotal = Decimal('0.00')
-        delivery_cost = Decimal('0.00')
-        grand_total = Decimal('0.00')
-        items_needed_for_free_delivery = 0
-
         try:
+            cart = get_cart(request)
+            cart_items_data = []
+            total_quantity = 0
+            subtotal = Decimal('0.00')
+            delivery_cost = Decimal('0.00')
+            grand_total = Decimal('0.00')
+            items_needed_for_free_delivery = settings.FREE_DELIVERY_THRESHOLD
 
             if cart:
-                cart_items = cart.items.select_related(
-                    'artwork', 'framing_condition', 'artwork__main_photo'
-                ).all()
+                try:
+                    cart_items = cart.items.select_related(
+                        'artwork',
+                        'artwork__artist',
+                        'artwork__artist__user_profile',
+                        'artwork__artist__user_profile__user',
+                        'framing_condition',
+                        'artwork__main_photo'
+                    ).all()
 
-                for item in cart_items:
-                    cart_items_data.append({
-                        'artwork_name': (
-                            item.artwork.name
-                            if item.artwork else "Deleted Artwork"
-                        ),
-                        'artwork_image_url': (
-                            item.artwork.image.url
-                            if item.artwork and item.artwork.image else None
-                        ),
-                        'quantity': item.quantity,
-                        'notes': item.notes,
-                        'price': item.artwork.price if item.artwork else 0,
-                        'framing_condition': (
-                            item.framing_condition.condition_friendly_name
-                            if item.framing_condition else None
-                        ),
-                    })
+                    for item in cart_items:
+                        try:
+                            artwork_image_url = None
 
-                total_quantity = cart.get_total_quantity() if cart else 0
-                subtotal = cart.get_subtotal() if cart else Decimal('0.00')
-                delivery_cost = (
-                    cart.get_delivery_cost() if cart else Decimal('0.00')
-                    )
-                grand_total = (
-                    cart.get_grand_total() if cart else Decimal('0.00')
-                    )
+                            if item.artwork and item.artwork.main_photo:
+                                photo = item.artwork.main_photo
 
-                if 0 < total_quantity < settings.FREE_DELIVERY_THRESHOLD:
-                    items_needed_for_free_delivery = (
-                        settings.FREE_DELIVERY_THRESHOLD - total_quantity
-                    )
+                                if (
+                                    hasattr(photo, 'get_image_url') and
+                                    callable(photo.get_image_url)
+                                ):
+                                    try:
+                                        artwork_image_url = (
+                                            photo.get_image_url()
+                                            )
+                                    except Exception:
+                                        pass
 
-            html = render_to_string(
-                'cart/includes/cart_dropdown.html',
-                {
-                    'cart_items': cart_items_data,
-                    'total_quantity': total_quantity,
-                    'subtotal': subtotal,
-                    'delivery_cost': delivery_cost,
-                    'grand_total': grand_total,
-                    'items_needed_for_free_delivery': (
-                        items_needed_for_free_delivery
-                        ),
-                    'free_delivery_item_threshold': (
-                        settings.FREE_DELIVERY_THRESHOLD
-                        ),
-                }
-            )
+                                if not artwork_image_url and hasattr(
+                                    photo, 'image'
+                                ):
+                                    try:
+                                        if photo.image:
+                                            artwork_image_url = photo.image.url
+                                    except (AttributeError, ValueError):
+                                        pass
+
+                            framing_name = None
+                            if item.framing_condition:
+                                framing_name = (
+                                    item.framing_condition.
+                                    condition_friendly_name or
+                                    item.framing_condition.condition_name or
+                                    "Standard"
+                                )
+
+                            cart_item = {
+                                'artwork_name': (
+                                    item.artwork.name if item.artwork
+                                    else "Deleted Artwork"
+                                ),
+                                'artwork_image_url': artwork_image_url,
+                                'quantity': item.quantity,
+                                'notes': item.notes or '',
+                                'price': (
+                                    item.artwork.price if item.artwork
+                                    else Decimal('0.00')
+                                ),
+                                'framing_condition': framing_name,
+                            }
+
+                            cart_items_data.append(cart_item)
+
+                        except Exception:
+                            continue
+
+                    total_quantity = cart.get_total_quantity()
+                    subtotal = cart.get_subtotal()
+                    delivery_cost = cart.get_delivery_cost()
+                    grand_total = cart.get_grand_total()
+
+                    if 0 < total_quantity < settings.FREE_DELIVERY_THRESHOLD:
+                        items_needed_for_free_delivery = (
+                            settings.FREE_DELIVERY_THRESHOLD - total_quantity
+                        )
+                    else:
+                        items_needed_for_free_delivery = 0
+
+                except Exception:
+                    raise
+
+            try:
+                html = render_to_string(
+                    'cart/includes/cart_dropdown.html',
+                    {
+                        'cart_items': cart_items_data,
+                        'total_quantity': total_quantity,
+                        'subtotal': subtotal,
+                        'delivery_cost': delivery_cost,
+                        'grand_total': grand_total,
+                        'items_needed_for_free_delivery': (
+                            items_needed_for_free_delivery
+                            ),
+                        'free_delivery_item_threshold': (
+                            settings.FREE_DELIVERY_THRESHOLD
+                            ),
+                    },
+                    request=request
+                )
+
+            except Exception:
+                raise
 
             return JsonResponse({
                 'html': html,
                 'cart_count': total_quantity,
                 'total_quantity': total_quantity
-                })
-        except Exception:
+            })
+
+        except Exception as e:
             return JsonResponse(
-                {'error': 'Failed to generate cart dropdown.'},
+                {
+                    'error': 'Failed to generate cart dropdown.',
+                    'details': (
+                        str(e) if settings.DEBUG else 'An error occurred'
+                        )
+                },
                 status=500
             )
 
@@ -269,7 +272,7 @@ class UpdateCartView(View):
                 return JsonResponse({
                     'success': False,
                     'error': 'Invalid quantity value'
-                    }, status=400)
+                }, status=400)
 
             if not artwork_id:
                 return JsonResponse({
@@ -298,9 +301,7 @@ class UpdateCartView(View):
                     'error': 'Cart not found'
                 }, status=400)
 
-            existing_items_for_artwork = (
-                cart.items.filter(artwork=artwork) if cart else None
-                )
+            existing_items_for_artwork = cart.items.filter(artwork=artwork)
 
             framing_condition = None
             if framing_option:
@@ -354,12 +355,18 @@ class UpdateCartView(View):
                     'grand_total': cart.get_grand_total(),
                     'total_quantity': cart.get_total_quantity(),
                     'items_needed_for_free_delivery': (
-                        settings.FREE_DELIVERY_THRESHOLD -
-                        cart.get_total_quantity()
-                        if 0 < cart.get_total_quantity() <
-                        settings.FREE_DELIVERY_THRESHOLD else 0
+                        (
+                            settings.FREE_DELIVERY_THRESHOLD -
+                            cart.get_total_quantity()
+                            )
+                        if (
+                            0 < cart.get_total_quantity() <
+                            settings.FREE_DELIVERY_THRESHOLD
+                            )
+                        else 0
                     )
-                }
+                },
+                request=request
             )
 
             return JsonResponse({
@@ -367,9 +374,9 @@ class UpdateCartView(View):
                 'message': message,
                 'updated_summary_html': updated_summary_html,
                 'new_quantity': quantity,
-                'new_subtotal': cart.get_subtotal(),
-                'new_delivery_cost': cart.get_delivery_cost(),
-                'new_grand_total': cart.get_grand_total(),
+                'new_subtotal': str(cart.get_subtotal()),
+                'new_delivery_cost': str(cart.get_delivery_cost()),
+                'new_grand_total': str(cart.get_grand_total()),
                 'new_framing_condition': (
                     framing_condition.condition_friendly_name
                     if framing_condition else None
