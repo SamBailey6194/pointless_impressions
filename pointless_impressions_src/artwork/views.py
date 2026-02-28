@@ -84,7 +84,12 @@ def _serialize_artwork_data(artwork_queryset, placeholder_image):
                 try:
                     img_field = getattr(image_obj, 'image', None)
                     if hasattr(img_field, 'url'):
-                        image_url = img_field.url
+                        try:
+                            image_url = img_field.build_url(
+                                width=2000, height=2000, crop='limit'
+                            )
+                        except Exception:
+                            image_url = img_field.url
                     else:
                         image_url = str(img_field)
                 except (AttributeError, ValueError):
@@ -115,13 +120,17 @@ def _serialize_artwork_data(artwork_queryset, placeholder_image):
             # Artist Data
             artist_data = None
             if hasattr(artwork, 'artist') and artwork.artist:
-                user = artwork.artist.user_profile.user
-                artist_data = {
-                    'username': user.username,
-                    'first_name': user.first_name,
-                    'last_name': user.last_name,
-                    'full_name': f"{user.first_name} {user.last_name}".strip(),
-                }
+                user_profile = getattr(artwork.artist, 'user_profile', None)
+                if user_profile:
+                    user = user_profile.user
+                    artist_data = {
+                        'username': user.username,
+                        'first_name': user.first_name,
+                        'last_name': user.last_name,
+                        'full_name': (
+                            f"{user.first_name} {user.last_name}".strip()
+                        ),
+                    }
 
             # Truncated Description
             full_desc = artwork.description
@@ -165,7 +174,7 @@ def _serialize_artwork_data(artwork_queryset, placeholder_image):
                 'quantity': artwork.quantity,
             }
             cleaned_data.append(item)
-        return cleaned_data
+    return cleaned_data
 
 
 def get_placeholder_image_from_context(request):
@@ -289,7 +298,10 @@ class ArtworkListView(ListView):
 
         artworks_on_page = context['artworks']
         for artwork in artworks_on_page:
-            artwork.add_to_cart_form = AddToCartForm(artwork_id=artwork.id)
+            if artwork.is_available:
+                artwork.add_to_cart_form = AddToCartForm(artwork_id=artwork.id)
+            else:
+                artwork.add_to_cart_form = None
 
         placeholder = context.get('placeholder_image')
 

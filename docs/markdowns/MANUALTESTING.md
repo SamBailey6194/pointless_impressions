@@ -29,6 +29,8 @@ This document outlines the manual tests to be carried out for each feature. Use 
       - [Test Registration Atomicity and Email Dispatch](#test-registration-atomicity-and-email-dispatch)
     - [Cart Interactivity Fix (1.1) - Backend](#cart-interactivity-fix-11---backend)
       - [Test Cart Update and Remove Endpoints](#test-cart-update-and-remove-endpoints)
+    - [Image Dimension Cap - Backend](#image-dimension-cap---backend)
+      - [Test Artwork API Image URL Dimensions](#test-artwork-api-image-url-dimensions)
   - [Frontend Testing](#frontend-testing)
     - [US001: Browse Available Artworks - In Artwork App](#us001-browse-available-artworks---in-artwork-app-1)
       - [Test the Artwork Listing Page](#test-the-artwork-listing-page)
@@ -57,6 +59,8 @@ This document outlines the manual tests to be carried out for each feature. Use 
       - [Test Registration and Email Verification Flow](#test-registration-and-email-verification-flow)
     - [Cart Interactivity Fix (1.1) - Frontend](#cart-interactivity-fix-11---frontend)
       - [Test Cart Quantity Controls and Remove Item](#test-cart-quantity-controls-and-remove-item)
+    - [Image Dimension Cap - Frontend](#image-dimension-cap---frontend)
+      - [Test Image Dimensions via Browser DevTools](#test-image-dimensions-via-browser-devtools)
 
 ---
 
@@ -480,3 +484,39 @@ Requires the dev environment running (`./dev.sh start`) with at least one artwor
 | 8 | Remove the last item in the cart | Page reloads showing an empty cart message | Pass |
 | 9 | Open the browser developer tools console before clicking **Update** or **Remove** | No JavaScript errors appear in the console during or after the operation | Pass |
 | 10 | Click **Update** with no changes to quantity or framing | Page reloads without error — a no-op update is handled gracefully | Pass |
+
+---
+
+### Image Dimension Cap - Backend
+
+#### Test Artwork API Image URL Dimensions
+
+Requires the dev environment running (`./dev.sh start`). Tests confirm that every image URL returned by the artwork API includes a Cloudinary `c_limit,w_2000,h_2000` transformation so no image exceeds 2000px on either dimension.
+
+| Step | Action | Expected Outcome | Pass / Fail |
+| :--- | :--- | :--- | :--- |
+| 1 | Open a terminal and run: `curl -s http://localhost:8000/api/artworks/ \| python3 -m json.tool \| grep image_url` | A list of `image_url` values is printed to the terminal | Pass |
+| 2 | Inspect any `image_url` value from the output | The URL contains `/w_2000,h_2000,c_limit/` in the Cloudinary path (e.g., `https://res.cloudinary.com/<cloud>/image/upload/w_2000,h_2000,c_limit/...`) | Pass |
+| 3 | Copy one `image_url` and open it in a browser or run: `curl -sI "<image_url>" \| grep -i content-length` | The image loads successfully (HTTP 200); the Cloudinary transformation is applied server-side | Pass |
+| 4 | Open the Django shell with `./dev.sh shell` and run: `from pointless_impressions_src.photo.models import Photo; p = Photo.objects.first(); print(p.get_image_url)` | The URL contains `w_2000,h_2000,c_limit` in the path | Pass |
+| 5 | In the Django shell, run: `from pointless_impressions_src.photo.models import Photo; p = Photo.objects.first(); print(p.image.build_url(width=2000, height=2000, crop='limit'))` | Returns the same transformed URL as `get_image_url` — confirms `build_url` is working correctly | Pass |
+
+---
+
+### Image Dimension Cap - Frontend
+
+#### Test Image Dimensions via Browser DevTools
+
+Requires the dev environment running (`./dev.sh start`). Tests confirm that images rendered on artwork pages do not exceed 2000px on either dimension, and that landscape and portrait images each respect their natural aspect ratio at the capped size.
+
+| Step | Action | Expected Outcome | Pass / Fail |
+| :--- | :--- | :--- | :--- |
+| 1 | Navigate to http://localhost:8000/artworks/ and open browser DevTools (F12) | DevTools panel opens on the artwork listing page | Pass |
+| 2 | Go to the **Network** tab in DevTools, filter by **Img**, and reload the page | All artwork image requests appear in the network log | Pass |
+| 3 | Click on any artwork image request and inspect the **Request URL** | URL contains `/w_2000,h_2000,c_limit/` in the Cloudinary path | Pass |
+| 4 | Right-click any artwork image on the page and select **Inspect** (or open the **Elements** tab) | The `src` attribute of the `<img>` tag contains `w_2000,h_2000,c_limit` in the Cloudinary URL | Pass |
+| 5 | In the **Console** tab, run: `document.querySelectorAll('img').forEach(img => console.log(img.naturalWidth, img.naturalHeight, img.src))` | All listed image dimensions show width ≤ 2000 and height ≤ 2000 | Pass |
+| 6 | Identify a known landscape artwork image (wider than tall) and run step 5 for that image | Width is at most 2000px; height is less than 2000px and maintains the correct aspect ratio (e.g., a 4000×3000 original appears as 2000×1500) | Pass |
+| 7 | Identify a known portrait artwork image (taller than wide) and run step 5 for that image | Height is at most 2000px; width is less than 2000px and maintains the correct aspect ratio (e.g., a 3000×4000 original appears as 1500×2000) | Pass |
+| 8 | Navigate to an artwork detail page (http://localhost:8000/artworks/<slug>/) and repeat steps 2–5 | Detail page artwork images also contain `w_2000,h_2000,c_limit` in URLs and respect the 2000px cap | Pass |
+| 9 | Open the **Network** tab and check the image file sizes for artwork images | Images are smaller in file size compared to a raw Cloudinary URL without transformation — confirms the cap is active | Pass |
