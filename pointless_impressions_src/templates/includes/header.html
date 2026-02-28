@@ -8,9 +8,11 @@
     {% comment %} Logo Section {% endcomment %}
     <div class="navbar-start">
       <a href="{% url 'home' %}" class="btn btn-ghost normal-case text-xl h-auto p-2">
-        {% with image_to_render=site_logo %}
-          {% cloudinary image_to_render.image height=60 crop='fit' format='webp' quality='auto' alt=image_to_render.alt_text_or_default class="h-8 sm:h-10 md:h-12 w-auto" crossorigin="anonymous" %}
-        {% endwith %}
+        {% if site_logo %}
+          {% with image_to_render=site_logo %}
+            {% cloudinary image_to_render.image height=60 crop='fit' format='webp' quality='auto' alt=image_to_render.alt_text_or_default class="h-8 sm:h-10 md:h-12 w-auto" crossorigin="anonymous" loading="eager" fetchpriority="high" %}
+          {% endwith %}
+        {% endif %}
       </a>
     </div>
 
@@ -74,7 +76,7 @@
                       <i class="fa-solid fa-circle-chevron-down"></i>
                   </label>
                   <ul tabindex="0" class="menu menu-sm dropdown-content z-10 p-2 shadow-lg rounded-box w-52 ml-14">
-                      {% for artist in artists %}
+                      {% for artist in all_artists %}
                           <li>
                               <a href="{% url 'artwork:list' %}?artist={{ artist.user_profile.user.username }}" class="hover:bg-(--pointless-yellow)">
                                   {{ artist.user_profile.user.username|title }}
@@ -110,7 +112,7 @@
                   Display user's profile picture if logged in and has one 
                 {% endcomment %}
                 {% with profile_pic=request.user.user_profile.profile_picture %}
-                  {% cloudinary profile_pic.image format="auto" quality="auto" width=80 height=80 crop="fill" class="w-10 rounded-full" alt=profile_pic.alt_text_or_default %}
+                  {% cloudinary profile_pic.image format="auto" quality="auto" width=80 height=80 crop="fill" class="w-10 rounded-full" alt=profile_pic.alt_text_or_default loading="lazy" %}
                 {% endwith %}
 
               {% else %}
@@ -130,7 +132,7 @@
                 {% comment %} Django Site Admin for Developers {% endcomment %}
                 {% if request.user.is_staff %}
                   <li>
-                    <a href="{% url 'admin' %}" class="hover:bg-(--pointless-yellow)">
+                    <a href="{% url 'admin:index' %}" class="hover:bg-(--pointless-yellow)">
                       <i class="fa-solid fa-shield-halved"></i> Site Admin (Dev)
                     </a>
                   </li>
@@ -214,7 +216,7 @@
 
         {% comment %} Mobile Hamburger Menu {% endcomment %}
         <div class="dropdown dropdown-end md:hidden">
-          <label tabindex="0" class="btn btn-ghost btn-circle">
+          <label tabindex="0" class="btn btn-ghost btn-circle" aria-label="Open navigation menu" role="button">
             <i class="fa-solid fa-bars text-lg"></i>
           </label>
           <ul tabindex="0" class="menu menu-sm dropdown-content mt-3 z-50 p-2 shadow-lg rounded-box w-48 right-0">
@@ -271,10 +273,10 @@
                   </a>
                 </li>
                 <ul tabindex="0">
-                {% for artist in artists %}
+                {% for artist in all_artists %}
                   <li>
-                    <a href="{% url 'artwork:list' %}?artist={{ artist.user.username }}">
-                      {{ artist.user.username|title }}
+                    <a href="{% url 'artwork:list' %}?artist={{ artist.user_profile.user.username }}">
+                      {{ artist.user_profile.user.username|title }}
                     </a>
                   </li>
                 {% endfor %}
@@ -293,8 +295,8 @@
       <div class="max-w-md mx-auto">
         <div class="flex w-full relative">
           <form method="get" action="{% url 'search:search_results' %}" class="flex w-full">
-            <input type="text" name="q" id="desktop-search-input" placeholder="Search products, artists..." autocomplete="off" class="custom-input flex-1 rounded-r-none" />
-            <button type="submit" class="btn rounded-l-none">
+            <input type="text" name="q" id="desktop-search-input" placeholder="Search products, artists..." autocomplete="off" class="custom-input flex-1 rounded-r-none" aria-label="Search products and categories" />
+            <button type="submit" class="btn rounded-l-none" aria-label="Search">
               <i class="fa-solid fa-magnifying-glass"></i>
             </button>
           </form>
@@ -308,8 +310,8 @@
     <div class="w-full px-2">
       <div class="flex w-full relative">
         <form method="get" action="{% url 'search:search_results' %}" class="flex w-full">
-          <input type="text" name="q" id="mobile-search-input" placeholder="Search products, artists..." autocomplete="off" class="custom-input w-full rounded-r-none" />
-          <button type="submit" class="btn rounded-l-none">
+          <input type="text" name="q" id="mobile-search-input" placeholder="Search products, artists..." autocomplete="off" class="custom-input w-full rounded-r-none" aria-label="Search products and categories" />
+          <button type="submit" class="btn rounded-l-none" aria-label="Search">
             <i class="fa-solid fa-magnifying-glass"></i>
           </button>
         </form>

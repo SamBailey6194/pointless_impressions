@@ -211,6 +211,18 @@ If you prefer to run Docker commands manually instead of using the `dev.sh` scri
     - The database will automatically migrate
     - A superuser (admin/admin123) will be created automatically
 
+### Test Fixture Credentials
+
+| Username | Email | Password | Group | Django Admin |
+| :--- | :--- | :--- | :--- | :--- |
+| `owneruser` | owner@example.com | `testpass123` | Owner | No |
+| `manageruser` | manager@example.com | `testpass123` | Manager | No |
+| `employeeuser` | employee@example.com | `testpass123` | Employee | No |
+| `customeruser` | customer@example.com | `testpass123` | *(none)* | No |
+| `superuser` | superuser@example.com | `testpass123` | *(none)* | Full access |
+| `staffuser` | staffuser@example.com | `testpass123` | *(none)* | Limited access |
+| `artistuser` | artist@example.com | `testpass123` | *(none)* | No |
+
 ### Creating Additional Superusers
 
 If you need to create additional superusers:

@@ -864,3 +864,94 @@
     animation: fade-out 0.3s ease-out;
   }
 }
+
+/* ============================================================
+   POINTLESS IMPRESSIONS — PATCH v1.0
+   ============================================================ */
+
+/* WCAG: Skip Navigation Link */
+.skip-link {
+  position: absolute;
+  top: -40px;
+  left: 6px;
+  z-index: 9999;
+  padding: 8px 16px;
+  background: var(--pointless-yellow);
+  color: var(--pointless-black);
+  font-weight: 700;
+  font-size: 0.875rem;
+  border-radius: 0 0 4px 4px;
+  text-decoration: none;
+  transition: top 0.15s ease;
+  white-space: nowrap;
+}
+.skip-link:focus,
+.skip-link:focus-visible {
+  top: 0;
+  outline: 3px solid var(--pointless-blue);
+  outline-offset: 2px;
+}
+
+/* WCAG: Enhanced Focus Indicators */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+[tabindex]:focus-visible {
+  outline: 3px solid var(--pointless-yellow) !important;
+  outline-offset: 2px !important;
+  border-radius: 3px;
+}
+.btn:focus-visible {
+  outline: 3px solid var(--pointless-yellow) !important;
+  outline-offset: 2px !important;
+}
+
+/* Card Sizing: Carousel — uniform 260px image area */
+.card-adaptive figure {
+  height: 260px !important;
+  overflow: hidden !important;
+  flex-shrink: 0 !important;
+}
+.card-adaptive figure img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  display: block;
+}
+
+/* Reserve space for 2-line titles */
+.card-adaptive h2.card-title,
+.card-adaptive h3.card-title,
+.card-adaptive .card-title {
+  min-height: 3.5rem;
+}
+
+/* Card Sizing: Artwork list — flex layout ensures equal height */
+#artwork-list .artwork-card.card {
+  display: flex !important;
+  flex-direction: column !important;
+}
+#artwork-list .artwork-card .card-body {
+  flex: 1 !important;
+  display: flex !important;
+  flex-direction: column !important;
+}
+#artwork-list .artwork-card .card-actions {
+  margin-top: auto;
+}
+
+/* Responsiveness: Mobile < 640px */
+@media (max-width: 639px) {
+  .carousel.h-96 {
+    height: clamp(220px, 60vw, 384px);
+  }
+}
+
+/* Responsiveness: XL screens > 1536px */
+@media (min-width: 1536px) {
+  .max-w-7xl {
+    max-width: 96rem;
+  }
+}

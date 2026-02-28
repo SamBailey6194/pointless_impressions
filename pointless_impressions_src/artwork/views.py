@@ -14,6 +14,7 @@ from .models import (
 from .forms import AddToCartForm
 from pointless_impressions_src.profiles.models import Artist
 from pointless_impressions_src.cart.models import Cart
+from pointless_impressions_src.cart.utils import get_cart
 from pointless_impressions_src.photo.models import Photo
 
 
@@ -84,88 +85,98 @@ def _serialize_artwork_data(artwork_queryset, placeholder_image):
                 try:
                     img_field = getattr(image_obj, 'image', None)
                     if hasattr(img_field, 'url'):
-                        image_url = img_field.url
+                        try:
+                            image_url = img_field.build_url(
+                                width=2000, height=2000, crop='limit'
+                            )
+                        except Exception:
+                            image_url = img_field.url
                     else:
                         image_url = str(img_field)
                 except (AttributeError, ValueError):
                     pass
-            else:
-                # Fallback to placeholder if no main photo
-                placeholder_image_obj = placeholder_image
-                if placeholder_image_obj:
-                    image_public_id = getattr(
-                        placeholder_image_obj, 'asset_identifier', None
+
+        else:
+            # Fallback to placeholder if no main photo
+            placeholder_image_obj = placeholder_image
+            if placeholder_image_obj:
+                image_public_id = getattr(
+                    placeholder_image_obj, 'asset_identifier', None
+                    )
+
+                # Clean placeholder path if ID is missing
+                if not image_public_id and hasattr(
+                    placeholder_image_obj, 'image'
+                ):
+                    raw_path = str(placeholder_image_obj.image)
+                    image_public_id = re.sub(
+                        r'^(image/upload/)?(v\d+/)?', '', raw_path
                         )
 
-                    # Clean placeholder path if ID is missing
-                    if not image_public_id and hasattr(
-                        placeholder_image_obj, 'image'
-                    ):
-                        raw_path = str(placeholder_image_obj.image)
-                        image_public_id = re.sub(
-                            r'^(image/upload/)?(v\d+/)?', '', raw_path
-                            )
+                image_url_attr = getattr(
+                    placeholder_image_obj, 'get_image_url', None
+                    )
+                if callable(image_url_attr):
+                    image_url = image_url_attr()
 
-                    image_url_attr = getattr(
-                        placeholder_image_obj, 'get_image_url', None
-                        )
-                    if callable(image_url_attr):
-                        image_url = image_url_attr()
-
-            # Artist Data
-            artist_data = None
-            if hasattr(artwork, 'artist') and artwork.artist:
-                user = artwork.artist.user_profile.user
+        # Artist Data
+        artist_data = None
+        if hasattr(artwork, 'artist') and artwork.artist:
+            user_profile = getattr(artwork.artist, 'user_profile', None)
+            if user_profile:
+                user = user_profile.user
                 artist_data = {
                     'username': user.username,
                     'first_name': user.first_name,
                     'last_name': user.last_name,
-                    'full_name': f"{user.first_name} {user.last_name}".strip(),
-                }
-
-            # Truncated Description
-            full_desc = artwork.description
-            truncated_desc = truncatewords(full_desc, PLACEHOLDER_WORDS)
-
-            # Framing Condition Data
-            conditions = [
-                {
-                    'id': cond.id,
-                    'name': cond.condition_name,
-                    'friendly_name': cond.condition_friendly_name,
-                    'slug': cond.slug
-                }
-                for cond in getattr(artwork, 'prefetched_conditions', [])
-            ]
-
-            # Core Artwork Data
-            item = {
-                'id': artwork.id,
-                'name': artwork.name,
-                'artist': artist_data,
-                'full_description': full_desc,
-                'description': truncated_desc,
-                'price': round(float(artwork.price), 2),
-                'category': (
-                    artwork.category.name if artwork.category else None
+                    'full_name': (
+                        f"{user.first_name} {user.last_name}".strip()
                     ),
-                'selected_conditions': conditions,
-                'is_available': artwork.is_available,
-                'is_in_stock': artwork.is_in_stock,
-                'is_featured': artwork.is_featured,
-                'sku': artwork.sku,
-                'slug': artwork.slug,
-                'image_url': image_url,
-                'image_public_id': image_public_id,
-                'image_alt_text': image_alt_text,
-                'created_at': artwork.created_at.isoformat() if getattr(
-                    artwork, 'created_at', None) else None,
-                'updated_at': artwork.updated_at.isoformat() if getattr(
-                    artwork, 'updated_at', None) else None,
-                'quantity': artwork.quantity,
+                }
+
+        # Truncated Description
+        full_desc = artwork.description
+        truncated_desc = truncatewords(full_desc, PLACEHOLDER_WORDS)
+
+        # Framing Condition Data
+        conditions = [
+            {
+                'id': cond.id,
+                'name': cond.condition_name,
+                'friendly_name': cond.condition_friendly_name,
+                'slug': cond.slug
             }
-            cleaned_data.append(item)
-        return cleaned_data
+            for cond in getattr(artwork, 'prefetched_conditions', [])
+        ]
+
+        # Core Artwork Data
+        item = {
+            'id': artwork.id,
+            'name': artwork.name,
+            'artist': artist_data,
+            'full_description': full_desc,
+            'description': truncated_desc,
+            'price': round(float(artwork.price), 2),
+            'category': (
+                artwork.category.name if artwork.category else None
+                ),
+            'selected_conditions': conditions,
+            'is_available': artwork.is_available,
+            'is_in_stock': artwork.is_in_stock,
+            'is_featured': artwork.is_featured,
+            'sku': artwork.sku,
+            'slug': artwork.slug,
+            'image_url': image_url,
+            'image_public_id': image_public_id,
+            'image_alt_text': image_alt_text,
+            'created_at': artwork.created_at.isoformat() if getattr(
+                artwork, 'created_at', None) else None,
+            'updated_at': artwork.updated_at.isoformat() if getattr(
+                artwork, 'updated_at', None) else None,
+            'quantity': artwork.quantity,
+        }
+        cleaned_data.append(item)
+    return cleaned_data
 
 
 def get_placeholder_image_from_context(request):
@@ -289,7 +300,10 @@ class ArtworkListView(ListView):
 
         artworks_on_page = context['artworks']
         for artwork in artworks_on_page:
-            artwork.add_to_cart_form = AddToCartForm(artwork_id=artwork.id)
+            if artwork.is_available:
+                artwork.add_to_cart_form = AddToCartForm(artwork_id=artwork.id)
+            else:
+                artwork.add_to_cart_form = None
 
         placeholder = context.get('placeholder_image')
 
@@ -352,7 +366,7 @@ class ArtworkDetailView(DetailView):
             [artwork], placeholder
         )
 
-        artwork_data = serialized_data_list[0]
+        artwork_data = serialized_data_list[0] if serialized_data_list else {}
         context['artwork_data'] = artwork_data
 
         all_photos = artwork.photos.all()
@@ -422,13 +436,17 @@ class ArtworkDetailView(DetailView):
         if form.is_valid():
             framing_option = form.cleaned_data.get('framing_option')
 
-            # Retrieve or create the cart for the current session
-            session_id = request.session.session_key
-            if not session_id:
+            # Retrieve or create the cart, consistent with get_cart() used
+            # by checkout/dropdown views (user-linked for auth, session for anon)
+            if not request.session.session_key:
                 request.session.create()
-                session_id = request.session.session_key
 
-            cart, created = Cart.get_or_create_from_sessionid(session_id)
+            cart = get_cart(request)
+            if not cart:
+                # Anonymous user with no existing cart — create one
+                cart, _ = Cart.get_or_create_from_sessionid(
+                    request.session.session_key
+                )
 
             quantity = form.cleaned_data.get('quantity')
             notes = form.cleaned_data.get('notes', '')

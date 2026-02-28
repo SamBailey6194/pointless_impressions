@@ -89,6 +89,8 @@
 
   <body class="leading-normal tracking-normal min-h-screen flex flex-col">
 
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+
     {% comment %} Header Content Area {% endcomment %}
     <header class="fixed top-0 z-50 w-full">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 p-4">
@@ -97,7 +99,7 @@
     </header>
 
     {% comment %} Main Content Area {% endcomment %}
-    <main class="grow pt-24 md:pt-28 lg:pt-32">
+    <main id="main-content" class="grow pt-24 md:pt-28 lg:pt-32">
       {% comment %} Full Content Block for pages that need complete control {% endcomment %}
       {% block content %}
         
