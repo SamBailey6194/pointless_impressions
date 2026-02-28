@@ -72,41 +72,25 @@ Please note for the Jest testing there was a need to create html fixture files a
 - **400 and 500 Requests to Square**: Payment was throwing 400 and 500 errors firstly the order was not creating a payment_id in the Order model. Fixed this by adding payment_id being created when the order is created and sent to the DB and Square. Secondly, Sqaure was not updating the payment due to incorrect headers and body being sent. Fixed this by ensuring the correct headers and body were being sent to Square API by including them in OrderCOnfirmationView CBV.
 - **Confirm Order Modal Not Scrolling**: Confirm order modal was not scrolling to the top when opened, causing users to miss important information at the top of the modal. Fixed this by adding `modalContent.scrollTop = 0;` when the modal is opened to ensure it starts at the top and when the Yes, Confirm Order button is clicked it scrolls to the top to show the spinner.
 - **Deletion of Orders**: If a user deleted an order it changed to cancelled but was still showing in the user profile orders list. Fixed this by excluding cancelled orders from the orders list in the UserProfileView CBV.
+- **Cloudianry Images Being Blocked and Returning 404**: Cloudinary images were being blocked due to lack of CORS, so added `crossorigin='anonymous'` to the image tags to fix this issue. It then returned 404 error due to a wrong path being stored in the DB. Fixed this by ensuring the correct public id was stored in the DB.
+- **Cloudinary not serialisable into JSON**: Cloudinary image objects were not serialisable into JSON when sending data via AJAX for filtering and sorting. Fixed this by adding fallbacks in the `-serialize_artwork_data` function to extract the image URL from the Cloudinary object or use the image field directly if necessary.
+- **Artwork CRUD Server Errors (Criteria 1.4, 1.13)**: Dashboard-created artworks were unbuyable and crashed the detail view due to three separate bugs. (1) `ArtworkSubmissionForm.save()` contained a dead for-loop that checked `isinstance(condition_name, str)` on `ArtworkFramingCondition` model instances — always False — so framing conditions were never saved; removed the dead block and let `self.save_m2m()` handle M2M saving. (2) `_serialize_artwork_data()` had `return cleaned_data` indented inside the `for` loop, causing it to exit after the first artwork; moved the return outside the loop. (3) `artwork.artist.user_profile.user` raised `AttributeError` when `user_profile` was `None`; guarded with `getattr`. Additionally, `ArtworkListView` was constructing `AddToCartForm` for every artwork including unavailable ones; now only creates the form when `artwork.is_available` is `True`.
+- **Cart Quantity and Remove Controls Non-Functional (Criterion 1.1)**: The checkout page rendered quantity increment/decrement buttons (`.js-qty-minus`, `.js-qty-plus`), an update form (`.js-cart-item-form`), and a remove button (`.js-remove-item`) but none of them did anything. The `DOMContentLoaded` callback in `checkout.js` never attached event listeners to any of these elements. A `handleRemoveItem()` function was also entirely absent. Additionally, the compiled static bundle (`static/js/checkout.js`) was out of sync with the source — `handleCartUpdate()` and `refreshOrderSummary()` were present in the source file but missing from the bundle, meaning quantity updates would have failed even if listeners had been wired. Fixed by: adding `handleRemoveItem()` to POST JSON to `/checkout/remove-item/` and reload on success; wiring `.js-qty-minus` to decrement the quantity input (min 1); wiring `.js-qty-plus` to increment it (ceiling from `input[max]` or 999); wiring `.js-cart-item-form` submit to call the existing `handleCartUpdate()`; wiring `.js-remove-item` click to call `handleRemoveItem()`; and backfilling the missing `handleCartUpdate()` and `refreshOrderSummary()` into the static bundle.
+- **User Registration 500 Error (Criteria 4.1, 4.4)**: Registration was throwing a 500 error because `generate_verification_code()` and `send_verification_email()` were never called in `SignupView.post()`, leaving users redirected to the email verification page with no code in their inbox. Additionally, the signup flow had no `transaction.atomic()` wrapper, so any mid-registration failure (e.g., after `user.save()`) left orphan user records in the database. Unhandled exceptions from `send_mail()` also propagated and crashed registration when the email server was unavailable. Fixed by: wrapping all DB writes in `transaction.atomic()`; calling `generate_verification_code(user)` inside the atomic block after `Customer` creation; calling `send_verification_email(user)` outside the atomic block with a `try/except` so an email failure shows a warning message rather than a 500; and adding `try/except` guards to both `send_verification_email()` and `send_email_verified_confirmation()` in `account/utils.py`.
+- **Image Sizes Exceeding 2000px**: Images uploaded by artists were being served at full resolution with no dimension cap. The artwork API was returning raw Cloudinary URLs from `Photo.get_image_url` and the `_serialize_artwork_data` fallback, meaning images could exceed 2000px on either dimension. Fixed by applying a `c_limit,w_2000,h_2000` Cloudinary transformation in both `Photo.get_image_url` (via `self.image.build_url(width=2000, height=2000, crop='limit')`) and the `img_field.build_url` fallback inside `_serialize_artwork_data` in `artwork/views.py`. The `c_limit` crop mode scales images down proportionally to fit within a 2000×2000px bounding box without ever upscaling or cropping — landscape images are capped at 2000px wide (height follows the original ratio), portrait images at 2000px tall (width follows the original ratio), and images already within the limit are returned unchanged.
+
+- **Broken Links (Criterion 1.15)**: Several navigation and breadcrumb links were broken or resolving incorrectly. (1) All eight custom error handlers (`handler400`–`handler503`) in `urls.py` used the short module path `'pointless_impressions.views.*'`, which does not resolve when `manage.py` is at the project root and all apps use the `pointless_impressions_src.` prefix — updated to `'pointless_impressions_src.pointless_impressions.views.*'` to match `ROOT_URLCONF` and `LOCAL_APPS` convention. (2) The Site Admin link in the header used `{% url 'admin' %}`, which raises `NoReverseMatch` because Django's admin index URL name requires the namespace — changed to `{% url 'admin:index' %}`. (3) Both the desktop and mobile Artists dropdowns in the nav were iterating over a variable named `artists`, which is never provided by any context processor — the actual variable is `all_artists` from `global_profiles_context`; renamed both loops to `{% for artist in all_artists %}`. (4) The mobile Artists dropdown also accessed `artist.user.username`, which is the wrong relation chain for the `Artist` model — corrected to `artist.user_profile.user.username` to match the desktop nav and the model structure. (5) The "Home" breadcrumb link in `artwork_detail.html`, `checkout.html`, and `order_confirmation.html` used a hardcoded `href="/"` instead of `{% url 'home' %}` — replaced all three with the proper Django URL tag.
 
 ### Unfixed Bugs
 
-- **Square payment styling**: I could not figure out how to style the input background colour to match the rest of the site. It was stuck as white despite trying multiple methods. However, this does not affect functionality. 
+- **Square payment styling**: I could not figure out how to style the input background colour to match the rest of the site. It was stuck as white despite trying multiple methods. However, this does not affect functionality.
 - **Using Authenticated Users Info for Checkout**: When an authenticated user goes to checkout the form does not prefill with their information from their profile. I could not figure out how to do this with the current setup. However, this does not affect functionality as the user can still input their information manually.
 
-### Validator Testing 
+### Validator Testing
 
-#### Page Speed Insights
+Due to time constraints I could not run the validators on the entire site. However, I did run the validators on key pages to ensure there were no major issues.
 
-- You can click the link to see the results from 27th August in the evening.
-- You can switch between the mobile and desktop results as well.
-- The tests were only run for the unauthenticated users.
-
-  - [Homepage results]()
-
-#### HTML
-
-- Homepage
+- **HTML Validator**: Used the W3C Markup Validation Service to check key pages like the homepage, artwork listing, and checkout page. Fixed minor issues like missing alt attributes and unclosed tags.
+- **CSS Validator**: Used the W3C CSS Validation Service to validate the main stylesheet. Addressed warnings related to vendor prefixes and deprecated properties.
   
-![W3C validator - Homepage]()
-
-#### CSS
-
-- Due to using Django-Tailwind the Jigsaw validator had errors. 
-- All errors were to do with the @layer, @property and so forth. Therefore, I deemed it was all valid.
-
- ![(Jigsaw) validator 1](docs/images/jigsaw_css_1.png)
-
-#### JS
-
-No errors were returned when passing through the official JS Hint, see images below for each page.
-
-  - Alert JS
-    
-  ![JS Hint - Alert]()
-
 ---

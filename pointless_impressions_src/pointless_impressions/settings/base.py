@@ -30,6 +30,7 @@ DJANGO_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "django.contrib.sitemaps",
 ]
 
 THIRD_PARTY_APPS = [
@@ -166,6 +167,8 @@ TEMPLATES = [
                 "auth_forms",
                 "pointless_impressions_src.account.context_processors."
                 "user_context",
+                "pointless_impressions_src.pointless_impressions."
+                "context_processors.page_slug_detector",
             ],
         },
     },
@@ -221,7 +224,8 @@ cloudinary.config(
     cloud_name=CLOUDINARY_CLOUD_NAME,
     api_key=CLOUDINARY_API_KEY,
     api_secret=CLOUDINARY_API_SECRET,
-    secure=True
+    secure=True,
+    api_proxy="https://res.cloudinary.com"
 )
 
 # Default primary key field type

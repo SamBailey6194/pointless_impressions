@@ -33,7 +33,7 @@
                                 {% if result.model_name == 'artwork' %}
                                     {% comment %} Handle Artwork Images {% endcomment %}
                                     {% with image_to_render=item.main_photo|default:placeholder_image %}
-                                        {% cloudinary image_to_render.image format="webp" quality="auto" width=400 height=300 crop="fill" class="w-full h-64 object-cover" alt=image_to_render.alt_text_or_default %}
+                                        {% cloudinary image_to_render.image format="auto" quality="auto" width=400 height=300 crop="fill" class="w-full h-64 object-cover" alt=image_to_render.alt_text_or_default crossorigin="anonymous" %}
                                     {% endwith %}
                                 {% else %}
                                     {% comment %} Fallback for other models {% endcomment %}

@@ -13,27 +13,28 @@
       {% comment %} SEO Meta Tags {% endcomment %}
 
       {% comment %} Dynamic Meta Description based on page type {% endcomment %}
-      <meta name="description" content="{% if product %}{{ artwork.description|striptags|truncatechars:155 }}{% elif post %}{{ post.meta_description|striptags|truncatechars:155 }}{% elif page_slug == 'about' %}Learn about Pointless Impressions, our mission, values, and the artists we support.{% else %}Discover and buy unique Pointillism art online at Pointless Impressions. Explore curated pieces, artist stories, and art education.{% endif %}" />
+      <meta name="description" content="{% if artwork %}{{ artwork.description|striptags|truncatechars:155 }}{% elif post %}{{ post.meta_description|striptags|truncatechars:155 }}{% elif page_slug == 'about' %}Learn about Pointless Impressions, our mission, values, and the artists we support.{% else %}Discover and buy unique Pointillism art online at Pointless Impressions. Explore curated pieces, artist stories, and art education.{% endif %}" />
 
       {% comment %} Open Graph Tags {% endcomment %}
       <meta property="og:title" content="{% block og_title %}{% if artwork %}{{ artwork.name|truncatechars:200|striptags }} | Pointless Impressions{% elif post %}{{ post.title|striptags }} | Pointless Impressions{% elif page_slug == 'about' %}About Us | Pointless Impressions{% else %}Pointless Impressions – Unique Pointillism Art{% endif %}{% endblock %}" />
       <meta property="og:description" content="{% if artwork %}{{ artwork.description|striptags|truncatechars:155 }}{% elif post %}{{ post.meta_description|striptags|truncatechars:155 }}{% elif page_slug == 'about' %}Learn about Pointless Impressions, our mission, values, and the artists we support.{% else %}Discover and buy unique Pointillism art online at Pointless Impressions. Explore curated pieces, artist stories, and art education.{% endif %}" />
-      <meta property="og:type" content="website" />
+      <meta property="og:type" content="{% if artwork %}product{% elif post %}article{% else %}website{% endif %}" />
+      <meta property="og:url" content="{{ request.build_absolute_uri }}" />
       <meta property="og:site_name" content="Pointless Impressions" />
 
       {% comment %} Open Graph Image Block uses Cloudinary {% endcomment %}
       {% comment %}
       {% if artwork.main_photo %}
-          <meta property="og:image" content="{% cloudinary_url artwork.main_photo width=1200 height=630 crop='fill' format='auto' quality='auto' %}">
+          <meta property="og:image" content="{% cloudinary_url artwork.main_photo.image width=1200 height=630 crop='fill' format='auto' quality='auto' crossorigin='anonymous' %}">
       {% elif post.featured_image %}
-          <meta property="og:image" content="{% cloudinary_url post.featured_image width=1200 height=630 crop='fill' format='auto' quality='auto' %}">
+          <meta property="og:image" content="{% cloudinary_url post.featured_image.image width=1200 height=630 crop='fill' format='auto' quality='auto' crossorigin='anonymous' %}">
       {% elif site_logo %}
-          <meta property="og:image" content="{% cloudinary_url site_logo.image width=1200 height=630 crop='fill' format='auto' quality='auto' %}">
+          <meta property="og:image" content="{% cloudinary_url site_logo.image width=1200 height=630 crop='fill' format='auto' quality='auto' crossorigin='anonymous' %}">
       {% endif %}
       {% endcomment %}
 
       {% comment %} Robots Meta Tags {% endcomment %}
-      {% if page_slug == "login" or page_slug == "signup" or page_slug == "checkout" or page_slug == "account" or page_slug == "admin" %}
+      {% if page_slug in "login,signup,checkout,account,profiles,admin" %}
           <meta name="robots" content="noindex, nofollow">
           <meta name="googlebot" content="noindex, nofollow" />
       {% else %}
@@ -47,18 +48,18 @@
       {% comment %} Favicon {% endcomment %}
       {# Modern browsers with auto format (AVIF/WebP/PNG fallback) #}
       {% cloudinary_url site_logo_white_bg.image width=32 height=32 crop='fit' format='auto' quality='auto' as favicon_32 %}
-      <link rel="icon" type="image/png" sizes="32x32" href="{{ favicon_32 }}">
+      <link rel="icon" type="image/png" sizes="32x32" href="{{ favicon_32 }}" crossorigin="anonymous">
       
       {% cloudinary_url site_logo_white_bg.image width=16 height=16 crop='fit' format='auto' quality='auto' as favicon_16 %}
-      <link rel="icon" type="image/png" sizes="16x16" href="{{ favicon_16 }}">
+      <link rel="icon" type="image/png" sizes="16x16" href="{{ favicon_16 }}" crossorigin="anonymous">
       
       {# Apple Touch Icon #}
       {% cloudinary_url site_logo_white_bg.image width=180 height=180 crop='fit' format='auto' quality='auto' as apple_touch %}
-      <link rel="apple-touch-icon" href="{{ apple_touch }}">
+      <link rel="apple-touch-icon" href="{{ apple_touch }}" crossorigin="anonymous">
       
       {# Android Chrome #}
       {% cloudinary_url site_logo_white_bg.image width=192 height=192 crop='fit' format='auto' quality='auto' as android_192 %}
-      <link rel="icon" type="image/png" sizes="192x192" href="{{ android_192 }}">
+      <link rel="icon" type="image/png" sizes="192x192" href="{{ android_192 }}" crossorigin="anonymous">
     {% endblock %}
 
     {% block extra_meta %}
@@ -165,29 +166,32 @@
     {% comment %} Extra JavaScript Files {% endcomment %}
     {% block postloadjs %}
       <script>
-        // Accessing the Django settings directly
-        const IS_CLOUD_HOSTED = "{{ PRODUCTION }}" === "True";
-        const CLOUD_NAME = "{{ settings.CLOUDINARY_CLOUD_NAME|default:'' }}";
-        
-        // Set the base URL dynamically
-        const MEDIA_BASE_URL = IS_CLOUD_HOSTED 
-          ? `https://res.cloudinary.com/${CLOUD_NAME}/image/upload/`
-          : "{{ settings.MEDIA_URL }}";
+          // Accessing the Django settings directly
+          const IS_CLOUD_HOSTED = "{{ PRODUCTION }}" === "True";
+          const CLOUD_NAME = "{{ settings.CLOUDINARY_CLOUD_NAME|default:'' }}";
+          
+          // Set the base URL dynamically
+          const MEDIA_BASE_URL = IS_CLOUD_HOSTED 
+            ? `https://res.cloudinary.com/${CLOUD_NAME}/image/upload/`
+            : "{{ settings.MEDIA_URL }}";
 
-        // Global helper function (uses the base environment variables)
-        function getCloudinaryUrl(publicId, transformations) {
-            if (!IS_CLOUD_HOSTED || !publicId) {
-                // Fallback for local dev/missing ID
-                return `${MEDIA_BASE_URL}${publicId || 'placeholder.png'}`; 
-            }
-            
-            const tx = transformations || 'w_400,h_300,c_fill';
-            return `${MEDIA_BASE_URL}${tx},f_auto,q_auto/${publicId}`; 
-        }
+          // Global helper function (uses the base environment variables)
+          function getCloudinaryUrl(publicId, transformations) {
+              if (!IS_CLOUD_HOSTED || !publicId) {
+                  // Fallback for local dev/missing ID
+                  return `${MEDIA_BASE_URL}${publicId || 'placeholder.png'}`; 
+              }
+              let cleanId = publicId.replace('image/upload/', '');
+              cleanId = cleanId.replace(/^v\d+\//, ''); 
+              const tx = transformations || 'w_400,h_300,c_fill';
+              
+              // Construct the clean URL
+              return `${MEDIA_BASE_URL}${tx},f_auto,q_auto/${cleanId}`; 
+          }
 
-        // Define the Autocomplete URL
-        window.GLOBAL_URLS = window.GLOBAL_URLS || {}; 
-        window.GLOBAL_URLS.AUTOCOMPLETE_API = "{% url 'search:search_autocomplete' %}";
+          // Define the Autocomplete URL
+          window.GLOBAL_URLS = window.GLOBAL_URLS || {}; 
+          window.GLOBAL_URLS.AUTOCOMPLETE_API = "{% url 'search:search_autocomplete' %}";
       </script>
     {% endblock %}
   </body>

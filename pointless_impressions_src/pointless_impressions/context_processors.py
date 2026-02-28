@@ -72,3 +72,44 @@ def global_context(request):
         'placeholder_image': placeholder_image,
         'image_to_render': image_to_render,
     }
+
+
+def page_slug_detector(request):
+    """
+    Automatically determines the 'page_slug' based on the URL
+    namespace or name.
+
+    This prevents us from having to set context['page_slug'] in every view.
+    """
+    if not request.resolver_match:
+        return {'page_slug': ''}
+
+    namespace = request.resolver_match.namespace
+
+    url_name = request.resolver_match.url_name
+
+    if namespace == 'dashboard':
+        return {'page_slug': 'dashboard'}
+
+    elif namespace == 'search':
+        return {'page_slug': 'search'}
+
+    elif namespace == 'order':
+        return {'page_slug': 'order'}
+
+    elif namespace == 'cart':
+        return {'page_slug': 'checkout'}
+
+    elif namespace == 'profiles':
+        return {'page_slug': 'profiles'}
+
+    if url_name == 'login':
+        return {'page_slug': 'login'}
+
+    elif url_name == 'signup':
+        return {'page_slug': 'signup'}
+
+    elif url_name == 'health':
+        return {'page_slug': 'health'}
+
+    return {'page_slug': ''}

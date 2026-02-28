@@ -115,9 +115,14 @@ class Photo(models.Model):
 
     @property
     def get_image_url(self):
-        """Return the URL of the uploaded image."""
+        """Return the URL of the uploaded image, capped at 2000px per side."""
         if self.image:
-            return self.image.url
+            try:
+                return self.image.build_url(
+                    width=2000, height=2000, crop='limit'
+                )
+            except Exception:
+                return self.image.url
         return ''
 
     @property

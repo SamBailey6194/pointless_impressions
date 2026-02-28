@@ -9,7 +9,7 @@
     <div class="navbar-start">
       <a href="{% url 'home' %}" class="btn btn-ghost normal-case text-xl h-auto p-2">
         {% with image_to_render=site_logo %}
-          {% cloudinary image_to_render.image height=60 crop='fit' format='auto' quality='auto' alt=image_to_render.alt_text_or_default class="h-8 sm:h-10 md:h-12 w-auto" %}
+          {% cloudinary image_to_render.image height=60 crop='fit' format='webp' quality='auto' alt=image_to_render.alt_text_or_default class="h-8 sm:h-10 md:h-12 w-auto" crossorigin="anonymous" %}
         {% endwith %}
       </a>
     </div>
@@ -74,7 +74,7 @@
                       <i class="fa-solid fa-circle-chevron-down"></i>
                   </label>
                   <ul tabindex="0" class="menu menu-sm dropdown-content z-10 p-2 shadow-lg rounded-box w-52 ml-14">
-                      {% for artist in artists %}
+                      {% for artist in all_artists %}
                           <li>
                               <a href="{% url 'artwork:list' %}?artist={{ artist.user_profile.user.username }}" class="hover:bg-(--pointless-yellow)">
                                   {{ artist.user_profile.user.username|title }}
@@ -110,7 +110,7 @@
                   Display user's profile picture if logged in and has one 
                 {% endcomment %}
                 {% with profile_pic=request.user.user_profile.profile_picture %}
-                  {% cloudinary profile_pic.image format="webp" quality="auto" width=80 height=80 crop="fill" class="w-10 rounded-full" alt=profile_pic.alt_text_or_default %}
+                  {% cloudinary profile_pic.image format="auto" quality="auto" width=80 height=80 crop="fill" class="w-10 rounded-full" alt=profile_pic.alt_text_or_default %}
                 {% endwith %}
 
               {% else %}
@@ -130,7 +130,7 @@
                 {% comment %} Django Site Admin for Developers {% endcomment %}
                 {% if request.user.is_staff %}
                   <li>
-                    <a href="{% url 'admin' %}" class="hover:bg-(--pointless-yellow)">
+                    <a href="{% url 'admin:index' %}" class="hover:bg-(--pointless-yellow)">
                       <i class="fa-solid fa-shield-halved"></i> Site Admin (Dev)
                     </a>
                   </li>
@@ -166,11 +166,6 @@
                 <li>
                   <a href="{% url 'profiles:signup' %}" class="hover:bg-(--pointless-yellow)">
                     <i class="fa-solid fa-user-plus"></i> Sign Up
-                  </a>
-                </li>
-                <li>
-                  <a href="{% url 'profiles:artist_application' %}" class="hover:bg-(--pointless-yellow)">
-                    <i class="fa-solid fa-user-plus"></i> Artists: Apply Here
                   </a>
                 </li>
               {% endif %}
@@ -276,10 +271,10 @@
                   </a>
                 </li>
                 <ul tabindex="0">
-                {% for artist in artists %}
+                {% for artist in all_artists %}
                   <li>
-                    <a href="{% url 'artwork:list' %}?artist={{ artist.user.username }}">
-                      {{ artist.user.username|title }}
+                    <a href="{% url 'artwork:list' %}?artist={{ artist.user_profile.user.username }}">
+                      {{ artist.user_profile.user.username|title }}
                     </a>
                   </li>
                 {% endfor %}

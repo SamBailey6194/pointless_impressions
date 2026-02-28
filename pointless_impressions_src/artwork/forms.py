@@ -188,22 +188,6 @@ class ArtworkSubmissionForm(forms.ModelForm):
 
         if commit:
             artwork.save()
-
-            selected_conditions = self.cleaned_data.get('selected_conditions')
-
-            if selected_conditions:
-
-                for condition_name in selected_conditions:
-                    if condition_name and isinstance(
-                        condition_name, str
-                    ) and condition_name.strip():
-                        condition, created = (
-                            ArtworkFramingCondition.objects.get_or_create(
-                                condition_friendly_name=condition_name.strip()
-                            )
-                        )
-                        artwork.selected_conditions.add(condition)
-
             self.save_m2m()
 
         return artwork

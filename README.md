@@ -165,8 +165,6 @@ Some of these will be models rather than full pages.
 
 As you venture to look at the [Features](#features) you will notice some design choices, flow and relationships between the database tables were changed while the project was being made.
 
-![Responsive Image]()
-
 ---
 
 ## Features 
@@ -194,7 +192,7 @@ Due to the length of the testing section please see [Testing Markdown](docs/mark
 
 ## Deployment
 
-The app deployed via Heroku [here]() following the steps below:
+The app deployed via Heroku [here](https://pointless-impressions-c0e03a9cdc86.herokuapp.com/) following the steps below:
 
 1. **Ensure you run commands before committing**
 
@@ -527,9 +525,10 @@ The app deployed via Heroku [here]() following the steps below:
     ALLOWED_HOSTS=
     DEBUG=FALSE
     DJANGO_SECRET_KEY= 
-    DJANGO_DEBUG=False 
-    DJANGO_ALLOWED_HOSTS= 
+    DEBUG=False 
+    DOMAIN=
     DJANGO_SETTINGS_MODULE= 
+    DISABLE_COLLECTSTATIC=0
     STAGING/PRODUCTION_DB_URL= 
     EMAIL_BACKEND= 
     EMAIL_HOST= 

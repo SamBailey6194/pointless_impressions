@@ -7,7 +7,7 @@
             "asset_identifier": "pointless_impressions_logo",
             "title": "Pointless Impressions Logo",
             "description": "Main image for Pointless Impressions website.",
-            "image": "v1/pointless-impressions/site_assets/pointless_impressions_logo.png",
+            "image": "pointless-impressions/site_assets/pointless_impressions_logo",
             "alt_text": "Pointless Impressions logo",
             "uploaded_by": 1,
             "uploaded_at": "2025-10-31T00:00:00Z"
@@ -21,7 +21,7 @@
             "asset_identifier": "pointless_impressions_logo_white_bg",
             "title": "Pointless Impressions Logo White Background",
             "description": "Main image for Pointless Impressions website.",
-            "image": "v1/pointless-impressions/site_assets/pointless_impressions_logo_white_bg.png",
+            "image": "pointless-impressions/site_assets/pointless_impressions_logo_white_bg",
             "alt_text": "Pointless Impressions logo with white background",
             "uploaded_by": 1,
             "uploaded_at": "2025-10-31T00:00:00Z"
@@ -35,7 +35,7 @@
             "asset_identifier": "placeholder_image",
             "title": "Placeholder Image",
             "description": "Placeholder image for when no other image is available.",
-            "image": "v1/pointless-impressions/site_assets/noimage.png",
+            "image": "pointless-impressions/site_assets/noimage",
             "alt_text": "Placeholder image with camera icon",
             "uploaded_by": 1,
             "uploaded_at": "2025-10-31T00:00:00Z"
@@ -50,7 +50,7 @@
             "asset_identifier": null,
             "title": "City Icons 01 Framed",
             "description": "City Icons 01 Framed Artwork",
-            "image": "v1/pointless-impressions/artwork/city_icons_01_framed.png",
+            "image": "pointless-impressions/artwork/city_icons_01_framed",
             "alt_text": "City Icons 01 Framed Artwork",
             "uploaded_at": "2025-11-01T10:00:00Z",
             "uploaded_by": 7
@@ -65,7 +65,7 @@
             "asset_identifier": null,
             "title": "City Icons 01",
             "description": "City Icons 01 Artwork",
-            "image": "v1/pointless-impressions/artwork/city_icons_01.png",
+            "image": "pointless-impressions/artwork/city_icons_01",
             "alt_text": "City Icons 01 Artwork",
             "uploaded_at": "2025-11-01T11:00:00Z",
             "uploaded_by": 7
@@ -80,7 +80,7 @@
             "asset_identifier": null,
             "title": "City Icons 02 Framed",
             "description": "City Icons 02 Framed Artwork",
-            "image": "v1/pointless-impressions/artwork/city_icons_02_framed.png",
+            "image": "pointless-impressions/artwork/city_icons_02_framed",
             "alt_text": "City Icons 02 Framed Artwork",
             "uploaded_at": "2025-11-01T12:00:00Z",
             "uploaded_by": 7
@@ -95,7 +95,7 @@
             "asset_identifier": null,
             "title": "City Icons 02",
             "description": "City Icons 02 Artwork",
-            "image": "v1/pointless-impressions/artwork/city_icons_02.png",
+            "image": "pointless-impressions/artwork/city_icons_02",
             "alt_text": "City Icons 02 Artwork",
             "uploaded_at": "2025-11-01T13:00:00Z",
             "uploaded_by": 7
@@ -110,7 +110,7 @@
             "asset_identifier": null,
             "title": "City Icons 03 Framed",
             "description": "City Icons 03 Framed Artwork",
-            "image": "v1/pointless-impressions/artwork/city_icons_03_framed.png",
+            "image": "pointless-impressions/artwork/city_icons_03_framed",
             "alt_text": "City Icons 03 Framed Artwork",
             "uploaded_at": "2025-11-01T14:00:00Z",
             "uploaded_by": 7
@@ -125,7 +125,7 @@
             "asset_identifier": null,
             "title": "City Icons 03",
             "description": "City Icons 03 Artwork",
-            "image": "v1/pointless-impressions/artwork/city_icons_03.png",
+            "image": "pointless-impressions/artwork/city_icons_03",
             "alt_text": "City Icons 03 Artwork",
             "uploaded_at": "2025-11-01T15:00:00Z",
             "uploaded_by": 7
@@ -140,7 +140,7 @@
             "asset_identifier": null,
             "title": "City Icons 04 Framed",
             "description": "City Icons 04 Framed Artwork",
-            "image": "v1/pointless-impressions/artwork/city_icons_04_framed.png",
+            "image": "pointless-impressions/artwork/city_icons_04_framed",
             "alt_text": "City Icons 04 Framed Artwork",
             "uploaded_at": "2025-11-01T14:00:00Z",
             "uploaded_by": 7
@@ -155,7 +155,7 @@
             "asset_identifier": null,
             "title": "City Icons 04",
             "description": "City Icons 04 Artwork",
-            "image": "v1/pointless-impressions/artwork/city_icons_04.png",
+            "image": "pointless-impressions/artwork/city_icons_04",
             "alt_text": "City Icons 04 Artwork",
             "uploaded_at": "2025-11-01T15:00:00Z",
             "uploaded_by": 7
@@ -170,7 +170,7 @@
             "asset_identifier": null,
             "title": "City Icons 05 Framed",
             "description": "City Icons 05 Framed Artwork",
-            "image": "v1/pointless-impressions/artwork/city_icons_05_framed.png",
+            "image": "pointless-impressions/artwork/city_icons_05_framed",
             "alt_text": "City Icons 05 Framed Artwork",
             "uploaded_at": "2025-11-01T14:00:00Z",
             "uploaded_by": 7
@@ -185,7 +185,7 @@
             "asset_identifier": null,
             "title": "City Icons 05",
             "description": "City Icons 05 Artwork",
-            "image": "v1/pointless-impressions/artwork/city_icons_05.png",
+            "image": "pointless-impressions/artwork/city_icons_05",
             "alt_text": "City Icons 05 Artwork",
             "uploaded_at": "2025-11-01T15:00:00Z",
             "uploaded_by": 7
@@ -200,7 +200,7 @@
             "asset_identifier": null,
             "title": "City Modernity Framed",
             "description": "City Modernity Framed Artwork",
-            "image": "v1/pointless-impressions/artwork/city_modernity_01_framed.png",
+            "image": "pointless-impressions/artwork/city_modernity_01_framed",
             "alt_text": "City Modernity Framed Artwork",
             "uploaded_at": "2025-11-01T14:00:00Z",
             "uploaded_by": 7
@@ -215,7 +215,7 @@
             "asset_identifier": null,
             "title": "City Modernity",
             "description": "City Modernity Artwork",
-            "image": "v1/pointless-impressions/artwork/city_modernity_01.png",
+            "image": "pointless-impressions/artwork/city_modernity_01",
             "alt_text": "City Modernity Artwork",
             "uploaded_at": "2025-11-01T15:00:00Z",
             "uploaded_by": 7
@@ -230,7 +230,7 @@
             "asset_identifier": null,
             "title": "City Saints 01 Framed",
             "description": "City Saints 01 Framed Artwork",
-            "image": "v1/pointless-impressions/artwork/city_saints_01_framed.png",
+            "image": "pointless-impressions/artwork/city_saints_01_framed",
             "alt_text": "City Saints 01 Framed Artwork",
             "uploaded_at": "2025-11-01T14:00:00Z",
             "uploaded_by": 7
@@ -245,7 +245,7 @@
             "asset_identifier": null,
             "title": "City Saints 01",
             "description": "City Saints 01 Artwork",
-            "image": "v1/pointless-impressions/artwork/city_saints_01.png",
+            "image": "pointless-impressions/artwork/city_saints_01",
             "alt_text": "City Saints 01 Artwork",
             "uploaded_at": "2025-11-01T15:00:00Z",
             "uploaded_by": 7
@@ -260,7 +260,7 @@
             "asset_identifier": null,
             "title": "City Saints 02 Framed",
             "description": "City Saints 02 Framed Artwork",
-            "image": "v1/pointless-impressions/artwork/city_saints_02_framed.png",
+            "image": "pointless-impressions/artwork/city_saints_02_framed",
             "alt_text": "City Saints 02 Framed Artwork",
             "uploaded_at": "2025-11-01T14:00:00Z",
             "uploaded_by": 7
@@ -275,7 +275,7 @@
             "asset_identifier": null,
             "title": "City Saints 02",
             "description": "City Saints 02 Artwork",
-            "image": "v1/pointless-impressions/artwork/city_saints_02.png",
+            "image": "pointless-impressions/artwork/city_saints_02",
             "alt_text": "City Saints 02 Artwork",
             "uploaded_at": "2025-11-01T15:00:00Z",
             "uploaded_by": 7
@@ -290,7 +290,7 @@
             "asset_identifier": null,
             "title": "City The Buzz Framed",
             "description": "City The Buzz Framed Artwork",
-            "image": "v1/pointless-impressions/artwork/city_the_buzz_01_framed.png",
+            "image": "pointless-impressions/artwork/city_the_buzz_01_framed",
             "alt_text": "City The Buzz Framed Artwork",
             "uploaded_at": "2025-11-01T14:00:00Z",
             "uploaded_by": 7
@@ -305,7 +305,7 @@
             "asset_identifier": null,
             "title": "City The Buzz",
             "description": "City The Buzz Artwork",
-            "image": "v1/pointless-impressions/artwork/city_the_buzz_01.png",
+            "image": "pointless-impressions/artwork/city_the_buzz_01",
             "alt_text": "City The Buzz Artwork",
             "uploaded_at": "2025-11-01T15:00:00Z",
             "uploaded_by": 7
@@ -320,7 +320,7 @@
             "asset_identifier": null,
             "title": "Digital Abstract Frames",
             "description": "Digital Abstract Frames Artwork",
-            "image": "v1/pointless-impressions/artwork/digital_abstract_frames.png",
+            "image": "pointless-impressions/artwork/digital_abstract_frames",
             "alt_text": "Digital Abstract Frames Artwork",
             "uploaded_at": "2025-11-01T16:00:00Z",
             "uploaded_by": 7
@@ -335,7 +335,7 @@
             "asset_identifier": null,
             "title": "Digital Abstract",
             "description": "Digital Abstract Artwork",
-            "image": "v1/pointless-impressions/artwork/digital_abstract.png",
+            "image": "pointless-impressions/artwork/digital_abstract",
             "alt_text": "Digital Abstract Artwork",
             "uploaded_at": "2025-11-01T16:00:00Z",
             "uploaded_by": 7
@@ -350,7 +350,7 @@
             "asset_identifier": null,
             "title": "Digital Dotty Framed",
             "description": "Digital Dotty Framed Artwork",
-            "image": "v1/pointless-impressions/artwork/digital_dotty_framed.png",
+            "image": "pointless-impressions/artwork/digital_dotty_framed",
             "alt_text": "Digital Dotty Framed Artwork",
             "uploaded_at": "2025-11-01T16:00:00Z",
             "uploaded_by": 7
@@ -365,7 +365,7 @@
             "asset_identifier": null,
             "title": "Digital Dotty",
             "description": "Digital Dotty Artwork",
-            "image": "v1/pointless-impressions/artwork/digital_dotty.png",
+            "image": "pointless-impressions/artwork/digital_dotty",
             "alt_text": "Digital Dotty Artwork",
             "uploaded_at": "2025-11-01T16:00:00Z",
             "uploaded_by": 7
@@ -380,7 +380,7 @@
             "asset_identifier": null,
             "title": "Digital Mixing It Framed",
             "description": "Digital Mixing It Framed Artwork",
-            "image": "v1/pointless-impressions/artwork/digital_mixing_it_framed.png",
+            "image": "pointless-impressions/artwork/digital_mixing_it_framed",
             "alt_text": "Digital Mixing It Framed Artwork",
             "uploaded_at": "2025-11-01T16:00:00Z",
             "uploaded_by": 7
@@ -395,7 +395,7 @@
             "asset_identifier": null,
             "title": "Digital Mixing It",
             "description": "Digital Mixing It Artwork",
-            "image": "v1/pointless-impressions/artwork/digital_mixing_it.png",
+            "image": "pointless-impressions/artwork/digital_mixing_it",
             "alt_text": "Digital Mixing It Artwork",
             "uploaded_at": "2025-11-01T16:00:00Z",
             "uploaded_by": 7
@@ -410,7 +410,7 @@
             "asset_identifier": null,
             "title": "Digital Semis Framed",
             "description": "Digital Semis Framed Artwork",
-            "image": "v1/pointless-impressions/artwork/digital_semis_framed.png",
+            "image": "pointless-impressions/artwork/digital_semis_framed",
             "alt_text": "Digital Semis Framed Artwork",
             "uploaded_at": "2025-11-01T16:00:00Z",
             "uploaded_by": 7
@@ -425,7 +425,7 @@
             "asset_identifier": null,
             "title": "Digital Semis",
             "description": "Digital Semis Artwork",
-            "image": "v1/pointless-impressions/artwork/digital_semis.png",
+            "image": "pointless-impressions/artwork/digital_semis",
             "alt_text": "Digital Semis Artwork",
             "uploaded_at": "2025-11-01T16:00:00Z",
             "uploaded_by": 7
@@ -440,7 +440,7 @@
             "asset_identifier": null,
             "title": "Digital Trucking Framed",
             "description": "Digital Trucking Framed Artwork",
-            "image": "v1/pointless-impressions/artwork/digital_trucking_framed.png",
+            "image": "pointless-impressions/artwork/digital_trucking_framed",
             "alt_text": "Digital Trucking Framed Artwork",
             "uploaded_at": "2025-11-01T16:00:00Z",
             "uploaded_by": 7
@@ -455,7 +455,7 @@
             "asset_identifier": null,
             "title": "Digital Trucking",
             "description": "Digital Trucking Artwork",
-            "image": "v1/pointless-impressions/artwork/digital_trucking.png",
+            "image": "pointless-impressions/artwork/digital_trucking",
             "alt_text": "Digital Trucking Artwork",
             "uploaded_at": "2025-11-01T16:00:00Z",
             "uploaded_by": 7
@@ -470,7 +470,7 @@
             "asset_identifier": null,
             "title": "Digital Turrets Framed",
             "description": "Digital Turrets Framed Artwork",
-            "image": "v1/pointless-impressions/artwork/digital_turrets_framed.png",
+            "image": "pointless-impressions/artwork/digital_turrets_framed",
             "alt_text": "Digital Turrets Framed Artwork",
             "uploaded_at": "2025-11-01T16:00:00Z",
             "uploaded_by": 7
@@ -485,7 +485,7 @@
             "asset_identifier": null,
             "title": "Digital Turrets",
             "description": "Digital Turrets Artwork",
-            "image": "v1/pointless-impressions/artwork/digital_turrets.png",
+            "image": "pointless-impressions/artwork/digital_turrets",
             "alt_text": "Digital Turrets Artwork",
             "uploaded_at": "2025-11-01T16:00:00Z",
             "uploaded_by": 7
@@ -500,7 +500,7 @@
             "asset_identifier": null,
             "title": "Gardens Bending Grass 01 Framed",
             "description": "Gardens Bending Grass 01 Framed Artwork",
-            "image": "v1/pointless-impressions/artwork/gardens_bending_grass_01_framed.png",
+            "image": "pointless-impressions/artwork/gardens_bending_grass_01_framed",
             "alt_text": "Gardens Bending Grass 01 Framed Artwork",
             "uploaded_at": "2025-11-01T16:00:00Z",
             "uploaded_by": 7
@@ -515,7 +515,7 @@
             "asset_identifier": null,
             "title": "Gardens Bending Grass 01",
             "description": "Gardens Bending Grass 01 Artwork",
-            "image": "v1/pointless-impressions/artwork/gardens_bending_grass_01.png",
+            "image": "pointless-impressions/artwork/gardens_bending_grass_01",
             "alt_text": "Gardens Bending Grass 01 Artwork",
             "uploaded_at": "2025-11-01T16:00:00Z",
             "uploaded_by": 7
@@ -530,7 +530,7 @@
             "asset_identifier": null,
             "title": "Gardens Bending Grass 02 Framed",
             "description": "Gardens Bending Grass 02 Framed Artwork",
-            "image": "v1/pointless-impressions/artwork/gardens_bending_grass_02_framed.png",
+            "image": "pointless-impressions/artwork/gardens_bending_grass_02_framed",
             "alt_text": "Gardens Bending Grass 02 Framed Artwork",
             "uploaded_at": "2025-11-01T16:00:00Z",
             "uploaded_by": 7
@@ -545,7 +545,7 @@
             "asset_identifier": null,
             "title": "Gardens Bending Grass 02",
             "description": "Gardens Bending Grass 02 Artwork",
-            "image": "v1/pointless-impressions/artwork/gardens_bending_grass_02.png",
+            "image": "pointless-impressions/artwork/gardens_bending_grass_02",
             "alt_text": "Gardens Bending Grass 02 Artwork",
             "uploaded_at": "2025-11-01T16:00:00Z",
             "uploaded_by": 7
@@ -560,7 +560,7 @@
             "asset_identifier": null,
             "title": "Gardens The Hive Framed",
             "description": "Gardens The Hive Framed Artwork",
-            "image": "v1/pointless-impressions/artwork/gardens_the_hive_02_framed.png",
+            "image": "pointless-impressions/artwork/gardens_the_hive_02_framed",
             "alt_text": "Gardens The Hive Framed Artwork",
             "uploaded_at": "2025-11-01T16:00:00Z",
             "uploaded_by": 7
@@ -575,7 +575,7 @@
             "asset_identifier": null,
             "title": "Gardens The Hive",
             "description": "Gardens The Hive Artwork",
-            "image": "v1/pointless-impressions/artwork/gardens_the_hive_02.png",
+            "image": "pointless-impressions/artwork/gardens_the_hive_02",
             "alt_text": "Gardens The Hive Artwork",
             "uploaded_at": "2025-11-01T16:00:00Z",
             "uploaded_by": 7
@@ -590,7 +590,7 @@
             "asset_identifier": null,
             "title": "Gardens The Sunrise Framed",
             "description": "Gardens The Sunrise Framed Artwork",
-            "image": "v1/pointless-impressions/artwork/gardens_the_sunrise_01_framed.png",
+            "image": "pointless-impressions/artwork/gardens_the_sunrise_01_framed",
             "alt_text": "Gardens The Sunrise Framed Artwork",
             "uploaded_at": "2025-11-01T16:00:00Z",
             "uploaded_by": 7
@@ -605,7 +605,7 @@
             "asset_identifier": null,
             "title": "Gardens The Sunrise",
             "description": "Gardens The Sunrise Artwork",
-            "image": "v1/pointless-impressions/artwork/gardens_the_sunrise_01.png",
+            "image": "pointless-impressions/artwork/gardens_the_sunrise_01",
             "alt_text": "Gardens The Sunrise Artwork",
             "uploaded_at": "2025-11-01T16:00:00Z",
             "uploaded_by": 7
@@ -620,7 +620,7 @@
             "asset_identifier": null,
             "title": "Landscape Foreign Shores Chile Framed",
             "description": "Landscape Foreign Shores Chile Framed Artwork",
-            "image": "v1/pointless-impressions/artwork/landscape_foreign_shores_chile_01_framed.png",
+            "image": "pointless-impressions/artwork/landscape_foreign_shores_chile_01_framed",
             "alt_text": "Landscape Foreign Shores Chile Framed Artwork",
             "uploaded_at": "2025-11-01T16:00:00Z",
             "uploaded_by": 7
@@ -635,7 +635,7 @@
             "asset_identifier": null,
             "title": "Landscape Foreign Shores Chile",
             "description": "Landscape Foreign Shores Chile Artwork",
-            "image": "v1/pointless-impressions/artwork/landscape_foreign_shores_chile_01.png",
+            "image": "pointless-impressions/artwork/landscape_foreign_shores_chile_01",
             "alt_text": "Landscape Foreign Shores Chile Artwork",
             "uploaded_at": "2025-11-01T16:00:00Z",
             "uploaded_by": 7
@@ -650,7 +650,7 @@
             "asset_identifier": null,
             "title": "London Shard Of Glass Framed",
             "description": "London Shard Of Glass Framed Artwork",
-            "image": "v1/pointless-impressions/artwork/london_shard_of_glass_01_framed.png",
+            "image": "pointless-impressions/artwork/london_shard_of_glass_01_framed",
             "alt_text": "London Shard Of Glass Framed Artwork",
             "uploaded_at": "2025-11-01T16:00:00Z",
             "uploaded_by": 7
@@ -665,7 +665,7 @@
             "asset_identifier": null,
             "title": "London Shard Of Glass",
             "description": "London Shard Of Glass Artwork",
-            "image": "v1/pointless-impressions/artwork/london_shard_of_glass_01.png",
+            "image": "pointless-impressions/artwork/london_shard_of_glass_01",
             "alt_text": "London Shard Of Glass Artwork",
             "uploaded_at": "2025-11-01T16:00:00Z",
             "uploaded_by": 7
@@ -680,7 +680,7 @@
             "asset_identifier": null,
             "title": "Painting Autumn Reflections Framed",
             "description": "Painting Autumn Reflections Framed Artwork",
-            "image": "v1/pointless-impressions/artwork/painting_autumn_reflections_01_framed.png",
+            "image": "pointless-impressions/artwork/painting_autumn_reflections_01_framed",
             "alt_text": "Painting Autumn Reflections Framed Artwork",
             "uploaded_at": "2025-11-01T16:00:00Z",
             "uploaded_by": 7
@@ -695,7 +695,7 @@
             "asset_identifier": null,
             "title": "Painting Autumn Reflections",
             "description": "Painting Autumn Reflections Artwork",
-            "image": "v1/pointless-impressions/artwork/painting_autumn_reflections_01.png",
+            "image": "pointless-impressions/artwork/painting_autumn_reflections_01",
             "alt_text": "Painting Autumn Reflections Artwork",
             "uploaded_at": "2025-11-01T16:00:00Z",
             "uploaded_by": 7
@@ -710,7 +710,7 @@
             "asset_identifier": null,
             "title": "Painting Scottish Hills Framed",
             "description": "Painting Scottish Hills Framed Artwork",
-            "image": "v1/pointless-impressions/artwork/painting_scottish_hills_framed.png",
+            "image": "pointless-impressions/artwork/painting_scottish_hills_framed",
             "alt_text": "Painting Scottish Hills Framed Artwork",
             "uploaded_at": "2025-11-01T16:00:00Z",
             "uploaded_by": 7
@@ -725,7 +725,7 @@
             "asset_identifier": null,
             "title": "Painting Scottish Hills",
             "description": "Painting Scottish Hills Artwork",
-            "image": "v1/pointless-impressions/artwork/painting_scottish_hills.png",
+            "image": "pointless-impressions/artwork/painting_scottish_hills",
             "alt_text": "Painting Scottish Hills Artwork",
             "uploaded_at": "2025-11-01T16:00:00Z",
             "uploaded_by": 7
@@ -740,7 +740,7 @@
             "asset_identifier": null,
             "title": "Painting The Bear Framed",
             "description": "Painting The Bear Framed Artwork",
-            "image": "v1/pointless-impressions/artwork/painting_the_bear_framed.png",
+            "image": "pointless-impressions/artwork/painting_the_bear_framed",
             "alt_text": "Painting The Bear Framed Artwork",
             "uploaded_at": "2025-11-01T16:00:00Z",
             "uploaded_by": 7
@@ -755,7 +755,7 @@
             "asset_identifier": null,
             "title": "Painting The Bear",
             "description": "Painting The Bear Artwork",
-            "image": "v1/pointless-impressions/artwork/painting_the_bear.png",
+            "image": "pointless-impressions/artwork/painting_the_bear",
             "alt_text": "Painting The Bear Artwork",
             "uploaded_at": "2025-11-01T16:00:00Z",
             "uploaded_by": 7
@@ -770,7 +770,7 @@
             "asset_identifier": null,
             "title": "Painting The Elephant Framed",
             "description": "Painting The Elephant Framed Artwork",
-            "image": "v1/pointless-impressions/artwork/painting_the_elephant_01_framed.png",
+            "image": "pointless-impressions/artwork/painting_the_elephant_01_framed",
             "alt_text": "Painting The Elephant Framed Artwork",
             "uploaded_at": "2025-11-01T16:00:00Z",
             "uploaded_by": 7
@@ -785,7 +785,7 @@
             "asset_identifier": null,
             "title": "Painting The Elephant",
             "description": "Painting The Elephant Artwork",
-            "image": "v1/pointless-impressions/artwork/painting_the_elephant_01.png",
+            "image": "pointless-impressions/artwork/painting_the_elephant_01",
             "alt_text": "Painting The Elephant Artwork",
             "uploaded_at": "2025-11-01T16:00:00Z",
             "uploaded_by": 7
@@ -800,7 +800,7 @@
             "asset_identifier": null,
             "title": "Painting The Giraffe Framed",
             "description": "Painting The Giraffe Framed Artwork",
-            "image": "v1/pointless-impressions/artwork/painting_the_giraffe_framed.png",
+            "image": "pointless-impressions/artwork/painting_the_giraffe_framed",
             "alt_text": "Painting The Giraffe Framed Artwork",
             "uploaded_at": "2025-11-01T16:00:00Z",
             "uploaded_by": 7
@@ -815,7 +815,7 @@
             "asset_identifier": null,
             "title": "Painting The Giraffe",
             "description": "Painting The Giraffe Artwork",
-            "image": "v1/pointless-impressions/artwork/painting_the_giraffe.png",
+            "image": "pointless-impressions/artwork/painting_the_giraffe",
             "alt_text": "Painting The Giraffe Artwork",
             "uploaded_at": "2025-11-01T16:00:00Z",
             "uploaded_by": 7
@@ -830,7 +830,7 @@
             "asset_identifier": null,
             "title": "Painting The Lion Framed",
             "description": "Painting The Lion Framed Artwork",
-            "image": "v1/pointless-impressions/artwork/painting_the_lion_framed.png",
+            "image": "pointless-impressions/artwork/painting_the_lion_framed",
             "alt_text": "Painting The Lion Framed Artwork",
             "uploaded_at": "2025-11-01T16:00:00Z",
             "uploaded_by": 7
@@ -845,7 +845,7 @@
             "asset_identifier": null,
             "title": "Painting The Lion",
             "description": "Painting The Lion Artwork",
-            "image": "v1/pointless-impressions/artwork/painting_the_lion.png",
+            "image": "pointless-impressions/artwork/painting_the_lion",
             "alt_text": "Painting The Lion Artwork",
             "uploaded_at": "2025-11-01T16:00:00Z",
             "uploaded_by": 7
@@ -860,7 +860,7 @@
             "asset_identifier": null,
             "title": "Painting The Rabbit Framed",
             "description": "Painting The Rabbit Framed Artwork",
-            "image": "v1/pointless-impressions/artwork/painting_the_rabbit_framed.png",
+            "image": "pointless-impressions/artwork/painting_the_rabbit_framed",
             "alt_text": "Painting The Rabbit Framed Artwork",
             "uploaded_at": "2025-11-01T16:00:00Z",
             "uploaded_by": 7
@@ -875,7 +875,7 @@
             "asset_identifier": null,
             "title": "Painting The Rabbit",
             "description": "Painting The Rabbit Artwork",
-            "image": "v1/pointless-impressions/artwork/painting_the_rabbit.png",
+            "image": "pointless-impressions/artwork/painting_the_rabbit",
             "alt_text": "Painting The Rabbit Artwork",
             "uploaded_at": "2025-11-01T16:00:00Z",
             "uploaded_by": 7
@@ -890,7 +890,7 @@
             "asset_identifier": null,
             "title": "Painting The Rhino Framed",
             "description": "Painting The Rhino Framed Artwork",
-            "image": "v1/pointless-impressions/artwork/painting_the_rhino_framed.png",
+            "image": "pointless-impressions/artwork/painting_the_rhino_framed",
             "alt_text": "Painting The Rhino Framed Artwork",
             "uploaded_at": "2025-11-01T16:00:00Z",
             "uploaded_by": 7
@@ -905,7 +905,7 @@
             "asset_identifier": null,
             "title": "Painting The Rhino",
             "description": "Painting The Rhino Artwork",
-            "image": "v1/pointless-impressions/artwork/painting_the_rhino.png",
+            "image": "pointless-impressions/artwork/painting_the_rhino",
             "alt_text": "Painting The Rhino Artwork",
             "uploaded_at": "2025-11-01T16:00:00Z",
             "uploaded_by": 7
@@ -920,7 +920,7 @@
             "asset_identifier": null,
             "title": "Pointillism Always A Child 01 Framed",
             "description": "Pointillism Always A Child 01 Framed Artwork",
-            "image": "v1/pointless-impressions/artwork/pointillism_always_a_child_01_framed.png",
+            "image": "pointless-impressions/artwork/pointillism_always_a_child_01_framed",
             "alt_text": "Pointillism Always A Child 01 Framed Artwork",
             "uploaded_at": "2025-11-01T16:00:00Z",
             "uploaded_by": 7
@@ -935,7 +935,7 @@
             "asset_identifier": null,
             "title": "Pointillism Always A Child 01",
             "description": "Pointillism Always A Child 01 Artwork",
-            "image": "v1/pointless-impressions/artwork/pointillism_always_a_child_01.png",
+            "image": "pointless-impressions/artwork/pointillism_always_a_child_01",
             "alt_text": "Pointillism Always A Child 01 Artwork",
             "uploaded_at": "2025-11-01T16:00:00Z",
             "uploaded_by": 7
@@ -950,7 +950,7 @@
             "asset_identifier": null,
             "title": "Pointillism Always A Child 02 Framed",
             "description": "Pointillism Always A Child 02 Framed Artwork",
-            "image": "v1/pointless-impressions/artwork/pointillism_always_a_child_02_framed.png",
+            "image": "pointless-impressions/artwork/pointillism_always_a_child_02_framed",
             "alt_text": "Pointillism Always A Child 02 Framed Artwork",
             "uploaded_at": "2025-11-01T16:00:00Z",
             "uploaded_by": 7
@@ -965,7 +965,7 @@
             "asset_identifier": null,
             "title": "Pointillism Always A Child 02",
             "description": "Pointillism Always A Child 02 Artwork",
-            "image": "v1/pointless-impressions/artwork/pointillism_always_a_child_02.png",
+            "image": "pointless-impressions/artwork/pointillism_always_a_child_02",
             "alt_text": "Pointillism Always A Child 02 Artwork",
             "uploaded_at": "2025-11-01T16:00:00Z",
             "uploaded_by": 7
@@ -980,7 +980,7 @@
             "asset_identifier": null,
             "title": "Pointillism Always A Child 03 Framed",
             "description": "Pointillism Always A Child 03 Framed Artwork",
-            "image": "v1/pointless-impressions/artwork/pointillism_always_a_child_03_framed.png",
+            "image": "pointless-impressions/artwork/pointillism_always_a_child_03_framed",
             "alt_text": "Pointillism Always A Child 03 Framed Artwork",
             "uploaded_at": "2025-11-01T16:00:00Z",
             "uploaded_by": 7
@@ -995,7 +995,7 @@
             "asset_identifier": null,
             "title": "Pointillism Always A Child 03",
             "description": "Pointillism Always A Child 03 Artwork",
-            "image": "v1/pointless-impressions/artwork/pointillism_always_a_child_03.png",
+            "image": "pointless-impressions/artwork/pointillism_always_a_child_03",
             "alt_text": "Pointillism Always A Child 03 Artwork",
             "uploaded_at": "2025-11-01T16:00:00Z",
             "uploaded_by": 7
@@ -1010,7 +1010,7 @@
             "asset_identifier": null,
             "title": "Pointillism Always A Child 04 Framed",
             "description": "Pointillism Always A Child 04 Framed Artwork",
-            "image": "v1/pointless-impressions/artwork/pointillism_always_a_child_04_framed.png",
+            "image": "pointless-impressions/artwork/pointillism_always_a_child_04_framed",
             "alt_text": "Pointillism Always A Child 04 Framed Artwork",
             "uploaded_at": "2025-11-01T16:00:00Z",
             "uploaded_by": 7
@@ -1025,7 +1025,7 @@
             "asset_identifier": null,
             "title": "Pointillism Always A Child 04",
             "description": "Pointillism Always A Child 04 Artwork",
-            "image": "v1/pointless-impressions/artwork/pointillism_always_a_child_04.png",
+            "image": "pointless-impressions/artwork/pointillism_always_a_child_04",
             "alt_text": "Pointillism Always A Child 04 Artwork",
             "uploaded_at": "2025-11-01T16:00:00Z",
             "uploaded_by": 7
@@ -1040,7 +1040,7 @@
             "asset_identifier": null,
             "title": "Pointillism Always A Child 05 Framed",
             "description": "Pointillism Always A Child 05 Framed Artwork",
-            "image": "v1/pointless-impressions/artwork/pointillism_always_a_child_05_framed.png",
+            "image": "pointless-impressions/artwork/pointillism_always_a_child_05_framed",
             "alt_text": "Pointillism Always A Child 05 Framed Artwork",
             "uploaded_at": "2025-11-01T16:00:00Z",
             "uploaded_by": 7
@@ -1055,7 +1055,7 @@
             "asset_identifier": null,
             "title": "Pointillism Always A Child 05",
             "description": "Pointillism Always A Child 05 Artwork",
-            "image": "v1/pointless-impressions/artwork/pointillism_always_a_child_05.png",
+            "image": "pointless-impressions/artwork/pointillism_always_a_child_05",
             "alt_text": "Pointillism Always A Child 05 Artwork",
             "uploaded_at": "2025-11-01T16:00:00Z",
             "uploaded_by": 7
@@ -1070,7 +1070,7 @@
             "asset_identifier": null,
             "title": "Pointillism An Icon Framed",
             "description": "Pointillism An Icon Framed Artwork",
-            "image": "v1/pointless-impressions/artwork/pointillism_an_icon_01_framed.png",
+            "image": "pointless-impressions/artwork/pointillism_an_icon_01_framed",
             "alt_text": "Pointillism An Icon Framed Artwork",
             "uploaded_at": "2025-11-01T16:00:00Z",
             "uploaded_by": 7
@@ -1085,7 +1085,7 @@
             "asset_identifier": null,
             "title": "Pointillism An Icon",
             "description": "Pointillism An Icon Artwork",
-            "image": "v1/pointless-impressions/artwork/pointillism_an_icon_01.png",
+            "image": "pointless-impressions/artwork/pointillism_an_icon_01",
             "alt_text": "Pointillism An Icon Artwork",
             "uploaded_at": "2025-11-01T16:00:00Z",
             "uploaded_by": 7
@@ -1100,7 +1100,7 @@
             "asset_identifier": null,
             "title": "Pointillism The Beauty Of Genesis 01 Framed",
             "description": "Pointillism The Beauty Of Genesis 01 Framed Artwork",
-            "image": "v1/pointless-impressions/artwork/pointillism_the_beauty_of_genesis_01_framed.png",
+            "image": "pointless-impressions/artwork/pointillism_the_beauty_of_genesis_01_framed",
             "alt_text": "Pointillism The Beauty Of Genesis 01 Framed Artwork",
             "uploaded_at": "2025-11-01T16:00:00Z",
             "uploaded_by": 7
@@ -1115,7 +1115,7 @@
             "asset_identifier": null,
             "title": "Pointillism The Beauty Of Genesis 01",
             "description": "Pointillism The Beauty Of Genesis 01 Artwork",
-            "image": "v1/pointless-impressions/artwork/pointillism_the_beauty_of_genesis_01.png",
+            "image": "pointless-impressions/artwork/pointillism_the_beauty_of_genesis_01",
             "alt_text": "Pointillism The Beauty Of Genesis 01 Artwork",
             "uploaded_at": "2025-11-01T16:00:00Z",
             "uploaded_by": 7
@@ -1130,7 +1130,7 @@
             "asset_identifier": null,
             "title": "Pointillism The Beauty Of Genesis 02 Framed",
             "description": "Pointillism The Beauty Of Genesis 02 Framed Artwork",
-            "image": "v1/pointless-impressions/artwork/pointillism_the_beauty_of_genesis_02_framed.png",
+            "image": "pointless-impressions/artwork/pointillism_the_beauty_of_genesis_02_framed",
             "alt_text": "Pointillism The Beauty Of Genesis 02 Framed Artwork",
             "uploaded_at": "2025-11-01T16:00:00Z",
             "uploaded_by": 7
@@ -1145,7 +1145,7 @@
             "asset_identifier": null,
             "title": "Pointillism The Beauty Of Genesis 02",
             "description": "Pointillism The Beauty Of Genesis 02 Artwork",
-            "image": "v1/pointless-impressions/artwork/pointillism_the_beauty_of_genesis_02.png",
+            "image": "pointless-impressions/artwork/pointillism_the_beauty_of_genesis_02",
             "alt_text": "Pointillism The Beauty Of Genesis 02 Artwork",
             "uploaded_at": "2025-11-01T16:00:00Z",
             "uploaded_by": 7
@@ -1160,7 +1160,7 @@
             "asset_identifier": null,
             "title": "Pointillism The Dog 01 Framed",
             "description": "Pointillism The Dog 01 Framed Artwork",
-            "image": "v1/pointless-impressions/artwork/pointillism_the_dog_01_framed.png",
+            "image": "pointless-impressions/artwork/pointillism_the_dog_01_framed",
             "alt_text": "Pointillism The Dog 01 Framed Artwork",
             "uploaded_at": "2025-11-01T16:00:00Z",
             "uploaded_by": 7
@@ -1175,7 +1175,7 @@
             "asset_identifier": null,
             "title": "Pointillism The Dog 01",
             "description": "Pointillism The Dog 01 Artwork",
-            "image": "v1/pointless-impressions/artwork/pointillism_the_dog_01.png",
+            "image": "pointless-impressions/artwork/pointillism_the_dog_01",
             "alt_text": "Pointillism The Dog 01 Artwork",
             "uploaded_at": "2025-11-01T16:00:00Z",
             "uploaded_by": 7
@@ -1190,7 +1190,7 @@
             "asset_identifier": null,
             "title": "Pointillism The Dog 02 Framed",
             "description": "Pointillism The Dog 02 Framed Artwork",
-            "image": "v1/pointless-impressions/artwork/pointillism_the_dog_02_framed.png",
+            "image": "pointless-impressions/artwork/pointillism_the_dog_02_framed",
             "alt_text": "Pointillism The Dog 02 Framed Artwork",
             "uploaded_at": "2025-11-01T16:00:00Z",
             "uploaded_by": 7
@@ -1205,7 +1205,7 @@
             "asset_identifier": null,
             "title": "Pointillism The Dog 02",
             "description": "Pointillism The Dog 02 Artwork",
-            "image": "v1/pointless-impressions/artwork/pointillism_the_dog_02.png",
+            "image": "pointless-impressions/artwork/pointillism_the_dog_02",
             "alt_text": "Pointillism The Dog 02 Artwork",
             "uploaded_at": "2025-11-01T16:00:00Z",
             "uploaded_by": 7
@@ -1220,7 +1220,7 @@
             "asset_identifier": null,
             "title": "Resurrection Engulfed In The Flames Framed",
             "description": "Resurrection Engulfed In The Flames Framed Artwork",
-            "image": "v1/pointless-impressions/artwork/resurrection_engulfed_in_the_flames_framed.png",
+            "image": "pointless-impressions/artwork/resurrection_engulfed_in_the_flames_framed",
             "alt_text": "Resurrection Engulfed In The Flames Framed Artwork",
             "uploaded_at": "2025-11-01T16:00:00Z",
             "uploaded_by": 7
@@ -1235,7 +1235,7 @@
             "asset_identifier": null,
             "title": "Resurrection Engulfed In The Flames",
             "description": "Resurrection Engulfed In The Flames Artwork",
-            "image": "v1/pointless-impressions/artwork/resurrection_engulfed_in_the_flames.png",
+            "image": "pointless-impressions/artwork/resurrection_engulfed_in_the_flames",
             "alt_text": "Resurrection Engulfed In The Flames Artwork",
             "uploaded_at": "2025-11-01T16:00:00Z",
             "uploaded_by": 7
@@ -1250,7 +1250,7 @@
             "asset_identifier": null,
             "title": "Resurrection Surrender To The Flames Framed",
             "description": "Resurrection Surrender To The Flames Framed Artwork",
-            "image": "v1/pointless-impressions/artwork/resurrection_surrender_to_the_flames_framed.png",
+            "image": "pointless-impressions/artwork/resurrection_surrender_to_the_flames_framed",
             "alt_text": "Resurrection Surrender To The Flames Framed Artwork",
             "uploaded_at": "2025-11-01T16:00:00Z",
             "uploaded_by": 7
@@ -1265,7 +1265,7 @@
             "asset_identifier": null,
             "title": "Resurrection Surrender To The Flames",
             "description": "Resurrection Surrender To The Flames Artwork",
-            "image": "v1/pointless-impressions/artwork/resurrection_surrender_to_the_flames.png",
+            "image": "pointless-impressions/artwork/resurrection_surrender_to_the_flames",
             "alt_text": "Resurrection Surrender To The Flames Artwork",
             "uploaded_at": "2025-11-01T16:00:00Z",
             "uploaded_by": 7
@@ -1280,7 +1280,7 @@
             "asset_identifier": null,
             "title": "Resurrection The Fire Of Purity Framed",
             "description": "Resurrection The Fire Of Purity Framed Artwork",
-            "image": "v1/pointless-impressions/artwork/resurrection_the_fire_of_purity_framed.png",
+            "image": "pointless-impressions/artwork/resurrection_the_fire_of_purity_framed",
             "alt_text": "Resurrection The Fire Of Purity Framed Artwork",
             "uploaded_at": "2025-11-01T16:00:00Z",
             "uploaded_by": 7
@@ -1295,7 +1295,7 @@
             "asset_identifier": null,
             "title": "Resurrection The Fire Of Purity",
             "description": "Resurrection The Fire Of Purity Artwork",
-            "image": "v1/pointless-impressions/artwork/resurrection_the_fire_of_purity.png",
+            "image": "pointless-impressions/artwork/resurrection_the_fire_of_purity",
             "alt_text": "Resurrection The Fire Of Purity Artwork",
             "uploaded_at": "2025-11-01T16:00:00Z",
             "uploaded_by": 7
@@ -1310,7 +1310,7 @@
             "asset_identifier": null,
             "title": "Seascape Mists Of Time Framed",
             "description": "Seascape Mists Of Time Framed Artwork",
-            "image": "v1/pointless-impressions/artwork/seascape_mists_of_time_01_framed.png",
+            "image": "pointless-impressions/artwork/seascape_mists_of_time_01_framed",
             "alt_text": "Seascape Mists Of Time Framed Artwork",
             "uploaded_at": "2025-11-01T16:00:00Z",
             "uploaded_by": 7
@@ -1325,7 +1325,7 @@
             "asset_identifier": null,
             "title": "Seascape Mists Of Time",
             "description": "Seascape Mists Of Time Artwork",
-            "image": "v1/pointless-impressions/artwork/seascape_mists_of_time_01.png",
+            "image": "pointless-impressions/artwork/seascape_mists_of_time_01",
             "alt_text": "Seascape Mists Of Time Artwork",
             "uploaded_at": "2025-11-01T16:00:00Z",
             "uploaded_by": 7
@@ -1340,7 +1340,7 @@
             "asset_identifier": null,
             "title": "Seascape Sentry Duty Framed",
             "description": "Seascape Sentry Duty Framed Artwork",
-            "image": "v1/pointless-impressions/artwork/seascape_sentry_duty_01_framed.png",
+            "image": "pointless-impressions/artwork/seascape_sentry_duty_01_framed",
             "alt_text": "Seascape Sentry Duty Framed Artwork",
             "uploaded_at": "2025-11-01T16:00:00Z",
             "uploaded_by": 7
@@ -1355,7 +1355,7 @@
             "asset_identifier": null,
             "title": "Seascape Sentry Duty",
             "description": "Seascape Sentry Duty Artwork",
-            "image": "v1/pointless-impressions/artwork/seascape_sentry_duty_01.png",
+            "image": "pointless-impressions/artwork/seascape_sentry_duty_01",
             "alt_text": "Seascape Sentry Duty Artwork",
             "uploaded_at": "2025-11-01T16:00:00Z",
             "uploaded_by": 7
@@ -1370,7 +1370,7 @@
             "asset_identifier": null,
             "title": "Seascape The Beginning Framed",
             "description": "Seascape The Beginning Framed Artwork",
-            "image": "v1/pointless-impressions/artwork/seascape_the_beginning_01_framed.png",
+            "image": "pointless-impressions/artwork/seascape_the_beginning_01_framed",
             "alt_text": "Seascape The Beginning Framed Artwork",
             "uploaded_at": "2025-11-01T16:00:00Z",
             "uploaded_by": 7
@@ -1385,7 +1385,7 @@
             "asset_identifier": null,
             "title": "Seascape The Beginning",
             "description": "Seascape The Beginning Artwork",
-            "image": "v1/pointless-impressions/artwork/seascape_the_beginning_01.png",
+            "image": "pointless-impressions/artwork/seascape_the_beginning_01",
             "alt_text": "Seascape The Beginning Artwork",
             "uploaded_at": "2025-11-01T16:00:00Z",
             "uploaded_by": 7
@@ -1400,7 +1400,7 @@
             "asset_identifier": null,
             "title": "Seascape The Landmark Framed",
             "description": "Seascape The Landmark Framed Artwork",
-            "image": "v1/pointless-impressions/artwork/seascape_the_landmark_01_framed.png",
+            "image": "pointless-impressions/artwork/seascape_the_landmark_01_framed",
             "alt_text": "Seascape The Landmark Framed Artwork",
             "uploaded_at": "2025-11-01T16:00:00Z",
             "uploaded_by": 7
@@ -1415,7 +1415,7 @@
             "asset_identifier": null,
             "title": "Seascape The Landmark",
             "description": "Seascape The Landmark Artwork",
-            "image": "v1/pointless-impressions/artwork/seascape_the_landmark_01.png",
+            "image": "pointless-impressions/artwork/seascape_the_landmark_01",
             "alt_text": "Seascape The Landmark Artwork",
             "uploaded_at": "2025-11-01T16:00:00Z",
             "uploaded_by": 7
@@ -1430,7 +1430,7 @@
             "asset_identifier": null,
             "title": "Seascape Tides Out Framed",
             "description": "Seascape Tides Out Framed Artwork",
-            "image": "v1/pointless-impressions/artwork/seascape_tides_out_01_framed.png",
+            "image": "pointless-impressions/artwork/seascape_tides_out_01_framed",
             "alt_text": "Seascape Tides Out Framed Artwork",
             "uploaded_at": "2025-11-01T16:00:00Z",
             "uploaded_by": 7
@@ -1445,7 +1445,7 @@
             "asset_identifier": null,
             "title": "Seascape Tides Out",
             "description": "Seascape Tides Out Artwork",
-            "image": "v1/pointless-impressions/artwork/seascape_tides_out_01.png",
+            "image": "pointless-impressions/artwork/seascape_tides_out_01",
             "alt_text": "Seascape Tides Out Artwork",
             "uploaded_at": "2025-11-01T16:00:00Z",
             "uploaded_by": 7
@@ -1460,7 +1460,7 @@
             "asset_identifier": null,
             "title": "Statue Absence Frames",
             "description": "Statue Absence Frames Artwork",
-            "image": "v1/pointless-impressions/artwork/statue_absence_frames.png",
+            "image": "pointless-impressions/artwork/statue_absence_frames",
             "alt_text": "Statue Absence Frames Artwork",
             "uploaded_at": "2025-11-01T16:00:00Z",
             "uploaded_by": 7
@@ -1475,7 +1475,7 @@
             "asset_identifier": null,
             "title": "Statue Absence",
             "description": "Statue Absence Artwork",
-            "image": "v1/pointless-impressions/artwork/statue_absence.png",
+            "image": "pointless-impressions/artwork/statue_absence",
             "alt_text": "Statue Absence Artwork",
             "uploaded_at": "2025-11-01T16:00:00Z",
             "uploaded_by": 7
@@ -1490,7 +1490,7 @@
             "asset_identifier": null,
             "title": "Statue Angel Descends 01 Framed",
             "description": "Statue Angel Descends 01 Framed Artwork",
-            "image": "v1/pointless-impressions/artwork/statue_angel_descends_01_framed.png",
+            "image": "pointless-impressions/artwork/statue_angel_descends_01_framed",
             "alt_text": "Statue Angel Descends 01 Framed Artwork",
             "uploaded_at": "2025-11-01T16:00:00Z",
             "uploaded_by": 7
@@ -1505,7 +1505,7 @@
             "asset_identifier": null,
             "title": "Statue Angel Descends 01",
             "description": "Statue Angel Descends 01 Artwork",
-            "image": "v1/pointless-impressions/artwork/statue_angel_descends_01.png",
+            "image": "pointless-impressions/artwork/statue_angel_descends_01",
             "alt_text": "Statue Angel Descends 01 Artwork",
             "uploaded_at": "2025-11-01T16:00:00Z",
             "uploaded_by": 7
@@ -1520,7 +1520,7 @@
             "asset_identifier": null,
             "title": "Statue Angel Descends 02 Framed",
             "description": "Statue Angel Descends 02 Framed Artwork",
-            "image": "v1/pointless-impressions/artwork/statue_angel_descends_02_framed.png",
+            "image": "pointless-impressions/artwork/statue_angel_descends_02_framed",
             "alt_text": "Statue Angel Descends 02 Framed Artwork",
             "uploaded_at": "2025-11-01T16:00:00Z",
             "uploaded_by": 7
@@ -1535,7 +1535,7 @@
             "asset_identifier": null,
             "title": "Statue Angel Descends 02",
             "description": "Statue Angel Descends 02 Artwork",
-            "image": "v1/pointless-impressions/artwork/statue_angel_descends_02.png",
+            "image": "pointless-impressions/artwork/statue_angel_descends_02",
             "alt_text": "Statue Angel Descends 02 Artwork",
             "uploaded_at": "2025-11-01T16:00:00Z",
             "uploaded_by": 7
@@ -1550,7 +1550,7 @@
             "asset_identifier": null,
             "title": "Statue Angel Descends 03 Framed",
             "description": "Statue Angel Descends 03 Framed Artwork",
-            "image": "v1/pointless-impressions/artwork/statue_angel_descends_03_framed.png",
+            "image": "pointless-impressions/artwork/statue_angel_descends_03_framed",
             "alt_text": "Statue Angel Descends 03 Framed Artwork",
             "uploaded_at": "2025-11-01T16:00:00Z",
             "uploaded_by": 7
@@ -1565,7 +1565,7 @@
             "asset_identifier": null,
             "title": "Statue Angel Descends 03",
             "description": "Statue Angel Descends 03 Artwork",
-            "image": "v1/pointless-impressions/artwork/statue_angel_descends_03.png",
+            "image": "pointless-impressions/artwork/statue_angel_descends_03",
             "alt_text": "Statue Angel Descends 03 Artwork",
             "uploaded_at": "2025-11-01T16:00:00Z",
             "uploaded_by": 7
@@ -1580,7 +1580,7 @@
             "asset_identifier": null,
             "title": "Statue Angel Descends 04 Framed",
             "description": "Statue Angel Descends 04 Framed Artwork",
-            "image": "v1/pointless-impressions/artwork/statue_angel_descends_04_framed.png",
+            "image": "pointless-impressions/artwork/statue_angel_descends_04_framed",
             "alt_text": "Statue Angel Descends 04 Framed Artwork",
             "uploaded_at": "2025-11-01T16:00:00Z",
             "uploaded_by": 7
@@ -1595,7 +1595,7 @@
             "asset_identifier": null,
             "title": "Statue Angel Descends 04",
             "description": "Statue Angel Descends 04 Artwork",
-            "image": "v1/pointless-impressions/artwork/statue_angel_descends_04.png",
+            "image": "pointless-impressions/artwork/statue_angel_descends_04",
             "alt_text": "Statue Angel Descends 04 Artwork",
             "uploaded_at": "2025-11-01T16:00:00Z",
             "uploaded_by": 7
@@ -1610,7 +1610,7 @@
             "asset_identifier": null,
             "title": "Statue Angel Descends 05 Framed",
             "description": "Statue Angel Descends 05 Framed Artwork",
-            "image": "v1/pointless-impressions/artwork/statue_angel_descends_05_framed.png",
+            "image": "pointless-impressions/artwork/statue_angel_descends_05_framed",
             "alt_text": "Statue Angel Descends 05 Framed Artwork",
             "uploaded_at": "2025-11-01T16:00:00Z",
             "uploaded_by": 7
@@ -1625,7 +1625,7 @@
             "asset_identifier": null,
             "title": "Statue Angel Descends 05",
             "description": "Statue Angel Descends 05 Artwork",
-            "image": "v1/pointless-impressions/artwork/statue_angel_descends_05.png",
+            "image": "pointless-impressions/artwork/statue_angel_descends_05",
             "alt_text": "Statue Angel Descends 05 Artwork",
             "uploaded_at": "2025-11-01T16:00:00Z",
             "uploaded_by": 7
@@ -1640,7 +1640,7 @@
             "asset_identifier": null,
             "title": "Statue Angel Descends 06 Framed",
             "description": "Statue Angel Descends 06 Framed Artwork",
-            "image": "v1/pointless-impressions/artwork/statue_angel_descends_06_framed.png",
+            "image": "pointless-impressions/artwork/statue_angel_descends_06_framed",
             "alt_text": "Statue Angel Descends 06 Framed Artwork",
             "uploaded_at": "2025-11-01T16:00:00Z",
             "uploaded_by": 7
@@ -1655,7 +1655,7 @@
             "asset_identifier": null,
             "title": "Statue Angel Descends 06",
             "description": "Statue Angel Descends 06 Artwork",
-            "image": "v1/pointless-impressions/artwork/statue_angel_descends_06.png",
+            "image": "pointless-impressions/artwork/statue_angel_descends_06",
             "alt_text": "Statue Angel Descends 06 Artwork",
             "uploaded_at": "2025-11-01T16:00:00Z",
             "uploaded_by": 7
@@ -1670,7 +1670,7 @@
             "asset_identifier": null,
             "title": "Statue Angel Descends 07 Framed",
             "description": "Statue Angel Descends 07 Framed Artwork",
-            "image": "v1/pointless-impressions/artwork/statue_angel_descends_07_framed.png",
+            "image": "pointless-impressions/artwork/statue_angel_descends_07_framed",
             "alt_text": "Statue Angel Descends 07 Framed Artwork",
             "uploaded_at": "2025-11-01T16:00:00Z",
             "uploaded_by": 7
@@ -1685,7 +1685,7 @@
             "asset_identifier": null,
             "title": "Statue Angel Descends 07",
             "description": "Statue Angel Descends 07 Artwork",
-            "image": "v1/pointless-impressions/artwork/statue_angel_descends_07.png",
+            "image": "pointless-impressions/artwork/statue_angel_descends_07",
             "alt_text": "Statue Angel Descends 07 Artwork",
             "uploaded_at": "2025-11-01T16:00:00Z",
             "uploaded_by": 7
@@ -1700,7 +1700,7 @@
             "asset_identifier": null,
             "title": "Statue Angel Descends 08 Framed",
             "description": "Statue Angel Descends 08 Framed Artwork",
-            "image": "v1/pointless-impressions/artwork/statue_angel_descends_08_framed.png",
+            "image": "pointless-impressions/artwork/statue_angel_descends_08_framed",
             "alt_text": "Statue Angel Descends 08 Framed Artwork",
             "uploaded_at": "2025-11-01T16:00:00Z",
             "uploaded_by": 7
@@ -1715,7 +1715,7 @@
             "asset_identifier": null,
             "title": "Statue Angel Descends 08",
             "description": "Statue Angel Descends 08 Artwork",
-            "image": "v1/pointless-impressions/artwork/statue_angel_descends_08.png",
+            "image": "pointless-impressions/artwork/statue_angel_descends_08",
             "alt_text": "Statue Angel Descends 08 Artwork",
             "uploaded_at": "2025-11-01T16:00:00Z",
             "uploaded_by": 7
@@ -1730,7 +1730,7 @@
             "asset_identifier": null,
             "title": "Statue Angel Descends 09 Framed",
             "description": "Statue Angel Descends 09 Framed Artwork",
-            "image": "v1/pointless-impressions/artwork/statue_angel_descends_09_framed.png",
+            "image": "pointless-impressions/artwork/statue_angel_descends_09_framed",
             "alt_text": "Statue Angel Descends 09 Framed Artwork",
             "uploaded_at": "2025-11-01T16:00:00Z",
             "uploaded_by": 7
@@ -1745,7 +1745,7 @@
             "asset_identifier": null,
             "title": "Statue Angel Descends 09",
             "description": "Statue Angel Descends 09 Artwork",
-            "image": "v1/pointless-impressions/artwork/statue_angel_descends_09.png",
+            "image": "pointless-impressions/artwork/statue_angel_descends_09",
             "alt_text": "Statue Angel Descends 09 Artwork",
             "uploaded_at": "2025-11-01T16:00:00Z",
             "uploaded_by": 7
@@ -1760,7 +1760,7 @@
             "asset_identifier": null,
             "title": "Statue Angel Descends 10 Framed",
             "description": "Statue Angel Descends 10 Framed Artwork",
-            "image": "v1/pointless-impressions/artwork/statue_angel_descends_10_framed.png",
+            "image": "pointless-impressions/artwork/statue_angel_descends_10_framed",
             "alt_text": "Statue Angel Descends 10 Framed Artwork",
             "uploaded_at": "2025-11-01T16:00:00Z",
             "uploaded_by": 7
@@ -1775,7 +1775,7 @@
             "asset_identifier": null,
             "title": "Statue Angel Descends 10",
             "description": "Statue Angel Descends 10 Artwork",
-            "image": "v1/pointless-impressions/artwork/statue_angel_descends_10.png",
+            "image": "pointless-impressions/artwork/statue_angel_descends_10",
             "alt_text": "Statue Angel Descends 10 Artwork",
             "uploaded_at": "2025-11-01T16:00:00Z",
             "uploaded_by": 7
@@ -1790,7 +1790,7 @@
             "asset_identifier": null,
             "title": "Statue Angel Descends 11 Framed",
             "description": "Statue Angel Descends 11 Framed Artwork",
-            "image": "v1/pointless-impressions/artwork/statue_angel_descends_11_framed.png",
+            "image": "pointless-impressions/artwork/statue_angel_descends_11_framed",
             "alt_text": "Statue Angel Descends 11 Framed Artwork",
             "uploaded_at": "2025-11-01T16:00:00Z",
             "uploaded_by": 7
@@ -1805,7 +1805,7 @@
             "asset_identifier": null,
             "title": "Statue Angel Descends 11",
             "description": "Statue Angel Descends 11 Artwork",
-            "image": "v1/pointless-impressions/artwork/statue_angel_descends_11.png",
+            "image": "pointless-impressions/artwork/statue_angel_descends_11",
             "alt_text": "Statue Angel Descends 11 Artwork",
             "uploaded_at": "2025-11-01T16:00:00Z",
             "uploaded_by": 7
@@ -1820,7 +1820,7 @@
             "asset_identifier": null,
             "title": "Statue Ascending Framed",
             "description": "Statue Ascending Framed Artwork",
-            "image": "v1/pointless-impressions/artwork/statue_ascending_framed.png",
+            "image": "pointless-impressions/artwork/statue_ascending_framed",
             "alt_text": "Statue Ascending Framed Artwork",
             "uploaded_at": "2025-11-01T16:00:00Z",
             "uploaded_by": 7
@@ -1835,7 +1835,7 @@
             "asset_identifier": null,
             "title": "Statue Ascending",
             "description": "Statue Ascending Artwork",
-            "image": "v1/pointless-impressions/artwork/statue_ascending.png",
+            "image": "pointless-impressions/artwork/statue_ascending",
             "alt_text": "Statue Ascending Artwork",
             "uploaded_at": "2025-11-01T16:00:00Z",
             "uploaded_by": 7
@@ -1850,7 +1850,7 @@
             "asset_identifier": null,
             "title": "Statue Drops Of Memories Framed",
             "description": "Statue Drops Of Memories Framed Artwork",
-            "image": "v1/pointless-impressions/artwork/statue_drops_of_memories_framed.png",
+            "image": "pointless-impressions/artwork/statue_drops_of_memories_framed",
             "alt_text": "Statue Drops Of Memories Framed Artwork",
             "uploaded_at": "2025-11-01T16:00:00Z",
             "uploaded_by": 7
@@ -1865,7 +1865,7 @@
             "asset_identifier": null,
             "title": "Statue Drops Of Memories",
             "description": "Statue Drops Of Memories Artwork",
-            "image": "v1/pointless-impressions/artwork/statue_drops_of_memories.png",
+            "image": "pointless-impressions/artwork/statue_drops_of_memories",
             "alt_text": "Statue Drops Of Memories Artwork",
             "uploaded_at": "2025-11-01T16:00:00Z",
             "uploaded_by": 7
@@ -1880,7 +1880,7 @@
             "asset_identifier": null,
             "title": "Statue Silent Weapons Framed",
             "description": "Statue Silent Weapons Framed Artwork",
-            "image": "v1/pointless-impressions/artwork/statue_silent_weapons_framed.png",
+            "image": "pointless-impressions/artwork/statue_silent_weapons_framed",
             "alt_text": "Statue Silent Weapons Framed Artwork",
             "uploaded_at": "2025-11-01T16:00:00Z",
             "uploaded_by": 7
@@ -1895,7 +1895,7 @@
             "asset_identifier": null,
             "title": "Statue Silent Weapons",
             "description": "Statue Silent Weapons Artwork",
-            "image": "v1/pointless-impressions/artwork/statue_silent_weapons.png",
+            "image": "pointless-impressions/artwork/statue_silent_weapons",
             "alt_text": "Statue Silent Weapons Artwork",
             "uploaded_at": "2025-11-01T16:00:00Z",
             "uploaded_by": 7
@@ -1910,7 +1910,7 @@
             "asset_identifier": null,
             "title": "Statue The Crossing Framed",
             "description": "Statue The Crossing Framed Artwork",
-            "image": "v1/pointless-impressions/artwork/statue_the_crossing_framed.png",
+            "image": "pointless-impressions/artwork/statue_the_crossing_framed",
             "alt_text": "Statue The Crossing Framed Artwork",
             "uploaded_at": "2025-11-01T16:00:00Z",
             "uploaded_by": 7
@@ -1925,7 +1925,7 @@
             "asset_identifier": null,
             "title": "Statue The Crossing",
             "description": "Statue The Crossing Artwork",
-            "image": "v1/pointless-impressions/artwork/statue_the_crossing.png",
+            "image": "pointless-impressions/artwork/statue_the_crossing",
             "alt_text": "Statue The Crossing Artwork",
             "uploaded_at": "2025-11-01T16:00:00Z",
             "uploaded_by": 7
@@ -1940,7 +1940,7 @@
             "asset_identifier": null,
             "title": "Statue The Remains Framed",
             "description": "Statue The Remains Framed Artwork",
-            "image": "v1/pointless-impressions/artwork/statue_the_remains_framed.png",
+            "image": "pointless-impressions/artwork/statue_the_remains_framed",
             "alt_text": "Statue The Remains Framed Artwork",
             "uploaded_at": "2025-11-01T16:00:00Z",
             "uploaded_by": 7
@@ -1955,7 +1955,7 @@
             "asset_identifier": null,
             "title": "Statue The Remains",
             "description": "Statue The Remains Artwork",
-            "image": "v1/pointless-impressions/artwork/statue_the_remains.png",
+            "image": "pointless-impressions/artwork/statue_the_remains",
             "alt_text": "Statue The Remains Artwork",
             "uploaded_at": "2025-11-01T16:00:00Z",
             "uploaded_by": 7

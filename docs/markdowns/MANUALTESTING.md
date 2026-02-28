@@ -25,6 +25,12 @@ This document outlines the manual tests to be carried out for each feature. Use 
       - [Test Add to Cart Functionality (Backend)](#test-add-to-cart-functionality-backend)
     - [US004: Checkout with Address Form](#us004-checkout-with-address-form)
       - [Test Checkout Functionality](#test-checkout-functionality)
+    - [User Registration Fix (4.1, 4.4) - Backend](#user-registration-fix-41-44---backend)
+      - [Test Registration Atomicity and Email Dispatch](#test-registration-atomicity-and-email-dispatch)
+    - [Cart Interactivity Fix (1.1) - Backend](#cart-interactivity-fix-11---backend)
+      - [Test Cart Update and Remove Endpoints](#test-cart-update-and-remove-endpoints)
+    - [Image Dimension Cap - Backend](#image-dimension-cap---backend)
+      - [Test Artwork API Image URL Dimensions](#test-artwork-api-image-url-dimensions)
   - [Frontend Testing](#frontend-testing)
     - [US001: Browse Available Artworks - In Artwork App](#us001-browse-available-artworks---in-artwork-app-1)
       - [Test the Artwork Listing Page](#test-the-artwork-listing-page)
@@ -49,6 +55,15 @@ This document outlines the manual tests to be carried out for each feature. Use 
       - [Test Add to Cart Functionality](#test-add-to-cart-functionality)
     - [US004: Checkout with Address Form](#us004-checkout-with-address-form-1)
       - [Test Checkout Functionality](#test-checkout-functionality-1)
+    - [User Registration Fix (4.1, 4.4) - Frontend](#user-registration-fix-41-44---frontend)
+      - [Test Registration and Email Verification Flow](#test-registration-and-email-verification-flow)
+    - [Cart Interactivity Fix (1.1) - Frontend](#cart-interactivity-fix-11---frontend)
+      - [Test Cart Quantity Controls and Remove Item](#test-cart-quantity-controls-and-remove-item)
+    - [Image Dimension Cap - Frontend](#image-dimension-cap---frontend)
+      - [Test Image Dimensions via Browser DevTools](#test-image-dimensions-via-browser-devtools)
+    - [Broken Links Fix (1.15) - Frontend](#broken-links-fix-115---frontend)
+      - [Test Navigation and Breadcrumb Links](#test-navigation-and-breadcrumb-links)
+      - [Test Error Handler Pages](#test-error-handler-pages)
 
 ---
 
@@ -204,6 +219,41 @@ Use `./dev.sh shell` to test photo form behavior with conditional fields.
 | 2 | Submit checkout form via API with missing fields | API returns error response with validation messages | Pass |
 | 3 | Submit checkout form via API with invalid address | API returns error response with validation messages | Pass |
 | 4 | Submit checkout form via API with valid address | API returns success response, and address is saved in the database | Pass |
+
+---
+
+### User Registration Fix (4.1, 4.4) - Backend
+
+#### Test Registration Atomicity and Email Dispatch
+
+Requires the dev environment running (`./dev.sh start`) with MailDev accessible at http://localhost:1080.
+
+| Step | Action | Expected Outcome | Pass / Fail |
+| :--- | :--- | :--- | :--- |
+| 1 | Navigate to http://localhost:8000/profiles/signup/ | Signup page loads with signup, profile photo, and address forms | Pass |
+| 2 | Fill all required signup fields (username, email, password, first name, last name) and submit without a profile photo | Registration completes successfully — photo is optional and must not block submission | Pass |
+| 3 | After successful submission, open MailDev at http://localhost:1080 | A "Your Email Verification Code" email is present for the registered email address, confirming `send_verification_email()` was called | Pass |
+| 4 | Note the 6-digit verification code from the email | Code is a zero-padded 6-digit number (e.g., 047821) | Pass |
+| 5 | Open the Django shell and run: `from pointless_impressions_src.account.models import CustomUser; u = CustomUser.objects.latest('date_joined'); print(u.is_active)` | Returns `False` — the user is inactive until email is verified | Pass |
+| 6 | Check that related records exist: `from pointless_impressions_src.profiles.models import UserProfile, Customer; print(UserProfile.objects.filter(user=u).exists(), Customer.objects.filter(user_profile__user=u).exists())` | Returns `True True` — UserProfile and Customer records were created atomically alongside the user | Pass |
+| 7 | Simulate a failed signup by temporarily disconnecting the database mid-transaction (or by checking that no orphan `CustomUser` record exists after a validation error on a later form field) | If any form fails validation, no user, profile, customer, or address record is created — the transaction rolls back completely | Pass |
+| 8 | With email sending configured, verify `EmailVerificationCode` record was created: `from pointless_impressions_src.account.models import EmailVerificationCode; print(EmailVerificationCode.objects.filter(user=u).count())` | Returns `1` — exactly one unused verification code exists for the new user | Pass |
+
+---
+
+### Cart Interactivity Fix (1.1) - Backend
+
+#### Test Cart Update and Remove Endpoints
+
+Use `./dev.sh shell` or a REST client (e.g. curl/Postman) to call the endpoints directly. Requires at least one item already in the cart session.
+
+| Step | Action | Expected Outcome | Pass / Fail |
+| :--- | :--- | :--- | :--- |
+| 1 | POST to `/checkout/update/` with `X-Requested-With: XMLHttpRequest`, valid CSRF token, and FormData containing `artwork_id`, `quantity=2`, `framing_option` | Returns `{"success": true, "message": "..."}` and the cart session is updated with the new quantity | Pass |
+| 2 | POST to `/checkout/update/` with a quantity exceeding available stock | Returns `{"success": false, "error": "..."}` — cart quantity is not changed | Pass |
+| 3 | POST to `/checkout/update/` with a missing `artwork_id` | Returns an error response — no change to cart | Pass |
+| 4 | POST to `/checkout/remove-item/` with `X-Requested-With: XMLHttpRequest`, valid CSRF token, and JSON body `{"artwork_id": <id>}` | Returns `{"success": true}` and the item is removed from the cart session | Pass |
+| 5 | POST to `/checkout/remove-item/` with an `artwork_id` not in the cart | Returns an error or success response gracefully — no server 500 | Pass |
 
 ---
 
@@ -395,3 +445,120 @@ Use `./dev.sh shell` to test photo form behavior with conditional fields.
 | 3 | Submit the form with missing fields | Form displays validation errors for required fields | Pass |
 | 4 | Submit the form with invalid address | Form displays validation errors for address fields | Pass |
 | 5 | Submit the form with valid address | Form submits successfully, and confirmation page is displayed | Pass |
+
+---
+
+### User Registration Fix (4.1, 4.4) - Frontend
+
+#### Test Registration and Email Verification Flow
+
+Requires the dev environment running (`./dev.sh start`) with MailDev accessible at http://localhost:1080.
+
+| Step | Action | Expected Outcome | Pass / Fail |
+| :--- | :--- | :--- | :--- |
+| 1 | Navigate to http://localhost:8000/profiles/signup/ as an unauthenticated user | Signup page loads with three form sections: account details, profile photo (optional), and address | Pass |
+| 2 | Submit the form with all required fields filled and no profile photo | Registration succeeds — page redirects to the email verification page at `/profiles/verify-email/` with a success message | Pass |
+| 3 | Open MailDev at http://localhost:1080 and check inbox | A "Your Email Verification Code" email is present for the registered address within a few seconds of submission | Pass |
+| 4 | On the email verification page, enter the correct 6-digit code from the MailDev email | Page redirects to the dashboard; success message "Your email has been verified!" displays | Pass |
+| 5 | Open MailDev again after successful verification | A "Your Email Has Been Verified!" confirmation email is present in the inbox | Pass |
+| 6 | Return to the verification page after already verifying (`/profiles/verify-email/`) | Redirect or error message displays — the user cannot re-verify an already verified account | Pass |
+| 7 | On the email verification page, enter an incorrect or expired code | Error message displays (e.g., "Invalid verification code.") — the user remains on the verify email page | Pass |
+| 8 | Click "Resend code" on the verification page | A new code email arrives in MailDev; the previous code is invalidated | Pass |
+| 9 | Submit the signup form with a required field missing (e.g., no email address) | Form re-renders with field-level validation error; no user is created; no verification email is sent | Pass |
+| 10 | Submit the signup form with a duplicate username or email already in the database | Form re-renders with a validation error on the relevant field; no duplicate user is created | Pass |
+
+---
+
+### Cart Interactivity Fix (1.1) - Frontend
+
+#### Test Cart Quantity Controls and Remove Item
+
+Requires the dev environment running (`./dev.sh start`) with at least one artwork in the cart. Navigate to http://localhost:8000/checkout/ to see the cart summary with forms.
+
+| Step | Action | Expected Outcome | Pass / Fail |
+| :--- | :--- | :--- | :--- |
+| 1 | Navigate to http://localhost:8000/checkout/ with one or more items in the cart | Checkout page loads showing cart summary with quantity controls (– and + buttons), an Update button, and a Remove button for each item | Pass |
+| 2 | Click the **–** button on a cart item that has quantity 2 | Quantity input decrements to 1 | Pass |
+| 3 | Click the **–** button on a cart item that already shows quantity 1 | Quantity input stays at 1 — it cannot go below 1 | Pass |
+| 4 | Click the **+** button on a cart item | Quantity input increments by 1 | Pass |
+| 5 | Click **Update** on a cart item after changing the quantity | Page reloads; cart summary reflects the new quantity and updated subtotal/grand total | Pass |
+| 6 | Change the framing option dropdown on a cart item and click **Update** | Page reloads; cart summary reflects the new framing selection | Pass |
+| 7 | Click **Remove** on a cart item | Page reloads; the item is no longer shown in the cart summary; totals update accordingly | Pass |
+| 8 | Remove the last item in the cart | Page reloads showing an empty cart message | Pass |
+| 9 | Open the browser developer tools console before clicking **Update** or **Remove** | No JavaScript errors appear in the console during or after the operation | Pass |
+| 10 | Click **Update** with no changes to quantity or framing | Page reloads without error — a no-op update is handled gracefully | Pass |
+
+---
+
+### Image Dimension Cap - Backend
+
+#### Test Artwork API Image URL Dimensions
+
+Requires the dev environment running (`./dev.sh start`). Tests confirm that every image URL returned by the artwork API includes a Cloudinary `c_limit,w_2000,h_2000` transformation so no image exceeds 2000px on either dimension.
+
+| Step | Action | Expected Outcome | Pass / Fail |
+| :--- | :--- | :--- | :--- |
+| 1 | Open a terminal and run: `curl -s http://localhost:8000/api/artworks/ \| python3 -m json.tool \| grep image_url` | A list of `image_url` values is printed to the terminal | Pass |
+| 2 | Inspect any `image_url` value from the output | The URL contains `/w_2000,h_2000,c_limit/` in the Cloudinary path (e.g., `https://res.cloudinary.com/<cloud>/image/upload/w_2000,h_2000,c_limit/...`) | Pass |
+| 3 | Copy one `image_url` and open it in a browser or run: `curl -sI "<image_url>" \| grep -i content-length` | The image loads successfully (HTTP 200); the Cloudinary transformation is applied server-side | Pass |
+| 4 | Open the Django shell with `./dev.sh shell` and run: `from pointless_impressions_src.photo.models import Photo; p = Photo.objects.first(); print(p.get_image_url)` | The URL contains `w_2000,h_2000,c_limit` in the path | Pass |
+| 5 | In the Django shell, run: `from pointless_impressions_src.photo.models import Photo; p = Photo.objects.first(); print(p.image.build_url(width=2000, height=2000, crop='limit'))` | Returns the same transformed URL as `get_image_url` — confirms `build_url` is working correctly | Pass |
+
+---
+
+### Image Dimension Cap - Frontend
+
+#### Test Image Dimensions via Browser DevTools
+
+Requires the dev environment running (`./dev.sh start`). Tests confirm that images rendered on artwork pages do not exceed 2000px on either dimension, and that landscape and portrait images each respect their natural aspect ratio at the capped size.
+
+| Step | Action | Expected Outcome | Pass / Fail |
+| :--- | :--- | :--- | :--- |
+| 1 | Navigate to http://localhost:8000/artworks/ and open browser DevTools (F12) | DevTools panel opens on the artwork listing page | Pass |
+| 2 | Go to the **Network** tab in DevTools, filter by **Img**, and reload the page | All artwork image requests appear in the network log | Pass |
+| 3 | Click on any artwork image request and inspect the **Request URL** | URL contains `/w_2000,h_2000,c_limit/` in the Cloudinary path | Pass |
+| 4 | Right-click any artwork image on the page and select **Inspect** (or open the **Elements** tab) | The `src` attribute of the `<img>` tag contains `w_2000,h_2000,c_limit` in the Cloudinary URL | Pass |
+| 5 | In the **Console** tab, run: `document.querySelectorAll('img').forEach(img => console.log(img.naturalWidth, img.naturalHeight, img.src))` | All listed image dimensions show width ≤ 2000 and height ≤ 2000 | Pass |
+| 6 | Identify a known landscape artwork image (wider than tall) and run step 5 for that image | Width is at most 2000px; height is less than 2000px and maintains the correct aspect ratio (e.g., a 4000×3000 original appears as 2000×1500) | Pass |
+| 7 | Identify a known portrait artwork image (taller than wide) and run step 5 for that image | Height is at most 2000px; width is less than 2000px and maintains the correct aspect ratio (e.g., a 3000×4000 original appears as 1500×2000) | Pass |
+| 8 | Navigate to an artwork detail page (http://localhost:8000/artworks/<slug>/) and repeat steps 2–5 | Detail page artwork images also contain `w_2000,h_2000,c_limit` in URLs and respect the 2000px cap | Pass |
+| 9 | Open the **Network** tab and check the image file sizes for artwork images | Images are smaller in file size compared to a raw Cloudinary URL without transformation — confirms the cap is active | Pass |
+
+---
+
+### Broken Links Fix (1.15) - Frontend
+
+#### Test Navigation and Breadcrumb Links
+
+Requires the dev environment running (`./dev.sh start`). Tests confirm that all navigation links, Artists dropdowns, and breadcrumb Home links resolve correctly.
+
+| Step | Action | Expected Outcome | Pass / Fail |
+| :--- | :--- | :--- | :--- |
+| 1 | Navigate to http://localhost:8000/ and inspect the header navbar | The site loads without any template errors in the console or Django logs | Pass |
+| 2 | Log in as a staff user and open the account dropdown in the header | A **Site Admin (Dev)** link is visible in the dropdown | Pass |
+| 3 | Click the **Site Admin (Dev)** link | Browser navigates to http://localhost:8000/admin/ (Django admin index) without a `NoReverseMatch` error | Pass |
+| 4 | On any page, open the **Shop → Artists** dropdown in the desktop navigation | The Artists sub-menu is populated with the usernames of all active artists from the database — not an empty list | Pass |
+| 5 | Click an artist name in the desktop Artists dropdown | Browser navigates to `/artworks/?artist=<username>` and the artwork list is filtered to show only that artist's work | Pass |
+| 6 | On a mobile viewport (< 768px), open the hamburger menu and navigate to **Shop → Artists** | The Artists sub-menu is populated with the same artist list as the desktop nav, using the correct usernames | Pass |
+| 7 | Click an artist name in the mobile Artists sub-menu | Browser navigates to `/artworks/?artist=<username>` and the artwork list filters correctly | Pass |
+| 8 | Navigate to any artwork detail page (e.g., http://localhost:8000/artworks/city-icons-01/) | The breadcrumb at the top shows: Home → Artworks → [artwork name] | Pass |
+| 9 | Click **Home** in the artwork detail breadcrumb | Browser navigates to http://localhost:8000/ without a 404 or redirect error | Pass |
+| 10 | Navigate to http://localhost:8000/checkout/ with items in the cart | The breadcrumb at the top shows: Home → Artworks → Checkout | Pass |
+| 11 | Click **Home** in the checkout breadcrumb | Browser navigates to http://localhost:8000/ without a 404 or redirect error | Pass |
+| 12 | Navigate to the order confirmation page after placing a test order | The breadcrumb shows: Home → Artworks → Checkout → Order Confirmation | Pass |
+| 13 | Click **Home** in the order confirmation breadcrumb | Browser navigates to http://localhost:8000/ without a 404 or redirect error | Pass |
+
+---
+
+#### Test Error Handler Pages
+
+Requires the dev environment running with `DEBUG = False` (use the staging or production config, or temporarily set `DEBUG = False` in a local `.env`). Tests confirm that custom error pages render when the corresponding HTTP error status is triggered.
+
+| Step | Action | Expected Outcome | Pass / Fail |
+| :--- | :--- | :--- | :--- |
+| 1 | Navigate to a URL that does not exist (e.g., http://localhost:8000/this-does-not-exist/) | The custom 404 page renders (from `templates/errors/404.html`) — not Django's default yellow debug page | Pass |
+| 2 | Inspect the HTTP response status in browser DevTools → Network tab | Response status is `404` | Pass |
+| 3 | Confirm the 404 page contains site navigation (header/footer) and a helpful message | The page uses `base.html` and links back to the homepage or artwork list | Pass |
+| 4 | Trigger a 403 response (e.g., attempt to access an admin-only view as a non-staff user) | The custom 403 page renders from `templates/errors/403.html` with status `403` | Pass |
+| 5 | Trigger a 500 response (e.g., temporarily break a view) | The custom 500 page renders from `templates/errors/500.html` with status `500` — not a raw Django traceback | Pass |
+| 6 | Check the Django error log after triggering each error | Log entries show the correct error and path — confirms the error handler views in `pointless_impressions_src.pointless_impressions.views` are being called | Pass |

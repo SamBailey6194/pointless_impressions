@@ -53,7 +53,15 @@ I implemented a comprehensive SEO strategy directly within the Django `base.html
      - `meta_og_tags` block for Open Graph tags.  
      - `extra_meta` block for page-specific tags like noindex or canonical overrides.
 
+8. **Sitemap and Robot.txt**:
+    - A `robots.txt` file is included to guide search engine crawlers.  
+    - Using `django.contrib.sitemaps`, a dynamic `sitemap.xml` is generated to list all public URLs for better indexing. It can be accessed at `/sitemap.xml`.
+
 **Result:** Every page of Pointless Impressions is optimised for search engines, social media sharing, and user experience, while sensitive pages are protected from indexing. This setup reduces maintenance overhead by centralising SEO logic in a single template.
+
+### Payments Feature
+
+Due to the client having an existing Square account with a subscription already set up, I integrated Square payments into the checkout process. This allows users to securely complete their purchases using Square's payment gateway, ensuring compliance with payment regulations and providing a seamless checkout experience. The features are listed in the next section.
 
 ### Existing Features
 
@@ -421,7 +429,7 @@ Toast.handleAPIError(error)                // Displays API error messages
 
 **Image Optimization:**
 - **Development**: Local image URLs via Django media storage
-- **Production**: Cloudinary with auto-formatting (format="webp"), quality optimization (quality="auto")
+- **Production**: Cloudinary with auto-formatting (format="auto"), quality optimization (quality="auto")
 - **Responsive Images**: Width/height specifications for each context
 - **Fallback Handling**: Placeholder icons for missing images
 
@@ -436,7 +444,17 @@ Toast.handleAPIError(error)                // Displays API error messages
 
 ---
 
+### Example of Social Media Marketing
+
+I used Facebook to make a page. Below are examples of the page.
+
+![Facebook Page Screenshot](/docs/images/facebook_page.png)
+
+![Facebook Posts Screenshot](/docs/images/facebook_posts.png)
+
 ### Features Left to Implement
+
+Some of the features listed below have the backend structure in place but need frontend implementation or further refinement:
 
 - Blog App with full CRUD functionality for posts and comments
 - Adding and editing Addresses in User Profile
@@ -451,5 +469,7 @@ Toast.handleAPIError(error)                // Displays API error messages
 - Some of the modals styling could be improved further to make them more visually appealing and user-friendly.
 - Review system for Artwork to be reviewed by verified purchasers.
 - Link the DB newsletter subscriptions to an actual email marketing service like Mailchimp. For now we are using the newsletter subscription in the footer to send to MailChimp.
+- Enhancing accessibility features across the site to ensure compliance with WCAG standards, for example ensuring everything has a aria-label when required.
+- Change size of PNGs to be smaller for faster loading times.
 
 ---
