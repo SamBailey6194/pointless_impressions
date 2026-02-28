@@ -61,7 +61,15 @@
             </div>
           </div>
 
-          {% if not artwork_data.is_in_stock %}
+          {% if not artwork_data.is_available %}
+            <div class="alert alert-info" data-testid="availability-status">
+              <i class="fa-solid fa-clock text-xl"></i>
+              <div>
+                <h3 class="font-bold">Pending Approval</h3>
+                <div class="text-xs">This artwork is awaiting admin approval before it can be purchased</div>
+              </div>
+            </div>
+          {% elif not artwork_data.is_in_stock %}
             <div class="alert alert-warning" data-testid="availability-status">
               <i class="fa-solid fa-exclamation-triangle text-xl"></i>
               <div>
