@@ -74,7 +74,7 @@
                       <i class="fa-solid fa-circle-chevron-down"></i>
                   </label>
                   <ul tabindex="0" class="menu menu-sm dropdown-content z-10 p-2 shadow-lg rounded-box w-52 ml-14">
-                      {% for artist in artists %}
+                      {% for artist in all_artists %}
                           <li>
                               <a href="{% url 'artwork:list' %}?artist={{ artist.user_profile.user.username }}" class="hover:bg-(--pointless-yellow)">
                                   {{ artist.user_profile.user.username|title }}
@@ -130,7 +130,7 @@
                 {% comment %} Django Site Admin for Developers {% endcomment %}
                 {% if request.user.is_staff %}
                   <li>
-                    <a href="{% url 'admin' %}" class="hover:bg-(--pointless-yellow)">
+                    <a href="{% url 'admin:index' %}" class="hover:bg-(--pointless-yellow)">
                       <i class="fa-solid fa-shield-halved"></i> Site Admin (Dev)
                     </a>
                   </li>
@@ -271,10 +271,10 @@
                   </a>
                 </li>
                 <ul tabindex="0">
-                {% for artist in artists %}
+                {% for artist in all_artists %}
                   <li>
-                    <a href="{% url 'artwork:list' %}?artist={{ artist.user.username }}">
-                      {{ artist.user.username|title }}
+                    <a href="{% url 'artwork:list' %}?artist={{ artist.user_profile.user.username }}">
+                      {{ artist.user_profile.user.username|title }}
                     </a>
                   </li>
                 {% endfor %}

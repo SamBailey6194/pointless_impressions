@@ -80,11 +80,11 @@ if settings.DEBUG:
         settings.STATIC_URL, document_root=settings.STATIC_ROOT
     )
 
-handler400 = 'pointless_impressions.views.error_400_view'
-handler401 = 'pointless_impressions.views.error_401_view'
-handler403 = 'pointless_impressions.views.error_403_view'
-handler404 = 'pointless_impressions.views.error_404_view'
-handler408 = 'pointless_impressions.views.error_408_view'
-handler500 = 'pointless_impressions.views.error_500_view'
-handler502 = 'pointless_impressions.views.error_502_view'
-handler503 = 'pointless_impressions.views.error_503_view'
+handler400 = 'pointless_impressions_src.pointless_impressions.views.error_400_view'
+handler401 = 'pointless_impressions_src.pointless_impressions.views.error_401_view'
+handler403 = 'pointless_impressions_src.pointless_impressions.views.error_403_view'
+handler404 = 'pointless_impressions_src.pointless_impressions.views.error_404_view'
+handler408 = 'pointless_impressions_src.pointless_impressions.views.error_408_view'
+handler500 = 'pointless_impressions_src.pointless_impressions.views.error_500_view'
+handler502 = 'pointless_impressions_src.pointless_impressions.views.error_502_view'
+handler503 = 'pointless_impressions_src.pointless_impressions.views.error_503_view'

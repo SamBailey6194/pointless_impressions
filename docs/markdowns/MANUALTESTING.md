@@ -61,6 +61,9 @@ This document outlines the manual tests to be carried out for each feature. Use 
       - [Test Cart Quantity Controls and Remove Item](#test-cart-quantity-controls-and-remove-item)
     - [Image Dimension Cap - Frontend](#image-dimension-cap---frontend)
       - [Test Image Dimensions via Browser DevTools](#test-image-dimensions-via-browser-devtools)
+    - [Broken Links Fix (1.15) - Frontend](#broken-links-fix-115---frontend)
+      - [Test Navigation and Breadcrumb Links](#test-navigation-and-breadcrumb-links)
+      - [Test Error Handler Pages](#test-error-handler-pages)
 
 ---
 
@@ -520,3 +523,42 @@ Requires the dev environment running (`./dev.sh start`). Tests confirm that imag
 | 7 | Identify a known portrait artwork image (taller than wide) and run step 5 for that image | Height is at most 2000px; width is less than 2000px and maintains the correct aspect ratio (e.g., a 3000×4000 original appears as 1500×2000) | Pass |
 | 8 | Navigate to an artwork detail page (http://localhost:8000/artworks/<slug>/) and repeat steps 2–5 | Detail page artwork images also contain `w_2000,h_2000,c_limit` in URLs and respect the 2000px cap | Pass |
 | 9 | Open the **Network** tab and check the image file sizes for artwork images | Images are smaller in file size compared to a raw Cloudinary URL without transformation — confirms the cap is active | Pass |
+
+---
+
+### Broken Links Fix (1.15) - Frontend
+
+#### Test Navigation and Breadcrumb Links
+
+Requires the dev environment running (`./dev.sh start`). Tests confirm that all navigation links, Artists dropdowns, and breadcrumb Home links resolve correctly.
+
+| Step | Action | Expected Outcome | Pass / Fail |
+| :--- | :--- | :--- | :--- |
+| 1 | Navigate to http://localhost:8000/ and inspect the header navbar | The site loads without any template errors in the console or Django logs | Pass |
+| 2 | Log in as a staff user and open the account dropdown in the header | A **Site Admin (Dev)** link is visible in the dropdown | Pass |
+| 3 | Click the **Site Admin (Dev)** link | Browser navigates to http://localhost:8000/admin/ (Django admin index) without a `NoReverseMatch` error | Pass |
+| 4 | On any page, open the **Shop → Artists** dropdown in the desktop navigation | The Artists sub-menu is populated with the usernames of all active artists from the database — not an empty list | Pass |
+| 5 | Click an artist name in the desktop Artists dropdown | Browser navigates to `/artworks/?artist=<username>` and the artwork list is filtered to show only that artist's work | Pass |
+| 6 | On a mobile viewport (< 768px), open the hamburger menu and navigate to **Shop → Artists** | The Artists sub-menu is populated with the same artist list as the desktop nav, using the correct usernames | Pass |
+| 7 | Click an artist name in the mobile Artists sub-menu | Browser navigates to `/artworks/?artist=<username>` and the artwork list filters correctly | Pass |
+| 8 | Navigate to any artwork detail page (e.g., http://localhost:8000/artworks/city-icons-01/) | The breadcrumb at the top shows: Home → Artworks → [artwork name] | Pass |
+| 9 | Click **Home** in the artwork detail breadcrumb | Browser navigates to http://localhost:8000/ without a 404 or redirect error | Pass |
+| 10 | Navigate to http://localhost:8000/checkout/ with items in the cart | The breadcrumb at the top shows: Home → Artworks → Checkout | Pass |
+| 11 | Click **Home** in the checkout breadcrumb | Browser navigates to http://localhost:8000/ without a 404 or redirect error | Pass |
+| 12 | Navigate to the order confirmation page after placing a test order | The breadcrumb shows: Home → Artworks → Checkout → Order Confirmation | Pass |
+| 13 | Click **Home** in the order confirmation breadcrumb | Browser navigates to http://localhost:8000/ without a 404 or redirect error | Pass |
+
+---
+
+#### Test Error Handler Pages
+
+Requires the dev environment running with `DEBUG = False` (use the staging or production config, or temporarily set `DEBUG = False` in a local `.env`). Tests confirm that custom error pages render when the corresponding HTTP error status is triggered.
+
+| Step | Action | Expected Outcome | Pass / Fail |
+| :--- | :--- | :--- | :--- |
+| 1 | Navigate to a URL that does not exist (e.g., http://localhost:8000/this-does-not-exist/) | The custom 404 page renders (from `templates/errors/404.html`) — not Django's default yellow debug page | Pass |
+| 2 | Inspect the HTTP response status in browser DevTools → Network tab | Response status is `404` | Pass |
+| 3 | Confirm the 404 page contains site navigation (header/footer) and a helpful message | The page uses `base.html` and links back to the homepage or artwork list | Pass |
+| 4 | Trigger a 403 response (e.g., attempt to access an admin-only view as a non-staff user) | The custom 403 page renders from `templates/errors/403.html` with status `403` | Pass |
+| 5 | Trigger a 500 response (e.g., temporarily break a view) | The custom 500 page renders from `templates/errors/500.html` with status `500` — not a raw Django traceback | Pass |
+| 6 | Check the Django error log after triggering each error | Log entries show the correct error and path — confirms the error handler views in `pointless_impressions_src.pointless_impressions.views` are being called | Pass |
