@@ -8,9 +8,11 @@
     {% comment %} Logo Section {% endcomment %}
     <div class="navbar-start">
       <a href="{% url 'home' %}" class="btn btn-ghost normal-case text-xl h-auto p-2">
-        {% with image_to_render=site_logo %}
-          {% cloudinary image_to_render.image height=60 crop='fit' format='webp' quality='auto' alt=image_to_render.alt_text_or_default class="h-8 sm:h-10 md:h-12 w-auto" crossorigin="anonymous" %}
-        {% endwith %}
+        {% if site_logo %}
+          {% with image_to_render=site_logo %}
+            {% cloudinary image_to_render.image height=60 crop='fit' format='webp' quality='auto' alt=image_to_render.alt_text_or_default class="h-8 sm:h-10 md:h-12 w-auto" crossorigin="anonymous" %}
+          {% endwith %}
+        {% endif %}
       </a>
     </div>
 
