@@ -60,6 +60,58 @@
   var payments = null;
   var paymentInProgress = false;
   var delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+  async function refreshOrderSummary() {
+    window.location.reload();
+  }
+  async function handleCartUpdate(form) {
+    const formData = new FormData(form);
+    const artworkId = form.querySelector('input[name="artwork_id"]').value;
+    if (!artworkId) return;
+    try {
+      const response = await fetch("/checkout/update/", {
+        method: "POST",
+        headers: {
+          "X-Requested-With": "XMLHttpRequest",
+          "X-CSRFToken": getCsrfToken()
+        },
+        body: formData,
+        credentials: "include"
+      });
+      const data = await response.json();
+      if (data.success) {
+        if (window.Toast) window.Toast.show(data.message, "success");
+        await refreshOrderSummary();
+      } else {
+        if (window.Toast) window.Toast.show(data.error, "error");
+      }
+    } catch (err) {
+      console.error("Failed to submit form:", err);
+      if (window.Toast) window.Toast.show("Error updating cart.", "error");
+    }
+  }
+  async function handleRemoveItem(artworkId) {
+    try {
+      const response = await fetch("/checkout/remove-item/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-Requested-With": "XMLHttpRequest",
+          "X-CSRFToken": getCsrfToken()
+        },
+        body: JSON.stringify({ artwork_id: artworkId }),
+        credentials: "include"
+      });
+      const data = await response.json();
+      if (data.success) {
+        window.location.reload();
+      } else {
+        if (window.Toast) window.Toast.show(data.error || "Failed to remove item.", "error");
+      }
+    } catch (err) {
+      console.error("Failed to remove item:", err);
+      if (window.Toast) window.Toast.show("Error removing item.", "error");
+    }
+  }
   function getSquareCardStyles() {
     const pointlessWhite = "#FAFAFA";
     const pointlessBlack = "#050505";
@@ -291,6 +343,35 @@
       });
       toggleBillingFields();
     }
+    document.querySelectorAll(".js-qty-minus").forEach(function(btn) {
+      btn.addEventListener("click", function() {
+        const input = btn.closest("form").querySelector('input[name="quantity"]');
+        if (!input) return;
+        const current = parseInt(input.value, 10) || 1;
+        if (current > 1) input.value = current - 1;
+      });
+    });
+    document.querySelectorAll(".js-qty-plus").forEach(function(btn) {
+      btn.addEventListener("click", function() {
+        const input = btn.closest("form").querySelector('input[name="quantity"]');
+        if (!input) return;
+        const current = parseInt(input.value, 10) || 1;
+        const max = parseInt(input.max, 10) || 999;
+        if (current < max) input.value = current + 1;
+      });
+    });
+    document.querySelectorAll(".js-cart-item-form").forEach(function(form) {
+      form.addEventListener("submit", function(e) {
+        e.preventDefault();
+        handleCartUpdate(form);
+      });
+    });
+    document.querySelectorAll(".js-remove-item").forEach(function(btn) {
+      btn.addEventListener("click", function() {
+        const artworkId = btn.dataset.artworkId;
+        if (artworkId) handleRemoveItem(artworkId);
+      });
+    });
     if (placeOrderButton && confirmModal && finalConfirmBtn) {
       placeOrderButton.addEventListener("click", function(e) {
         e.preventDefault();
