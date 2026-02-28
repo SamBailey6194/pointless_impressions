@@ -36,18 +36,6 @@
   --font-Inter: 'Inter', sans-serif;
 }
 
-/* Custom CSS for Dark Mode */
-@media (prefers-color-scheme: dark) {
-  @theme {
-    /* Custom Colours */
-    --pointless-white: oklch(0.98 0 0);
-    --pointless-yellow: oklch(0.72 0.18 93); 
-    --pointless-blue: oklch(0.6 0.2 260);
-    --pointless-red: oklch(0.65 0.22 22);
-    --pointless-black: oklch(0.08 0 0);
-  }
-}
-
 @layer base {
   /* Body Layout */
   body {
@@ -179,6 +167,15 @@
 
   /* Dark Mode Overrides */
   @media (prefers-color-scheme: dark) {
+    /* Override colour tokens for dark mode (Tailwind v4: @theme must be top-level,
+       so dark mode token values are set here via :root instead) */
+    :root, :host {
+      --pointless-yellow: oklch(0.72 0.18 93);
+      --pointless-blue: oklch(0.6 0.2 260);
+      --pointless-red: oklch(0.65 0.22 22);
+      --pointless-black: oklch(0.08 0 0);
+    }
+
     header, footer {
       background-color: var(--pointless-blue);
       color: var(--pointless-white);
@@ -937,9 +934,23 @@ textarea:focus-visible,
   flex: 1 !important;
   display: flex !important;
   flex-direction: column !important;
+  min-height: 280px !important;
 }
 #artwork-list .artwork-card .card-actions {
   margin-top: auto;
+}
+#artwork-list .artwork-card .artwork-description {
+  flex: 1 !important;
+}
+
+/* WCAG 1.4.3: Artwork price — theme colour variable (dark navy in light mode, white in dark mode) */
+.artwork-price {
+  color: var(--pointless-blue) !important;
+}
+@media (prefers-color-scheme: dark) {
+  .artwork-price {
+    color: var(--pointless-white) !important;
+  }
 }
 
 /* Responsiveness: Mobile < 640px */
