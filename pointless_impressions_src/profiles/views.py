@@ -58,7 +58,9 @@ class SignupView(View, AnonymousRequiredMixin):
         context = {
             'signup_form': SignupForm(),
             'profile_pic_form': ProfilePhotoForm(),
-            'address_form': AddressForm(),
+            # auto_id prefix prevents duplicate HTML IDs when both SignupForm
+            # and AddressForm render fields named first_name / last_name.
+            'address_form': AddressForm(auto_id='addr_%s'),
         }
         return render(request, self.template_name, context)
 
@@ -67,7 +69,8 @@ class SignupView(View, AnonymousRequiredMixin):
         profile_pic_form = ProfilePhotoForm(
             request.POST, request.FILES
         )
-        address_form = AddressForm(request.POST)
+        # auto_id prefix prevents duplicate HTML IDs — see get() for context.
+        address_form = AddressForm(request.POST, auto_id='addr_%s')
 
         if (
             signup_form.is_valid() and

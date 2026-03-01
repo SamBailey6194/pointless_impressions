@@ -191,7 +191,7 @@
                     <h3 class="text-xl font-semibold mb-2 card-title">{{ similar_artist.name }}</h3>
                     <p class="text-xs mb-3 opacity-70">By: {{ similar_artist.artist.user_profile.user.username }} | Category: {{ similar_artist.category.name }}</p>
                     <p class="text-sm mb-3 card-description grow">{{ similar_artist.description|truncatewords:20 }}</p>
-                    <p class="text-lg font-bold text-(--pointless-blue)">£{{ similar_artist.price }}</p>
+                    <p class="text-lg font-bold artwork-price">£{{ similar_artist.price }}</p>
                   </div>
                   <div class="card-actions justify-between items-center m-4">
                     <a href="{% url 'artwork:list' %}?artist={{ similar_artist.artist.user_profile.user.username }}" class="btn btn-ghost btn-sm">
@@ -249,7 +249,7 @@
                     <h3 class="text-xl font-semibold mb-2 card-title">{{ similar_artwork.name }}</h3>
                     <p class="text-xs mb-3 opacity-70">By: {{ similar_artwork.artist.user_profile.user.username }} | Category: {{ similar_artwork.category.name }}</p>
                     <p class="text-sm mb-3 card-description grow">{{ similar_artwork.description|truncatewords:20 }}</p>
-                    <p class="text-lg font-bold text-(--pointless-blue)">£{{ similar_artwork.price }}</p>
+                    <p class="text-lg font-bold artwork-price">£{{ similar_artwork.price }}</p>
                   </div>
                   <div class="card-actions justify-between items-center m-4">
                     <a href="{% url 'artwork:list' %}?category={{ similar_artwork.category.slug }}" class="btn btn-ghost btn-sm">
