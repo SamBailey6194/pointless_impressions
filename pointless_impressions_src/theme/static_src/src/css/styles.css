@@ -943,13 +943,16 @@ textarea:focus-visible,
   flex: 1 !important;
 }
 
-/* WCAG 1.4.3: Artwork price — theme colour variable (dark navy in light mode, white in dark mode) */
+/* WCAG 1.4.3: Artwork price — theme colour variable (dark navy in light mode, near-black in dark mode).
+   Dark mode uses --pointless-black (oklch 8%) rather than --pointless-white because the carousel card
+   background is hardcoded to oklch(0.98 0 0) (near-white), making white text invisible (~1:1 ratio).
+   Near-black on near-white gives approximately 14:1 contrast, well above the 4.5:1 AA requirement. */
 .artwork-price {
   color: var(--pointless-blue) !important;
 }
 @media (prefers-color-scheme: dark) {
   .artwork-price {
-    color: var(--pointless-white) !important;
+    color: var(--pointless-black) !important;
   }
 }
 

@@ -5562,7 +5562,7 @@ textarea:focus-visible,
 }
 @media (prefers-color-scheme: dark) {
   .artwork-price {
-    color: var(--pointless-white) !important;
+    color: var(--pointless-black) !important;
   }
 }
 @media (max-width: 639px) {

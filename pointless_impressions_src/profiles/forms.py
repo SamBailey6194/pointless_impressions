@@ -221,13 +221,32 @@ class SignupForm(UserCreationForm):
 
 
 class LoginForm(AuthenticationForm):
-    """Form for user login."""
+    """
+    Form for user login, rendered inside the header login modal.
+
+    Uses a prefixed auto_id ('login_%s') so that crispy-forms generates
+    'id_login_username' and 'div_id_login_username' instead of the default
+    'id_username' / 'div_id_username'. This prevents duplicate HTML IDs when
+    the login modal and the signup form appear on the same page (e.g. the
+    signup page), which would otherwise violate WCAG 1.3.1 and 4.1.1.
+
+    The HTML label elements include matching 'for' attributes so that
+    screen readers can associate each label with its input.
+    """
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        # Override the widget id attrs to match the prefixed auto_id below.
+        # AuthenticationForm declares 'username' and 'password' fields, so
+        # setting attrs here ensures the rendered <input> ids are unique.
+        self.fields['username'].widget.attrs.update({'id': 'id_login_username'})
+        self.fields['password'].widget.attrs.update({'id': 'id_login_password'})
         self.helper = FormHelper()
         self.helper.form_method = 'post'
         self.helper.form_tag = True
         self.helper.form_action = reverse('profiles:login')
+        # Use a prefixed auto_id so crispy wrapper divs become div_id_login_*
+        # instead of the default div_id_* that clash with the signup form.
+        self.helper.auto_id = 'login_%s'
         self.helper.layout = Layout(
             Div(
                 HTML(
@@ -242,7 +261,8 @@ class LoginForm(AuthenticationForm):
                     ),
                 Div(
                     HTML(
-                        "<label class='text-(--pointless-black) "
+                        "<label for='id_login_username' "
+                        "class='text-(--pointless-black) "
                         "dark:text-(--pointless-white) "
                         "mb-4'>"
                         "Username</label>"
@@ -253,7 +273,8 @@ class LoginForm(AuthenticationForm):
                         css_class='mb-4 custom-input w-full lg:w-66'
                     ),
                     HTML(
-                        "<label class='text-(--pointless-black) "
+                        "<label for='id_login_password' "
+                        "class='text-(--pointless-black) "
                         "dark:text-(--pointless-white) "
                         "mb-4'>"
                         "Password</label>"
