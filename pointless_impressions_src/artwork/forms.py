@@ -4,6 +4,7 @@ from crispy_forms.layout import Layout, Div, Field, HTML
 from .models import (
     Artwork, ArtworkFramingCondition, ArtworkCategory
 )
+from pointless_impressions_src.profiles.models import Artist
 
 
 # Write your forms here.
@@ -60,11 +61,50 @@ class ArtworkSubmissionForm(forms.ModelForm):
             })
         }
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, show_artist_selector=False, **kwargs):
         super().__init__(*args, **kwargs)
+        self.show_artist_selector = show_artist_selector
+
+        if show_artist_selector:
+            self.fields['artist_id'] = forms.ModelChoiceField(
+                queryset=Artist.objects.filter(
+                    is_approved=True
+                ).select_related('user_profile__user'),
+                required=True,
+                label='Artist',
+                empty_label='Select an artist',
+            )
+            self.fields['artist_id'].label_from_instance = (
+                lambda obj: (
+                    obj.user_profile.user.get_full_name()
+                    or obj.user_profile.user.username
+                )
+            )
+
         self.helper = FormHelper()
         self.helper.form_tag = False
         self.helper.form_method = 'post'
+
+        artist_section = []
+        if show_artist_selector:
+            artist_section = [
+                HTML(
+                    "<div class='form-divider'></div>"
+                ),
+                HTML(
+                    "<h4 class='mb-2 text-(--pointless-black) "
+                    "dark:text-(--pointless-white)'>"
+                    "Artist</h4>"
+                ),
+                Div(
+                    Field(
+                        'artist_id',
+                        css_class='custom-input w-full'
+                    ),
+                    css_class='mb-4'
+                ),
+            ]
+
         self.helper.layout = Layout(
             Div(
                 HTML(
@@ -126,6 +166,7 @@ class ArtworkSubmissionForm(forms.ModelForm):
                         ),
                         css_class='mb-4'
                     ),
+                    *artist_section,
                     HTML(
                         "<div class='form-divider'></div>"
                     ),
@@ -166,17 +207,20 @@ class ArtworkSubmissionForm(forms.ModelForm):
             )
         return price
 
-    def save(self, commit=True, artist=None):
+    def save(self, commit=True, artist=None, auto_approve=False):
         """
-        Save artwork with artist and pending approval status.
+        Save artwork with artist and approval status.
         Dynamically add new categories and framing conditions to the database.
+        When auto_approve=True (Owner/Manager), artwork is immediately available.
         """
         artwork = super().save(commit=False)
 
         if artist:
             artwork.artist = artist
+        elif self.show_artist_selector and self.cleaned_data.get('artist_id'):
+            artwork.artist = self.cleaned_data['artist_id']
 
-        artwork.is_available = False
+        artwork.is_available = auto_approve
 
         category_name = self.cleaned_data.get('category')
         if category_name:

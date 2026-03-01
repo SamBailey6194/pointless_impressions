@@ -25,13 +25,16 @@
                             Price
                         </th>
                         <th class="px-6 py-3 text-center text-xs font-medium uppercase tracking-wider">
+                            Status
+                        </th>
+                        <th class="px-6 py-3 text-center text-xs font-medium uppercase tracking-wider">
                             Actions
                         </th>
                     </tr>
                 </thead>
                 <tbody class="divide-y">
                     {% for artwork in artworks %}
-                    <tr> 
+                    <tr>
                         <td class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
                             {{ artwork.name }}
                         </td>
@@ -39,17 +42,38 @@
                             {{ artwork.description|truncatechars:50 }}
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-center text-sm">
-                            {{ artwork.artist.user_profile.user.first_name }}
+                            {% if artwork.artist %}
+                                {{ artwork.artist.user_profile.user.get_full_name|default:artwork.artist.user_profile.user.username }}
+                            {% else %}
+                                <span class="text-gray-400 italic">No artist</span>
+                            {% endif %}
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-center text-sm">
                             £{{ artwork.price|floatformat:2 }}
                         </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-center text-sm">
+                            {% if artwork.is_available %}
+                                <span class="px-2 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
+                                    Published
+                                </span>
+                            {% else %}
+                                <span class="px-2 py-1 rounded-full text-xs font-semibold bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200">
+                                    Pending
+                                </span>
+                            {% endif %}
+                        </td>
                         <td class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium gap-2">
-                            <button class="btn btn-ghost btn-outline btn-sm w-20 js-edit-artwork-btn" 
+                            {% if not artwork.is_available %}
+                            <button class="btn btn-ghost btn-outline btn-sm w-20 js-approve-artwork-btn"
+                                    data-artwork-slug="{{ artwork.slug }}">
+                                Approve
+                            </button>
+                            {% endif %}
+                            <button class="btn btn-ghost btn-outline btn-sm w-20 js-edit-artwork-btn"
                                     data-artwork-id="{{ artwork.id }}" data-artwork-slug="{{ artwork.slug }}">
                                 Edit
                             </button>
-                            <button class="btn btn-ghost btn-outline btn-sm w-20 js-delete-artwork-btn" 
+                            <button class="btn btn-ghost btn-outline btn-sm w-20 js-delete-artwork-btn"
                                     data-artwork-id="{{ artwork.id }}" data-artwork-slug="{{ artwork.slug }}">
                                 Delete
                             </button>

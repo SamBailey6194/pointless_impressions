@@ -38,6 +38,11 @@ urlpatterns = [
         name='delete_artwork_modal'
     ),
     path(
+        'admin-dashboard/<uuid:public_id>/approve-artwork/<slug:artwork_slug>/',
+        views.ApproveArtworkView.as_view(),
+        name='approve_artwork'
+    ),
+    path(
         'admin-dashboard/<uuid:public_id>/add-artwork/',
         views.AddArtworkModalView.as_view(),
         name='add_artwork_modal'

@@ -148,6 +148,8 @@ class AddArtworkModalView(AdminRequiredMixin, FormView):
     GET: Renders the add artwork modal form.
 
     POST: Processes the submitted form to create a new artwork.
+    Owner/Manager users get their artwork auto-approved. If they have no
+    artist profile the form includes an artist selector dropdown.
 
     Form:
         ArtworkSubmissionForm: Form for submitting new artwork details.
@@ -159,25 +161,72 @@ class AddArtworkModalView(AdminRequiredMixin, FormView):
     template_name = 'dashboard/includes/add_artwork_modal.html'
     form_class = ArtworkSubmissionForm
 
+    def _user_has_artist_profile(self):
+        user = self.request.user
+        return (
+            hasattr(user, 'user_profile')
+            and hasattr(user.user_profile, 'artist')
+        )
+
+    def _show_artist_selector(self):
+        """Show selector when the user has no artist profile of their own."""
+        return not self._user_has_artist_profile()
+
+    def _is_privileged_role(self):
+        return self.request.user.groups.filter(
+            name__in=['Owner', 'Manager']
+        ).exists()
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['show_artist_selector'] = self._show_artist_selector()
+        return kwargs
+
     def form_valid(self, form):
         artist = None
 
-        if hasattr(self.request.user, 'user_profile'):
-            if hasattr(self.request.user.user_profile, 'artist'):
-                artist = self.request.user.user_profile.artist
+        if self._user_has_artist_profile():
+            artist = self.request.user.user_profile.artist
 
-        form.save(artist=artist)
+        auto_approve = self._is_privileged_role()
+        form.save(artist=artist, auto_approve=auto_approve)
 
-        return JsonResponse({
-            'success': True,
-            'message': 'Artwork added successfully.'
-        })
+        msg = (
+            'Artwork added and published.'
+            if auto_approve
+            else 'Artwork submitted for approval.'
+        )
+        return JsonResponse({'success': True, 'message': msg})
 
     def form_invalid(self, form):
         return JsonResponse({
             'success': False,
             'errors': form.errors
         }, status=400)
+
+
+class ApproveArtworkView(AdminRequiredMixin, View):
+    """
+    Approve a pending artwork by setting is_available=True.
+    Only Owner/Manager roles may approve.
+    """
+
+    def post(self, request, artwork_slug, *args, **kwargs):
+        if not request.user.groups.filter(
+            name__in=['Owner', 'Manager']
+        ).exists():
+            return JsonResponse(
+                {'success': False, 'message': 'Permission denied.'},
+                status=403
+            )
+
+        artwork = get_object_or_404(Artwork, slug=artwork_slug)
+        artwork.is_available = True
+        artwork.save(update_fields=['is_available'])
+        return JsonResponse({
+            'success': True,
+            'message': f'"{artwork.name}" approved and published.'
+        })
 
 
 class AdminDashboardView(AdminRequiredMixin, TemplateView):

@@ -27,6 +27,13 @@ document.addEventListener('DOMContentLoaded', () => {
             openDeleteArtworkModal(publicId, artworkSlug);
         }
 
+        if (e.target.closest('.js-approve-artwork-btn')) {
+            e.preventDefault();
+            const btn = e.target.closest('.js-approve-artwork-btn');
+            const artworkSlug = btn.dataset.artworkSlug;
+            approveArtwork(publicId, artworkSlug, btn);
+        }
+
         if (e.target.closest('.js-add-artwork-btn')) {
             e.preventDefault();
             openAddArtworkModal(publicId);
@@ -471,6 +478,38 @@ function setupDeleteOrderForm(publicId, orderId) {
             console.error('Error deleting order:', error);
             showNotification('An unexpected error occurred.', 'error');
         });
+    });
+}
+
+function approveArtwork(publicId, artworkSlug, btn) {
+    const url = `/dashboard/admin-dashboard/${publicId}/approve-artwork/${artworkSlug}/`;
+
+    btn.disabled = true;
+    btn.textContent = 'Approving…';
+
+    fetch(url, {
+        method: 'POST',
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+            'X-CSRFToken': getCookie('csrftoken')
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showNotification(data.message, 'success');
+            location.reload();
+        } else {
+            showNotification(data.message || 'Failed to approve artwork', 'error');
+            btn.disabled = false;
+            btn.textContent = 'Approve';
+        }
+    })
+    .catch(error => {
+        console.error('Error approving artwork:', error);
+        showNotification('An unexpected error occurred.', 'error');
+        btn.disabled = false;
+        btn.textContent = 'Approve';
     });
 }
 
