@@ -97,6 +97,7 @@ class EditArtworkModalView(AdminRequiredMixin, FormView):
         Form is pre-populated with existing artwork data.
 
     POST: Processes the submitted form to update artwork details.
+        is_available is preserved (not changed by the edit).
 
     Template:
         dashboard/includes/edit_artwork_modal.html
@@ -114,6 +115,8 @@ class EditArtworkModalView(AdminRequiredMixin, FormView):
             kwargs['instance'] = artwork
         else:
             kwargs['instance'] = None
+
+        kwargs['show_artist_selector'] = True
         return kwargs
 
     def get_context_data(self, **kwargs):
@@ -121,14 +124,14 @@ class EditArtworkModalView(AdminRequiredMixin, FormView):
         slug = self.kwargs.get('artwork_slug')
 
         if slug:
-
             context['artwork'] = get_object_or_404(Artwork, slug=slug)
 
         context['artwork_submission_form'] = context['form']
         return context
 
     def form_valid(self, form):
-        form.save()
+        # auto_approve=None preserves the artwork's existing is_available value.
+        form.save(auto_approve=None)
         return JsonResponse({
             'success': True,
             'message': 'Artwork updated successfully.'
@@ -148,8 +151,8 @@ class AddArtworkModalView(AdminRequiredMixin, FormView):
     GET: Renders the add artwork modal form.
 
     POST: Processes the submitted form to create a new artwork.
-    Owner/Manager users get their artwork auto-approved. If they have no
-    artist profile the form includes an artist selector dropdown.
+    Owner/Manager users get their artwork auto-approved.
+    The artist is always selected via the artist dropdown in the form.
 
     Form:
         ArtworkSubmissionForm: Form for submitting new artwork details.
@@ -161,17 +164,6 @@ class AddArtworkModalView(AdminRequiredMixin, FormView):
     template_name = 'dashboard/includes/add_artwork_modal.html'
     form_class = ArtworkSubmissionForm
 
-    def _user_has_artist_profile(self):
-        user = self.request.user
-        return (
-            hasattr(user, 'user_profile')
-            and hasattr(user.user_profile, 'artist')
-        )
-
-    def _show_artist_selector(self):
-        """Show selector when the user has no artist profile of their own."""
-        return not self._user_has_artist_profile()
-
     def _is_privileged_role(self):
         return self.request.user.groups.filter(
             name__in=['Owner', 'Manager']
@@ -179,17 +171,12 @@ class AddArtworkModalView(AdminRequiredMixin, FormView):
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
-        kwargs['show_artist_selector'] = self._show_artist_selector()
+        kwargs['show_artist_selector'] = True
         return kwargs
 
     def form_valid(self, form):
-        artist = None
-
-        if self._user_has_artist_profile():
-            artist = self.request.user.user_profile.artist
-
         auto_approve = self._is_privileged_role()
-        form.save(artist=artist, auto_approve=auto_approve)
+        form.save(auto_approve=auto_approve)
 
         msg = (
             'Artwork added and published.'

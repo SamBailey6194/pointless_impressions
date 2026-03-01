@@ -25,6 +25,17 @@ class ArtworkSubmissionForm(forms.ModelForm):
         }
     )
 
+    quantity = forms.IntegerField(
+        min_value=0,
+        initial=0,
+        label='Quantity in Stock',
+        help_text='Number of copies available',
+        widget=forms.NumberInput(attrs={
+            'class': 'form-control',
+            'placeholder': '0',
+        })
+    )
+
     selected_conditions = forms.ModelMultipleChoiceField(
         queryset=ArtworkFramingCondition.objects.all(),
         widget=forms.CheckboxSelectMultiple,
@@ -38,6 +49,7 @@ class ArtworkSubmissionForm(forms.ModelForm):
             'name',
             'description',
             'price',
+            'quantity',
             'category',
             'selected_conditions'
         ]
@@ -70,16 +82,25 @@ class ArtworkSubmissionForm(forms.ModelForm):
                 queryset=Artist.objects.filter(
                     is_approved=True
                 ).select_related('user_profile__user'),
-                required=True,
+                required=False,
                 label='Artist',
-                empty_label='Select an artist',
+                empty_label='— No artist —',
             )
-            self.fields['artist_id'].label_from_instance = (
-                lambda obj: (
-                    obj.user_profile.user.get_full_name()
-                    or obj.user_profile.user.username
-                )
-            )
+
+            def _artist_label(obj):
+                try:
+                    return (
+                        obj.user_profile.user.get_full_name()
+                        or obj.user_profile.user.username
+                    )
+                except Exception:
+                    return f'Artist #{obj.pk}'
+
+            self.fields['artist_id'].label_from_instance = _artist_label
+
+            # Pre-select the current artist when editing an existing artwork.
+            if self.instance and self.instance.pk and self.instance.artist_id:
+                self.initial['artist_id'] = self.instance.artist_id
 
         self.helper = FormHelper()
         self.helper.form_tag = False
@@ -137,7 +158,7 @@ class ArtworkSubmissionForm(forms.ModelForm):
                     HTML(
                         "<h4 class='mb-2 text-(--pointless-black) "
                         "dark:text-(--pointless-white)'>"
-                        "Pricing and Category</h4>"
+                        "Pricing and Stock</h4>"
                     ),
                     Div(
                         Field(
@@ -150,6 +171,14 @@ class ArtworkSubmissionForm(forms.ModelForm):
                             css_class='custom-input w-full lg:w-66'
                         ),
                         css_class='lg:flex lg:gap-4 mb-4'
+                    ),
+                    Div(
+                        Field(
+                            'quantity',
+                            placeholder="0",
+                            css_class='mb-4 custom-input w-full lg:w-66'
+                        ),
+                        css_class='mb-4'
                     ),
                     HTML(
                         "<div class='form-divider'></div>"
@@ -207,28 +236,22 @@ class ArtworkSubmissionForm(forms.ModelForm):
             )
         return price
 
-    def save(self, commit=True, artist=None, auto_approve=False):
+    def save(self, commit=True, artist=None, auto_approve=None):
         """
         Save artwork with artist and approval status.
-        Dynamically add new categories and framing conditions to the database.
         When auto_approve=True (Owner/Manager), artwork is immediately available.
+        When auto_approve=False, artwork is set to pending.
+        When auto_approve=None (default, used on edit), is_available is preserved.
         """
         artwork = super().save(commit=False)
 
         if artist:
             artwork.artist = artist
-        elif self.show_artist_selector and self.cleaned_data.get('artist_id'):
-            artwork.artist = self.cleaned_data['artist_id']
+        elif self.show_artist_selector:
+            artwork.artist = self.cleaned_data.get('artist_id') or None
 
-        artwork.is_available = auto_approve
-
-        category_name = self.cleaned_data.get('category')
-        if category_name:
-            if isinstance(category_name, str) and category_name.strip():
-                category, created = ArtworkCategory.objects.get_or_create(
-                    name=category_name.strip()
-                )
-                artwork.category = category
+        if auto_approve is not None:
+            artwork.is_available = auto_approve
 
         if commit:
             artwork.save()

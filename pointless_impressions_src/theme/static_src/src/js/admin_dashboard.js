@@ -196,7 +196,12 @@ function openEditArtworkModal(publicId, artworkSlug) {
     const url = `/dashboard/admin-dashboard/${publicId}/edit-artwork/${artworkSlug}/`;
 
     fetch(url)
-        .then(response => response.text())
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`Server error: ${response.status}`);
+            }
+            return response.text();
+        })
         .then(html => {
             const modalContainer = document.getElementById('edit-artwork-modal-container');
             modalContainer.innerHTML = html;
@@ -255,7 +260,12 @@ function openAddArtworkModal(publicId) {
     const url = `/dashboard/admin-dashboard/${publicId}/add-artwork/`;
 
     fetch(url)
-        .then(response => response.text())
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`Server error: ${response.status}`);
+            }
+            return response.text();
+        })
         .then(html => {
             const modalContainer = document.getElementById('add-artwork-modal-container');
             modalContainer.innerHTML = html;
@@ -315,7 +325,12 @@ function openDeleteArtworkModal(publicId, artworkSlug) {
     const url = `/dashboard/admin-dashboard/${publicId}/delete-artwork/${artworkSlug}/`;
 
     fetch(url)
-        .then(response => response.text())
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`Server error: ${response.status}`);
+            }
+            return response.text();
+        })
         .then(html => {
             const modalContainer = document.getElementById('delete-artwork-modal-container');
             modalContainer.innerHTML = html;
@@ -368,13 +383,18 @@ function setupDeleteArtworkForm(publicId, artworkSlug) {
 
 function openEditOrderModal(publicId, orderId) {
     const url = `/dashboard/admin-dashboard/${publicId}/edit-order/${orderId}/`;
-    
+
     fetch(url)
-        .then(response => response.text())
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`Server error: ${response.status}`);
+            }
+            return response.text();
+        })
         .then(html => {
             const modalContainer = document.getElementById('edit-order-modal-container');
             modalContainer.innerHTML = html;
-            
+
             const modal = modalContainer.querySelector('dialog');
             if (modal) {
                 modal.showModal();
@@ -427,17 +447,22 @@ function setupEditOrderForm(publicId, orderId) {
 
 function openDeleteOrderModal(publicId, orderId) {
     const url = `/dashboard/admin-dashboard/${publicId}/delete-order/${orderId}/`;
-    
+
     fetch(url)
-        .then(response => response.text())
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`Server error: ${response.status}`);
+            }
+            return response.text();
+        })
         .then(html => {
             const modalContainer = document.getElementById('delete-order-modal-container');
             modalContainer.innerHTML = html;
-            
+
             const modal = modalContainer.querySelector('dialog');
             if (modal) {
                 modal.showModal();
-                setupDeleteOrderForm(publicId, orderId);
+                setupDeleteOrderModal(publicId, orderId);
             }
         })
         .catch(error => {
