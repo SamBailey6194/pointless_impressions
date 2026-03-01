@@ -72,6 +72,15 @@ class SignupView(View, AnonymousRequiredMixin):
         # auto_id prefix prevents duplicate HTML IDs — see get() for context.
         address_form = AddressForm(request.POST, auto_id='addr_%s')
 
+        try:
+            return self._process_signup(
+                request, signup_form, profile_pic_form, address_form
+            )
+        except Exception:
+            logger.exception("Unhandled exception in SignupView.post()")
+            raise
+
+    def _process_signup(self, request, signup_form, profile_pic_form, address_form):
         if (
             signup_form.is_valid() and
             profile_pic_form.is_valid() and
