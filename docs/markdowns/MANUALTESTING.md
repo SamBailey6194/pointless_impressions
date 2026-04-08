@@ -678,3 +678,170 @@ Requires the dev environment running (`./dev.sh start`). Tests confirm that artw
 | 5 | Verify no broken image error is shown | If no image was uploaded, a placeholder or graceful fallback is displayed — no broken image icon | Pass |
 | 6 | Open browser DevTools → Console tab | No JavaScript errors on the detail page | Pass |
 | 7 | Navigate back to the artwork list and click another fixture artwork (e.g., "Painting The Bear") | Existing artworks still load correctly — the fix did not break artworks that have images | Pass |
+
+---
+
+### User Registration & Login Fix (Criteria 4.1, 4.4)
+
+#### Test Login Page Renders as a Full Page
+
+Requires the dev environment running (`./dev.sh start`).
+
+| Step | Action | Expected Outcome | Pass / Fail |
+| :--- | :--- | :--- | :--- |
+| 1 | Navigate directly to http://localhost:8000/profiles/login/ | A full styled login page renders — no blank white page | Pass |
+| 2 | Verify the page includes the site header and footer | Site navigation, branding, and footer are visible | Pass |
+| 3 | Verify the login form is visible on the page | Username and password fields are present and interactive | Pass |
+| 4 | Submit valid credentials (e.g., `customeruser` / `testpass123`) | User is logged in and redirected to the dashboard | Pass |
+| 5 | Log out and attempt to access a login-required page (e.g., http://localhost:8000/dashboard/) | Browser redirects to `/profiles/login/` — page renders correctly, not blank | Pass |
+
+#### Test User Registration — Successful New Signup
+
+Requires the dev environment running (`./dev.sh start`) and MailDev open at http://localhost:1080.
+
+| Step | Action | Expected Outcome | Pass / Fail |
+| :--- | :--- | :--- | :--- |
+| 1 | Navigate to http://localhost:8000/profiles/signup/ | Signup page loads with all three form sections: personal details, profile photo, and address | Pass |
+| 2 | Fill in all required fields using a unique email, username, and phone number not already in the database | Form accepts input without errors | Pass |
+| 3 | Submit the form | No 500 server error; user is redirected to the email verification page | Pass |
+| 4 | Open MailDev at http://localhost:1080 | A verification email was received for the new user's address | Pass |
+| 5 | Enter the verification code from the email | Account is activated and user is logged in | Pass |
+
+#### Test User Registration — Duplicate Phone Number
+
+| Step | Action | Expected Outcome | Pass / Fail |
+| :--- | :--- | :--- | :--- |
+| 1 | Navigate to http://localhost:8000/profiles/signup/ | Signup page loads | Pass |
+| 2 | Fill in all required fields but use a phone number already registered (e.g., a fixture user's phone) | Form accepts input | Pass |
+| 3 | Submit the form | Form re-renders with a validation error on the phone field: "A user with that phone number already exists." — no 500 server error | Pass |
+
+#### Test Address Form Prefix — Correct Data Saved
+
+| Step | Action | Expected Outcome | Pass / Fail |
+| :--- | :--- | :--- | :--- |
+| 1 | Complete the signup form using a different first name in the personal section vs the address section (e.g., "Sam" as user, "John" as address recipient) | Form accepts input | Pass |
+| 2 | Submit and verify the account | Log in and navigate to the user profile / address section | Pass |
+| 3 | Check the saved address | Address recipient name is "John" (from the address form), not "Sam" (from the signup form) — confirms form prefix is working correctly | Pass |
+
+---
+
+### Artwork Image Upload Fix (Assessor Feedback)
+
+#### Test Adding Artwork with an Image via Dashboard
+
+Requires the dev environment running (`./dev.sh start`) and being logged in as `owneruser`.
+
+| Step | Action | Expected Outcome | Pass / Fail |
+| :--- | :--- | :--- | :--- |
+| 1 | Navigate to the admin dashboard at http://localhost:8000/dashboard/admin-dashboard/ | Dashboard loads with the artwork table visible | Pass |
+| 2 | Click "Add New Artwork" | The add artwork modal opens with all form fields visible | Pass |
+| 3 | Fill in the artwork details (name, description, price, category, conditions, artist) | Form accepts input | Pass |
+| 4 | Click the "Artwork Image" file input and select a local image file | File is selected and shown in the input | Pass |
+| 5 | Submit the form | Modal closes; a success toast appears; the new artwork appears in the dashboard table | Pass |
+| 6 | Navigate to http://localhost:8000/artworks/ and find the new artwork | The artwork card shows the uploaded image, not a placeholder | Pass |
+| 7 | Click the artwork card | Detail page loads with the image displayed | Pass |
+
+#### Test Adding Artwork Without an Image
+
+| Step | Action | Expected Outcome | Pass / Fail |
+| :--- | :--- | :--- | :--- |
+| 1 | Open the "Add New Artwork" modal and fill in all fields but leave the image input empty | Form accepts input | Pass |
+| 2 | Submit the form | Artwork is created successfully; no error relating to a missing image | Pass |
+| 3 | Artwork appears in the list | A placeholder image is shown (no broken image icon) | Pass |
+
+#### Test Editing Artwork and Replacing Its Image
+
+| Step | Action | Expected Outcome | Pass / Fail |
+| :--- | :--- | :--- | :--- |
+| 1 | Click the edit icon on an existing artwork in the dashboard | Edit modal opens pre-populated with the artwork's current data | Pass |
+| 2 | Select a new image file in the "Replace Artwork Image" input | File is selected | Pass |
+| 3 | Submit the form | Artwork is updated; the new image is now displayed on the artwork detail page | Pass |
+| 4 | Edit the same artwork again without selecting a new image | Submit the form; the existing image is preserved — not removed | Pass |
+
+#### Test Artwork Checkout After Frontend Creation with Image
+
+| Step | Action | Expected Outcome | Pass / Fail |
+| :--- | :--- | :--- | :--- |
+| 1 | Create a new artwork via the dashboard with an image uploaded | Artwork is created and visible in the store | Pass |
+| 2 | Log in as `customeruser` and navigate to the artwork detail page | Page loads; image is displayed; "Add to Cart" button is present | Pass |
+| 3 | Add the artwork to the cart and navigate to checkout | Checkout page shows the artwork with correct price and image | Pass |
+| 4 | Complete the checkout flow | Order is placed successfully | Pass |
+
+---
+
+### Logout Page Fix (Criteria 4.1, 4.4)
+
+#### Test Logout Page Renders as a Full Page
+
+Requires the dev environment running (`./dev.sh start`) and being logged in.
+
+| Step | Action | Expected Outcome | Pass / Fail |
+| :--- | :--- | :--- | :--- |
+| 1 | While logged in, navigate directly to http://localhost:8000/profiles/logout/ | A full styled logout confirmation page renders — no blank white page | Pass |
+| 2 | Verify the page includes the site header and footer | Site navigation, branding, and footer are visible | Pass |
+| 3 | Verify a logout confirmation form or prompt is visible | The logout form is rendered inside the page layout | Pass |
+| 4 | Submit the logout form | User is logged out and redirected to the home page | Pass |
+| 5 | Verify the Cancel link on the logout page | Clicking Cancel returns the user to the home page without logging out | Pass |
+| 6 | While logged out, navigate to http://localhost:8000/profiles/logout/ | User is redirected to the login page (LoginRequiredMixin) | Pass |
+
+---
+
+### Signup Error Visibility Fix (Criteria 4.1, 4.4)
+
+#### Test Error Summary Banner Appears on Invalid Submission
+
+Requires the dev environment running (`./dev.sh start`).
+
+| Step | Action | Expected Outcome | Pass / Fail |
+| :--- | :--- | :--- | :--- |
+| 1 | Navigate to http://localhost:8000/profiles/signup/ | Signup page loads; no error banner is visible | Pass |
+| 2 | Fill in all required fields but leave both address type checkboxes (Shipping, Billing) unchecked | Form accepts input | Pass |
+| 3 | Submit the form | Page re-renders; a red error summary banner appears at the **top** of the page, above the form | Pass |
+| 4 | Verify the error summary lists the address type error | Banner contains "Address — address types: Please select at least one address type." | Pass |
+| 5 | Verify the page automatically scrolls to the error summary | On page load the banner is brought into view without the user having to scroll | Pass |
+| 6 | Submit the form with a mismatched password | Error summary includes the password error alongside any other errors | Pass |
+| 7 | Fill in all fields correctly including at least one address type | Form submits successfully; no error banner appears | Pass |
+
+---
+
+### Dark Mode Form Card Visibility Fix (Criteria 4.1, 4.4)
+
+#### Test Signup Form Sections Visible in Dark Mode
+
+Requires the dev environment running (`./dev.sh start`) and the browser or OS set to dark mode.
+
+| Step | Action | Expected Outcome | Pass / Fail |
+| :--- | :--- | :--- | :--- |
+| 1 | Enable dark mode on your OS or browser | Browser switches to dark colour scheme | Pass |
+| 2 | Navigate to http://localhost:8000/profiles/signup/ | Page loads in dark mode | Pass |
+| 3 | Scroll through the entire signup form | All three sections (Personal Details, Profile Photo, Address) are clearly visible — no dark void or invisible sections | Pass |
+| 4 | Verify the "Address" heading in the address section | The heading text "Address" is readable (white text on dark card background) | Pass |
+| 5 | Verify the input fields in the Address section | Text inputs (Address Label, First Name, Last Name, Address Line 1, etc.) have a visible, lighter background distinct from the card | Pass |
+| 6 | Verify the Shipping and Billing checkboxes | The address type checkboxes are visible and interactable | Pass |
+| 7 | Verify the Country selector dropdown | The country select element has a visible background and readable text | Pass |
+| 8 | Type into any input field in the Address section | Text appears white and readable against the input background | Pass |
+| 9 | Switch back to light mode | All form sections remain correctly styled in light mode — no regression | Pass |
+
+---
+
+### Profile Photo and Address Sections Invisible Fix — Signup Form (Criteria 4.1, 4.4)
+
+#### Test All Three Signup Form Cards Render Visibly in Dark Mode
+
+Requires the dev environment running (`./dev.sh start`) and the browser or OS set to dark mode.
+
+| Step | Action | Expected Outcome | Pass / Fail |
+| :--- | :--- | :--- | :--- |
+| 1 | Enable dark mode on your OS or browser | Browser switches to dark colour scheme | Pass |
+| 2 | Navigate to http://localhost:8000/profiles/signup/ | Page loads in dark mode | Pass |
+| 3 | Observe the "Sign Up" section at the top of the form | Section renders with a visible gray card background and white text | Pass |
+| 4 | Scroll down past the Password section | The "Profile Photo" section card appears with a clearly visible gray background — not a dark void | Pass |
+| 5 | Verify "Profile Photo" heading is visible | White heading text on gray card background is readable | Pass |
+| 6 | Verify the image file input is visible | File input field is visible with a distinguishable background | Pass |
+| 7 | Continue scrolling to the Address section | The "Address" section card appears with a clearly visible gray background — not a dark void | Pass |
+| 8 | Verify the "Address" heading is visible | White heading text on gray card background is readable | Pass |
+| 9 | Verify all address input fields are visible | Text inputs have a lighter background, clearly separated from the card | Pass |
+| 10 | Verify the Shipping and Billing checkboxes are visible | Checkbox labels and inputs are visible | Pass |
+| 11 | Verify the Country dropdown is visible | The select element renders with a visible background | Pass |
+| 12 | Verify the Sign Up button is visible below the address form | Button renders with yellow/brand styling | Pass |
+| 13 | Switch to light mode and reload the signup page | All three form cards render correctly in light mode with gray backgrounds and black text — no regression | Pass |
