@@ -2,9 +2,13 @@
 
 <dialog id="edit-artwork-modal" class="modal">
     <div class="modal-box lg:w-7/12 lg:max-w-4xl lg:h-9/12">
-        <form id="edit-artwork-form" method="post" class="form-card p-6" action="{% url 'dashboard:edit_artwork_modal' user.public_id artwork.slug %}">
+        <form id="edit-artwork-form" method="post" enctype="multipart/form-data" class="form-card p-6" action="{% url 'dashboard:edit_artwork_modal' user.public_id artwork.slug %}">
             {% csrf_token %}
             {% crispy artwork_submission_form %}
+            <div class="mb-4">
+                <label for="id_artwork_image" class="block text-sm font-medium mb-1">Replace Artwork Image (optional)</label>
+                <input type="file" id="id_artwork_image" name="artwork_image" accept="image/*" class="custom-input w-full btn btn-ghost btn-outline">
+            </div>
             <div class="modal-action">
                 <button type="submit" class="btn btn-ghost btn-outline">Save</button>
                 <button type="button" class="btn btn-ghost js-close-modal-btn" data-modal-id="edit-artwork-modal">

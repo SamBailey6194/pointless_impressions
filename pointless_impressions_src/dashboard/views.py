@@ -10,6 +10,7 @@ from pointless_impressions_src.account.models import CustomUser
 from pointless_impressions_src.artwork.forms import ArtworkSubmissionForm
 from pointless_impressions_src.artwork.models import Artwork
 from pointless_impressions_src.order.models import Order
+from pointless_impressions_src.photo.models import Photo
 
 
 # Create your views here.
@@ -131,7 +132,21 @@ class EditArtworkModalView(AdminRequiredMixin, FormView):
 
     def form_valid(self, form):
         # auto_approve=None preserves the artwork's existing is_available value.
-        form.save(auto_approve=None)
+        artwork = form.save(auto_approve=None)
+
+        image = self.request.FILES.get('artwork_image')
+        if image:
+            photo = Photo.objects.create(
+                artwork=artwork,
+                image=image,
+                title=artwork.name,
+                description=artwork.description or artwork.name,
+                alt_text=f"Image of {artwork.name}",
+                photo_type='artwork',
+            )
+            artwork.main_photo = photo
+            artwork.save(update_fields=['main_photo'])
+
         return JsonResponse({
             'success': True,
             'message': 'Artwork updated successfully.'
@@ -176,7 +191,20 @@ class AddArtworkModalView(AdminRequiredMixin, FormView):
 
     def form_valid(self, form):
         auto_approve = self._is_privileged_role()
-        form.save(auto_approve=auto_approve)
+        artwork = form.save(auto_approve=auto_approve)
+
+        image = self.request.FILES.get('artwork_image')
+        if image:
+            photo = Photo.objects.create(
+                artwork=artwork,
+                image=image,
+                title=artwork.name,
+                description=artwork.description or artwork.name,
+                alt_text=f"Image of {artwork.name}",
+                photo_type='artwork',
+            )
+            artwork.main_photo = photo
+            artwork.save(update_fields=['main_photo'])
 
         msg = (
             'Artwork added and published.'
