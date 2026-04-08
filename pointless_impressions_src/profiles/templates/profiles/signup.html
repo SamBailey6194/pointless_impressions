@@ -7,18 +7,39 @@
         <h1 class="text-4xl font-bold mb-4">Sign Up</h1>
         <p class="mb-6">Create an account to access exclusive features and content.</p>
 
+        {% if signup_form.errors or address_form.errors %}
+        <div id="signup-error-summary" role="alert" class="alert alert-error mb-6">
+            <i class="fa-solid fa-circle-exclamation"></i>
+            <div>
+                <p class="font-semibold mb-1">Please correct the following errors:</p>
+                <ul class="list-disc list-inside text-sm">
+                    {% for field, errors in signup_form.errors.items %}
+                        {% for error in errors %}
+                            <li>{{ field|capfirst|cut:"_" }}: {{ error }}</li>
+                        {% endfor %}
+                    {% endfor %}
+                    {% for field, errors in address_form.errors.items %}
+                        {% for error in errors %}
+                            <li>Address — {{ field|capfirst }}: {{ error }}</li>
+                        {% endfor %}
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+        {% endif %}
+
         <form method="post" action="{% url 'profiles:signup' %}" enctype="multipart/form-data" class="max-w-7xl">
             {% csrf_token %}
 
-            <div class="form-card">
+            <div class="form-card p-6 mb-6 bg-gray-300 dark:bg-gray-700 rounded-lg">
                 {% crispy signup_form %}
             </div>
 
-            <div class="form-card">
+            <div class="form-card p-6 mb-6 bg-gray-300 dark:bg-gray-700 rounded-lg">
                 {% crispy profile_pic_form %}
             </div>
 
-            <div class="form-card">
+            <div class="form-card p-6 mb-6 bg-gray-300 dark:bg-gray-700 rounded-lg">
                 {% crispy address_form %}
             </div>
 
@@ -30,4 +51,18 @@
         </form>
     </div>
 </section>
+{% endblock %}
+
+{% block postloadjs %}
+{{ block.super }}
+{% if signup_form.errors or address_form.errors %}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var summary = document.getElementById('signup-error-summary');
+        if (summary) {
+            summary.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+    });
+</script>
+{% endif %}
 {% endblock %}

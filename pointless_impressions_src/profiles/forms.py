@@ -184,6 +184,15 @@ class SignupForm(UserCreationForm):
             )
         )
 
+    def clean_phone(self):
+        """Validate that the phone number is not already registered."""
+        phone = self.cleaned_data.get('phone')
+        if phone and CustomUser.objects.filter(phone=phone).exists():
+            raise ValidationError(
+                "A user with that phone number already exists."
+            )
+        return phone
+
     def clean_password1(self):
         """
         Validate password1 against all configured validators in settings.
