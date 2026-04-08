@@ -193,7 +193,7 @@
 
     .custom-input,
     #id_phone_1 {
-      background-color: var(--pointless-black) !important;
+      background-color: var(--color-gray-600) !important;
       border-color: var(--pointless-blue) !important;
       color: var(--pointless-white) !important;
     }
@@ -210,8 +210,17 @@
       color: var(--pointless-white) !important;
     }
 
+    .form-card h1,
+    .form-card h2,
+    .form-card h3,
+    .form-card h4,
+    .form-card h5,
+    .form-card h6 {
+      color: var(--pointless-white) !important;
+    }
+
     .select-dropdown {
-      background-color: var(--pointless-black) !important;
+      background-color: var(--color-gray-600) !important;
       border-color: var(--pointless-blue) !important;
       color: var(--pointless-white) !important;
     }
@@ -240,6 +249,7 @@
 
     .form-card {
       background-color: var(--color-gray-700) !important;
+      color: var(--pointless-white) !important;
     }
 
     .form-divider {
