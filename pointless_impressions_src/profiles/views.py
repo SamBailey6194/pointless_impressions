@@ -58,9 +58,10 @@ class SignupView(View, AnonymousRequiredMixin):
         context = {
             'signup_form': SignupForm(),
             'profile_pic_form': ProfilePhotoForm(),
-            # auto_id prefix prevents duplicate HTML IDs when both SignupForm
-            # and AddressForm render fields named first_name / last_name.
-            'address_form': AddressForm(auto_id='addr_%s'),
+            # prefix='addr' prevents field name collisions (first_name/last_name
+            # appear in both SignupForm and AddressForm). auto_id prevents
+            # duplicate HTML IDs. Both are required together.
+            'address_form': AddressForm(prefix='addr', auto_id='addr_%s'),
         }
         return render(request, self.template_name, context)
 
@@ -69,8 +70,9 @@ class SignupView(View, AnonymousRequiredMixin):
         profile_pic_form = ProfilePhotoForm(
             request.POST, request.FILES
         )
-        # auto_id prefix prevents duplicate HTML IDs — see get() for context.
-        address_form = AddressForm(request.POST, auto_id='addr_%s')
+        # prefix='addr' + auto_id prevents field name and HTML ID collisions
+        # with SignupForm — see get() for context.
+        address_form = AddressForm(request.POST, prefix='addr', auto_id='addr_%s')
 
         try:
             return self._process_signup(
@@ -160,7 +162,7 @@ class LoginView(FormView, AnonymousRequiredMixin):
     Context:
     - form: Instance of LoginForm for user input.
     """
-    template_name = 'profiles/includes/login_modal.html'
+    template_name = 'profiles/login.html'
     form_class = LoginForm
 
     def form_valid(self, form):
@@ -199,7 +201,7 @@ class LogoutView(
     Context:
     - N/A
     """
-    template_name = 'profiles/includes/logout_modal.html'
+    template_name = 'profiles/logout.html'
     form_class = LogoutForm
 
     def form_valid(self, form):

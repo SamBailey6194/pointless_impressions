@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% load static tailwind_tags cloudinary crispy_forms_tags %}
+
+{% block content %}
+<section class="section-alt py-16 w-full">
+    <div class="max-w-md mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="form-card p-8">
+            {% crispy login_form %}
+        </div>
+    </div>
+</section>
+{% endblock %}
