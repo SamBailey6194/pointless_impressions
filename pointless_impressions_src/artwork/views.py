@@ -71,28 +71,22 @@ def _serialize_artwork_data(artwork_queryset, placeholder_image):
                 except (AttributeError, ValueError):
                     pass
 
-            # Get image URL - for local dev with ImageField or Cloudinary
-            image_url_attr = getattr(image_obj, 'get_image_url', None)
-
-            if callable(image_url_attr):
-                url_result = image_url_attr()
-                # Only set if not empty string
-                if url_result and url_result.strip():
-                    image_url = url_result
+            # Get image URL - get_image_url is a @property, not a method
+            image_url = getattr(image_obj, 'get_image_url', None) or None
 
             # Fallback: Try to get URL from image field directly
             if not image_url and hasattr(image_obj, 'image'):
                 try:
-                    img_field = getattr(image_obj, 'image', None)
-                    if hasattr(img_field, 'url'):
+                    img_field = image_obj.image
+                    if hasattr(img_field, 'build_url'):
                         try:
                             image_url = img_field.build_url(
                                 width=2000, height=2000, crop='limit'
                             )
                         except Exception:
-                            image_url = img_field.url
+                            image_url = getattr(img_field, 'url', str(img_field))
                     else:
-                        image_url = str(img_field)
+                        image_url = getattr(img_field, 'url', str(img_field))
                 except (AttributeError, ValueError):
                     pass
 
@@ -113,11 +107,9 @@ def _serialize_artwork_data(artwork_queryset, placeholder_image):
                         r'^(image/upload/)?(v\d+/)?', '', raw_path
                         )
 
-                image_url_attr = getattr(
+                image_url = getattr(
                     placeholder_image_obj, 'get_image_url', None
-                    )
-                if callable(image_url_attr):
-                    image_url = image_url_attr()
+                    ) or None
 
         # Artist Data
         artist_data = None
@@ -252,7 +244,7 @@ class ArtworkListView(ListView):
         general_filter = self.request.GET.get('filter')
         available_only = self.request.GET.get('available_only')
         if general_filter == 'available' or available_only == 'on':
-            queryset = queryset.filter(is_available=True)
+            queryset = queryset.filter(is_available=True, is_in_stock=True)
 
         artist_username = self.request.GET.get('artist')
         if artist_username:

@@ -44,7 +44,7 @@ class ArtworkModelAdmin(admin.ModelAdmin):
         'is_featured',
         'created_at'
     ]
-    search_fields = ['name', 'artist__user__username', 'sku', 'slug']
+    search_fields = ['name', 'artist__user_profile__user__username', 'sku', 'slug']
     readonly_fields = ['sku', 'slug', 'created_at', 'updated_at']
     fieldsets = (
         ('Basic Information', {
