@@ -23,6 +23,7 @@ from .forms import OrderForm
 from pointless_impressions_src.cart.utils import get_cart, serialize_items
 from square.client import Square
 from square.environment import SquareEnvironment
+from square.core.api_error import ApiError
 
 # Create your views here.
 square_client = Square(
@@ -102,6 +103,16 @@ class OrderConfirmationView(View):
                     note=f"Order for {form.cleaned_data.get('email')}",
                     buyer_email_address=form.cleaned_data.get('email'),
                 )
+            except ApiError as e:
+                detail = e.errors[0].detail if e.errors else None
+                error_msg = (
+                    detail or
+                    'Card verification failed. Please try a different card.'
+                )
+                return JsonResponse({
+                    'status': 'error',
+                    'message': error_msg
+                }, status=400)
             except Exception:
                 return JsonResponse({
                     'status': 'error',
@@ -109,9 +120,11 @@ class OrderConfirmationView(View):
                 }, status=500)
 
             if payment_response.errors:
-                error_msg = payment_response.errors[0].get(
-                    'detail', 'Payment processing failed. Please try again.'
-                    )
+                error = payment_response.errors[0]
+                error_msg = (
+                    error.detail or
+                    'Payment processing failed. Please try again.'
+                )
                 return JsonResponse({
                     'status': 'error',
                     'message': error_msg
@@ -174,30 +187,31 @@ class OrderConfirmationView(View):
                     }, status=500)
 
         except Exception:
-            payment_id_recovery = payment_result.id if payment_result else None
-            shipping_snapshot = self.build_address_snapshot(
-                form_data, 'shipping'
+            try:
+                payment_id_recovery = (
+                    payment_result.id
+                    if 'payment_result' in dir() and payment_result
+                    else None
                 )
-            billing_snapshot = self.build_address_snapshot(
-                form_data, 'billing'
+                shipping_snapshot = self.build_address_snapshot(
+                    form_data, 'shipping'
                 )
-
-            payment_recovered = PaymentRecovery.objects.create(
-                payment_id=payment_id_recovery,
-                amount=cart.get_grand_total(),
-                currency='GBP',
-                buyer_email=form_data.get('email'),
-                buyer_phone=form_data.get('phone'),
-                billing_address=build_address_dict(
-                    billing_snapshot
-                    ),
-                shipping_address=build_address_dict(
-                    shipping_snapshot
-                    ),
-                cart_snapshot=serialize_items(cart),
-                notes="Order creation failed."
-            )
-            payment_recovered.save()
+                billing_snapshot = self.build_address_snapshot(
+                    form_data, 'billing'
+                )
+                PaymentRecovery.objects.create(
+                    payment_id=payment_id_recovery,
+                    amount=cart.get_grand_total(),
+                    currency='GBP',
+                    buyer_email=form_data.get('email'),
+                    buyer_phone=form_data.get('phone'),
+                    billing_address=build_address_dict(billing_snapshot),
+                    shipping_address=build_address_dict(shipping_snapshot),
+                    cart_snapshot=serialize_items(cart),
+                    notes="Order creation failed."
+                )
+            except Exception:
+                pass
             return JsonResponse({
                 'status': 'error',
                 'message': "An error occurred while processing your order. "
