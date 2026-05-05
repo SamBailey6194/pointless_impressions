@@ -129,7 +129,7 @@ Use `./dev.sh shell` to access the Django shell for executing the queries 2 to 1
 | 5 | Check artwork description: `print(artwork.description)` | Returns full description text for the artwork | Pass |
 | 6 | Check availability status: `print(artwork.is_available)` | Returns True for "City Icons 01" | Pass |
 | 7 | Retrieve artwork image: `print(artwork.main_photo)` | Returns Photo object associated with artwork | Pass |
-| 8 | Check artist relationship: `print(artwork.artist.user.username)` | Returns artist username; verifies ForeignKey relationship is intact | Pass |
+| 8 | Check artist relationship: `print(artwork.artist.user_profile.user.username)` | Returns artist username; verifies ForeignKey relationship is intact | Pass |
 | 9 | Check category relationship: `print(artwork.category.name)` | Returns "Photography" for "City Icons 01"; verifies ForeignKey relationship is intact | Pass |
 | 10 | Check framing conditions: `print(list(artwork.selected_conditions.all()))` | Returns list of FramingCondition objects associated with artwork | Pass |
 | 11 | Attempt to retrieve non-existent artwork: `Artwork.objects.get(slug="fake-artwork")` | Raises `Artwork.DoesNotExist` exception (proper error handling) | Pass |
@@ -561,7 +561,7 @@ Requires the dev environment running (`./dev.sh start`). Tests confirm that ever
 
 | Step | Action | Expected Outcome | Pass / Fail |
 | :--- | :--- | :--- | :--- |
-| 1 | Open a terminal and run: `curl -s http://localhost:8000/api/artworks/ \| python3 -m json.tool \| grep image_url` | A list of `image_url` values is printed to the terminal | Pass |
+| 1 | Open a terminal and run: `curl -s http://localhost:8000/artworks/api/artworks/ \| python3 -m json.tool \| grep image_url` | A list of `image_url` values is printed to the terminal | Pass |
 | 2 | Inspect any `image_url` value from the output | The URL contains `/w_2000,h_2000,c_limit/` in the Cloudinary path (e.g., `https://res.cloudinary.com/<cloud>/image/upload/w_2000,h_2000,c_limit/...`) | Pass |
 | 3 | Copy one `image_url` and open it in a browser or run: `curl -sI "<image_url>" \| grep -i content-length` | The image loads successfully (HTTP 200); the Cloudinary transformation is applied server-side | Pass |
 | 4 | Open the Django shell with `./dev.sh shell` and run: `from pointless_impressions_src.photo.models import Photo; p = Photo.objects.first(); print(p.get_image_url)` | The URL contains `w_2000,h_2000,c_limit` in the path | Pass |
