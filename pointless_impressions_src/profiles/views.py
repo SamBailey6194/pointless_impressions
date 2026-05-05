@@ -174,13 +174,26 @@ class LoginView(FormView, AnonymousRequiredMixin):
             login(self.request, user)
             messages.success(self.request, "Login successful!")
             return redirect('dashboard:landing')
-        messages.error(self.request, "Invalid username or password.")
+
+        try:
+            CustomUser.objects.get(
+                username=form.cleaned_data['username'],
+                is_active=False
+            )
+            messages.error(
+                self.request,
+                "Please verify your email before logging in. "
+                "Check your inbox or use 'Resend code' on the verification page."
+            )
+        except CustomUser.DoesNotExist:
+            messages.error(self.request, "Invalid username or password.")
+
         return self.form_invalid(form)
 
 
 class LogoutView(
+    LoginRequiredMixin,
     FormView,
-    LoginRequiredMixin
 ):
     """
     User logout view that handles user logout.

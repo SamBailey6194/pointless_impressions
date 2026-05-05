@@ -198,6 +198,9 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+LOGIN_URL = 'profiles:login'
+LOGIN_REDIRECT_URL = 'dashboard:landing'
+
 # Internationalization
 LANGUAGE_CODE = "en-gb"
 TIME_ZONE = "UTC"
