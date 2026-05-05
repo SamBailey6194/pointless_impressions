@@ -45,6 +45,18 @@ class BasePhotoForm(ModelForm):
         """Define form ID in subclasses."""
         return 'base-photo-form'
 
+    def clean_title(self):
+        title = self.cleaned_data.get('title', '')
+        if len(title) < 3:
+            raise forms.ValidationError("Title must be at least 3 characters long.")
+        return title
+
+    def clean_description(self):
+        description = self.cleaned_data.get('description', '')
+        if len(description) < 5:
+            raise forms.ValidationError("Description must be at least 5 characters long.")
+        return description
+
 
 class ProfilePhotoForm(BasePhotoForm):
     """
@@ -127,7 +139,8 @@ class AssetPhotoForm(BasePhotoForm):
             'description',
             'image',
             'alt_text',
-            'asset_identifier'
+            'asset_identifier',
+            'photo_type',
         ]
 
     def __init__(self, *args, **kwargs):
@@ -174,6 +187,12 @@ class AssetPhotoForm(BasePhotoForm):
     def get_form_id(self):
         return 'asset-photo-form'
 
+    def clean(self):
+        cleaned_data = super().clean()
+        if not cleaned_data.get('asset_identifier'):
+            self.add_error('asset_identifier', "Asset identifier is required for site assets.")
+        return cleaned_data
+
     def save(self, commit=True, **kwargs):
         """
         Override save to set photo_type to 'site_asset'.
@@ -193,7 +212,7 @@ class ArtworkPhotoForm(BasePhotoForm):
     """
 
     class Meta(BasePhotoForm.Meta):
-        fields = ['title', 'description', 'image', 'alt_text', 'artwork']
+        fields = ['title', 'description', 'image', 'alt_text', 'artwork', 'photo_type']
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -233,6 +252,12 @@ class ArtworkPhotoForm(BasePhotoForm):
 
     def get_form_id(self):
         return 'artwork-photo-form'
+
+    def clean(self):
+        cleaned_data = super().clean()
+        if not cleaned_data.get('artwork'):
+            self.add_error('artwork', "Artwork must be selected for artwork photos.")
+        return cleaned_data
 
     def save(self, commit=True, **kwargs):
         """
